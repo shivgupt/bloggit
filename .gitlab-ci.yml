@@ -4,17 +4,20 @@ stages:
  - deploy
 
 build:
+  image: docker:latest
   stage: build
   script:
     - make prod
 
 test:
+  image: docker:latest
   stage: test
   script:
     - make pull
     - make start-prod
 
 deploy:
+  image: docker:latest
   stage: deploy
   only:
     refs:
