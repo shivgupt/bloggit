@@ -1,8 +1,6 @@
 #!/bin/bash
 set -e
 
-echo "Running tests..."
-curl --version
 curl="curl --insecure "
 host="https://127.0.0.1"
 

@@ -4,7 +4,7 @@ stages:
  - deploy
 
 build:
-  image: docker:latest
+  image: docker:stable
   stage: build
   services:
     - docker:dind
@@ -16,7 +16,7 @@ build:
     - make push-commit
 
 test:
-  image: docker:latest
+  image: docker:stable
   stage: test
   services:
     - docker:dind
@@ -25,10 +25,10 @@ test:
     - make pull
     - make start-prod
     - sleep 5 && make dls
-    - make test
+    - make test || bash ops/logs.sh proxy
 
 deploy:
-  image: docker:latest
+  image: docker:stable
   stage: deploy
   services:
     - docker:dind
