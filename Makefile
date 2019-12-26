@@ -1,16 +1,17 @@
-project=blog
-
 # Specify make-specific variables (VPATH = prerequisite search path)
 flags=.makeflags
 VPATH=$(flags)
 SHELL=/bin/bash
 
+project=blog
 find_options=-type f -not -path "*/node_modules/*" -not -name "*.swp" -not -path "*/.*" -not -name "*.log"
 version=$(shell cat package.json | grep '"version":' | awk -F '"' '{print $$4}')
 commit=$(shell git rev-parse HEAD | head -c 8)
+user=$(shell if [[ -n "${GITLAB_USER_ID}" ]]; then echo "${GITLAB_USER_ID}"; else echo "`whoami`"; fi)
+registry=$(shell if [[ -n "${CI_REGISTRY}" ]]; then echo "${CI_REGISTRY}"; else echo "registry.gitlab.com/$(user)/$(project)"; fi)
 
 # Pool of images to pull cached layers from during docker build steps
-cache_from=$(shell if [[ -n "${CI}" ]]; then echo "$(project)_server:$(commit),$(project)_server:latest,(project)_builder:latest,(project)_proxy:$(commit),(project)_proxy:latest"; else echo ""; fi)
+cache_from=$(shell if [[ -n "${CI}" ]]; then echo "--cache-from=$(project)_server:$(commit),$(project)_server:latest,(project)_builder:latest,(project)_proxy:$(commit),(project)_proxy:latest"; else echo ""; fi)
 
 cwd=$(shell pwd)
 server=$(cwd)/modules/server
@@ -34,9 +35,6 @@ $(shell mkdir -p .makeflags)
 
 ########################################
 # Command & Control Shortcuts
-
-debug:
-	echo $(commit) $(version)
 
 default: dev
 all: dev prod

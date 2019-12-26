@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 set -e
 
-username="`whoami`"
-organization="${GITLAB_USER_ID-$username}"
+organization="${GITLAB_USER_ID-`whoami`}"
 project="blog"
-registry_url="${CI_REGISTRY:-registry.gitlab.com}"
+registry_url="registry.gitlab.com"
+registry="${CI_REGISTRY:-$registry_url/$project/$organization}"
 
 commit=`git rev-parse HEAD | head -c 8`
 release=`cat package.json | grep '"version":' | awk -F '"' '{print $4}'`
@@ -22,17 +22,17 @@ fi
 
 function safePush {
   image=${project}_$1
-  echo;echo "Pushing $registry_url/$organization/$image:$version"
-  if [[ -n "`curl -sflL "$registry_url/$image/tags/$version"`" ]]
+  echo;echo "Pushing $registry/$image:$version"
+  if [[ -n "`curl -sflL "$registry/$image/tags/$version"`" ]]
   then
-    echo "Image $organization/$image:$version already exists on the container registy, Aborting push"
+    echo "Image $registry/$image:$version already exists on the container registy, Aborting push"
     return
   else
-    docker tag $image:$commit $organization/$image:$version
-    docker push $organization/$image:$version
+    docker tag $image:$commit $registry/$image:$version
+    docker push $registry/$image:$version
     # latest images are used as cache for build steps, keep them up-to-date
-    docker tag $organization/$image:$version $organization/$image:latest
-    docker push $organization/$image:latest
+    docker tag $registry/$image:$version $registry/$image:latest
+    docker push $registry/$image:latest
   fi
 }
 
