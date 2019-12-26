@@ -84,23 +84,23 @@ pull:
 
 proxy: $(shell find $(proxy) $(find_options))
 	$(log_start)
-	docker build --file $(proxy)/dev.dockerfile --tag $(project)_proxy:latest .
+	docker build --file $(proxy)/dev.dockerfile $(cache_from) --tag $(project)_proxy:latest .
 	$(log_finish) && mv -f $(totalTime) $(flags)/$@
 
 proxy-prod: client-js $(shell find $(proxy) $(find_options))
 	$(log_start)
-	docker build --file $(proxy)/prod.dockerfile --tag $(project)_proxy:latest .
+	docker build --file $(proxy)/prod.dockerfile $(cache_from) --tag $(project)_proxy:latest .
 	docker tag $(project)_proxy:latest $(project)_proxy:$(commit)
 	$(log_finish) && mv -f $(totalTime) $(flags)/$@
 
 server: server-js $(shell find $(server)/ops $(find_options))
 	$(log_start)
-	docker build --file $(server)/ops/dev.dockerfile --tag $(project)_server:latest .
+	docker build --file $(server)/ops/dev.dockerfile $(cache_from) --tag $(project)_server:latest .
 	$(log_finish) && mv -f $(totalTime) $(flags)/$@
 
 server-prod: server-js $(shell find $(server)/ops $(find_options))
 	$(log_start)
-	docker build --file $(server)/ops/prod.dockerfile --tag $(project)_server:latest .
+	docker build --file $(server)/ops/prod.dockerfile $(cache_from) --tag $(project)_server:latest .
 	docker tag $(project)_server:latest $(project)_server:$(commit)
 	$(log_finish) && mv -f $(totalTime) $(flags)/$@
 
