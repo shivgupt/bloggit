@@ -1,0 +1,29 @@
+stages:
+ - build
+ - test
+ - deploy
+
+build:
+  stage: build
+  script:
+    - make prod
+
+test:
+  stage: test
+  script:
+    - make pull
+    - make start-prod
+
+deploy:
+  stage: deploy
+  only:
+    refs:
+      - master
+  script:
+    - echo "Attempting to deploy"
+    - |
+    ssh -o StrictHostKeyChecking=no $BLOG_SERVER <<<EOF
+      set -e
+      echo "Successfully connected to `hostname`"
+      exit
+    EOF
