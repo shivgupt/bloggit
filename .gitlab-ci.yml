@@ -21,9 +21,9 @@ deploy:
       - master
   script:
     - echo "Attempting to deploy"
-    - |
-    ssh -o StrictHostKeyChecking=no $BLOG_SERVER <<<EOF
-      set -e
-      echo "Successfully connected to `hostname`"
-      exit
-    EOF
+    - >
+      ssh -o StrictHostKeyChecking=no $BLOG_SERVER <<<EOF
+        set -e
+        echo "Successfully connected to `hostname`"
+        exit
+      EOF
