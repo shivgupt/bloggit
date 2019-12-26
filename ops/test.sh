@@ -4,20 +4,21 @@ set -e
 echo "Running tests..."
 curl --version
 curl="curl --insecure "
+host="https://127.0.0.1"
 
-echo "https://localhost should display html"
-$curl "https://localhost"
+echo "$host should display html"
+$curl "$host"
 echo
-if [[ "`$curl --silent "https://localhost"`" == "<!doctype html>"* ]]
+if [[ "`$curl --silent "$host"`" == "<!doctype html>"* ]]
 then echo "Looks good"
 else echo "Looks not good" && exit 1
 fi
 
 echo
-echo "https://localhost/api/hello should connect to the server"
-$curl "https://localhost/api/hello"
+echo "$host/api/hello should connect to the server"
+$curl "$host/api/hello"
 echo
-if [[ "`$curl --silent "https://localhost/api/hello"`" == "Hello"* ]]
+if [[ "`$curl --silent "$host/api/hello"`" == "Hello"* ]]
 then echo "Looks good"
 else echo "Looks not good" && exit 1
 fi
