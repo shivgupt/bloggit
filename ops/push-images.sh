@@ -3,7 +3,7 @@ set -e
 
 organization="`whoami`"
 project="blog"
-registry_url="https://index.docker.io/v1/repositories/$organization"
+registry_url="registry.gitlab.com/$organization"
 
 commit=`git rev-parse HEAD | head -c 8`
 release=`cat package.json | grep '"version":' | awk -F '"' '{print $4}'`
