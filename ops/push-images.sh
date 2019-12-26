@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
 set -e
 
-organization="${GITLAB_USER_ID-`whoami`}"
+organization="${CI_PROJECT_NAMESPACE:-`whoami`}"
 project="blog"
-registry_url="registry.gitlab.com"
-registry="${CI_REGISTRY:-$registry_url/$project/$organization}"
+registry="registry.gitlab.com/$organization/$project"
 
 commit=`git rev-parse HEAD | head -c 8`
 release=`cat package.json | grep '"version":' | awk -F '"' '{print $4}'`
