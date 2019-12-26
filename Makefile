@@ -10,7 +10,7 @@ version=$(shell cat package.json | grep '"version":' | awk -F '"' '{print $$4}')
 commit=$(shell git rev-parse HEAD | head -c 8)
 
 # Pool of images to pull cached layers from during docker build steps
-cache_from=$(shell if [[ -n "${GITHUB_WORKFLOW}" ]]; then echo "$(project)_server:$(commit),$(project)_server:latest,(project)_builder:latest,(project)_proxy:$(commit),(project)_proxy:latest"; else echo ""; fi)
+cache_from=$(shell if [[ -n "${CI}" ]]; then echo "$(project)_server:$(commit),$(project)_server:latest,(project)_builder:latest,(project)_proxy:$(commit),(project)_proxy:latest"; else echo ""; fi)
 
 cwd=$(shell pwd)
 server=$(cwd)/modules/server
