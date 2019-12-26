@@ -1,2 +1,44 @@
-modules/**/node_modules
-node_modules
+# Cache
+.cache
+.config
+.node-gyp
+.npm
+modules/**/.cache
+modules/**/.config
+modules/**/.node-gyp
+modules/**/.npm
+
+# Compiled output
+build/
+dist/
+node_modules/
+.makeflags
+
+# Logs
+lerna-debug.log*
+npm-debug.log*
+package.json.lerna_backup
+
+# OS
+.bash_history
+.DS_Store
+
+# Tests
+.nyc_output
+coverage
+cypress/screenshots
+cypress/videos
+
+# IDEs and editors
+*.launch
+*.sublime-workspace
+*.sw[opq]
+.c9/
+.classpath
+.idea
+.project
+.settings/
+.vscode
+
+# Misc
+.rpt2_cache
