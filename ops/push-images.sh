@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 set -e
 
-organization="`whoami`"
+username="`whoami`"
+organization="${GITLAB_USER_ID-$username}"
 project="blog"
-registry_url="registry.gitlab.com/$organization"
+registry_url="${CI_REGISTRY:-registry.gitlab.com}"
 
 commit=`git rev-parse HEAD | head -c 8`
 release=`cat package.json | grep '"version":' | awk -F '"' '{print $4}'`
@@ -21,10 +22,10 @@ fi
 
 function safePush {
   image=${project}_$1
-  echo;echo "Pushing $organization/$image:$version"
+  echo;echo "Pushing $registry_url/$organization/$image:$version"
   if [[ -n "`curl -sflL "$registry_url/$image/tags/$version"`" ]]
   then
-    echo "Image $organization/$image:$version already exists on docker hub, Aborting push"
+    echo "Image $organization/$image:$version already exists on the container registy, Aborting push"
     return
   else
     docker tag $image:$commit $organization/$image:$version

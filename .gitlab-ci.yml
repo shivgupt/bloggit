@@ -9,7 +9,7 @@ build:
   services:
     - docker:dind
   script:
-    - apk add bash git make
+    - apk add bash curl git make
     - make pull
     - make prod
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
@@ -21,7 +21,7 @@ test:
   services:
     - docker:dind
   script:
-    - apk add bash git make
+    - apk add bash curl git make
     - make pull
     - make start-prod
 
@@ -34,7 +34,7 @@ deploy:
     refs:
       - master
   script:
-    - apk add bash git make
+    - apk add bash curl git make
     - make pull
     - make push-release
     - >
