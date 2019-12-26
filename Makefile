@@ -47,6 +47,9 @@ restart: stop
 stop:
 	bash ops/stop.sh
 
+reset: stop
+	docker container prune -f
+
 clean: stop
 	docker container prune -f
 	rm -rf $(flags)/*

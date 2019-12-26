@@ -12,8 +12,8 @@ docker swarm init 2> /dev/null || true
 
 number_of_services=3 # NOTE: Gotta update this manually when adding/removing services :(
 
-node_port=8080
 port=3000
+server_port=8080
 
 # docker images
 builder_image="${project}_builder"
@@ -48,6 +48,7 @@ services:
     environment:
       DOMAINNAME: localhost
       MODE: dev
+      SERVER_URL: http://server:$server_port
       UI_URL: http://ui:3000
     networks:
       - $project
@@ -74,7 +75,7 @@ services:
     networks:
       - $project
     ports:
-      - "$node_port:$node_port"
+      - "$server_port:$server_port"
     volumes:
       - `pwd`:/root
     working_dir: /root/modules/server
