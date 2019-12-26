@@ -41,6 +41,9 @@ prod: proxy-prod server-prod
 start: dev
 	bash ops/start-dev.sh
 
+restart: stop
+	bash ops/start-dev.sh
+
 stop:
 	bash ops/stop.sh
 
