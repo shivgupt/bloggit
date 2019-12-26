@@ -2,20 +2,22 @@
 set -e
 
 echo "Running tests..."
-curl --version
+curl="curl --insecure --silent "
 
 echo "https://localhost should display html"
-out="`curl -ks "https://localhost"`"
-if [[ "$out" == "<!doctype html>"* ]]
+$curl "https://localhost"
+echo
+if [[ "`$curl "https://localhost"`" == "<!doctype html>"* ]]
 then echo "Looks good"
-else echo "Looks not good: $out" && exit 1
+else echo "Looks not good" && exit 1
 fi
 
 echo
 echo "https://localhost/api/hello should connect to the server"
-out="`curl -ks "https://localhost/api/hello"`"
-if [[ "$out" == "Hello"* ]]
+$curl "https://localhost/api/hello"
+echo
+if [[ "`$curl "https://localhost/api/hello"`" == "Hello"* ]]
 then echo "Looks good"
-else echo "Looks not good: $out" && exit 1
+else echo "Looks not good" && exit 1
 fi
 
