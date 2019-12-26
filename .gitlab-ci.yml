@@ -9,7 +9,7 @@ build:
   services:
     - docker:dind
   script:
-    - apk add bash make
+    - apk add bash git make
     - make prod
 
 test:
@@ -18,7 +18,7 @@ test:
   services:
     - docker:dind
   script:
-    - apk add bash make
+    - apk add bash git make
     - make pull
     - make start-prod
 
