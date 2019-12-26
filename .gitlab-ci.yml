@@ -24,6 +24,7 @@ test:
     - apk add bash curl git make
     - make pull
     - make start-prod
+    - make test
 
 deploy:
   image: docker:latest

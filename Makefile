@@ -77,6 +77,9 @@ pull:
 	docker pull $(registry)/$(project)_server:latest && docker tag $(registry)/$(project)_server:latest $(project)_server:latest || true
 	docker pull $(registry)/$(project)_proxy:latest && docker tag $(registry)/$(project)_proxy:latest $(project)_proxy:latest || true
 
+test:
+	bash ops/test.sh
+
 ########################################
 # Core Build Rules
 
