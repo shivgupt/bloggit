@@ -9,7 +9,6 @@ find_options=-type f -not -path "*/node_modules/*" -not -name "*.swp" -not -path
 version=$(shell cat package.json | grep '"version":' | awk -F '"' '{print $$4}')
 commit=$(shell git rev-parse HEAD | head -c 8)
 
-
 cwd=$(shell pwd)
 server=$(cwd)/modules/server
 client=$(cwd)/modules/client
@@ -41,8 +40,14 @@ prod: proxy-prod server-prod
 start: dev
 	bash ops/start-dev.sh
 
+start-prod:
+	bash ops/start-prod.sh
+
 restart: stop
 	bash ops/start-dev.sh
+
+restart-prod: stop
+	bash ops/start-prod.sh
 
 stop:
 	bash ops/stop.sh
@@ -73,7 +78,6 @@ proxy-prod: client-js $(shell find $(proxy) $(find_options))
 server: server-js $(shell find $(server)/ops $(find_options))
 	$(log_start)
 	docker build --file $(server)/ops/dev.dockerfile --tag $(project)_server:latest .
-	docker tag $(project)_server:latest $(project)_server:$(commit)
 	$(log_finish) && mv -f $(totalTime) $(flags)/$@
 
 server-prod: server-js $(shell find $(server)/ops $(find_options))

@@ -7,7 +7,7 @@ mode="${MODE:-dev}"
 server_url="${SERVER_URL}"
 ui_url="${UI_URL}"
 
-echo "domain=$domain email=$email ui=$ui_url mode=$mode"
+echo "domain=$domain email=$email mode=$mode server=$server_url ui=$ui_url"
 
 # Provide a message indicating that we're still waiting for everything to wake up
 function loading_msg {
