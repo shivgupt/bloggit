@@ -37,6 +37,7 @@ deploy:
   script:
     - apk add bash curl git make
     - make pull
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - make push-release
     - >
       ssh -o StrictHostKeyChecking=no $BLOG_SERVER <<<EOF
