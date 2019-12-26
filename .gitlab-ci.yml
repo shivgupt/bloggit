@@ -7,14 +7,14 @@ build:
   image: docker:latest
   stage: build
   script:
-    - apk add make
+    - apk add bash make
     - make prod
 
 test:
   image: docker:latest
   stage: test
   script:
-    - apk add make
+    - apk add bash make
     - make pull
     - make start-prod
 
