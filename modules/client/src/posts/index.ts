@@ -1,2 +1,2 @@
-export * from './crypto'
-export * from './politics'
+export const crypto = require('./crypto');
+export const politics = require('./politics');
