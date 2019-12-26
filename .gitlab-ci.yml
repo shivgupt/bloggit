@@ -6,6 +6,8 @@ stages:
 build:
   image: docker:latest
   stage: build
+  services:
+    - docker:dind
   script:
     - apk add bash make
     - make prod
@@ -13,6 +15,8 @@ build:
 test:
   image: docker:latest
   stage: test
+  services:
+    - docker:dind
   script:
     - apk add bash make
     - make pull
@@ -21,6 +25,8 @@ test:
 deploy:
   image: docker:latest
   stage: deploy
+  services:
+    - docker:dind
   only:
     refs:
       - master
