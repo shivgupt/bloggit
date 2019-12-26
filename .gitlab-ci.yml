@@ -40,7 +40,7 @@ deploy:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - make push-release
     - >
-      ssh -o StrictHostKeyChecking=no $BLOG_SERVER <<<EOF
+      docker build --tag ssh-action ops/ssh-action/ && docker run ssh-action $BLOG_SERVER $SSH_KEY <<<EOF
         set -e
         echo "Successfully connected to `hostname`"
         exit
