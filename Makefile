@@ -6,6 +6,9 @@ VPATH=$(flags)
 SHELL=/bin/bash
 
 find_options=-type f -not -path "*/node_modules/*" -not -name "*.swp" -not -path "*/.*" -not -name "*.log"
+version=$(shell cat package.json | grep '"version":' | awk -F '"' '{print $$4}')
+commit=$(shell git rev-parse HEAD | head -c 8)
+
 
 cwd=$(shell pwd)
 server=$(cwd)/modules/server
@@ -32,8 +35,11 @@ $(shell mkdir -p .makeflags)
 
 default: dev
 all: dev prod
-dev: server-js
-prod: server-js client-js
+dev: proxy server
+prod: proxy-prod server-prod
+
+start: dev
+	bash ops/start-dev.sh
 
 stop:
 	bash ops/stop.sh
@@ -45,7 +51,30 @@ clean: stop
 	rm -rf modules/**/dist
 
 ########################################
-# Command & Control Shortcuts
+# Core Build Rules
+
+proxy: $(shell find $(proxy) $(find_options))
+	$(log_start)
+	docker build --file $(proxy)/dev.dockerfile --tag $(project)_proxy:latest .
+	$(log_finish) && mv -f $(totalTime) $(flags)/$@
+
+proxy-prod: client-js $(shell find $(proxy) $(find_options))
+	$(log_start)
+	docker build --file $(proxy)/prod.dockerfile --tag $(project)_proxy:latest .
+	docker tag $(project)_proxy:latest $(project)_proxy:$(commit)
+	$(log_finish) && mv -f $(totalTime) $(flags)/$@
+
+server: server-js $(shell find $(server)/ops $(find_options))
+	$(log_start)
+	docker build --file $(server)/ops/dev.dockerfile --tag $(project)_server:latest .
+	docker tag $(project)_server:latest $(project)_server:$(commit)
+	$(log_finish) && mv -f $(totalTime) $(flags)/$@
+
+server-prod: server-js $(shell find $(server)/ops $(find_options))
+	$(log_start)
+	docker build --file $(server)/ops/prod.dockerfile --tag $(project)_server:latest .
+	docker tag $(project)_server:latest $(project)_server:$(commit)
+	$(log_finish) && mv -f $(totalTime) $(flags)/$@
 
 server-js: node-modules $(shell find $(server)/src $(find_options))
 	$(log_start)
