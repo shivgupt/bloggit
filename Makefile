@@ -8,7 +8,7 @@ find_options=-type f -not -path "*/node_modules/*" -not -name "*.swp" -not -path
 version=$(shell cat package.json | grep '"version":' | awk -F '"' '{print $$4}')
 commit=$(shell git rev-parse HEAD | head -c 8)
 user=$(shell if [[ -n "${CI_PROJECT_NAMESPACE}" ]]; then echo "${CI_PROJECT_NAMESPACE}"; else echo "`whoami`"; fi)
-registry="registry.gitlab.com/$(user)/$(project)"
+registry=registry.gitlab.com/$(user)/$(project)
 
 # Pool of images to pull cached layers from during docker build steps
 cache_from=$(shell if [[ -n "${CI}" ]]; then echo "--cache-from=$(project)_server:$(commit),$(project)_server:latest,(project)_builder:latest,(project)_proxy:$(commit),(project)_proxy:latest"; else echo ""; fi)
