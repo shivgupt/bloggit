@@ -2,6 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import logo from './logo.svg';
 import './App.css';
+import { RenderPosts } from './components/Posts'
 
 const App: React.FC = () => {
   const [serverMsg, setServerMsg] = useState('please wait..');
@@ -26,6 +27,7 @@ const App: React.FC = () => {
         >
           Learn React
         </a>
+      <RenderPosts post={'hello-world'} />
       </header>
     </div>
   );

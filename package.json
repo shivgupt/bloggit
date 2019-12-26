@@ -1,6 +1,8 @@
 {
 	"name": "blog",
-  "version": "1.0.0",
+	"version": "1.0.0",
 	"author": "Bo & Shiv",
-	"license": "MIT"
+	"license": "MIT",
+	"dependencies": {
+	}
 }
