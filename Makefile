@@ -7,7 +7,7 @@ project=blog
 find_options=-type f -not -path "*/node_modules/*" -not -name "*.swp" -not -path "*/.*" -not -name "*.log"
 version=$(shell cat package.json | grep '"version":' | awk -F '"' '{print $$4}')
 commit=$(shell git rev-parse HEAD | head -c 8)
-user=$(shell if [[ -n "${GITLAB_USER_ID}" ]]; then echo "${GITLAB_USER_ID}"; else echo "`whoami`"; fi)
+user=$(shell if [[ -n "${CI_PROJECT_NAMESPACE}" ]]; then echo "${CI_PROJECT_NAMESPACE}"; else echo "`whoami`"; fi)
 registry="registry.gitlab.com/$(user)/$(project)"
 
 # Pool of images to pull cached layers from during docker build steps
