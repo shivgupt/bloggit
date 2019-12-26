@@ -24,7 +24,7 @@ test:
     - apk add bash curl git make
     - make pull
     - BLOG_DOMAINNAME=localhost make start-prod
-    - sleep 5
+    - sleep 15
     - make dls
     - docker service logs --raw --tail 100 blog_proxy
     - docker service logs --raw --tail 100 blog_server
