@@ -8,6 +8,9 @@ SHELL=/bin/bash
 find_options=-type f -not -path "*/node_modules/*" -not -name "*.swp" -not -path "*/.*" -not -name "*.log"
 
 cwd=$(shell pwd)
+server=$(cwd)/modules/server
+client=$(cwd)/modules/client
+proxy=$(cwd)/modules/proxy
 
 # Setup docker run time
 # If on Linux, give the container our uid & gid so we know what to reset permissions to
@@ -25,9 +28,37 @@ log_finish=@echo $$((`date "+%s"` - `cat $(startTime)`)) > $(totalTime); rm $(st
 $(shell mkdir -p .makeflags)
 
 ########################################
-# Common Prerequisites
+# Command & Control Shortcuts
 
-default: node-modules
+default: dev
+all: dev prod
+dev: server-js
+prod: server-js client-js
+
+stop:
+	bash ops/stop.sh
+
+clean: stop
+	docker container prune -f
+	rm -rf $(flags)/*
+	rm -rf modules/**/build
+	rm -rf modules/**/dist
+
+########################################
+# Command & Control Shortcuts
+
+server-js: node-modules $(shell find $(server)/src $(find_options))
+	$(log_start)
+	$(docker_run) "cd modules/server && npm run build"
+	$(log_finish) && mv -f $(totalTime) $(flags)/$@
+
+client-js: node-modules $(shell find $(client)/src $(find_options))
+	$(log_start)
+	$(docker_run) "cd modules/client && npm run build"
+	$(log_finish) && mv -f $(totalTime) $(flags)/$@
+
+########################################
+# Common Prerequisites
 
 builder: ops/builder.dockerfile
 	$(log_start)
