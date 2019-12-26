@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+echo "Running tests..."
+curl --version
+
 echo "https://localhost should display html"
 out="`curl -ks "https://localhost"`"
 if [[ "$out" == "<!doctype html>"* ]]
