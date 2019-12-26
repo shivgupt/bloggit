@@ -11,6 +11,7 @@ build:
   script:
     - apk add bash git make
     - make prod
+    - make push-commit
 
 test:
   image: docker:latest
@@ -31,8 +32,8 @@ deploy:
     refs:
       - master
   script:
-    - apk add openssh
-    - echo "Attempting to deploy"
+    - make pull
+    - make push-release
     - >
       ssh -o StrictHostKeyChecking=no $BLOG_SERVER <<<EOF
         set -e

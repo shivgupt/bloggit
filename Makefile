@@ -9,6 +9,9 @@ find_options=-type f -not -path "*/node_modules/*" -not -name "*.swp" -not -path
 version=$(shell cat package.json | grep '"version":' | awk -F '"' '{print $$4}')
 commit=$(shell git rev-parse HEAD | head -c 8)
 
+# Pool of images to pull cached layers from during docker build steps
+cache_from=$(shell if [[ -n "${GITHUB_WORKFLOW}" ]]; then echo "$(project)_server:$(commit),$(project)_server:latest,(project)_builder:latest,(project)_proxy:$(commit),(project)_proxy:latest"; else echo ""; fi)
+
 cwd=$(shell pwd)
 server=$(cwd)/modules/server
 client=$(cwd)/modules/client
@@ -31,6 +34,9 @@ $(shell mkdir -p .makeflags)
 
 ########################################
 # Command & Control Shortcuts
+
+debug:
+	echo $(commit) $(version)
 
 default: dev
 all: dev prod
@@ -60,6 +66,18 @@ clean: stop
 	rm -rf $(flags)/*
 	rm -rf modules/**/build
 	rm -rf modules/**/dist
+
+push-commit:
+	bash ops/push-images.sh commit server proxy
+
+push-release:
+	bash ops/push-images.sh release server proxy
+
+pull:
+	docker pull $(registry)/$(project)_server:$(commit) && docker tag $(registry)/$(project)_server:$(commit) $(project)_server:$(commit) || true
+	docker pull $(registry)/$(project)_proxy:$(commit) && docker tag $(registry)/$(project)_proxy:$(commit) $(project)_proxy:$(commit) || true
+	docker pull $(registry)/$(project)_server:latest && docker tag $(registry)/$(project)_server:latest $(project)_server:latest || true
+	docker pull $(registry)/$(project)_proxy:latest && docker tag $(registry)/$(project)_proxy:latest $(project)_proxy:latest || true
 
 ########################################
 # Core Build Rules
