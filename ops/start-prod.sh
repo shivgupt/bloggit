@@ -9,14 +9,13 @@ docker swarm init 2> /dev/null || true
 
 BLOG_DOMAINNAME="${BLOG_DOMAINNAME:-localhost}"
 BLOG_EMAIL="${BLOG_EMAIL:-noreply@gmail.com}" # for notifications when ssl certs expire
-BLOG_MODE="${BLOG_MODE:-local}" # One of: release, staging, local
 
 ####################
 # Internal Config
 
-server_port="8080"
+dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+project="`cat $dir/../package.json | jq .name | tr -d '"'`"
 number_of_services="2" # NOTE: Gotta update this manually when adding/removing services :(
-project="blog"
 
 ####################
 # Helper Functions
@@ -35,21 +34,9 @@ function pull_if_unavailable {
 ########################################
 ## Docker Image Config
 
-registry="docker.io/`whoami`/"
-
-if [[ "$BLOG_MODE" == "local" ]]
-then
-  version="`git rev-parse HEAD | head -c 8`"
-  registry=""
-elif [[ "$BLOG_MODE" == "staging" ]]
-then version="`git rev-parse HEAD | head -c 8`"
-elif [[ "$BLOG_MODE" == "release" ]]
-then version="`cat package.json | jq .version | tr -d '"'`"
-else echo "Unknown mode ($BLOG_MODE) for domain: $BLOG_DOMAINNAME. Aborting" && exit 1
-fi
-
-server_image="$registry${project}_server:$version"
-proxy_image="$registry${project}_proxy:$version"
+version="`git rev-parse HEAD | head -c 8`"
+server_image="${project}_server:$version"
+proxy_image="${project}_proxy:$version"
 
 pull_if_unavailable "$server_image"
 pull_if_unavailable "$proxy_image"
@@ -57,7 +44,7 @@ pull_if_unavailable "$proxy_image"
 ########################################
 ## Deploy according to configuration
 
-echo "Deploying server image: $server_image to $BLOG_DOMAINNAME"
+echo "Deploying $server_image & $proxy_image to $BLOG_DOMAINNAME"
 
 mkdir -p modules/database/snapshots /tmp/$project
 cat - > /tmp/$project/docker-compose.yml <<EOF

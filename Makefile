@@ -3,7 +3,8 @@ flags=.makeflags
 VPATH=$(flags)
 SHELL=/bin/bash
 
-project=blog
+dir=$(shell cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )
+project=$(shell cat $(dir)/package.json | jq .name | tr -d '"')
 find_options=-type f -not -path "*/node_modules/*" -not -name "*.swp" -not -path "*/.*" -not -name "*.log"
 version=$(shell cat package.json | grep '"version":' | awk -F '"' '{print $$4}')
 commit=$(shell git rev-parse HEAD | head -c 8)
@@ -65,17 +66,17 @@ clean: stop
 	rm -rf modules/**/build
 	rm -rf modules/**/dist
 
-push-commit:
-	bash ops/push-images.sh commit server proxy
-
-push-release:
-	bash ops/push-images.sh release server proxy
+push:
+	bash ops/push-images.sh server proxy
 
 pull:
 	docker pull $(registry)/$(project)_server:$(commit) && docker tag $(registry)/$(project)_server:$(commit) $(project)_server:$(commit) || true
 	docker pull $(registry)/$(project)_proxy:$(commit) && docker tag $(registry)/$(project)_proxy:$(commit) $(project)_proxy:$(commit) || true
 	docker pull $(registry)/$(project)_server:latest && docker tag $(registry)/$(project)_server:latest $(project)_server:latest || true
 	docker pull $(registry)/$(project)_proxy:latest && docker tag $(registry)/$(project)_proxy:latest $(project)_proxy:latest || true
+
+build-report:
+	bash ops/build-report.sh
 
 dls:
 	@docker service ls && echo '=====' && docker container ls -a
