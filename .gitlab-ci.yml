@@ -7,7 +7,8 @@ build:
   image: docker:stable
   stage: build
   services:
-    - docker:dind
+    - name: docker:dind
+      alias: localhost
   script:
     - apk add bash curl git make
     - make pull
@@ -19,7 +20,8 @@ test:
   image: docker:stable
   stage: test
   services:
-    - docker:dind
+    - name: docker:dind
+      alias: localhost
   script:
     - apk add bash curl git make
     - make pull
@@ -34,7 +36,8 @@ deploy:
   image: docker:stable
   stage: deploy
   services:
-    - docker:dind
+    - name: docker:dind
+      alias: localhost
   only:
     refs:
       - master

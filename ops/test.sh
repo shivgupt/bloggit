@@ -2,7 +2,7 @@
 set -e
 
 curl="curl --insecure "
-host="https://docker:443"
+host="https://localhost:433"
 
 echo "$host should display html"
 $curl "$host"
