@@ -9,12 +9,9 @@ const App: React.FC = () => {
     <div className="App">
       <NavBar />
       <header className="App-header">
-      {Object.keys(posts).map((topic) => {
-        console.log(topic)
-        return Object.keys((posts as any)[topic]).map((post) => {
-          console.log(post)
-          return <RenderPosts postPath={(posts as any)[topic][post]} />
-        })
+      {Object.keys(posts).map((post) => {
+        console.log((posts as any)[post])
+        return <RenderPosts postPath={(posts as any)[post].path} />
       })}
 
       </header>
