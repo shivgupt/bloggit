@@ -7,9 +7,9 @@ project="`cat $dir/../package.json | jq .name | tr -d '"'`"
 registry="registry.gitlab.com/$organization/$project"
 version="`git rev-parse HEAD | head -c 8`"
 
-for image in $@
+for arg in $@
 do
-  image=${project}_$1
+  image=${project}_$arg
   echo;echo "Pushing $registry/$image:$version"
   docker tag $image:$version $registry/$image:$version
   docker push $registry/$image:$version

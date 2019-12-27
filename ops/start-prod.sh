@@ -44,7 +44,7 @@ pull_if_unavailable "$proxy_image"
 ########################################
 ## Deploy according to configuration
 
-echo "Deploying server image: $server_image to $BLOG_DOMAINNAME"
+echo "Deploying $server_image & $proxy_image to $BLOG_DOMAINNAME"
 
 mkdir -p modules/database/snapshots /tmp/$project
 cat - > /tmp/$project/docker-compose.yml <<EOF
