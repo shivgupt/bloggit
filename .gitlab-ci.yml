@@ -47,7 +47,7 @@ deploy:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - make push-release
     - >
-      docker build --tag ssh-action ops/ssh-action/
+      docker build --tag ssh-action ops/ssh-action;
       docker run \
         --env=CI_REPOSITORY_URL=$CI_REPOSITORY_URL \
         --env=CI_PROJECT_NAME=$CI_PROJECT_NAME \
