@@ -14,7 +14,7 @@ build:
     - make pull
     - make prod
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - make push-commit
+    - make push
 
 test:
   image: docker:stable
@@ -24,7 +24,7 @@ test:
       alias: localhost
   script:
     - apk add bash curl git jq make
-    - make pull-commit
+    - make pull
     - BLOG_DOMAINNAME=localhost make start-prod
     - make test
 
@@ -50,7 +50,7 @@ deploy:
           git checkout --force master;
           git reset --hard $CI_COMMIT_SHA;
           export BLOG_DOMAINNAME="$BLOG_DOMAINNAME";
-          make pull-commit;
+          make pull;
           make restart-prod;
           docker container prune -f;
           docker image ls -q | xargs docker image rm || true;

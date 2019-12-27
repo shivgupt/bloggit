@@ -15,6 +15,7 @@ number_of_services=3 # NOTE: Gotta update this manually when adding/removing ser
 
 port=3000
 server_port=8080
+ui_port=3000
 
 # docker images
 builder_image="${project}_builder"
@@ -50,7 +51,7 @@ services:
       DOMAINNAME: localhost
       MODE: dev
       SERVER_URL: http://server:$server_port
-      UI_URL: http://ui:3000
+      UI_URL: http://ui:$ui_port
     networks:
       - $project
     ports:
