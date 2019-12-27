@@ -6,12 +6,9 @@ user="$1"
 cmd="$2"
 
 finish() {
-    if [[ "$this_user" == "$user" ]]
-    then echo "Same user, skipping permission fix"
-    else
-      echo "Fixing permissions for $user"
-      chown -R ${user} /root
-    fi
+  if [[ "$this_user" != "$user" ]]
+  then chown -R ${user} /root
+  fi
 }
 trap finish EXIT
 
