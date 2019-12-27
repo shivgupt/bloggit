@@ -13,7 +13,6 @@ import {
   ExpandMore as ExpandMoreIcon,
 } from '@material-ui/icons';
 import { Link } from 'react-router-dom';
-import { PostData } from '../types';
 
 const useStyles = makeStyles(theme => ({
   card: {
@@ -25,14 +24,14 @@ export const PostPage = (props: any) => {
   const [postmd, setPostmd] = useState('');
 
   useEffect(() => {
-    //const postPath = require(`../posts/${props.post}.md`);
+    console.log(props.post)
 
-    fetch(props.postPath).then(
+    fetch(props.post.path).then(
       res => res.text()
     ).then(text => {
       setPostmd(text)
     })
-  }, [props.postPath]);
+  }, [props.post]);
 
   return (
     <ReactMarkdown source={postmd} />
@@ -41,28 +40,23 @@ export const PostPage = (props: any) => {
 
 export const PostCard = (props: any) => {
   const classes = useStyles();
-  const [post, setPost] = useState({} as PostData);
 
-  useEffect(() => {
-    setPost(props.post)
-  }, [props.post]);
-
-  if (!post) {
+  if (!props.post) {
     return <> Loading </>
   }
 
   return (
      <Card className={classes.card}>
-      <CardHeader title={post.title} />
+      <CardHeader title={props.post.title} />
       <CardContent>
         <Typography variant="body2" color="textSecondary" component="p">
-          {post.tldr}
+          {props.post.tldr}
         </Typography>
       </CardContent>
       <CardActions disableSpacing>
         <IconButton
           component={Link}
-          to={`/post${post.path}`}
+          to={`/post/${props.post.slug}`}
           aria-label="show more"
         >
           <ExpandMoreIcon />
