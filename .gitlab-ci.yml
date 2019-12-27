@@ -57,7 +57,7 @@ deploy:
           git reset --hard $CI_COMMIT_SHA;
           export BLOG_MODE="staging";
           export BLOG_DOMAINNAME="$BLOG_DOMAINNAME";
-          make pull-release;
+          make pull-commit;
           make restart-prod;
           docker container prune -f;
           docker image ls -q | xargs docker image rm || true;

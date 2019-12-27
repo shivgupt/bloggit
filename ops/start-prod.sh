@@ -35,21 +35,15 @@ function pull_if_unavailable {
 ########################################
 ## Docker Image Config
 
-registry="docker.io/`whoami`/"
-
-if [[ "$BLOG_MODE" == "local" ]]
-then
-  version="`git rev-parse HEAD | head -c 8`"
-  registry=""
-elif [[ "$BLOG_MODE" == "staging" ]]
+if [[ "$BLOG_MODE" == "local" || "$BLOG_MODE" == "staging" ]]
 then version="`git rev-parse HEAD | head -c 8`"
 elif [[ "$BLOG_MODE" == "release" ]]
 then version="`cat package.json | jq .version | tr -d '"'`"
 else echo "Unknown mode ($BLOG_MODE) for domain: $BLOG_DOMAINNAME. Aborting" && exit 1
 fi
 
-server_image="$registry${project}_server:$version"
-proxy_image="$registry${project}_proxy:$version"
+server_image="${project}_server:$version"
+proxy_image="${project}_proxy:$version"
 
 pull_if_unavailable "$server_image"
 pull_if_unavailable "$proxy_image"
