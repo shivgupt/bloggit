@@ -71,11 +71,19 @@ push-commit:
 push-release:
 	bash ops/push-images.sh release server proxy
 
-pull:
-	docker pull $(registry)/$(project)_server:$(commit) && docker tag $(registry)/$(project)_server:$(commit) $(project)_server:$(commit) || true
-	docker pull $(registry)/$(project)_proxy:$(commit) && docker tag $(registry)/$(project)_proxy:$(commit) $(project)_proxy:$(commit) || true
+pull: pull-commit pull-latest
+
+pull-latest:
 	docker pull $(registry)/$(project)_server:latest && docker tag $(registry)/$(project)_server:latest $(project)_server:latest || true
 	docker pull $(registry)/$(project)_proxy:latest && docker tag $(registry)/$(project)_proxy:latest $(project)_proxy:latest || true
+
+pull-commit:
+	docker pull $(registry)/$(project)_server:$(commit) && docker tag $(registry)/$(project)_server:$(commit) $(project)_server:$(commit) || true
+	docker pull $(registry)/$(project)_proxy:$(commit) && docker tag $(registry)/$(project)_proxy:$(commit) $(project)_proxy:$(commit) || true
+
+pull-release:
+	docker pull $(registry)/$(project)_server:$(version) && docker tag $(registry)/$(project)_server:$(version) $(project)_server:$(version) || true
+	docker pull $(registry)/$(project)_proxy:$(version) && docker tag $(registry)/$(project)_proxy:$(version) $(project)_proxy:$(version) || true
 
 dls:
 	@docker service ls && echo '=====' && docker container ls -a
