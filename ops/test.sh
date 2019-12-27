@@ -2,7 +2,7 @@
 set -e
 
 curl="curl --insecure "
-host="https://localhost:433"
+host="https://localhost"
 
 echo "$host should display html"
 $curl "$host"
