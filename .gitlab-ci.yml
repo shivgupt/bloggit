@@ -57,5 +57,5 @@ deploy:
           make pull;
           make restart-prod;
           docker container prune -f;
-          docker image ls -q | xargs docker image rm || true;
+          docker image ls -q | xargs docker image rm 2>&1 > /dev/null || true;
         '
