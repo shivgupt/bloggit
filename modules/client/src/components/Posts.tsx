@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
+import { Link } from 'react-router-dom';
+
 import {
   makeStyles,
   Card,
@@ -12,9 +14,8 @@ import {
 import {
   ExpandMore as ExpandMoreIcon,
 } from '@material-ui/icons';
-import { Link } from 'react-router-dom';
 
-import { getPostContent } from '../utils';
+import { getPostContent, getPostIndex } from '../utils';
 import { PostData } from '../types';
 
 const useStyles = makeStyles(theme => ({
@@ -24,7 +25,6 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export const PostPage = (props: any) => {
-  const [postData, setPostData] = useState({} as PostData);
   const [postMd, setPostMd] = useState('');
 
   useEffect(() => {
@@ -68,3 +68,24 @@ export const PostCard = (props: any) => {
     </Card>
   )
 }
+
+export const PostCardsLists = () => {
+
+  const [posts, setPosts] = useState([] as PostData[]);
+
+  useEffect(() => {
+    (async () => {
+      const posts = await getPostIndex();
+      setPosts(posts)
+    })()
+  }, []);
+
+  return (
+    <>
+      {posts.map((post) => {
+        return <PostCard key={post.slug} post={post} />
+      })}
+    </>
+  )
+}
+

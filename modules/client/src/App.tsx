@@ -1,32 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import './App.css';
-import { PostPage, PostCard } from './components/Posts';
+import {
+  PostCardsLists,
+  PostPage,
+} from './components/Posts';
 import { NavBar } from './components/NavBar';
 import { Route, Switch } from 'react-router-dom';
-import { getPostData, getPostIndex } from './utils';
-import { PostData } from './types';
-
-const RenderPostCards = () => {
-
-  const [posts, setPosts] = useState([] as PostData[]);
-
-  useEffect(() => {
-    (async () => {
-      const posts = await getPostIndex();
-      //console.log(posts)
-      setPosts(posts)
-    })()
-  }, []);
-
-  return (
-    <>
-      {posts.map((post) => {
-        //console.log(post)
-        return <PostCard key={post.slug} post={post} />
-      })}
-    </>
-  )
-}
+import { getPostData } from './utils';
 
 const App: React.FC = () => {
   return (
@@ -35,7 +15,7 @@ const App: React.FC = () => {
       <header className="App-header">
       <Switch>
         <Route exact path={["/", "/home"]} >
-          <RenderPostCards />
+          <PostCardsLists />
         </Route>
         <Route
           path="/post/:path"
