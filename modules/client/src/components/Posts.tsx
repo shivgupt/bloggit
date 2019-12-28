@@ -18,7 +18,7 @@ import {
   ExpandMore as ExpandMoreIcon,
 } from '@material-ui/icons';
 
-import { getPostContent, getPostIndex } from '../utils';
+import { getPostData, getPostContent, getPostIndex } from '../utils';
 import { PostData } from '../types';
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
@@ -34,20 +34,23 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
 
 export const PostPage = (props: any) => {
   const classes = useStyles();
-  const [postMd, setPostMd] = useState('');
+  const [content, setContent] = useState('Loading');
 
   useEffect(() => {
     (async () => {
       // console.log(props.post)
-      const resolvedPost = await props.post
-      console.log(`Rendering post ${resolvedPost.slug} at path ${resolvedPost.path}`);
-      setPostMd(await getPostContent(resolvedPost.slug));
+      const post = (await getPostData(props.slug));
+      if (!post) {
+        setContent('Post Does Not Exist');
+        return
+      }
+      setContent(await getPostContent(post.slug));
     })()
-  }, [props.post]);
+  }, [props.slug]);
 
   return (
     <Paper variant="outlined">
-      <ReactMarkdown source={postMd} className={classes.text}/>
+      <ReactMarkdown source={content} className={classes.text}/>
     </Paper>
   )
 }

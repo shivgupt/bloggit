@@ -6,7 +6,6 @@ import {
 } from './components/Posts';
 import { NavBar } from './components/NavBar';
 import { Route, Switch } from 'react-router-dom';
-import { getPostData } from './utils';
 
 const App: React.FC = () => {
   return (
@@ -18,9 +17,9 @@ const App: React.FC = () => {
           <PostCardsLists />
         </Route>
         <Route
-          path="/post/:path"
+          path="/post/:slug"
           render={
-            ({ match }) => <PostPage post={getPostData(match.params.path)} />
+            ({ match }) => <PostPage slug={match.params.slug} />
           }
         />
       </Switch>

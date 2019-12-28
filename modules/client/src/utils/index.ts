@@ -9,6 +9,7 @@ const getUrl = (file: string): string => {
 }
 
 let postsPromiseCache: Promise<PostData[]> | undefined;
+
 export const getPostIndex = async (): Promise<PostData[]> => {
   if (!postsPromiseCache) {
     postsPromiseCache = new Promise(async (resolve, reject) => {
@@ -37,5 +38,3 @@ export const getPostContent = async (slug: string): Promise<string> => {
   const response = await fetch(url);
   return response.text();
 }
-
-
