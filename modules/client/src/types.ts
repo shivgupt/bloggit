@@ -5,3 +5,9 @@ export type PostData = {
   tldr: string;
   title: string;
 };
+
+export type PostIndex = {
+  posts: PostData[];
+  style: any;
+  title: string;
+}

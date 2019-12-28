@@ -25,10 +25,12 @@ app.get('/content/*', async (req, res, next): Promise<void> => {
   try {
     const response = await fetch(url)
     if (response.status === 200) {
-      res.json(await response.json());
-    } else {
-      res.json({ error: `${response.status}: ${response.statusText}` });
+      url.endsWith('.json')
+        ? res.json(await response.json())
+        : res.send(await response.text());
+      return;
     }
+    res.json({ error: `${response.status}: ${response.statusText}` });
   } catch (e) {
     res.json({ error: e.message });
   }
