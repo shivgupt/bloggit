@@ -1,32 +1,20 @@
 import React, { useState } from 'react';
 import './App.css';
 import { PostPage, PostCard } from './components/Posts';
-import * as posts from './posts';
 import { NavBar } from './components/NavBar';
 import { Route, Switch } from 'react-router-dom';
-import { PostData } from './types';
+import { getPostData, getPostIndex } from './posts';
 
-const getPostData = (slug: string) => {
-  for(let post of Object.keys(posts)) {
-    if ((posts as any)[post].slug === slug) {
-      return (posts as any)[post]
-    }
-  }
-}
+getPostIndex();
 
 const RenderPostCards = () => {
   return (
-    <>
-    {Object.keys(posts).map((post) => {
-      console.log((posts as any)[post])
-      return <PostCard post={(posts as any)[post]} />
-    })}
-    </>
+    <div>
+    </div>
   )
 }
 
 const App: React.FC = () => {
-  //const [post, setPost] = useState({} as PostData);
   return (
     <div className="App">
       <NavBar />
