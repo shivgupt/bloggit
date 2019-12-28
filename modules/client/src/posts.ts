@@ -2,22 +2,24 @@ import { PostData } from './types';
 //import * as posts from './postsContent';
 import axios from 'axios';
 
+let posts: PostData[] | undefined;
+
 export const getPostIndex = async (): Promise<PostData[]> => {
-  const url = `${process.env.REACT_APP_CONTENT_URL}index.json`
-  console.log(`fetching index from ${url}`)
-  const index = await fetch(url)
-  console.log(index)
-  return Array<{}> as PostData[]
+  if (!posts) {
+    const response = (await axios(`${process.env.REACT_APP_CONTENT_URL}index.json`) as any);
+    posts = response.data.posts;
+  }
+  return posts;
 }
 
 export const getPostData = async (slug: string): Promise<PostData> => {
-  /*
-  for(let post of Object.keys(posts)) {
-    if ((posts as any)[post].slug === slug) {
-      return (posts as any)[post]
+  const posts = await getPostIndex();
+
+  for(let post of posts) {
+    if (post.slug === slug) {
+      return post
     }
   }
-   */
   return {} as PostData;
 }
 

@@ -1,16 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 import { PostPage, PostCard } from './components/Posts';
 import { NavBar } from './components/NavBar';
 import { Route, Switch } from 'react-router-dom';
 import { getPostData, getPostIndex } from './posts';
-
-getPostIndex();
+import { PostData } from './types';
 
 const RenderPostCards = () => {
+
+  const [posts, setPosts] = useState([] as PostData[]);
+
+  useEffect(() => {
+    (async () => {
+      const posts = await getPostIndex();
+      console.log(posts)
+      setPosts(posts)
+    })()
+  }, []);
+
   return (
-    <div>
-    </div>
+    <>
+      {posts.map((post) => {
+        console.log(post)
+        return <PostCard post={post} />
+      })}
+    </>
   )
 }
 
