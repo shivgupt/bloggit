@@ -8,17 +8,22 @@ import {
 } from '@material-ui/core';
 import {
   Menu as MenuIcon,
+  Home as HomeIcon,
 } from '@material-ui/icons';
+import { Link } from 'react-router-dom';
 
 const useStyles = makeStyles(theme => ({
   grow: {
     flexGrow: 1,
   },
+  homeButton: {
+    marginRight: theme.spacing(2),
+  },
+  menuButton: {
+    marginLeft: theme.spacing(2),
+  },
   title: {
-    display: 'none',
-    [theme.breakpoints.up('sm')]: {
-      display: 'block',
-    },
+    flexGrow: 1,
   },
 }));
 
@@ -29,16 +34,26 @@ export const NavBar = (props: any) => {
       <AppBar position="static">
         <Toolbar>
           <IconButton
+            component={Link}
+            edge="start"
+            to={'/home'}
+            color="inherit"
+            className={classes.homeButton}
+          >
+            <HomeIcon />
+          </IconButton>
+          <Typography className={classes.title} variant="h5" noWrap>
+            My Blog
+          </Typography>
+          <IconButton
             edge="start"
             color="inherit"
             aria-label="open drawer"
+            className={classes.menuButton}
           >
             <MenuIcon />
           </IconButton>
         </Toolbar>
-          <Typography className={classes.title} variant="h6" noWrap>
-            My Blog
-          </Typography>
       </AppBar>
     </div>
   )
