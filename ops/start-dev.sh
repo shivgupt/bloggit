@@ -8,6 +8,11 @@ project="`cat $dir/../package.json | jq .name | tr -d '"'`"
 docker swarm init 2> /dev/null || true
 
 ####################
+# External Env Vars
+
+BLOG_CONTENT_URL=$BLOG_CONTENT_URL
+
+####################
 # Internal Config
 # config & hard-coded stuff you might want to change
 
@@ -74,6 +79,8 @@ services:
     image: $server_image
     environment:
       NODE_ENV: development
+      BLOG_CONTENT_URL: $BLOG_CONTENT_URL
+      PORT: $server_port
     networks:
       - $project
     ports:

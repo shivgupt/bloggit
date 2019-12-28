@@ -7,6 +7,7 @@ docker swarm init 2> /dev/null || true
 ####################
 # External Env Vars
 
+BLOG_CONTENT_URL=$BLOG_CONTENT_URL
 BLOG_DOMAINNAME="${BLOG_DOMAINNAME:-localhost}"
 BLOG_EMAIL="${BLOG_EMAIL:-noreply@gmail.com}" # for notifications when ssl certs expire
 
@@ -16,6 +17,7 @@ BLOG_EMAIL="${BLOG_EMAIL:-noreply@gmail.com}" # for notifications when ssl certs
 dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 project="`cat $dir/../package.json | jq .name | tr -d '"'`"
 number_of_services="2" # NOTE: Gotta update this manually when adding/removing services :(
+server_port=8080
 
 ####################
 # Helper Functions
@@ -59,7 +61,7 @@ services:
     environment:
       DOMAINNAME: $BLOG_DOMAINNAME
       EMAIL: $BLOG_EMAIL
-      SERVER_URL: http://server:8080
+      SERVER_URL: http://server:$server_port
       MODE: prod
     logging:
       driver: "json-file"
@@ -76,6 +78,8 @@ services:
     image: $server_image
     environment:
       NODE_ENV: production
+      BLOG_CONTENT_URL: $BLOG_CONTENT_URL
+      PORT: $server_port
     logging:
       driver: "json-file"
       options:
