@@ -94,8 +94,7 @@ proxy: $(shell find $(proxy) $(find_options))
 
 proxy-prod: client-js $(shell find $(proxy) $(find_options))
 	$(log_start)
-	docker build --file $(proxy)/prod.dockerfile $(cache_from) --tag $(project)_proxy:latest .
-	docker tag $(project)_proxy:latest $(project)_proxy:$(commit)
+	docker build --file $(proxy)/prod.dockerfile $(cache_from) --tag $(project)_proxy:$(commit) .
 	$(log_finish) && mv -f $(totalTime) $(flags)/$@
 
 server: server-js $(shell find $(server)/ops $(find_options))
@@ -105,8 +104,7 @@ server: server-js $(shell find $(server)/ops $(find_options))
 
 server-prod: server-js $(shell find $(server)/ops $(find_options))
 	$(log_start)
-	docker build --file $(server)/ops/prod.dockerfile $(cache_from) --tag $(project)_server:latest .
-	docker tag $(project)_server:latest $(project)_server:$(commit)
+	docker build --file $(server)/ops/prod.dockerfile $(cache_from) --tag $(project)_server:$(commit) .
 	$(log_finish) && mv -f $(totalTime) $(flags)/$@
 
 server-js: node-modules $(shell find $(server)/src $(find_options))
