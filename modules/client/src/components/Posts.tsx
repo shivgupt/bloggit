@@ -3,13 +3,16 @@ import ReactMarkdown from 'react-markdown';
 import { Link } from 'react-router-dom';
 
 import {
-  makeStyles,
   Card,
   CardActions,
   CardContent,
   CardHeader,
   IconButton,
+  Paper,
+  Theme,
   Typography,
+  createStyles,
+  makeStyles,
 } from '@material-ui/core';
 import {
   ExpandMore as ExpandMoreIcon,
@@ -18,13 +21,19 @@ import {
 import { getPostContent, getPostIndex } from '../utils';
 import { PostData } from '../types';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme: Theme) => createStyles({
   card: {
     maxWidth: 345,
   },
-}));
+  text: {
+    padding: "20px",
+    textAlign: "justify",
+    fontVariant: "discretionary-ligatures",
+  },
+}),);
 
 export const PostPage = (props: any) => {
+  const classes = useStyles();
   const [postMd, setPostMd] = useState('');
 
   useEffect(() => {
@@ -37,7 +46,9 @@ export const PostPage = (props: any) => {
   }, [props.post]);
 
   return (
-    <ReactMarkdown source={postMd} />
+    <Paper variant="outlined">
+      <ReactMarkdown source={postMd} className={classes.text}/>
+    </Paper>
   )
 }
 
