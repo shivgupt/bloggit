@@ -1,32 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 import { PostPage, PostCard } from './components/Posts';
-import * as posts from './posts';
 import { NavBar } from './components/NavBar';
 import { Route, Switch } from 'react-router-dom';
+import { getPostData, getPostIndex } from './posts';
 import { PostData } from './types';
 
-const getPostData = (slug: string) => {
-  for(let post of Object.keys(posts)) {
-    if ((posts as any)[post].slug === slug) {
-      return (posts as any)[post]
-    }
-  }
-}
-
 const RenderPostCards = () => {
+
+  const [posts, setPosts] = useState([] as PostData[]);
+
+  useEffect(() => {
+    (async () => {
+      const posts = await getPostIndex();
+      //console.log(posts)
+      setPosts(posts)
+    })()
+  }, []);
+
   return (
     <>
-    {Object.keys(posts).map((post) => {
-      console.log((posts as any)[post])
-      return <PostCard post={(posts as any)[post]} />
-    })}
+      {posts.map((post) => {
+        //console.log(post)
+        return <PostCard key={post.slug} post={post} />
+      })}
     </>
   )
 }
 
 const App: React.FC = () => {
-  //const [post, setPost] = useState({} as PostData);
   return (
     <div className="App">
       <NavBar />
@@ -37,7 +39,9 @@ const App: React.FC = () => {
         </Route>
         <Route
           path="/post/:path"
-          render={({ match }) => { return <PostPage post={getPostData(match.params.path)} /> }}
+          render={
+            ({ match }) => <PostPage post={getPostData(match.params.path)} />
+          }
         />
       </Switch>
       </header>
