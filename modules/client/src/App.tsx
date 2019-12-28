@@ -13,7 +13,7 @@ const RenderPostCards = () => {
   useEffect(() => {
     (async () => {
       const posts = await getPostIndex();
-      console.log(posts)
+      //console.log(posts)
       setPosts(posts)
     })()
   }, []);
@@ -21,8 +21,8 @@ const RenderPostCards = () => {
   return (
     <>
       {posts.map((post) => {
-        console.log(post)
-        return <PostCard post={post} />
+        //console.log(post)
+        return <PostCard key={post.slug} post={post} />
       })}
     </>
   )
@@ -39,7 +39,9 @@ const App: React.FC = () => {
         </Route>
         <Route
           path="/post/:path"
-          render={({ match }) => { return <PostPage post={getPostData(match.params.path)} /> }}
+          render={
+            ({ match }) => <PostPage post={getPostData(match.params.path)} />
+          }
         />
       </Switch>
       </header>

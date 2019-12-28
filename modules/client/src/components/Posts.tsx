@@ -14,6 +14,9 @@ import {
 } from '@material-ui/icons';
 import { Link } from 'react-router-dom';
 
+import { getPostContent } from '../posts';
+import { PostData } from '../types';
+
 const useStyles = makeStyles(theme => ({
   card: {
     maxWidth: 345,
@@ -21,20 +24,20 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export const PostPage = (props: any) => {
-  const [postmd, setPostmd] = useState('');
+  const [postData, setPostData] = useState({} as PostData);
+  const [postMd, setPostMd] = useState('');
 
   useEffect(() => {
-    console.log(props.post)
-
-    fetch(props.post.path).then(
-      res => res.text()
-    ).then(text => {
-      setPostmd(text)
-    })
+    (async () => {
+      // console.log(props.post)
+      const resolvedPost = await props.post
+      console.log(`Rendering post ${resolvedPost.slug} at path ${resolvedPost.path}`);
+      setPostMd(await getPostContent(resolvedPost.slug));
+    })()
   }, [props.post]);
 
   return (
-    <ReactMarkdown source={postmd} />
+    <ReactMarkdown source={postMd} />
   )
 }
 
