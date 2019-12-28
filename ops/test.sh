@@ -2,21 +2,26 @@
 set -e
 
 curl="curl --insecure "
-host="https://localhost"
+dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+project="`cat $dir/../package.json | jq .name | tr -d '"'`"
 
-echo "$host should display html"
-$curl "$host"
-echo
-if [[ "`$curl --silent "$host"`" == "<!doctype html>"* ]]
-then echo "Looks good"
-else echo "Looks not good" && exit 1
+if [[ -n "`docker service ls | grep ${project}_ui`" ]]
+then host="http://localhost:3000"
+else host="https://localhost"
 fi
 
 echo
 echo "$host/api/hello should connect to the server"
 $curl "$host/api/hello"
 echo
-if [[ "`$curl --silent "$host/api/hello"`" == "Hello"* ]]
+if [[ "`$curl --silent "$host/api/hello" | tr '[:upper:]' '[:lower:]'`" == "hello"* ]]
+then echo "Looks good"
+else echo "Looks not good" && exit 1
+fi
+
+echo
+echo "$host should display html"
+if [[ "`$curl --silent "$host" | tr '[:upper:]' '[:lower:]'`" == "<!doctype html>"* ]]
 then echo "Looks good"
 else echo "Looks not good" && exit 1
 fi
