@@ -3,7 +3,7 @@ import './App.css';
 import { PostPage, PostCard } from './components/Posts';
 import { NavBar } from './components/NavBar';
 import { Route, Switch } from 'react-router-dom';
-import { getPostData, getPostIndex } from './posts';
+import { getPostData, getPostIndex } from './utils';
 import { PostData } from './types';
 
 const RenderPostCards = () => {

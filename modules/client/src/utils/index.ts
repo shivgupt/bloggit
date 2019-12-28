@@ -1,5 +1,4 @@
-import { PostData } from './types';
-//import * as posts from './postsContent';
+import { PostData } from '../types';
 import axios from 'axios';
 
 const getUrl = (file: string): string => {

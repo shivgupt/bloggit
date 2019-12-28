@@ -14,7 +14,7 @@ import {
 } from '@material-ui/icons';
 import { Link } from 'react-router-dom';
 
-import { getPostContent } from '../posts';
+import { getPostContent } from '../utils';
 import { PostData } from '../types';
 
 const useStyles = makeStyles(theme => ({
