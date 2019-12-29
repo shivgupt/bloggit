@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import ReactMarkdown from 'react-markdown';
+import Markdown from 'react-markdown';
 import { Link } from 'react-router-dom';
 
 import {
@@ -20,6 +20,8 @@ import {
 
 import { getPostData, getPostContent, getPostIndex } from '../utils';
 import { PostData } from '../types';
+
+import { HeadingRenderer } from './HeadingRenderer';
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
   card: {
@@ -50,7 +52,11 @@ export const PostPage = (props: any) => {
 
   return (
     <Paper variant="outlined">
-      <ReactMarkdown source={content} className={classes.text}/>
+      <Markdown
+        source={content}
+        className={classes.text}
+        renderers={{ heading: HeadingRenderer }}
+      />
     </Paper>
   )
 }
