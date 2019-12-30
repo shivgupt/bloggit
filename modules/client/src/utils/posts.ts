@@ -5,18 +5,32 @@ import { env } from './env'
 let indexCache: Promise<PostIndex> | undefined;
 let contentCache: { [key: string]: Promise<string>; } = {};
 
+const contentUrls = (file: string): string[] => [
+  (!env || typeof env.contentUrl !== 'string') ? file : `${env.contentUrl}/${file}`,
+  `/api/content/${file}`,
+]
+
+// Remember which contentUrl worked & try that one first from now on
+const smartIndexKey = 'contentUrlIndex';
+const smartIndex = (i: number) => {
+  const contentUrlIndex = localStorage.getItem(smartIndexKey) || "0";
+  return (i + parseInt(contentUrlIndex, 10)) % contentUrls('').length
+}
+
 const get = async (file: string): Promise<string | PostIndex> => {
-  console.log(`Getting content file ${file}`);
-  for (const contentUrl of [
-    (!env || typeof env.contentUrl !== 'string') ? file : `${env.contentUrl}/${file}`,
-    `/api/content/${file}`,
-  ]) {
+  const urls = contentUrls(file);
+  for (let i = 0; i < urls.length; i += 1) {
+    const url = urls[smartIndex(i)]
     try {
-      const response = await axios(contentUrl)
+      const response = await axios(url)
       if (response && response.data) {
+        if (i !== 0) {
+          console.log(`Setting default content url to ${i}: ${url.replace(file, '')}`);
+          localStorage.setItem(smartIndexKey, smartIndex(i).toString());
+        }
         return response.data;
       }
-      console.warn(`Got bad data from ${contentUrl}: ${JSON.stringify(response.data)}`);
+      console.warn(`Got bad data from ${url}: ${JSON.stringify(response.data)}`);
     } catch (e) {
       console.warn(e.message);
     }
