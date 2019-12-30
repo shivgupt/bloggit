@@ -47,7 +47,13 @@ export const PostPage = (props: any) => {
         setContent('Post Does Not Exist');
         return
       }
+      console.log(post.slug)
       setContent(await getPostContent(post.slug));
+      if (window.location.hash) {
+        // TODO: Find a better way to focus at sub-section at time of load.
+        // This is pretty hacky
+        window.location.hash = window.location.hash;
+      }
     })()
   }, [props.slug]);
 
