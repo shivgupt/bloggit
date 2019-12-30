@@ -23,7 +23,6 @@ export const CodeBlockRenderer = (props: any) => {
   // console.log(props)
 
   return (
-    
     <Paper variant="outlined">
       <Table className={classes.table} size="small" aria-label="a dense table">
         <TableBody>

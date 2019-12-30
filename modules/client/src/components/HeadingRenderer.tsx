@@ -6,5 +6,16 @@ export const HeadingRenderer = (props: any) => {
   }
   const child = props.children[0];
   console.log(child.$$typeof, child);
-  return <h3 title="test">{props.children}</h3>;
+  console.log(props);
+  var headingSlug = child.props.value.toLowerCase().replace(/\W/g, '-');
+  let link = <a href={`#${headingSlug}`} title="Permanent link">¶</a>
+
+  return React.createElement(
+    `h${props.level}`,
+    {
+      'data-sourcepos': props['data-sourcepos'],
+      'id': headingSlug
+    },
+    [link,props.children]
+  )
 }
