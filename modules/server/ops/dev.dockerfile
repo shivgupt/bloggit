@@ -5,6 +5,8 @@ RUN apk add --update --no-cache bash curl g++ gcc git jq make python
 RUN npm config set unsafe-perm true
 RUN npm install -g npm@6.12.0
 
+RUN git clone https://gitlab.com/bohendo/blog-content.git /blog-content
+
 # https://github.com/moby/moby/issues/37965#issuecomment-426853382
 COPY ops/wait-for.sh ops/wait-for.sh
 RUN true

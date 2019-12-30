@@ -1,10 +1,8 @@
 import express from 'express';
-import fetch from 'node-fetch';
+import path from 'path';
 
-const env = {
-  contentUrl: process.env.BLOG_CONTENT_URL,
-  port: parseInt(process.env.PORT, 10) || 8080,
-}
+import { env } from './env';
+import { content } from './content';
 
 console.log(`Starting server in env: ${JSON.stringify(env, null, 2)}`);
 
@@ -15,29 +13,11 @@ app.use((req, res, next) => {
   next();
 });
 
-app.get('/content/*', async (req, res, next): Promise<void> => {
-  if (!env.contentUrl) {
-    next();
-    return;
-  }
-  const url = `${env.contentUrl}/${req.path.replace(/^\/content\//, '')}`
-  console.log(`Forwarding content from ${url}`);
-  try {
-    const response = await fetch(url)
-    if (response.status === 200) {
-      url.endsWith('.json')
-        ? res.json(await response.json())
-        : res.send(await response.text());
-      return;
-    }
-    res.json({ error: `${response.status}: ${response.statusText}` });
-  } catch (e) {
-    res.json({ error: e.message });
-  }
-});
+app.use('/content', content);
 
 app.use((req, res) => {
-  res.send('Hello World!!');
+  console.log(`404: Hello World!!`);
+  res.status(404).send('Hello World!!');
 });
 
 app.listen(env.port, () => console.log(`Listening on port ${env.port}!`));
