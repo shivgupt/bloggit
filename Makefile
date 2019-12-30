@@ -13,8 +13,9 @@ registry=registry.gitlab.com/$(user)/$(project)
 
 # Set a default content url as an example & to help debug
 default_content=https://gitlab.com/bohendo/blog-content/raw/master
+default_content_repo=https://gitlab.com/bohendo/blog-content.git
 content_url=$(shell if [[ -n "${BLOG_CONTENT_URL}" ]]; then echo "${BLOG_CONTENT_URL}"; else echo $(default_content); fi)
-content_repo=$(shell echo $(content_url) | cut -d '/' -f '1-5' | sed 's/$$/.git/') 
+content_repo=$(shell if [[ -n "${BLOG_CONTENT_REPO}" ]]; then echo "${BLOG_CONTENT_REPO}"; else echo $(default_content_repo); fi)
 
 # Pool of images to pull cached layers from during docker build steps
 cache_from=$(shell if [[ -n "${CI}" ]]; then echo "--cache-from=$(project)_server:$(commit),$(project)_server:latest,$(project)_builder:latest,$(project)_proxy:$(commit),$(project)_proxy:latest"; else echo ""; fi)
