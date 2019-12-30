@@ -8,6 +8,9 @@ RUN npm install -g npm@6.12.0
 COPY modules/server/package.json package.json
 RUN npm install > /dev/null 2>&1
 
+ARG CONTENT_REPO
+RUN git clone $CONTENT_REPO /blog-content
+
 # https://github.com/moby/moby/issues/37965#issuecomment-426853382
 COPY ops/wait-for.sh ops/wait-for.sh
 RUN true

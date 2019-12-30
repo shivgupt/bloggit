@@ -42,4 +42,5 @@ cypress/videos
 
 # Misc
 .rpt2_cache
+.env
 modules/**/.env
