@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Markdown from 'react-markdown';
 import { Link } from 'react-router-dom';
+import { CodeBlockRenderer } from './CodeBlock';
 
 import {
   Card,
@@ -55,7 +56,7 @@ export const PostPage = (props: any) => {
       <Markdown
         source={content}
         className={classes.text}
-        renderers={{ heading: HeadingRenderer }}
+        renderers={{ heading: HeadingRenderer, code: CodeBlockRenderer }}
       />
     </Paper>
   )
