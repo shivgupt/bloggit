@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 import {
   PostCardsLists,
@@ -8,9 +8,11 @@ import { NavBar } from './components/NavBar';
 import { Route, Switch } from 'react-router-dom';
 
 const App: React.FC = () => {
+  const [content, setContent] = useState('Loading');
+
   return (
     <div className="App">
-      <NavBar />
+      <NavBar content={content}/>
       <header className="App-header">
       <Switch>
         <Route exact path={["/", "/home"]} >
@@ -19,7 +21,7 @@ const App: React.FC = () => {
         <Route
           path="/post/:slug"
           render={
-            ({ match }) => <PostPage slug={match.params.slug} />
+            ({ match }) => <PostPage content={content} setContent={setContent} slug={match.params.slug} />
           }
         />
       </Switch>

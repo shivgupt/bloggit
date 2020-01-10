@@ -5,12 +5,16 @@ import {
   IconButton,
   Toolbar,
   Typography,
+  SwipeableDrawer,
 } from '@material-ui/core';
 import {
   Menu as MenuIcon,
   Home as HomeIcon,
+  Toc as TocIcon,
 } from '@material-ui/icons';
 import { Link } from 'react-router-dom';
+import Markdown from 'react-markdown';
+import { TocGenerator } from './ToC';
 
 const useStyles = makeStyles(theme => ({
   grow: {
@@ -29,6 +33,17 @@ const useStyles = makeStyles(theme => ({
 
 export const NavBar = (props: any) => {
   const classes = useStyles();
+  const {content} = props;
+  const [state, setState] = React.useState({open: false });
+
+  const toggleDrawer = (open) => event => {
+      if (event && event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
+        return;
+      }
+
+      setState({open});
+    };
+
   return (
     <div className={classes.grow}>
       <AppBar position="static">
@@ -49,10 +64,29 @@ export const NavBar = (props: any) => {
             edge="start"
             color="inherit"
             aria-label="open drawer"
+            onClick={toggleDrawer(true)}
             className={classes.menuButton}
           >
             <MenuIcon />
           </IconButton>
+          <SwipeableDrawer
+            anchor="right"
+            open={state.open}
+            onClose={toggleDrawer(false)}
+            onOpen={toggleDrawer(true)}
+          >
+            { content ? 
+              <>
+                <TocIcon/> 
+                <Markdown
+                  allowedTypes={['text', 'heading']}
+                  source={content}
+                  renderers={{ heading: TocGenerator}}
+                />
+              </> :
+              <div> Hello </div>
+            }
+          </SwipeableDrawer>
         </Toolbar>
       </AppBar>
     </div>

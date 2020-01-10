@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import Markdown from 'react-markdown';
 import { Link } from 'react-router-dom';
 import { CodeBlockRenderer } from './CodeBlock';
-import { Toc } from './ToC';
 
 import {
   Card,
@@ -38,7 +37,7 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
 
 export const PostPage = (props: any) => {
   const classes = useStyles();
-  const [content, setContent] = useState('Loading');
+  const {content, setContent} = props;
 
   useEffect(() => {
     (async () => {
@@ -60,7 +59,6 @@ export const PostPage = (props: any) => {
 
   return (
     <Paper variant="outlined">
-      <Toc source={content} />
       <Markdown
         source={content}
         className={classes.text}
