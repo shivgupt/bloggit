@@ -8,7 +8,8 @@ export const HeadingRenderer = (props: any) => {
 
   const value = getChildValue(props.children[0]);
 
-  var headingSlug = value.toLowerCase().replace(/[^a-z0-9 ]/g, '').replace(/\W/g, '-');
+  if (value) {
+  var headingSlug = value.toLowerCase().replace(/[^a-z0-9 ]/g, '').replace(/\W+/g, '-');
   let link = <a href={`#${headingSlug}`} title="Permanent link">¶</a>
 
   return React.createElement(
@@ -19,4 +20,6 @@ export const HeadingRenderer = (props: any) => {
     },
     [link,props.children]
   )
+  }
+  return null
 }

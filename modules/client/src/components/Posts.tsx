@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Markdown from 'react-markdown';
 import { Link } from 'react-router-dom';
 import { CodeBlockRenderer } from './CodeBlock';
+import { Toc } from './ToC';
 
 import {
   Card,
@@ -55,10 +56,11 @@ export const PostPage = (props: any) => {
         window.location.hash = window.location.hash;
       }
     })()
-  }, [props.slug]);
+  }, [props.slug, window.location.hash]);
 
   return (
     <Paper variant="outlined">
+      <Toc source={content} />
       <Markdown
         source={content}
         className={classes.text}
