@@ -96,13 +96,14 @@ export const PostCard = (props: any) => {
   )
 }
 
-export const PostCardsLists = () => {
+export const PostCardsLists = (props: any) => {
 
-  const [posts, setPosts] = useState([] as PostData[]);
+  const {posts, setPosts} = props;
 
   useEffect(() => {
     (async () => {
       const posts = await getPostIndex();
+      console.log(posts)
       setPosts(posts)
     })()
   }, []);

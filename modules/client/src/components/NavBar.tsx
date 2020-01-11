@@ -2,6 +2,7 @@ import React from 'react';
 import {
   makeStyles,
   AppBar,
+  List,
   IconButton,
   Toolbar,
   Typography,
@@ -78,11 +79,13 @@ export const NavBar = (props: any) => {
             { content ? 
               <>
                 <TocIcon/> 
-                <Markdown
-                  allowedTypes={['text', 'heading']}
-                  source={content}
-                  renderers={{ heading: TocGenerator}}
-                />
+                <List>
+                  <Markdown
+                    allowedTypes={['text', 'heading']}
+                    source={content}
+                    renderers={{ heading: TocGenerator}}
+                  />
+                </List>
               </> :
               <div> Hello </div>
             }

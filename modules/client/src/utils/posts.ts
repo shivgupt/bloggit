@@ -42,7 +42,16 @@ export const getPostIndex = async (): Promise<PostData[]> => {
   if (!indexCache) {
     indexCache = get('index.json') as Promise<PostIndex>;
   }
-  return (await indexCache).posts;
+
+  const posts = (await indexCache).posts;
+
+  return posts.map((post)=> {
+    post.category = post.category ||
+      post.path.substring(0, post.path.indexOf('/')) ||
+      "default";
+
+    return post;
+  })
 }
 
 export const getPostData = async (slug: string): Promise<PostData | undefined> =>

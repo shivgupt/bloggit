@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Markdown from 'react-markdown';
 import { getChildValue } from '../utils';
 import { Link } from 'react-router-dom';
+import { ListItem } from '@material-ui/core';
 
 export const TocGenerator = (props: any) => {
   if (props.children.length > 1) {
@@ -15,8 +16,11 @@ export const TocGenerator = (props: any) => {
     var headingSlug = value.toLowerCase().replace(/[^a-z0-9 ]/g, '').replace(/\W+/g, '-');
 
     return (
-      <Link to={{hash:`#${headingSlug}`}}> {' '.repeat(props.level)} {value}
-      </Link>
+
+      <ListItem>
+        <Link to={{hash:`#${headingSlug}`}}> {''.repeat(props.level)} {value}
+        </Link>
+      </ListItem>
     )
   }
   return null;
