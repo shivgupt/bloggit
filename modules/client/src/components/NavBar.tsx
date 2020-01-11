@@ -2,7 +2,6 @@ import React from 'react';
 import {
   makeStyles,
   AppBar,
-  List,
   IconButton,
   Toolbar,
   Typography,
@@ -11,11 +10,10 @@ import {
 import {
   Menu as MenuIcon,
   Home as HomeIcon,
-  Toc as TocIcon,
 } from '@material-ui/icons';
 import { Link } from 'react-router-dom';
 import Markdown from 'react-markdown';
-import { TocGenerator } from './ToC';
+import { Toc } from './ToC';
 
 const useStyles = makeStyles(theme => ({
   grow: {
@@ -34,7 +32,7 @@ const useStyles = makeStyles(theme => ({
 
 export const NavBar = (props: any) => {
   const classes = useStyles();
-  const {content} = props;
+  const {content, posts} = props;
   const [state, setState] = React.useState({open: false });
 
   const toggleDrawer = (open) => event => {
@@ -76,18 +74,9 @@ export const NavBar = (props: any) => {
             onClose={toggleDrawer(false)}
             onOpen={toggleDrawer(true)}
           >
-            { content ? 
-              <>
-                <TocIcon/> 
-                <List>
-                  <Markdown
-                    allowedTypes={['text', 'heading']}
-                    source={content}
-                    renderers={{ heading: TocGenerator}}
-                  />
-                </List>
-              </> :
-              <div> Hello </div>
+            { content ?
+              <Toc posts={posts} content={content}/>
+              : <div> Hello </div>
             }
           </SwipeableDrawer>
         </Toolbar>
