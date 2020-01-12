@@ -32,15 +32,17 @@ const useStyles = makeStyles(theme => ({
 
 export const NavBar = (props: any) => {
   const classes = useStyles();
-  const {content, posts} = props;
-  const [state, setState] = React.useState({open: false });
+  const {
+    posts,
+    setState,
+    state,
+  } = props;
 
   const toggleDrawer = (open) => event => {
       if (event && event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
         return;
       }
-
-      setState({open});
+      setState({...state, open: open});
     };
 
   return (
@@ -74,10 +76,7 @@ export const NavBar = (props: any) => {
             onClose={toggleDrawer(false)}
             onOpen={toggleDrawer(true)}
           >
-            { content ?
-              <Toc posts={posts} content={content}/>
-              : <div> Hello </div>
-            }
+            <Toc toggleDrawer={toggleDrawer} posts={posts} state={state} setState={setState}/>
           </SwipeableDrawer>
         </Toolbar>
       </AppBar>

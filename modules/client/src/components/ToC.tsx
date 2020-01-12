@@ -5,10 +5,13 @@ import { Link } from 'react-router-dom';
 import {
   List,
   ListItem,
+  IconButton,
+  SwipeableDrawer,
 } from '@material-ui/core';
 import { PostData } from '../types';
 import {
   Toc as TocIcon,
+  NavigateNext as NavigateNextIcon,
 } from '@material-ui/icons';
 
 export const TocGenerator = (props: any) => {
@@ -35,28 +38,51 @@ export const TocGenerator = (props: any) => {
 
 export const Toc = (props: any) => {
 
-  const {posts, content} = props;
+  const {
+    posts,
+    setState,
+    state,
+    toggleDrawer
+  } = props;
 
-  const getPostsByCategories = (posts: PostData[]) => {
-    let postsByCategory = {}
+  switch(state.current) {
+    case 'categories': 
+      return (
+        <List component="nav" >
+          {Object.keys(posts).map((c) => {
+            return (
+                <ListItem>
+                  {c}
+                  <IconButton
+                    onClick={() => setState({...state, current: 'posts', child: c})}
+                  >
+                    <NavigateNextIcon />
+                  </IconButton>
+                </ListItem>
+            )
+          })}
+        </List>
+      )
 
-    posts.forEach(p => {
-      if (postsByCategory[p.category])
-        postsByCategory[p.category].push(p);
-      else
-        postsByCategory[p.category] = [p];
-    })
+    case 'posts': 
+      return (
+        <List>
+          {posts[state.child].map((p) => {
+            return (
+              <ListItem>
+                {p.title}
+              </ListItem>
+            )
+          })}
+        </List>
+      )
 
-    return postsByCategory;
+    default:
+      return <div> Hello </div>
   }
-  let categories;
+}
 
-  useEffect(() => {
-    categories = getPostsByCategories(posts);
-    console.log(categories);
-  }, [posts]);
-
-  return (
+/*
               <>
                 <TocIcon/>
                 <List>
@@ -67,5 +93,4 @@ export const Toc = (props: any) => {
                   />
                 </List>
               </>
-  )
-}
+ * */
