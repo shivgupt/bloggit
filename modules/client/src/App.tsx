@@ -11,7 +11,12 @@ import { getPostsByCategories } from './utils';
 
 const App: React.FC = () => {
   const [content, setContent] = useState('Loading');
-  const [state, setState] = useState({parent: null, current: 'categories', child: 'posts', open: false});
+  const [state, setState] = useState({
+    parent: null,
+    current: 'categories',
+    child: 'posts',
+    open: false
+  });
   const [posts, setPosts] = useState([] as PostData[]);
 
   return (

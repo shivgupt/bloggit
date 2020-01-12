@@ -12,6 +12,7 @@ import { PostData } from '../types';
 import {
   Toc as TocIcon,
   NavigateNext as NavigateNextIcon,
+  ArrowBackIos as NavigateBackIcon,
 } from '@material-ui/icons';
 
 export const TocGenerator = (props: any) => {
@@ -54,7 +55,7 @@ export const Toc = (props: any) => {
                 <ListItem>
                   {c}
                   <IconButton
-                    onClick={() => setState({...state, current: 'posts', child: c})}
+                    onClick={() => setState({...state, parent: 'categories', current: 'posts', child: c})}
                   >
                     <NavigateNextIcon />
                   </IconButton>
@@ -66,15 +67,22 @@ export const Toc = (props: any) => {
 
     case 'posts': 
       return (
-        <List>
-          {posts[state.child].map((p) => {
-            return (
-              <ListItem>
-                {p.title}
-              </ListItem>
-            )
-          })}
-        </List>
+        <>
+          <IconButton
+            onClick={() => setState({...state, parent: null, current: 'categories', child: 'posts'})}
+          >
+            <NavigateBackIcon />
+          </IconButton>
+          <List component="nav" >
+            {posts[state.child].map((p) => {
+              return (
+                <ListItem>
+                  {p.title}
+                </ListItem>
+              )
+            })}
+          </List>
+        </>
       )
 
     default:
