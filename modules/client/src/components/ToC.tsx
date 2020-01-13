@@ -46,6 +46,8 @@ export const Toc = (props: any) => {
     toggleDrawer
   } = props;
 
+  console.log(posts);
+
   switch(node.current) {
     case 'categories': 
       return (
@@ -76,7 +78,7 @@ export const Toc = (props: any) => {
           <List component="nav" >
             {posts[node.child].map((p) => {
               return (
-                <ListItem>
+                <ListItem key={p.title} component={Link} to={`/post/${p.slug}`}>
                   {p.title}
                 </ListItem>
               )
