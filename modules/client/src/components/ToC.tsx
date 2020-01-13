@@ -4,6 +4,7 @@ import { getChildValue } from '../utils';
 import { Link } from 'react-router-dom';
 import {
   makeStyles,
+  Divider,
   IconButton,
   List,
   ListItem,
@@ -17,6 +18,9 @@ import {
 const useStyles = makeStyles(theme => ({
   list: {
     width: '100%',
+  },
+  tocButton: {
+    marginLeft: theme.spacing(2),
   },
 }));
 
@@ -34,10 +38,13 @@ const TocGenerator = (props: any) => {
 
     return (
 
-      <ListItem key={headingSlug} className={classes.list}>
-        <Link to={{hash:`#${headingSlug}`}}> {''.repeat(props.level)} {value}
-        </Link>
-      </ListItem>
+      <>
+        <ListItem key={headingSlug} className={classes.list}>
+          <Link to={{hash:`#${headingSlug}`}}> {''.repeat(props.level)} {value}
+          </Link>
+        </ListItem>
+        <Divider />
+      </>
     )
   }
   return null;
@@ -59,6 +66,7 @@ export const Toc = (props: any) => {
         <List component="nav" className={classes.list}>
           {Object.keys(posts).map((c) => {
             return (
+              <>
                 <ListItem>
                   {c}
                   <IconButton
@@ -67,6 +75,8 @@ export const Toc = (props: any) => {
                     <NavigateNextIcon />
                   </IconButton>
                 </ListItem>
+                <Divider />
+              </>
             )
           })}
         </List>
@@ -81,20 +91,25 @@ export const Toc = (props: any) => {
           >
             <NavigateBackIcon />
           </IconButton>
+          <Divider />
           <List component="nav" className={classes.list}>
             {posts[node.child].map((p) => {
               return (
-                <ListItem key={p.title} component={Link} to={`/post/${p.slug}`}>
-                  {p.title}
-                  {p.content ? 
-                    <IconButton
-                      onClick={() => setNode({parent: 'posts', current: 'toc', child: p})}
-                    >
-                      <TocIcon/>
-                    </IconButton>
-                    : null
-                  }
-                </ListItem>
+                <>
+                  <ListItem key={p.title} component={Link} to={`/post/${p.slug}`}>
+                    {p.title}
+                    {p.content ? 
+                      <IconButton
+                        onClick={() => setNode({parent: 'posts', current: 'toc', child: p})}
+                        className={classes.tocButton}
+                      >
+                        <TocIcon/>
+                      </IconButton>
+                      : null
+                    }
+                  </ListItem>
+                  <Divider />
+                </>
               )
             })}
           </List>
@@ -109,6 +124,7 @@ export const Toc = (props: any) => {
           >
             <NavigateBackIcon />
           </IconButton>
+          <Divider />
           <List component="nav" className={classes.list}>
             <Markdown
               allowedTypes={['text', 'heading']}
