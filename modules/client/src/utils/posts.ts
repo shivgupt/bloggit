@@ -47,8 +47,10 @@ export const getPostIndex = async (): Promise<PostData[]> => {
 
   return posts.map((post)=> {
     post.category = post.category ||
-      post.path.substring(0, post.path.indexOf('/')) ||
-      "default";
+    post.path.substring(0, post.path.indexOf('/')) ||
+    "default";
+
+    post.content = post.content || 'Loading';
 
     return post;
   })

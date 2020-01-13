@@ -20,7 +20,6 @@ import {
 } from '@material-ui/icons';
 
 import { getPostData, getPostContent, getPostIndex } from '../utils';
-import { PostData } from '../types';
 
 import { HeadingRenderer } from './HeadingRenderer';
 
@@ -37,30 +36,39 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
 
 export const PostPage = (props: any) => {
   const classes = useStyles();
-  const {content, setContent} = props;
+  const [postIndex, setPostIndex] = useState(-2);
+  const {posts, setPosts} = props;
+
+  useEffect(() => {
+    if (posts.length > 0) {
+      let index = posts.findIndex((p) => p.slug === props.slug);
+      setPostIndex(index);
+    }
+
+    if (window.location.hash) {
+      // TODO: Find a better way to focus at sub-section at time of load.
+      // This is pretty hacky
+      window.location.hash = window.location.hash;
+    }
+  }, [props.slug, window.location.hash, posts]);
 
   useEffect(() => {
     (async () => {
-      // console.log(props.post)
-      const post = (await getPostData(props.slug));
-      if (!post) {
-        setContent('Post Does Not Exist');
-        return
-      }
-      console.log(post.slug)
-      setContent(await getPostContent(post.slug));
-      if (window.location.hash) {
-        // TODO: Find a better way to focus at sub-section at time of load.
-        // This is pretty hacky
-        window.location.hash = window.location.hash;
+      if (postIndex >= 0) {
+        const postContent = await getPostContent(posts[postIndex].slug);
+        if (postContent) {
+          posts[postIndex].content = postContent;
+          setPosts([
+            ...posts,
+          ])}
       }
     })()
-  }, [props.slug, window.location.hash]);
+  }, [postIndex]);
 
   return (
     <Paper variant="outlined">
       <Markdown
-        source={content}
+        source={postIndex === -1 ? 'Post Does Not Exist' : (postIndex === -2 ? 'Loading' : posts[postIndex].content)}
         className={classes.text}
         renderers={{ heading: HeadingRenderer, code: CodeBlockRenderer }}
       />
@@ -98,15 +106,7 @@ export const PostCard = (props: any) => {
 
 export const PostCardsLists = (props: any) => {
 
-  const {posts, setPosts} = props;
-
-  useEffect(() => {
-    (async () => {
-      const posts = await getPostIndex();
-      console.log(posts)
-      setPosts(posts)
-    })()
-  }, []);
+  const {posts} = props;
 
   return (
     <>
