@@ -18,7 +18,7 @@ export const HeadingRenderer = (props: any) => {
       'data-sourcepos': props['data-sourcepos'],
       'id': headingSlug
     },
-    [link,props.children]
+    [props.children, link]
   )
   }
   return null

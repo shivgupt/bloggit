@@ -21,6 +21,9 @@ const useStyles = makeStyles(theme => ({
   homeButton: {
     marginRight: theme.spacing(2),
   },
+  list: {
+    width: '40%',
+  },
   menuButton: {
     marginLeft: theme.spacing(2),
   },
@@ -71,16 +74,17 @@ export const NavBar = (props: any) => {
           >
             <MenuIcon />
           </IconButton>
-          <SwipeableDrawer
-            anchor="right"
-            open={drawer.open}
-            onClose={toggleDrawer(false)}
-            onOpen={toggleDrawer(true)}
-          >
-            <Toc posts={posts} node={node} setNode={setNode}/>
-          </SwipeableDrawer>
         </Toolbar>
       </AppBar>
+      <SwipeableDrawer
+        anchor="right"
+        open={drawer.open}
+        onClose={toggleDrawer(false)}
+        onOpen={toggleDrawer(true)}
+        classes={{paper: classes.list}}
+      >
+        <Toc posts={posts} node={node} setNode={setNode}/>
+      </SwipeableDrawer>
     </div>
   )
 }

@@ -3,9 +3,10 @@ import Markdown from 'react-markdown';
 import { getChildValue } from '../utils';
 import { Link } from 'react-router-dom';
 import {
+  makeStyles,
+  IconButton,
   List,
   ListItem,
-  IconButton,
 } from '@material-ui/core';
 import {
   Toc as TocIcon,
@@ -13,7 +14,14 @@ import {
   ArrowBackIos as NavigateBackIcon,
 } from '@material-ui/icons';
 
+const useStyles = makeStyles(theme => ({
+  list: {
+    width: '100%',
+  },
+}));
+
 const TocGenerator = (props: any) => {
+  const classes = useStyles();
   if (props.children.length > 1) {
     console.warn(`This heading has more than one child..?`);
     return null;
@@ -26,7 +34,7 @@ const TocGenerator = (props: any) => {
 
     return (
 
-      <ListItem>
+      <ListItem key={headingSlug} className={classes.list}>
         <Link to={{hash:`#${headingSlug}`}}> {''.repeat(props.level)} {value}
         </Link>
       </ListItem>
@@ -43,10 +51,12 @@ export const Toc = (props: any) => {
     node,
   } = props;
 
+  const classes = useStyles();
   switch(node.current) {
     case 'categories': 
       return (
-        <List component="nav" >
+      <div className={classes.list}>
+        <List component="nav" className={classes.list}>
           {Object.keys(posts).map((c) => {
             return (
                 <ListItem>
@@ -60,17 +70,18 @@ export const Toc = (props: any) => {
             )
           })}
         </List>
+      </div>
       )
 
     case 'posts': 
       return (
-        <>
+        <div className={classes.list}>
           <IconButton
             onClick={() => setNode({parent: null, current: 'categories', child: 'posts'})}
           >
             <NavigateBackIcon />
           </IconButton>
-          <List component="nav" >
+          <List component="nav" className={classes.list}>
             {posts[node.child].map((p) => {
               return (
                 <ListItem key={p.title} component={Link} to={`/post/${p.slug}`}>
@@ -87,35 +98,28 @@ export const Toc = (props: any) => {
               )
             })}
           </List>
-        </>
+        </div>
       )
 
     case 'toc':
       return (
-        <>
+        <div className={classes.list}>
           <IconButton
             onClick={() => setNode({parent: 'categories', current: 'posts', child: node.child.category})}
           >
             <NavigateBackIcon />
           </IconButton>
-          <List component="nav" >
+          <List component="nav" className={classes.list}>
             <Markdown
               allowedTypes={['text', 'heading']}
               source={node.child.content}
               renderers={{ heading: TocGenerator}}
+              className={classes.list}
             />
           </List>
-        </>
+        </div>
       );
     default:
       return <div> Hello </div>
   }
 }
-
-/*
-              <>
-                <TocIcon/>
-                <List>
-                </List>
-              </>
- * */
