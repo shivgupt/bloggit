@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   makeStyles,
   AppBar,
@@ -12,7 +12,6 @@ import {
   Home as HomeIcon,
 } from '@material-ui/icons';
 import { Link } from 'react-router-dom';
-import Markdown from 'react-markdown';
 import { Toc } from './ToC';
 
 const useStyles = makeStyles(theme => ({
@@ -34,15 +33,17 @@ export const NavBar = (props: any) => {
   const classes = useStyles();
   const {
     posts,
-    setState,
-    state,
+    setNode,
+    node,
   } = props;
+
+  const [drawer, setDrawer] = useState({open: false});
 
   const toggleDrawer = (open) => event => {
       if (event && event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
         return;
       }
-      setState({...state, open: open});
+      setDrawer({open: open});
     };
 
   return (
@@ -72,11 +73,11 @@ export const NavBar = (props: any) => {
           </IconButton>
           <SwipeableDrawer
             anchor="right"
-            open={state.open}
+            open={drawer.open}
             onClose={toggleDrawer(false)}
             onOpen={toggleDrawer(true)}
           >
-            <Toc toggleDrawer={toggleDrawer} posts={posts} state={state} setState={setState}/>
+            <Toc toggleDrawer={toggleDrawer} posts={posts} node={node} setNode={setNode}/>
           </SwipeableDrawer>
         </Toolbar>
       </AppBar>

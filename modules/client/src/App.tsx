@@ -11,17 +11,16 @@ import { getPostsByCategories } from './utils';
 
 const App: React.FC = () => {
   const [content, setContent] = useState('Loading');
-  const [state, setState] = useState({
+  const [node, setNode] = useState({
     parent: null,
     current: 'categories',
     child: 'posts',
-    open: false
   });
   const [posts, setPosts] = useState([] as PostData[]);
 
   return (
     <div className="App">
-      <NavBar state={state} setState={setState} posts={getPostsByCategories(posts)}/>
+      <NavBar node={node} setNode={setNode} posts={getPostsByCategories(posts)}/>
       <header className="App-header">
       <Switch>
         <Route exact path={["/", "/home"]} >

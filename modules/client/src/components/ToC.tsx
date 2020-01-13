@@ -15,7 +15,7 @@ import {
   ArrowBackIos as NavigateBackIcon,
 } from '@material-ui/icons';
 
-export const TocGenerator = (props: any) => {
+const TocGenerator = (props: any) => {
   if (props.children.length > 1) {
     console.warn(`This heading has more than one child..?`);
     return null;
@@ -41,12 +41,12 @@ export const Toc = (props: any) => {
 
   const {
     posts,
-    setState,
-    state,
+    setNode,
+    node,
     toggleDrawer
   } = props;
 
-  switch(state.current) {
+  switch(node.current) {
     case 'categories': 
       return (
         <List component="nav" >
@@ -55,7 +55,7 @@ export const Toc = (props: any) => {
                 <ListItem>
                   {c}
                   <IconButton
-                    onClick={() => setState({...state, parent: 'categories', current: 'posts', child: c})}
+                    onClick={() => setNode({parent: 'categories', current: 'posts', child: c})}
                   >
                     <NavigateNextIcon />
                   </IconButton>
@@ -69,12 +69,12 @@ export const Toc = (props: any) => {
       return (
         <>
           <IconButton
-            onClick={() => setState({...state, parent: null, current: 'categories', child: 'posts'})}
+            onClick={() => setNode({parent: null, current: 'categories', child: 'posts'})}
           >
             <NavigateBackIcon />
           </IconButton>
           <List component="nav" >
-            {posts[state.child].map((p) => {
+            {posts[node.child].map((p) => {
               return (
                 <ListItem>
                   {p.title}
