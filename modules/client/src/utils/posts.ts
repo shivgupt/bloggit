@@ -50,7 +50,7 @@ export const getPostIndex = async (): Promise<PostData[]> => {
     post.path.substring(0, post.path.indexOf('/')) ||
     "default";
 
-    post.content = post.content || 'Loading';
+    post.content = post.content || '';
 
     return post;
   })

@@ -47,6 +47,7 @@ export const Toc = (props: any) => {
   } = props;
 
   console.log(posts);
+  console.log(node);
 
   switch(node.current) {
     case 'categories': 
@@ -80,6 +81,14 @@ export const Toc = (props: any) => {
               return (
                 <ListItem key={p.title} component={Link} to={`/post/${p.slug}`}>
                   {p.title}
+                  {p.content ? 
+                    <IconButton
+                      onClick={() => setNode({parent: 'posts', current: 'toc', child: p})}
+                    >
+                      <TocIcon/>
+                    </IconButton>
+                    : null
+                  }
                 </ListItem>
               )
             })}
@@ -87,6 +96,23 @@ export const Toc = (props: any) => {
         </>
       )
 
+    case 'toc':
+      return (
+        <>
+          <IconButton
+            onClick={() => setNode({parent: 'categories', current: 'posts', child: node.child.category})}
+          >
+            <NavigateBackIcon />
+          </IconButton>
+          <List component="nav" >
+            <Markdown
+              allowedTypes={['text', 'heading']}
+              source={node.child.content}
+              renderers={{ heading: TocGenerator}}
+            />
+          </List>
+        </>
+      );
     default:
       return <div> Hello </div>
   }
@@ -96,11 +122,6 @@ export const Toc = (props: any) => {
               <>
                 <TocIcon/>
                 <List>
-                  <Markdown
-                    allowedTypes={['text', 'heading']}
-                    source={content}
-                    renderers={{ heading: TocGenerator}}
-                  />
                 </List>
               </>
  * */
