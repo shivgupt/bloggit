@@ -25,7 +25,7 @@ import { HeadingRenderer } from './HeadingRenderer';
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
   card: {
-    maxWidth: 345,
+    width: 345,
   },
   text: {
     padding: "20px",
