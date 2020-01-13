@@ -77,7 +77,7 @@ export const NavBar = (props: any) => {
             onClose={toggleDrawer(false)}
             onOpen={toggleDrawer(true)}
           >
-            <Toc toggleDrawer={toggleDrawer} posts={posts} node={node} setNode={setNode}/>
+            <Toc posts={posts} node={node} setNode={setNode}/>
           </SwipeableDrawer>
         </Toolbar>
       </AppBar>

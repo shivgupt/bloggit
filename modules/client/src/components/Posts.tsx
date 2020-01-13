@@ -19,7 +19,7 @@ import {
   ExpandMore as ExpandMoreIcon,
 } from '@material-ui/icons';
 
-import { getPostData, getPostContent } from '../utils';
+import { getPostContent } from '../utils';
 
 import { HeadingRenderer } from './HeadingRenderer';
 
@@ -48,13 +48,14 @@ export const PostPage = (props: any) => {
     if (window.location.hash) {
       // TODO: Find a better way to focus at sub-section at time of load.
       // This is pretty hacky
+      // eslint-disable-next-line
       window.location.hash = window.location.hash;
     }
-  }, [props.slug, window.location.hash, posts]);
+  }, [props.slug, posts]);
 
   useEffect(() => {
     (async () => {
-      if (postIndex >= 0) {
+      if (postIndex >= 0 && !posts[postIndex].content) {
         const postContent = await getPostContent(posts[postIndex].slug);
         if (postContent) {
           posts[postIndex].content = postContent;
@@ -65,7 +66,7 @@ export const PostPage = (props: any) => {
         document.title = `${posts[postIndex].title} | ${indexTitle}`
       }
     })()
-  }, [postIndex]);
+  }, [postIndex, indexTitle]);
 
   return (
     <Paper variant="outlined">
@@ -112,7 +113,7 @@ export const PostCardsLists = (props: any) => {
 
   useEffect(() => {
     document.title = indexTitle;
-  }, []);
+  }, [indexTitle]);
 
   return (
     <>

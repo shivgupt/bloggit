@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import Markdown from 'react-markdown';
 import { getChildValue } from '../utils';
 import { Link } from 'react-router-dom';
@@ -6,9 +6,7 @@ import {
   List,
   ListItem,
   IconButton,
-  SwipeableDrawer,
 } from '@material-ui/core';
-import { PostData } from '../types';
 import {
   Toc as TocIcon,
   NavigateNext as NavigateNextIcon,
@@ -43,11 +41,7 @@ export const Toc = (props: any) => {
     posts,
     setNode,
     node,
-    toggleDrawer
   } = props;
-
-  console.log(posts);
-  console.log(node);
 
   switch(node.current) {
     case 'categories': 
