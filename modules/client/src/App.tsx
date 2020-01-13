@@ -7,7 +7,7 @@ import {
 import { NavBar } from './components/NavBar';
 import { Route, Switch } from 'react-router-dom';
 import { PostData } from './types';
-import { getPostsByCategories, getPostIndex } from './utils';
+import { getPostsByCategories, getPosts, getPostIndex } from './utils';
 
 const App: React.FC = () => {
   //const [content, setContent] = useState('Loading');
@@ -17,10 +17,16 @@ const App: React.FC = () => {
     child: 'posts',
   });
   const [posts, setPosts] = useState([] as PostData[]);
+  const [indexTitle, setIndexTitle] = useState('');
 
   useEffect(() => {
     (async () => {
-      setPosts((await getPostIndex()));
+      setPosts((await getPosts()));
+      const index = await getPostIndex();
+      console.log(index);
+      setIndexTitle(index.title);
+      document.title = index.title;
+
     })()
   }, []);
 
@@ -30,12 +36,12 @@ const App: React.FC = () => {
       <header className="App-header">
       <Switch>
         <Route exact path={["/", "/home"]} >
-          <PostCardsLists posts={posts} />
+          <PostCardsLists posts={posts} indexTitle={indexTitle} />
         </Route>
         <Route
           path="/post/:slug"
           render={
-            ({ match }) => <PostPage posts={posts} setPosts={setPosts} slug={match.params.slug} />
+            ({ match }) => <PostPage indexTitle={indexTitle} posts={posts} setPosts={setPosts} slug={match.params.slug} />
           }
         />
       </Switch>

@@ -38,7 +38,7 @@ const get = async (file: string): Promise<string | PostIndex> => {
   throw new Error(`Couldn't get ${file}`);
 }
 
-export const getPostIndex = async (): Promise<PostData[]> => {
+export const getPosts = async (): Promise<PostData[]> => {
   if (!indexCache) {
     indexCache = get('index.json') as Promise<PostIndex>;
   }
@@ -57,7 +57,7 @@ export const getPostIndex = async (): Promise<PostData[]> => {
 }
 
 export const getPostData = async (slug: string): Promise<PostData | undefined> =>
-  (await getPostIndex()).find(post => post.slug === slug);
+  (await getPosts()).find(post => post.slug === slug);
 
 export const getPostContent = async (slug: string): Promise<string> => {
   if (!contentCache[slug]) {
@@ -66,4 +66,12 @@ export const getPostContent = async (slug: string): Promise<string> => {
     contentCache[slug] = get(data.path) as Promise<string>;
   }
   return contentCache[slug];
+}
+
+export const getPostIndex = async (): Promise<PostIndex> => {
+  if (!indexCache) {
+    indexCache = get('index.json') as Promise<PostIndex>;
+  }
+
+  return indexCache;
 }

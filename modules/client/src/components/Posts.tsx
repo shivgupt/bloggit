@@ -19,7 +19,7 @@ import {
   ExpandMore as ExpandMoreIcon,
 } from '@material-ui/icons';
 
-import { getPostData, getPostContent, getPostIndex } from '../utils';
+import { getPostData, getPostContent } from '../utils';
 
 import { HeadingRenderer } from './HeadingRenderer';
 
@@ -37,7 +37,7 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
 export const PostPage = (props: any) => {
   const classes = useStyles();
   const [postIndex, setPostIndex] = useState(-2);
-  const {posts, setPosts} = props;
+  const {posts, setPosts, indexTitle} = props;
 
   useEffect(() => {
     if (posts.length > 0) {
@@ -60,7 +60,9 @@ export const PostPage = (props: any) => {
           posts[postIndex].content = postContent;
           setPosts([
             ...posts,
-          ])}
+          ])
+        }
+        document.title = `${posts[postIndex].title} | ${indexTitle}`
       }
     })()
   }, [postIndex]);
@@ -106,7 +108,11 @@ export const PostCard = (props: any) => {
 
 export const PostCardsLists = (props: any) => {
 
-  const {posts} = props;
+  const {posts, indexTitle} = props;
+
+  useEffect(() => {
+    document.title = indexTitle;
+  }, []);
 
   return (
     <>
