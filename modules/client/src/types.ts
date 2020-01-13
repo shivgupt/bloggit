@@ -5,6 +5,7 @@ export type PostData = {
   tags: string[];
   tldr: string;
   title: string;
+  content: string;
 };
 
 export type PostIndex = {
