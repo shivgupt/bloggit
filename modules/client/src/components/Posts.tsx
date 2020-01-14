@@ -122,16 +122,14 @@ export const PostCardsLists = (props: any) => {
   }, [indexTitle]);
 
   return (
-    <div className={classes.root}>
-    <Grid container spacing={3} justify={'space-around'} alignItems={'center'}>
-      {posts.map((post) => {
-        return (
-          <Grid item >
-            <PostCard key={post.slug} post={post} />
-          </Grid>
-        )})}
-    </Grid>
-    </div>
+      <Grid container spacing={3} justify={'space-around'} alignItems={'center'}>
+        {posts.map((post) => {
+          return (
+            <Grid item >
+              <PostCard key={post.slug} post={post} />
+            </Grid>
+          )})}
+      </Grid>
   )
 }
 

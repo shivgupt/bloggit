@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import './App.css';
 import {
   PostCardsLists,
   PostPage,
@@ -9,8 +8,24 @@ import { Route, Switch } from 'react-router-dom';
 import { PostData } from './types';
 import { getPostsByCategories, getPosts, getPostIndex } from './utils';
 
+import {
+  createStyles,
+  makeStyles,
+  Container,
+  CssBaseline,
+  Theme,
+} from '@material-ui/core';
+
+const useStyles = makeStyles((theme: Theme) => createStyles({
+  root: {
+    flexGrow: 1,
+    height: '100%',
+    width: '100%',
+  },
+}),);
+
 const App: React.FC = () => {
-  //const [content, setContent] = useState('Loading');
+  const classes = useStyles();
   const [node, setNode] = useState({
     parent: null,
     current: 'categories',
@@ -23,29 +38,30 @@ const App: React.FC = () => {
     (async () => {
       setPosts((await getPosts()));
       const index = await getPostIndex();
-      console.log(index);
       setIndexTitle(index.title);
       document.title = index.title;
-
     })()
   }, []);
 
   return (
     <div>
-      <NavBar node={node} setNode={setNode} posts={getPostsByCategories(posts)}/>
-      <header className="App-header">
-      <Switch>
-        <Route exact path={["/", "/home"]} >
-          <PostCardsLists posts={posts} indexTitle={indexTitle} />
-        </Route>
-        <Route
-          path="/post/:slug"
-          render={
-            ({ match }) => <PostPage indexTitle={indexTitle} posts={posts} setPosts={setPosts} slug={match.params.slug} />
-          }
-        />
-      </Switch>
-      </header>
+      <CssBaseline />
+      <Container maxWidth="lg">
+        <NavBar node={node} setNode={setNode} posts={getPostsByCategories(posts)}/>
+        <main>
+          <Switch>
+            <Route exact path={["/", "/home"]} >
+              <PostCardsLists posts={posts} indexTitle={indexTitle} />
+            </Route>
+            <Route
+              path="/post/:slug"
+              render={
+                ({ match }) => <PostPage indexTitle={indexTitle} posts={posts} setPosts={setPosts} slug={match.params.slug} />
+              }
+            />
+          </Switch>
+        </main>
+      </Container>
     </div>
   );
 }
