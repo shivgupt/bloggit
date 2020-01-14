@@ -42,7 +42,7 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
 export const PostPage = (props: any) => {
   const classes = useStyles();
   const [postIndex, setPostIndex] = useState(-2);
-  const {posts, setPosts, indexTitle} = props;
+  const {posts, setPosts, title, setTitle} = props;
 
   useEffect(() => {
     if (posts.length > 0) {
@@ -68,10 +68,16 @@ export const PostPage = (props: any) => {
             ...posts,
           ])
         }
-        document.title = `${posts[postIndex].title} | ${indexTitle}`
       }
     })()
-  }, [postIndex, indexTitle]);
+  }, [postIndex]);
+
+  useEffect(() => {
+    if (postIndex >= 0) {
+      setTitle({...title, secondary: posts[postIndex].title});
+      document.title = `${posts[postIndex].title} | ${title.primary}`
+    }
+  }, [props.slug, postIndex]);
 
   return (
     <Paper variant="outlined">
@@ -114,12 +120,13 @@ export const PostCard = (props: any) => {
 
 export const PostCardsLists = (props: any) => {
 
-  const {posts, indexTitle} = props;
+  const {posts, title, setTitle} = props;
   const classes = useStyles();
 
   useEffect(() => {
-    document.title = indexTitle;
-  }, [indexTitle]);
+    setTitle({...title, secondary: ''});
+    document.title = title.primary;
+  }, []);
 
   return (
       <Grid container spacing={3} justify={'space-around'} alignItems={'center'}>

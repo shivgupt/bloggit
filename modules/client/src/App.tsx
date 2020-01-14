@@ -18,9 +18,7 @@ import {
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
   root: {
-    flexGrow: 1,
-    height: '100%',
-    width: '100%',
+    backgroundColor: 'linen',
   },
 }),);
 
@@ -32,31 +30,31 @@ const App: React.FC = () => {
     child: 'posts',
   });
   const [posts, setPosts] = useState([] as PostData[]);
-  const [indexTitle, setIndexTitle] = useState('');
+  const [title, setTitle] = useState({primary: '', secondary: ''});
 
   useEffect(() => {
     (async () => {
       setPosts((await getPosts()));
       const index = await getPostIndex();
-      setIndexTitle(index.title);
-      document.title = index.title;
+      setTitle({...title, primary: index.title});
+      document.title = title.primary;
     })()
   }, []);
 
   return (
-    <div>
+    <div className={classes.root}>
       <CssBaseline />
       <Container maxWidth="lg">
-        <NavBar node={node} setNode={setNode} posts={getPostsByCategories(posts)}/>
+        <NavBar node={node} setNode={setNode} posts={getPostsByCategories(posts)} title={title}/>
         <main>
           <Switch>
             <Route exact path={["/", "/home"]} >
-              <PostCardsLists posts={posts} indexTitle={indexTitle} />
+              <PostCardsLists posts={posts} title={title} setTitle={setTitle} />
             </Route>
             <Route
               path="/post/:slug"
               render={
-                ({ match }) => <PostPage indexTitle={indexTitle} posts={posts} setPosts={setPosts} slug={match.params.slug} />
+                ({ match }) => <PostPage title={title} setTitle={setTitle} posts={posts} setPosts={setPosts} slug={match.params.slug} />
               }
             />
           </Switch>

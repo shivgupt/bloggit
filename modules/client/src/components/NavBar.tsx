@@ -16,7 +16,7 @@ import { Toc } from './ToC';
 
 const useStyles = makeStyles(theme => ({
   grow: {
-    flexGrow: 1,
+    borderBottom: `5px solid ${theme.palette.divider}`,
   },
   homeButton: {
     marginRight: theme.spacing(2),
@@ -28,7 +28,7 @@ const useStyles = makeStyles(theme => ({
     marginLeft: theme.spacing(2),
   },
   title: {
-    flexGrow: 1,
+    flex: 1,
   },
 }));
 
@@ -38,6 +38,7 @@ export const NavBar = (props: any) => {
     posts,
     setNode,
     node,
+    title
   } = props;
 
   const [drawer, setDrawer] = useState({open: false});
@@ -51,24 +52,24 @@ export const NavBar = (props: any) => {
 
   return (
     <div className={classes.grow}>
-      <AppBar position="static">
+      <AppBar position='static'>
         <Toolbar>
           <IconButton
             component={Link}
-            edge="start"
+            edge='start'
             to={'/home'}
-            color="inherit"
+            color='inherit'
             className={classes.homeButton}
           >
             <HomeIcon />
           </IconButton>
-          <Typography className={classes.title} variant="h5" noWrap>
-            My Blog
+          <Typography className={classes.title} variant='h5' align={'center'} component={'h2'} noWrap>
+            {title.secondary ? title.secondary : title.primary}
           </Typography>
           <IconButton
-            edge="start"
-            color="inherit"
-            aria-label="open drawer"
+            edge='start'
+            color='inherit'
+            aria-label='open drawer'
             onClick={toggleDrawer(true)}
             className={classes.menuButton}
           >
@@ -77,7 +78,7 @@ export const NavBar = (props: any) => {
         </Toolbar>
       </AppBar>
       <SwipeableDrawer
-        anchor="right"
+        anchor='right'
         open={drawer.open}
         onClose={toggleDrawer(false)}
         onOpen={toggleDrawer(true)}
