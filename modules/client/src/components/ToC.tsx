@@ -37,11 +37,9 @@ const TocGenerator = (props: any) => {
     var headingSlug = value.toLowerCase().replace(/[^a-z0-9 ]/g, '').replace(/\W+/g, '-');
 
     return (
-
       <>
-        <ListItem key={headingSlug} className={classes.list}>
-          <Link to={{hash:`#${headingSlug}`}}> {''.repeat(props.level)} {value}
-          </Link>
+        <ListItem button key={headingSlug} className={classes.list} component={Link} to={{hash:`#${headingSlug}`}}>
+          {value}
         </ListItem>
         <Divider />
       </>
