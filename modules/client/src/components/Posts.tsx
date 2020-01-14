@@ -8,6 +8,7 @@ import {
   CardActions,
   CardContent,
   CardHeader,
+  Grid,
   IconButton,
   Paper,
   Theme,
@@ -26,6 +27,10 @@ import { HeadingRenderer } from './HeadingRenderer';
 const useStyles = makeStyles((theme: Theme) => createStyles({
   card: {
     width: 345,
+    height: 245,
+  },
+  root: {
+    flexGrow: 1,
   },
   text: {
     padding: "20px",
@@ -110,17 +115,23 @@ export const PostCard = (props: any) => {
 export const PostCardsLists = (props: any) => {
 
   const {posts, indexTitle} = props;
+  const classes = useStyles();
 
   useEffect(() => {
     document.title = indexTitle;
   }, [indexTitle]);
 
   return (
-    <>
+    <div className={classes.root}>
+    <Grid container spacing={3} justify={'space-around'} alignItems={'center'}>
       {posts.map((post) => {
-        return <PostCard key={post.slug} post={post} />
-      })}
-    </>
+        return (
+          <Grid item >
+            <PostCard key={post.slug} post={post} />
+          </Grid>
+        )})}
+    </Grid>
+    </div>
   )
 }
 

@@ -31,7 +31,7 @@ const App: React.FC = () => {
   }, []);
 
   return (
-    <div className="App">
+    <div>
       <NavBar node={node} setNode={setNode} posts={getPostsByCategories(posts)}/>
       <header className="App-header">
       <Switch>
