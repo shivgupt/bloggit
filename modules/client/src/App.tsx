@@ -20,6 +20,9 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
   root: {
     backgroundColor: 'linen',
   },
+  main: {
+    marginTop: '80px',
+  },
 }),);
 
 const App: React.FC = () => {
@@ -46,7 +49,7 @@ const App: React.FC = () => {
       <CssBaseline />
       <Container maxWidth="lg">
         <NavBar node={node} setNode={setNode} posts={getPostsByCategories(posts)} title={title}/>
-        <main>
+        <main className={classes.main}>
           <Switch>
             <Route exact path={["/", "/home"]} >
               <PostCardsLists posts={posts} title={title} setTitle={setTitle} />
