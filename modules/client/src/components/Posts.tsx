@@ -2,26 +2,19 @@ import React, { useState, useEffect } from 'react';
 import Markdown from 'react-markdown';
 import { Link } from 'react-router-dom';
 import { CodeBlockRenderer } from './CodeBlock';
-
 import {
   Card,
-  CardActions,
+  CardActionArea,
   CardContent,
   CardHeader,
   Grid,
-  IconButton,
   Paper,
   Theme,
   Typography,
   createStyles,
   makeStyles,
 } from '@material-ui/core';
-import {
-  ExpandMore as ExpandMoreIcon,
-} from '@material-ui/icons';
-
 import { getPostContent } from '../utils';
-
 import { HeadingRenderer } from './HeadingRenderer';
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
@@ -99,23 +92,16 @@ export const PostCard = (props: any) => {
 
   return (
     <Grid item>
-      <Card className={classes.card}>
-        <CardHeader title={props.post.title} />
-        <CardContent>
-          <Typography variant="body2" color="textSecondary" component="p">
-            {props.post.tldr}
-          </Typography>
-        </CardContent>
-        <CardActions disableSpacing>
-          <IconButton
-            component={Link}
-            to={`/post/${props.post.slug}`}
-            aria-label="show more"
-          >
-            <ExpandMoreIcon />
-          </IconButton>
-        </CardActions>
-      </Card>
+      <CardActionArea component={Link} to={`/post/${props.post.slug}`}>
+        <Card className={classes.card}>
+          <CardHeader title={props.post.title} />
+          <CardContent>
+            <Typography variant="body2" color="textSecondary" component="p">
+              {props.post.tldr}
+            </Typography>
+          </CardContent>
+        </Card>
+      </CardActionArea>
     </Grid>
   )
 }
@@ -123,7 +109,6 @@ export const PostCard = (props: any) => {
 export const PostCardsLists = (props: any) => {
 
   const {posts, title, setTitle} = props;
-  const classes = useStyles();
 
   useEffect(() => {
     setTitle({...title, secondary: ''});
