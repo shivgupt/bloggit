@@ -98,23 +98,25 @@ export const PostCard = (props: any) => {
   }
 
   return (
-     <Card className={classes.card}>
-      <CardHeader title={props.post.title} />
-      <CardContent>
-        <Typography variant="body2" color="textSecondary" component="p">
-          {props.post.tldr}
-        </Typography>
-      </CardContent>
-      <CardActions disableSpacing>
-        <IconButton
-          component={Link}
-          to={`/post/${props.post.slug}`}
-          aria-label="show more"
-        >
-          <ExpandMoreIcon />
-        </IconButton>
-      </CardActions>
-    </Card>
+    <Grid item>
+      <Card className={classes.card}>
+        <CardHeader title={props.post.title} />
+        <CardContent>
+          <Typography variant="body2" color="textSecondary" component="p">
+            {props.post.tldr}
+          </Typography>
+        </CardContent>
+        <CardActions disableSpacing>
+          <IconButton
+            component={Link}
+            to={`/post/${props.post.slug}`}
+            aria-label="show more"
+          >
+            <ExpandMoreIcon />
+          </IconButton>
+        </CardActions>
+      </Card>
+    </Grid>
   )
 }
 
@@ -132,9 +134,7 @@ export const PostCardsLists = (props: any) => {
       <Grid container spacing={3} justify={'space-around'} alignItems={'center'}>
         {posts.map((post) => {
           return (
-            <Grid item >
-              <PostCard key={post.slug} post={post} />
-            </Grid>
+            <PostCard key={post.slug} post={post} />
           )})}
       </Grid>
   )
