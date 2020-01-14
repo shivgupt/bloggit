@@ -52,7 +52,7 @@ export const NavBar = (props: any) => {
 
   return (
     <div className={classes.grow}>
-      <AppBar position='static'>
+      <AppBar position='fixed'>
         <Toolbar>
           <IconButton
             component={Link}
