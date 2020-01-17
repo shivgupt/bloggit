@@ -1,47 +1,37 @@
 module.exports = {
+    rules: {
+      "comma-dangle": ["error", "always-multiline"],
+      "indent": ["error", 2],
+      "no-unused-vars": ["error"],
+      "no-var": ["error"],
+      "quotes": ["error", "single"],
+      "semi": ["error", "always"],
+    },
     settings: {
       react: {
-        version: "detect", // React version. "detect" automatically picks the version you have installed.
+        version: "detect",
       },
     },
     env: {
-        browser: true,
-        es6: true
+      browser: true,
+      es6: true
     },
     extends: [
-        "react-app",
-        "eslint:recommended",
-        "plugin:react/recommended",
-        "plugin:@typescript-eslint/eslint-recommended",
+      "react-app",
+      "eslint:recommended",
+      "plugin:react/recommended",
+      "plugin:@typescript-eslint/eslint-recommended",
     ],
-    globals: {
-        Atomics: "readonly",
-        SharedArrayBuffer: "readonly"
-    },
     parser: "@typescript-eslint/parser",
     parserOptions: {
-        ecmaFeatures: {
-            "jsx": true
-        },
-        ecmaVersion: 2018,
-        sourceType: "module"
+      ecmaFeatures: {
+        "jsx": true
+      },
+      ecmaVersion: 2018,
+      sourceType: "module"
     },
     plugins: [
-        "react",
-        "@typescript-eslint"
+      "react",
+      "@typescript-eslint"
     ],
-    rules: {
-      // enable additional rules
-      // "indent": ["error", 4],
-      "no-unused-vars": ["error"],
-      "linebreak-style": ["error", "unix"],
-      "quotes": ["error", "double"],
-      "semi": ["error", "always"],
-      // override default options for rules from base configurations
-      "comma-dangle": ["error", "never"],
-      "no-cond-assign": ["error", "always"],
-      // disable rules from base configurations
-      "no-console": "off",
-
-    }
 };
