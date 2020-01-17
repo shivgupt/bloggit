@@ -69,8 +69,8 @@ export const Toc = (props: any) => {
         <List component="nav" className={classes.list}>
           {Object.keys(posts).map((c) => {
             return (
-              <>
-                <ListItem>
+              <div key={c}>
+                <ListItem >
                   {c}
                   <IconButton
                     onClick={() => setNode({
@@ -82,7 +82,7 @@ export const Toc = (props: any) => {
                   </IconButton>
                 </ListItem>
                 <Divider />
-              </>
+              </div>
             );
           })}
         </List>
@@ -105,7 +105,7 @@ export const Toc = (props: any) => {
         <List component="nav" className={classes.list}>
           {posts[node.child].map((p) => {
             return (
-              <>
+              <div key={p.slug}>
                 <ListItem key={p.title} component={Link} to={`/post/${p.slug}`}>
                   {p.title}
                   {p.content ? 
@@ -123,7 +123,7 @@ export const Toc = (props: any) => {
                   }
                 </ListItem>
                 <Divider />
-              </>
+              </div>
             );
           })}
         </List>
