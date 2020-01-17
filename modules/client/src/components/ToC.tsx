@@ -26,6 +26,7 @@ const useStyles = makeStyles(theme => ({
 
 const TocGenerator = (props: any) => {
   const classes = useStyles();
+
   if (props.children.length > 1) {
     console.warn(`This heading has more than one child..?`);
     return null;
@@ -33,30 +34,27 @@ const TocGenerator = (props: any) => {
 
   const value = getChildValue(props.children[0]);
 
-  if (value) {
-    var headingSlug = value.toLowerCase().replace(/[^a-z0-9 ]/g, '').replace(/\W+/g, '-');
-
-    return (
-      <>
-        <ListItem button key={headingSlug} className={classes.list} component={Link} to={{hash:`#${headingSlug}`}}>
-          {value}
-        </ListItem>
-        <Divider />
-      </>
-    )
+  if (!value) {
+    console.warn(`This heading has no child values..?`);
+    return null;
   }
-  return null;
+
+  var headingSlug = value.toLowerCase().replace(/[^a-z0-9 ]/g, '').replace(/\W+/g, '-');
+
+  return (
+    <>
+      <ListItem button key={headingSlug} className={classes.list} component={Link} to={{hash:`#${headingSlug}`}}>
+        {value}
+      </ListItem>
+      <Divider />
+    </>
+  )
 };
 
 export const Toc = (props: any) => {
-
-  const {
-    posts,
-    setNode,
-    node,
-  } = props;
-
+  const { posts, setNode, node } = props;
   const classes = useStyles();
+
   switch(node.current) {
     case 'categories': 
       return (

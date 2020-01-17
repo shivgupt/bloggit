@@ -20,8 +20,6 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
 
 export const CodeBlockRenderer = (props: any) => {
   const classes = useStyles();
-  // console.log(props)
-
   return (
     <Paper variant="outlined">
       <Table className={classes.table} size="small" aria-label="a dense table">

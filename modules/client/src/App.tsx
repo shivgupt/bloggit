@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import {
-  PostCardsLists,
-  PostPage,
-} from './components/Posts';
+import { Home } from './components/Home';
+import { PostPage } from './components/Posts';
 import { NavBar } from './components/NavBar';
 import { Route, Switch } from 'react-router-dom';
 import { PostData } from './types';
@@ -52,7 +50,7 @@ const App: React.FC = () => {
         <main className={classes.main}>
           <Switch>
             <Route exact path={["/", "/home"]} >
-              <PostCardsLists posts={posts} title={title} setTitle={setTitle} />
+              <Home posts={posts} title={title} setTitle={setTitle} />
             </Route>
             <Route
               path="/post/:slug"

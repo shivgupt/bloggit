@@ -33,22 +33,17 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export const NavBar = (props: any) => {
+  const { posts, setNode, node, title } = props;
   const classes = useStyles();
-  const {
-    posts,
-    setNode,
-    node,
-    title
-  } = props;
-
   const [drawer, setDrawer] = useState({open: false});
 
   const toggleDrawer = (open) => event => {
-      if (event && event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
-        return;
-      }
-      setDrawer({open: open});
-    };
+    // what's the goal of ignoring some of these events?
+    if (event && event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
+      return;
+    }
+    setDrawer({open: open});
+  };
 
   return (
     <div className={classes.grow}>
