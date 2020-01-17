@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import Markdown from 'react-markdown';
-import { CodeBlockRenderer } from './CodeBlock';
+import React, { useState, useEffect } from "react";
+import Markdown from "react-markdown";
+import { CodeBlockRenderer } from "./CodeBlock";
 import {
   Paper,
   Theme,
   createStyles,
   makeStyles,
-} from '@material-ui/core';
-import { getPostContent } from '../utils';
-import { HeadingRenderer } from './HeadingRenderer';
+} from "@material-ui/core";
+import { getPostContent } from "../utils";
+import { HeadingRenderer } from "./HeadingRenderer";
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
   root: {
@@ -48,26 +48,26 @@ export const PostPage = (props: any) => {
           posts[postIndex].content = postContent;
           setPosts([
             ...posts,
-          ])
+          ]);
         }
       }
-    })()
+    })();
   }, [postIndex]);
 
   useEffect(() => {
     if (postIndex >= 0) {
       setTitle({...title, secondary: posts[postIndex].title});
-      document.title = `${posts[postIndex].title} | ${title.primary}`
+      document.title = `${posts[postIndex].title} | ${title.primary}`;
     }
   }, [props.slug, postIndex]);
 
   return (
     <Paper variant="outlined">
       <Markdown
-        source={postIndex === -1 ? 'Post Does Not Exist' : (postIndex === -2 ? 'Loading' : posts[postIndex].content)}
+        source={postIndex === -1 ? "Post Does Not Exist" : (postIndex === -2 ? "Loading" : posts[postIndex].content)}
         className={classes.text}
         renderers={{ heading: HeadingRenderer, code: CodeBlockRenderer }}
       />
     </Paper>
-  )
-}
+  );
+};

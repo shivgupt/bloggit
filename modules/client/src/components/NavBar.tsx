@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from "react";
 import {
   makeStyles,
   AppBar,
@@ -6,13 +6,13 @@ import {
   Toolbar,
   Typography,
   SwipeableDrawer,
-} from '@material-ui/core';
+} from "@material-ui/core";
 import {
   Menu as MenuIcon,
   Home as HomeIcon,
-} from '@material-ui/icons';
-import { Link } from 'react-router-dom';
-import { Toc } from './ToC';
+} from "@material-ui/icons";
+import { Link } from "react-router-dom";
+import { Toc } from "./ToC";
 
 const useStyles = makeStyles(theme => ({
   grow: {
@@ -22,7 +22,7 @@ const useStyles = makeStyles(theme => ({
     marginRight: theme.spacing(2),
   },
   list: {
-    width: '40%',
+    width: "40%",
   },
   menuButton: {
     marginLeft: theme.spacing(2),
@@ -39,7 +39,7 @@ export const NavBar = (props: any) => {
 
   const toggleDrawer = (open) => event => {
     // what's the goal of ignoring some of these events?
-    if (event && event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
+    if (event && event.type === "keydown" && (event.key === "Tab" || event.key === "Shift")) {
       return;
     }
     setDrawer({open: open});
@@ -47,24 +47,24 @@ export const NavBar = (props: any) => {
 
   return (
     <div className={classes.grow}>
-      <AppBar position='fixed'>
+      <AppBar position="fixed">
         <Toolbar>
           <IconButton
             component={Link}
-            edge='start'
-            to={'/home'}
-            color='inherit'
+            edge="start"
+            to={"/home"}
+            color="inherit"
             className={classes.homeButton}
           >
             <HomeIcon />
           </IconButton>
-          <Typography className={classes.title} variant='h5' align={'center'} component={'h2'} noWrap>
+          <Typography className={classes.title} variant="h5" align={"center"} component={"h2"} noWrap>
             {title.secondary ? title.secondary : title.primary}
           </Typography>
           <IconButton
-            edge='start'
-            color='inherit'
-            aria-label='open drawer'
+            edge="start"
+            color="inherit"
+            aria-label="open drawer"
             onClick={toggleDrawer(true)}
             className={classes.menuButton}
           >
@@ -73,7 +73,7 @@ export const NavBar = (props: any) => {
         </Toolbar>
       </AppBar>
       <SwipeableDrawer
-        anchor='right'
+        anchor="right"
         open={drawer.open}
         onClose={toggleDrawer(false)}
         onOpen={toggleDrawer(true)}
@@ -82,5 +82,5 @@ export const NavBar = (props: any) => {
         <Toc posts={posts} node={node} setNode={setNode}/>
       </SwipeableDrawer>
     </div>
-  )
-}
+  );
+};

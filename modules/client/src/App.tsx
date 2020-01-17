@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { Home } from './components/Home';
-import { PostPage } from './components/Posts';
-import { NavBar } from './components/NavBar';
-import { Route, Switch } from 'react-router-dom';
-import { PostData } from './types';
-import { getPostsByCategories, getPosts, getPostIndex } from './utils';
+import React, { useState, useEffect } from "react";
+import { Home } from "./components/Home";
+import { PostPage } from "./components/Posts";
+import { NavBar } from "./components/NavBar";
+import { Route, Switch } from "react-router-dom";
+import { PostData } from "./types";
+import { getPostsByCategories, getPosts, getPostIndex } from "./utils";
 
 import {
   createStyles,
@@ -12,26 +12,26 @@ import {
   Container,
   CssBaseline,
   Theme,
-} from '@material-ui/core';
+} from "@material-ui/core";
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
   root: {
-    backgroundColor: 'linen',
+    backgroundColor: "linen",
   },
   main: {
-    marginTop: '80px',
+    marginTop: "80px",
   },
-}),);
+}));
 
 const App: React.FC = () => {
   const classes = useStyles();
   const [node, setNode] = useState({
     parent: null,
-    current: 'categories',
-    child: 'posts',
+    current: "categories",
+    child: "posts",
   });
   const [posts, setPosts] = useState([] as PostData[]);
-  const [title, setTitle] = useState({primary: '', secondary: ''});
+  const [title, setTitle] = useState({primary: "", secondary: ""});
 
   useEffect(() => {
     (async () => {
@@ -39,8 +39,8 @@ const App: React.FC = () => {
       const index = await getPostIndex();
       setTitle({...title, primary: index.title});
       document.title = title.primary;
-    })()
-  }, []);
+    })();
+  }, [title]);
 
   return (
     <div className={classes.root}>
@@ -63,6 +63,6 @@ const App: React.FC = () => {
       </Container>
     </div>
   );
-}
+};
 
 export default App;

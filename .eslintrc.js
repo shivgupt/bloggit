@@ -1,10 +1,10 @@
 module.exports = {
     rules: {
-      "comma-dangle": ["error", "always-multiline"],
+      "comma-dangle": ["error", "only-multiline"],
       "indent": ["error", 2],
       "no-unused-vars": ["error"],
       "no-var": ["error"],
-      "quotes": ["error", "single"],
+      "quotes": ["error", "double"],
       "semi": ["error", "always"],
     },
     settings: {
