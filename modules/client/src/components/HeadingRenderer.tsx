@@ -1,7 +1,8 @@
 import { IconButton } from "@material-ui/core";
 import { Link as LinkIcon } from "@material-ui/icons";
 import React from "react";
-import { HashLink as Link } from "react-router-hash-link";
+
+import { HashLink } from "./HashLink";
 import { getChildValue } from "../utils";
 
 export const HeadingRenderer = (props: any) => {
@@ -27,7 +28,7 @@ export const HeadingRenderer = (props: any) => {
       props.children, 
       <IconButton
         color="inherit"
-        component={Link}
+        component={HashLink as any}
         edge="start"
         key={slug}
         title="Link to position on page"

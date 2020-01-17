@@ -1,6 +1,7 @@
 import React from "react";
 import Markdown from "react-markdown";
 import { getChildValue } from "../utils";
+import { HashLink } from "react-router-hash-link";
 import { Link } from "react-router-dom";
 import {
   makeStyles,
@@ -47,7 +48,7 @@ const TocGenerator = (props: any) => {
         button
         key={headingSlug}
         className={classes.list}
-        component={Link}
+        component={HashLink}
         to={{ hash:`#${headingSlug}` }}
       >
         {value}

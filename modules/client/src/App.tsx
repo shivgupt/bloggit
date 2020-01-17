@@ -40,6 +40,7 @@ const App: React.FC = () => {
   // Update the title when the content index changes
   useEffect(() => {
     setTitle({ ...title, primary: index.title });
+  // eslint-disable-next-line
   }, [index]);
 
   // Update the document title when the title changes

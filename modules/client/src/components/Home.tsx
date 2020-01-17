@@ -27,6 +27,7 @@ export const Home = (props: any) => {
     console.log(`Setting document title to ${title.primary}`);
     setTitle({ ...title });
     document.title = title.primary;
+  // eslint-disable-next-line
   }, []);
 
   return (
