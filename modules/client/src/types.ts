@@ -5,11 +5,11 @@ export type PostData = {
   tags: string[];
   tldr: string;
   title: string;
-  content: string;
+  content?: string;
 };
 
 export type PostIndex = {
   posts: PostData[];
-  style: any;
+  style?: any;
   title: string;
 }

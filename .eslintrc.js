@@ -2,8 +2,11 @@ module.exports = {
     rules: {
       "comma-dangle": ["error", "only-multiline"],
       "indent": ["error", 2],
+      "max-len": ["error", 100],
+      "no-undef": ["error"],
       "no-unused-vars": ["error"],
       "no-var": ["error"],
+      "object-curly-spacing": ["error", "always"],
       "quotes": ["error", "double"],
       "semi": ["error", "always"],
     },

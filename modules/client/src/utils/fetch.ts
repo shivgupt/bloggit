@@ -1,5 +1,5 @@
 import axios from "axios";
-import { PostIndex, PostData } from "../types";
+import { PostIndex } from "../types";
 import { env } from "./env";
 
 let indexCache: Promise<PostIndex> | undefined;
@@ -38,40 +38,24 @@ const get = async (file: string): Promise<string | PostIndex> => {
   throw new Error(`Couldn't get ${file}`);
 };
 
-export const getPosts = async (): Promise<PostData[]> => {
+export const fetchIndex = async(): Promise<PostIndex> => {
   if (!indexCache) {
     indexCache = get("index.json") as Promise<PostIndex>;
   }
-
-  const posts = (await indexCache).posts;
-
-  return posts.map((post)=> {
-    post.category = post.category ||
-    post.path.substring(0, post.path.indexOf("/")) ||
-    "default";
-
+  const index = await indexCache;
+  index.posts = index.posts.map((post)=> {
+    post.category = post.path.substring(0, post.path.indexOf("/")) || "default";
     post.content = post.content || "";
-
     return post;
   });
+  return index;
 };
 
-export const getPostData = async (slug: string): Promise<PostData | undefined> =>
-  (await getPosts()).find(post => post.slug === slug);
-
-export const getPostContent = async (slug: string): Promise<string> => {
+export const fetchContent = async(slug: string): Promise<string> => {
   if (!contentCache[slug]) {
-    const data = await getPostData(slug);
-    if (!data) { return ""; }
-    contentCache[slug] = get(data.path) as Promise<string>;
+    const post = (await fetchIndex()).posts.find(post => post.slug === slug);
+    if (!post) { return "Does not exist"; }
+    contentCache[slug] = get(post.path) as Promise<string>;
   }
   return contentCache[slug];
-};
-
-export const getPostIndex = async (): Promise<PostIndex> => {
-  if (!indexCache) {
-    indexCache = get("index.json") as Promise<PostIndex>;
-  }
-
-  return indexCache;
 };

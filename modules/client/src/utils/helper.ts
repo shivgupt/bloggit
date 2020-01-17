@@ -8,13 +8,11 @@ export const getChildValue = (child) => {
 
 export const getPostsByCategories = (posts: PostData[]) => {
   let postsByCategory = {};
-
   posts.forEach(p => {
     if (postsByCategory[p.category])
       postsByCategory[p.category].push(p);
     else
       postsByCategory[p.category] = [p];
   });
-
   return postsByCategory;
 };

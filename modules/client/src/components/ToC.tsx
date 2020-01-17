@@ -43,7 +43,13 @@ const TocGenerator = (props: any) => {
 
   return (
     <>
-      <ListItem button key={headingSlug} className={classes.list} component={Link} to={{hash:`#${headingSlug}`}}>
+      <ListItem
+        button
+        key={headingSlug}
+        className={classes.list}
+        component={Link}
+        to={{ hash:`#${headingSlug}` }}
+      >
         {value}
       </ListItem>
       <Divider />
@@ -66,7 +72,10 @@ export const Toc = (props: any) => {
                 <ListItem>
                   {c}
                   <IconButton
-                    onClick={() => setNode({parent: "categories", current: "posts", child: c})}
+                    onClick={() => setNode({
+                      parent: "categories",
+                      current: "posts", child: c
+                    })}
                   >
                     <NavigateNextIcon />
                   </IconButton>
@@ -83,7 +92,11 @@ export const Toc = (props: any) => {
     return (
       <div className={classes.list}>
         <IconButton
-          onClick={() => setNode({parent: null, current: "categories", child: "posts"})}
+          onClick={() => setNode({ 
+            parent: null,
+            current: "categories",
+            child: "posts",
+          })}
         >
           <NavigateBackIcon />
         </IconButton>
@@ -96,7 +109,11 @@ export const Toc = (props: any) => {
                   {p.title}
                   {p.content ? 
                     <IconButton
-                      onClick={() => setNode({parent: "posts", current: "toc", child: p})}
+                      onClick={() => setNode({
+                        parent: "posts",
+                        current: "toc",
+                        child: p,
+                      })}
                       className={classes.tocButton}
                     >
                       <TocIcon/>
@@ -116,7 +133,11 @@ export const Toc = (props: any) => {
     return (
       <div className={classes.list}>
         <IconButton
-          onClick={() => setNode({parent: "categories", current: "posts", child: node.child.category})}
+          onClick={() => setNode({
+            parent: "categories",
+            current: "posts",
+            child: node.child.category,
+          })}
         >
           <NavigateBackIcon />
         </IconButton>
@@ -125,7 +146,7 @@ export const Toc = (props: any) => {
           <Markdown
             allowedTypes={["text", "heading"]}
             source={node.child.content}
-            renderers={{ heading: TocGenerator}}
+            renderers={{ heading: TocGenerator }}
             className={classes.list}
           />
         </List>

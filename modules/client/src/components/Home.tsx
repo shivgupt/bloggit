@@ -1,5 +1,3 @@
-import React, { useEffect } from "react";
-import { Link } from "react-router-dom";
 import {
   Card,
   CardActionArea,
@@ -11,6 +9,8 @@ import {
   createStyles,
   makeStyles,
 } from "@material-ui/core";
+import React, { useEffect } from "react";
+import { Link } from "react-router-dom";
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
   card: {
@@ -21,13 +21,13 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
 
 export const Home = (props: any) => {
   const classes = useStyles();
-  const {posts, title, setTitle} = props;
+  const { posts, title, setTitle } = props;
 
   useEffect(() => {
     console.log(`Setting document title to ${title.primary}`);
     setTitle({ ...title });
     document.title = title.primary;
-  }, [title, setTitle]);
+  }, []);
 
   return (
     <Grid container spacing={3} justify={"space-around"} alignItems={"center"}>

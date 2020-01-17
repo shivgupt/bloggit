@@ -1,4 +1,7 @@
+import { IconButton } from "@material-ui/core";
+import { Link as LinkIcon } from "@material-ui/icons";
 import React from "react";
+import { HashLink as Link } from "react-router-hash-link";
 import { getChildValue } from "../utils";
 
 export const HeadingRenderer = (props: any) => {
@@ -8,18 +11,30 @@ export const HeadingRenderer = (props: any) => {
 
   const value = getChildValue(props.children[0]);
 
-  if (value) {
-    let headingSlug = value.toLowerCase().replace(/[^a-z0-9 ]/g, "").replace(/\W+/g, "-");
-    let link = <a href={`#${headingSlug}`} title="Permanent link">¶</a>;
-
-    return React.createElement(
-      `h${props.level}`,
-      {
-        "data-sourcepos": props["data-sourcepos"],
-        "id": headingSlug,
-      },
-      [props.children, link],
-    );
+  if (!value) {
+    return null;
   }
-  return null;
+
+  let slug = value.toLowerCase().replace(/[^a-z0-9 ]/g, "").replace(/\W+/g, "-");
+
+  return React.createElement(
+    `h${props.level}`,
+    {
+      "data-sourcepos": props["data-sourcepos"],
+      "id": slug,
+    },
+    [
+      props.children, 
+      <IconButton
+        color="inherit"
+        component={Link}
+        edge="start"
+        key={slug}
+        title="Link to position on page"
+        to={`#${slug}`}
+      >
+        <LinkIcon />
+      </IconButton>
+    ]
+  );
 };

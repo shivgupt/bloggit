@@ -1,14 +1,16 @@
-import React, { useState, useEffect } from "react";
-import Markdown from "react-markdown";
-import { CodeBlockRenderer } from "./CodeBlock";
 import {
-  Paper,
-  Theme,
   createStyles,
   makeStyles,
+  Paper,
+  Theme,
 } from "@material-ui/core";
-import { getPostContent } from "../utils";
+import React, { useEffect, useState } from "react";
+import Markdown from "react-markdown";
+
+import { CodeBlockRenderer } from "./CodeBlock";
 import { HeadingRenderer } from "./HeadingRenderer";
+import { emptyPost, fetchContent } from "../utils";
+import { PostData } from "../types";
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
   root: {
@@ -23,48 +25,28 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
 
 export const PostPage = (props: any) => {
   const classes = useStyles();
-  const [postIndex, setPostIndex] = useState(-2);
-  const {posts, setPosts, title, setTitle} = props;
+  const [content, setContent] = useState("Loading");
+  const [postData, setPostData] = useState(emptyPost as PostData);
+  const { index, setTitle, slug, title } = props;
 
-  useEffect(() => {
-    if (posts.length > 0) {
-      let index = posts.findIndex((p) => p.slug === props.slug);
-      setPostIndex(index);
-    }
-
-    if (window.location.hash) {
-      // TODO: Find a better way to focus at sub-section at time of load.
-      // This is pretty hacky
-      // eslint-disable-next-line
-      window.location.hash = window.location.hash;
-    }
-  }, [props.slug, posts]);
-
+  // Set post content & data if slug or index changes
   useEffect(() => {
     (async () => {
-      if (postIndex >= 0 && !posts[postIndex].content) {
-        const postContent = await getPostContent(posts[postIndex].slug);
-        if (postContent) {
-          posts[postIndex].content = postContent;
-          setPosts([
-            ...posts,
-          ]);
-        }
-      }
+      setContent(await fetchContent(slug));
+      setPostData(index.posts.find(post => post.slug === slug) || emptyPost);
     })();
-  }, [postIndex]);
+  }, [index, slug]);
 
+  // Set title when post data changes
   useEffect(() => {
-    if (postIndex >= 0) {
-      setTitle({...title, secondary: posts[postIndex].title});
-      document.title = `${posts[postIndex].title} | ${title.primary}`;
-    }
-  }, [props.slug, postIndex]);
+    setTitle({ ...title, secondary: postData.title });
+  // eslint-disable-next-line
+  }, [postData]);
 
   return (
     <Paper variant="outlined">
       <Markdown
-        source={postIndex === -1 ? "Post Does Not Exist" : (postIndex === -2 ? "Loading" : posts[postIndex].content)}
+        source={content}
         className={classes.text}
         renderers={{ heading: HeadingRenderer, code: CodeBlockRenderer }}
       />
