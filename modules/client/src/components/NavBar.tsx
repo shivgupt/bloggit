@@ -65,7 +65,7 @@ export const NavBar = (props: any) => {
             component={"h2"}
             noWrap
           >
-            {title.secondary ? title.secondary : title.primary}
+            {title.page ? title.page : title.site}
           </Typography>
           <IconButton
             edge="start"

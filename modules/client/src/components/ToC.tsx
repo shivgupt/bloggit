@@ -28,21 +28,16 @@ const useStyles = makeStyles(theme => ({
 
 const TocGenerator = (props: any) => {
   const classes = useStyles();
-
   if (props.children.length > 1) {
     console.warn("This heading has more than one child..?");
     return null;
   }
-
   const value = getChildValue(props.children[0]);
-
   if (!value) {
     console.warn("This heading has no child values..?");
     return null;
   }
-
   let headingSlug = value.toLowerCase().replace(/[^a-z0-9 ]/g, "").replace(/\W+/g, "-");
-
   return (
     <>
       <ListItem

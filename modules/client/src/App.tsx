@@ -32,7 +32,7 @@ const App: React.FC = () => {
   const [index, setIndex] = useState(emptyIndex);
   const [content, setContent] = useState({});
   const [currentSlug, setCurrentSlug] = useState("");
-  const [title, setTitle] = useState({ primary: "", secondary: "" });
+  const [title, setTitle] = useState({ site: "", page: "" });
 
   // Once: get the content index
   useEffect(() => {
@@ -52,15 +52,15 @@ const App: React.FC = () => {
   useEffect(() => {
     const post = index.posts[currentSlug];
     setTitle({
-      primary: index ? index.title : "My personal website",
-      secondary: post ? post.title : "",
+      site: index ? index.title : "My personal website",
+      page: post ? post.title : "",
     });
   // eslint-disable-next-line
   }, [index, currentSlug]);
 
   // Update the document title when the title changes
   useEffect(() => {
-    document.title = title.secondary ? `${title.secondary} | ${title.primary}` : title.primary;
+    document.title = title.page ? `${title.page} | ${title.site}` : title.site;
   }, [title]);
 
   return (
