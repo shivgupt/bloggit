@@ -9,7 +9,7 @@ import {
   createStyles,
   makeStyles,
 } from "@material-ui/core";
-import React, { useEffect } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
@@ -21,15 +21,7 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
 
 export const Home = (props: any) => {
   const classes = useStyles();
-  const { posts, title, setTitle } = props;
-
-  useEffect(() => {
-    console.log(`Setting document title to ${title.primary}`);
-    setTitle({ ...title });
-    document.title = title.primary;
-  // eslint-disable-next-line
-  }, []);
-
+  const { posts } = props;
   return (
     <Grid container spacing={3} justify={"space-around"} alignItems={"center"}>
       {posts.map((post) => {

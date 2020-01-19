@@ -33,7 +33,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export const NavBar = (props: any) => {
-  const { posts, setNode, node, title } = props;
+  const { content, posts, setNode, node, title } = props;
   const classes = useStyles();
   const [drawer, setDrawer] = useState({ open: false });
 
@@ -85,7 +85,7 @@ export const NavBar = (props: any) => {
         onOpen={toggleDrawer(true)}
         classes={{ paper: classes.list }}
       >
-        <Toc posts={posts} node={node} setNode={setNode}/>
+        <Toc content={content} posts={posts} node={node} setNode={setNode}/>
       </SwipeableDrawer>
     </div>
   );

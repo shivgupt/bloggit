@@ -11,7 +11,7 @@ import { Route, Switch } from "react-router-dom";
 import { Home } from "./components/Home";
 import { NavBar } from "./components/NavBar";
 import { PostPage } from "./components/Posts";
-import { emptyIndex, fetchIndex, getPostsByCategories } from "./utils";
+import { emptyIndex, fetchContent, fetchIndex, getPostsByCategories } from "./utils";
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
   root: {
@@ -30,6 +30,8 @@ const App: React.FC = () => {
     child: "posts",
   });
   const [index, setIndex] = useState(emptyIndex);
+  const [content, setContent] = useState({});
+  const [currentSlug, setCurrentSlug] = useState("");
   const [title, setTitle] = useState({ primary: "", secondary: "" });
 
   // Once: get the content index
@@ -37,11 +39,24 @@ const App: React.FC = () => {
     (async () => setIndex(await fetchIndex()))();
   }, []);
 
-  // Update the title when the content index changes
+  // Set post content & data if slug or index changes
   useEffect(() => {
-    setTitle({ ...title, primary: index.title });
+    (async () => {
+      const currentContent = await fetchContent(currentSlug);
+      setContent({ ...content, [currentSlug]: currentContent });
+    })();
   // eslint-disable-next-line
-  }, [index]);
+  }, [index, currentSlug]);
+
+  // Update the title when the index or current post changes
+  useEffect(() => {
+    const post = index.posts.find(post => post.slug === currentSlug);
+    setTitle({
+      primary: index ? index.title : "My personal website",
+      secondary: post ? post.title : "",
+    });
+  // eslint-disable-next-line
+  }, [index, currentSlug]);
 
   // Update the document title when the title changes
   useEffect(() => {
@@ -55,28 +70,30 @@ const App: React.FC = () => {
         <NavBar
           node={node}
           setNode={setNode}
+          content={content}
           posts={getPostsByCategories(index.posts)}
           title={title}
         />
         <main className={classes.main}>
           <Switch>
-            <Route exact path="/">
-              <Home
-                posts={index.posts}
-                title={title}
-                setTitle={setTitle}
-              />
-            </Route>
+            <Route exact
+              path="/"
+              render={() => {
+                setCurrentSlug("");
+                return (<Home
+                  posts={index.posts}
+                  title={title}
+                />);
+              }}
+            />
             <Route
               path="/post/:slug"
-              render={({ match }) =>
-                <PostPage
-                  title={title}
-                  setTitle={setTitle}
-                  index={index}
-                  slug={match.params.slug}
-                />
-              }
+              render={({ match }) => {
+                setCurrentSlug(match.params.slug);
+                return (<PostPage
+                  content={content[match.params.slug] || "Loading"}
+                />);
+              }}
             />
           </Switch>
         </main>

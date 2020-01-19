@@ -1,7 +1,6 @@
 import React from "react";
 import Markdown from "react-markdown";
 import { getChildValue } from "../utils";
-import { HashLink } from "react-router-hash-link";
 import { Link } from "react-router-dom";
 import {
   makeStyles,
@@ -15,6 +14,8 @@ import {
   NavigateNext as NavigateNextIcon,
   ArrowBackIos as NavigateBackIcon,
 } from "@material-ui/icons";
+
+import { HashLink } from "./HashLink";
 
 const useStyles = makeStyles(theme => ({
   list: {
@@ -48,7 +49,7 @@ const TocGenerator = (props: any) => {
         button
         key={headingSlug}
         className={classes.list}
-        component={HashLink}
+        component={HashLink as any}
         to={{ hash:`#${headingSlug}` }}
       >
         {value}
@@ -59,7 +60,7 @@ const TocGenerator = (props: any) => {
 };
 
 export const Toc = (props: any) => {
-  const { posts, setNode, node } = props;
+  const { content, node, posts, setNode } = props;
   const classes = useStyles();
 
   switch(node.current) {
@@ -108,13 +109,16 @@ export const Toc = (props: any) => {
               <div key={p.slug}>
                 <ListItem key={p.title} component={Link} to={`/post/${p.slug}`}>
                   {p.title}
-                  {p.content ? 
+                  {content[p.slug] ? 
                     <IconButton
-                      onClick={() => setNode({
-                        parent: "posts",
-                        current: "toc",
-                        child: p,
-                      })}
+                      onClick={() => {
+                        p.content = content[p.slug];
+                        setNode({
+                          parent: "posts",
+                          current: "toc",
+                          child: p,
+                        });
+                      }}
                       className={classes.tocButton}
                     >
                       <TocIcon/>
