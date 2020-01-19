@@ -9,7 +9,7 @@ export type PostData = {
 };
 
 export type PostIndex = {
-  posts: PostData[];
+  posts: { [slug: string]: PostData };
   style?: any;
   title: string;
 }

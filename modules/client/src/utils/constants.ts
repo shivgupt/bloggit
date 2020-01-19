@@ -1,7 +1,7 @@
 import { PostIndex, PostData } from "../types";
 
 export const emptyIndex: PostIndex = {
-  posts: [],
+  posts: {},
   title: "My Personal Website",
 };
 

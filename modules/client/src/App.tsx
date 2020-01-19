@@ -50,7 +50,7 @@ const App: React.FC = () => {
 
   // Update the title when the index or current post changes
   useEffect(() => {
-    const post = index.posts.find(post => post.slug === currentSlug);
+    const post = index.posts[currentSlug];
     setTitle({
       primary: index ? index.title : "My personal website",
       secondary: post ? post.title : "",
@@ -80,10 +80,12 @@ const App: React.FC = () => {
               path="/"
               render={() => {
                 setCurrentSlug("");
-                return (<Home
-                  posts={index.posts}
-                  title={title}
-                />);
+                return (
+                  <Home
+                    posts={index.posts}
+                    title={title}
+                  />
+                );
               }}
             />
             <Route

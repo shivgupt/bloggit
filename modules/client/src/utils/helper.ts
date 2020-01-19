@@ -6,13 +6,13 @@ export const getChildValue = (child) => {
   return getChildValue(child.props.children[0]);
 };
 
-export const getPostsByCategories = (posts: PostData[]) => {
+export const getPostsByCategories = (posts: { [slug: string]: PostData }) => {
   let postsByCategory = {};
-  posts.forEach(p => {
-    if (postsByCategory[p.category])
-      postsByCategory[p.category].push(p);
+  Object.keys(posts).forEach(slug => {
+    if (postsByCategory[posts[slug].category])
+      postsByCategory[posts[slug].category].push(posts[slug]);
     else
-      postsByCategory[p.category] = [p];
+      postsByCategory[posts[slug].category] = [posts[slug]];
   });
   return postsByCategory;
 };

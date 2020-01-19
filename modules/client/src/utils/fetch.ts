@@ -43,17 +43,22 @@ export const fetchIndex = async(): Promise<PostIndex> => {
     indexCache = get("index.json") as Promise<PostIndex>;
   }
   const index = await indexCache;
-  index.posts = index.posts.map((post)=> {
-    post.category = post.path.substring(0, post.path.indexOf("/")) || "default";
-    post.content = post.content || "";
-    return post;
+  if (!index || !index.posts) {
+    throw new Error(`Got invalid site index ${typeof index}: ${index}`);
+  }
+  // Set some default values
+  Object.keys(index!.posts).forEach(slug => {
+    const post = index.posts[slug];
+    index.posts[slug].category = post.path.substring(0, post.path.indexOf("/")) || "default";
+    index.posts[slug].content = post.content || "";
+    index.posts[slug].slug = slug;
   });
   return index;
 };
 
 export const fetchContent = async(slug: string): Promise<string> => {
   if (!contentCache[slug]) {
-    const post = (await fetchIndex()).posts.find(post => post.slug === slug);
+    const post = (await fetchIndex()).posts[slug];
     if (!post) { return "Does not exist"; }
     contentCache[slug] = get(post.path) as Promise<string>;
   }

@@ -24,15 +24,15 @@ export const Home = (props: any) => {
   const { posts } = props;
   return (
     <Grid container spacing={3} justify={"space-around"} alignItems={"center"}>
-      {posts.map((post) => {
+      {Object.keys(posts).map(slug => {
         return (
-          <Grid item key={post.slug}>
-            <CardActionArea component={Link} to={`/post/${post.slug}`}>
+          <Grid item key={slug}>
+            <CardActionArea component={Link} to={`/post/${slug}`}>
               <Card className={classes.card}>
-                <CardHeader title={post.title} />
+                <CardHeader title={posts[slug].title} />
                 <CardContent>
                   <Typography variant="body2" color="textSecondary" component="p">
-                    {post.tldr}
+                    {posts[slug].tldr}
                   </Typography>
                 </CardContent>
               </Card>
