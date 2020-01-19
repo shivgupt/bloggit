@@ -30,23 +30,29 @@ const App: React.FC = () => {
     child: "posts",
   });
   const [index, setIndex] = useState(emptyIndex);
-  const [content, setContent] = useState({});
   const [currentSlug, setCurrentSlug] = useState("");
   const [title, setTitle] = useState({ site: "", page: "" });
 
-  // Once: get the content index
+  // Only once: get the content index
   useEffect(() => {
     (async () => setIndex(await fetchIndex()))();
   }, []);
 
-  // Set post content & data if slug or index changes
+  // Set post content if slug changes
   useEffect(() => {
     (async () => {
+      // Do nothing if index isn't loaded yet or content is already loaded
+      if (!index.posts[currentSlug] || index.posts[currentSlug].content) {
+        return;
+      }
+      // Need to setIndex to a new object to be sure we trigger a re-render
+      const newIndex = JSON.parse(JSON.stringify(index));
       const currentContent = await fetchContent(currentSlug);
-      setContent({ ...content, [currentSlug]: currentContent });
+      newIndex.posts[currentSlug].content = currentContent;
+      setIndex(newIndex);
     })();
   // eslint-disable-next-line
-  }, [index, currentSlug]);
+  }, [currentSlug, index]);
 
   // Update the title when the index or current post changes
   useEffect(() => {
@@ -55,13 +61,9 @@ const App: React.FC = () => {
       site: index ? index.title : "My personal website",
       page: post ? post.title : "",
     });
+    document.title = title.page ? `${title.page} | ${title.site}` : title.site;
   // eslint-disable-next-line
   }, [index, currentSlug]);
-
-  // Update the document title when the title changes
-  useEffect(() => {
-    document.title = title.page ? `${title.page} | ${title.site}` : title.site;
-  }, [title]);
 
   return (
     <div className={classes.root}>
@@ -70,7 +72,6 @@ const App: React.FC = () => {
         <NavBar
           node={node}
           setNode={setNode}
-          content={content}
           posts={getPostsByCategories(index.posts)}
           title={title}
         />
@@ -91,9 +92,14 @@ const App: React.FC = () => {
             <Route
               path="/post/:slug"
               render={({ match }) => {
-                setCurrentSlug(match.params.slug);
+                const slug = match.params.slug;
+                setCurrentSlug(slug);
                 return (<PostPage
-                  content={content[match.params.slug] || "Loading"}
+                  content={
+                    index.posts[slug]
+                      ? (index.posts[slug].content || "Loading Page")
+                      : "Post does not exist"
+                  }
                 />);
               }}
             />

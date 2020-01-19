@@ -55,7 +55,7 @@ const TocGenerator = (props: any) => {
 };
 
 export const Toc = (props: any) => {
-  const { content, node, posts, setNode } = props;
+  const { node, posts, setNode } = props;
   const classes = useStyles();
 
   switch(node.current) {
@@ -104,10 +104,9 @@ export const Toc = (props: any) => {
               <div key={p.slug}>
                 <ListItem key={p.title} component={Link} to={`/post/${p.slug}`}>
                   {p.title}
-                  {content[p.slug] ? 
+                  {p.content ? 
                     <IconButton
                       onClick={() => {
-                        p.content = content[p.slug];
                         setNode({
                           parent: "posts",
                           current: "toc",
