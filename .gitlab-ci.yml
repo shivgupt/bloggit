@@ -25,7 +25,7 @@ test:
       alias: localhost
   script:
     - apk add bash curl git jq make
-    - make pull-latest
+    - make pull-commit
     - BLOG_DOMAINNAME=localhost make start-prod
     - sleep 15
     - make dls
