@@ -1,5 +1,6 @@
 {
 	"name": "blog",
+  "registry": "registry.gitlab.com",
 	"version": "1.0.0",
 	"author": "Bo & Shiv Hendo",
 	"license": "MIT",

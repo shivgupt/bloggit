@@ -72,16 +72,22 @@ clean: stop
 	rm -rf modules/**/build
 	rm -rf modules/**/dist
 
-push:
-	bash ops/push-images.sh builder server proxy
+push: push-commit
+push-commit:
+	bash ops/push-images.sh $(commit)
 
-pull:
-	docker pull $(registry)/$(project)_server:$(commit) && docker tag $(registry)/$(project)_server:$(commit) $(project)_server:$(commit) || true
-	docker pull $(registry)/$(project)_proxy:$(commit) && docker tag $(registry)/$(project)_proxy:$(commit) $(project)_proxy:$(commit) || true
-	docker pull $(registry)/$(project)_builder:$(commit) && docker tag $(registry)/$(project)_builder:$(commit) $(project)_builder:$(commit) || true
-	docker pull $(registry)/$(project)_server:latest && docker tag $(registry)/$(project)_server:latest $(project)_server:latest || true
-	docker pull $(registry)/$(project)_proxy:latest && docker tag $(registry)/$(project)_proxy:latest $(project)_proxy:latest || true
-	docker pull $(registry)/$(project)_builder:latest && docker tag $(registry)/$(project)_builder:latest $(project)_builder:latest || true
+push-release:
+	bash ops/push-images.sh $(release)
+
+pull: pull-commit
+pull-latest:
+	bash ops/pull-images.sh latest
+
+pull-commit:
+	bash ops/pull-images.sh $(commit)
+
+pull-release:
+	bash ops/pull-images.sh $(release)
 
 build-report:
 	bash ops/build-report.sh
@@ -130,11 +136,11 @@ client-js: node-modules $(shell find $(client)/src $(find_options))
 
 builder: ops/builder.dockerfile
 	$(log_start)
-	docker build --file ops/builder.dockerfile $(cache_from) --tag $(project)_builder:latest .
+	docker build --file ops/builder.dockerfile $(cache_from) --tag $(project)_builder:$(commit) .
+	docker tag $(project)_builder:$(commit) $(project)_builder:latest
 	$(log_finish) && mv -f $(totalTime) $(flags)/$@
 
 node-modules: builder package.json $(shell ls modules/**/package.json)
 	$(log_start)
 	$(docker_run) "lerna bootstrap --hoist --no-progress"
 	$(log_finish) && mv -f $(totalTime) $(flags)/$@
-
