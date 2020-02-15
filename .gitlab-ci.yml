@@ -12,7 +12,7 @@ build:
   script:
     - apk add bash curl git jq make
     - echo "REACT_APP_CONTENT_URL=$BLOG_CONTENT_URL" > modules/client/.env
-    - make pull
+    - make pull-latest
     - make prod
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - make push
@@ -25,7 +25,7 @@ test:
       alias: localhost
   script:
     - apk add bash curl git jq make
-    - make pull
+    - make pull-latest
     - BLOG_DOMAINNAME=localhost make start-prod
     - sleep 15
     - make dls
@@ -57,7 +57,7 @@ deploy:
           git reset --hard $CI_COMMIT_SHA;
           export BLOG_CONTENT_URL="$BLOG_CONTENT_URL";
           export BLOG_DOMAINNAME="$BLOG_DOMAINNAME";
-          make pull;
+          make pull-commit;
           make restart-prod;
           docker container prune -f;
           docker image ls -q | xargs docker image rm 2> /dev/null || true;

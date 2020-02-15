@@ -79,7 +79,7 @@ push-commit:
 push-release:
 	bash ops/push-images.sh $(release)
 
-pull: pull-commit
+pull: pull-latest
 pull-latest:
 	bash ops/pull-images.sh latest
 
