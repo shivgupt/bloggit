@@ -128,7 +128,7 @@ client-js: node-modules $(shell find $(client)/src $(find_options))
 
 builder: ops/builder.dockerfile
 	$(log_start)
-	docker build --file ops/builder.dockerfile --tag $(project)_builder:latest .
+	docker build --file ops/builder.dockerfile $(cache_from) --tag $(project)_builder:latest .
 	$(log_finish) && mv -f $(totalTime) $(flags)/$@
 
 node-modules: builder package.json $(shell ls modules/**/package.json)
