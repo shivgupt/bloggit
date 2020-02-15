@@ -27,7 +27,7 @@ export const Home = (props: any) => {
       {Object.keys(posts).map(slug => {
         return (
           <Grid item key={slug}>
-            <CardActionArea component={Link} to={`/post/${slug}`}>
+            <CardActionArea component={Link} to={`/${slug}`}>
               <Card className={classes.card}>
                 <CardHeader title={posts[slug].title} />
                 <CardContent>

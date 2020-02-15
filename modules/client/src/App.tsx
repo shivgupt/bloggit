@@ -90,7 +90,7 @@ const App: React.FC = () => {
               }}
             />
             <Route
-              path="/post/:slug"
+              path="/:slug"
               render={({ match }) => {
                 const slug = match.params.slug;
                 setCurrentSlug(slug);
