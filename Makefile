@@ -73,13 +73,15 @@ clean: stop
 	rm -rf modules/**/dist
 
 push:
-	bash ops/push-images.sh server proxy
+	bash ops/push-images.sh builder server proxy
 
 pull:
 	docker pull $(registry)/$(project)_server:$(commit) && docker tag $(registry)/$(project)_server:$(commit) $(project)_server:$(commit) || true
 	docker pull $(registry)/$(project)_proxy:$(commit) && docker tag $(registry)/$(project)_proxy:$(commit) $(project)_proxy:$(commit) || true
+	docker pull $(registry)/$(project)_builder:$(commit) && docker tag $(registry)/$(project)_builder:$(commit) $(project)_builder:$(commit) || true
 	docker pull $(registry)/$(project)_server:latest && docker tag $(registry)/$(project)_server:latest $(project)_server:latest || true
 	docker pull $(registry)/$(project)_proxy:latest && docker tag $(registry)/$(project)_proxy:latest $(project)_proxy:latest || true
+	docker pull $(registry)/$(project)_builder:latest && docker tag $(registry)/$(project)_builder:latest $(project)_builder:latest || true
 
 build-report:
 	bash ops/build-report.sh
