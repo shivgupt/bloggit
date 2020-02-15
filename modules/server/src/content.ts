@@ -11,7 +11,11 @@ content.use(async (req, res, next): Promise<void> => {
     next();
     return;
   }
-  const url = `${env.contentUrl.replace(/\/$/, "")}/${req.path.replace(/^\/content\//, "")}`;
+  console.log(req.path);
+  console.log(
+    `${env.contentUrl.replace(/\/+$/, "")} + / + ${req.path.replace(/^\/+content\/+/, "")}`,
+  );
+  const url = `${env.contentUrl.replace(/\/+$/, "")}/${req.path.replace(/^\/+content\/+/, "")}`;
   let result;
   try {
     const response = await fetch(url);
