@@ -6,6 +6,7 @@ import {
 } from "@material-ui/core";
 import React from "react";
 import Markdown from "react-markdown";
+import emoji from 'emoji-dictionary';
 
 import { CodeBlockRenderer } from "./CodeBlock";
 import { HeadingRenderer } from "./HeadingRenderer";
@@ -23,6 +24,9 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
 
 export const PostPage = (props: any) => {
   const classes = useStyles();
+
+  const emojiSupport = text => text.value.replace(/:\w+:/gi, name => emoji.getUnicode(name))
+
   return (
     <Paper variant="outlined">
       <Markdown
@@ -31,6 +35,7 @@ export const PostPage = (props: any) => {
         renderers={{
           heading: HeadingRenderer,
           code: CodeBlockRenderer,
+          text: emojiSupport,
         }}
       />
     </Paper>
