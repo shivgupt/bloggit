@@ -5,7 +5,7 @@ import { env } from "./env";
 let indexCache: Promise<PostIndex> | undefined;
 let contentCache: { [key: string]: Promise<string>; } = {};
 
-const contentUrls = (file: string): string[] => [
+const permaLink = (file: string): string[] => [
   (!env || typeof env.contentUrl !== "string") ? file : `${env.contentUrl}/${file}`,
   `/api/content/${file}`,
 ];
@@ -14,11 +14,11 @@ const contentUrls = (file: string): string[] => [
 const smartIndexKey = "contentUrlIndex";
 const smartIndex = (i: number) => {
   const contentUrlIndex = localStorage.getItem(smartIndexKey) || "0";
-  return (i + parseInt(contentUrlIndex, 10)) % contentUrls("").length;
+  return (i + parseInt(contentUrlIndex, 10)) % permaLink("").length;
 };
 
 const get = async (file: string): Promise<string | PostIndex> => {
-  const urls = contentUrls(file);
+  const urls = permaLink(file);
   for (let i = 0; i < urls.length; i += 1) {
     const url = urls[smartIndex(i)];
     try {
@@ -59,6 +59,7 @@ export const fetchIndex = async(): Promise<PostIndex> => {
 export const fetchContent = async(slug: string): Promise<string> => {
   if (!contentCache[slug]) {
     const post = (await fetchIndex()).posts[slug];
+    // TODO: Handle 404s better
     if (!post) { return "Does not exist"; }
     contentCache[slug] = get(post.path) as Promise<string>;
   }
