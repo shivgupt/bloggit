@@ -1,6 +1,17 @@
 #!/bin/bash
 set -e
 
+export branch="${BRANCH:-master}"
+
+if [[ -d "/blog-content" ]]
+then
+  pushd /blog-content
+  git fetch --all --prune --tags
+  git checkout --force $branch
+  git reset --hard origin/$branch
+  popd
+fi
+
 if [[ -d "modules/server" ]]
 then cd modules/server
 fi

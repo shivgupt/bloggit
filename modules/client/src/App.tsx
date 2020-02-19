@@ -98,7 +98,7 @@ const App: React.FC = () => {
                   content={
                     index.posts[slug]
                       ? (index.posts[slug].content || "Loading Page")
-                      : "Post does not exist"
+                      : "Loading Index"
                   }
                 />);
               }}

@@ -7,7 +7,7 @@ let contentCache: { [key: string]: Promise<string>; } = {};
 
 const permaLink = (file: string): string[] => [
   (!env || typeof env.contentUrl !== "string") ? file : `${env.contentUrl}/${file}`,
-  `/api/content/${file}`,
+  `/api/${file}`,
 ];
 
 // Remember which contentUrl worked & try that one first from now on
@@ -60,7 +60,7 @@ export const fetchContent = async(slug: string): Promise<string> => {
   if (!contentCache[slug]) {
     const post = (await fetchIndex()).posts[slug];
     // TODO: Handle 404s better
-    if (!post) { return "Does not exist"; }
+    if (!post) { return "Loading"; }
     contentCache[slug] = get(post.path) as Promise<string>;
   }
   return contentCache[slug];
