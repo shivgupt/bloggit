@@ -8,12 +8,8 @@ RUN npm install -g npm@6.12.0
 COPY modules/server/package.json package.json
 RUN npm install > /dev/null 2>&1
 
-ARG CONTENT_REPO
-RUN git clone $CONTENT_REPO /blog-content
-
-COPY ops/wait-for.sh ops/wait-for.sh
 COPY modules/server/ops ops
+COPY ops/wait-for.sh ops/wait-for.sh
 COPY modules/server/dist dist
 
 ENTRYPOINT ["bash", "ops/entry.sh"]
-

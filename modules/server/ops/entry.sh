@@ -1,16 +1,18 @@
 #!/bin/bash
 set -e
 
-export branch="${BRANCH:-master}"
+branch="${BLOG_CONTENT_BRANCH:-master}"
+repo="${BLOG_CONTENT_REPO}"
 
-if [[ -d "/blog-content" ]]
-then
-  pushd /blog-content
-  git fetch --all --prune --tags
-  git checkout --force $branch
-  git reset --hard origin/$branch
-  popd
+if [[ ! -d "/blog-content/.git" ]]
+then git clone $repo /blog-content
 fi
+
+pushd /blog-content
+git fetch --all --prune --tags
+git checkout --force $branch
+git reset --hard origin/$branch
+popd
 
 if [[ -d "modules/server" ]]
 then cd modules/server

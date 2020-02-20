@@ -10,7 +10,10 @@ docker swarm init 2> /dev/null || true
 ####################
 # External Env Vars
 
-BLOG_CONTENT_URL=$BLOG_CONTENT_URL
+BLOG_CONTENT_BRANCH="${BLOG_CONTENT_BRANCH:-master}"
+BLOG_CONTENT_DIR="${BLOG_CONTENT_DIR:-}"
+BLOG_CONTENT_REPO="${BLOG_CONTENT_REPO:-https://gitlab.com/bohendo/blog-content.git}"
+BLOG_CONTENT_URL="${BLOG_CONTENT_URL:-https://gitlab.com/bohendo/blog-content/raw}"
 
 ####################
 # Internal Config
@@ -48,6 +51,7 @@ networks:
 
 volumes:
   certs:
+  content:
 
 services:
   proxy:
@@ -79,6 +83,9 @@ services:
     image: $server_image
     environment:
       NODE_ENV: development
+      BLOG_CONTENT_BRANCH: $BLOG_CONTENT_BRANCH
+      BLOG_CONTENT_DIR: $BLOG_CONTENT_DIR
+      BLOG_CONTENT_REPO: $BLOG_CONTENT_REPO
       BLOG_CONTENT_URL: $BLOG_CONTENT_URL
       PORT: $server_port
     networks:
@@ -87,6 +94,7 @@ services:
       - "$server_port:$server_port"
     volumes:
       - `pwd`:/root
+      - content:/blog-content
     working_dir: /root/modules/server
 
 EOF

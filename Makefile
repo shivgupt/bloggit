@@ -11,12 +11,6 @@ commit=$(shell git rev-parse HEAD | head -c 8)
 user=$(shell if [[ -n "${CI_PROJECT_NAMESPACE}" ]]; then echo "${CI_PROJECT_NAMESPACE}"; else echo "`whoami`"; fi)
 registry=registry.gitlab.com/$(user)/$(project)
 
-# Set a default content url as an example & to help debug
-default_content=https://gitlab.com/bohendo/blog-content/raw/master
-default_content_repo=https://gitlab.com/bohendo/blog-content.git
-content_url=$(shell if [[ -n "${BLOG_CONTENT_URL}" ]]; then echo "${BLOG_CONTENT_URL}"; else echo $(default_content); fi)
-content_repo=$(shell if [[ -n "${BLOG_CONTENT_REPO}" ]]; then echo "${BLOG_CONTENT_REPO}"; else echo $(default_content_repo); fi)
-
 # Pool of images to pull cached layers from during docker build steps
 cache_from=$(shell if [[ -n "${CI}" ]]; then echo "--cache-from=$(project)_server:$(commit),$(project)_server:latest,$(project)_builder:latest,$(project)_proxy:$(commit),$(project)_proxy:latest"; else echo ""; fi)
 
@@ -113,12 +107,12 @@ proxy-prod: client-js $(shell find $(proxy) $(find_options))
 
 server: server-js $(shell find $(server)/ops $(find_options))
 	$(log_start)
-	docker build --file $(server)/ops/dev.dockerfile $(cache_from) --build-arg="CONTENT_REPO=$(content_repo)" --tag $(project)_server:latest .
+	docker build --file $(server)/ops/dev.dockerfile $(cache_from) --tag $(project)_server:latest .
 	$(log_finish) && mv -f $(totalTime) $(flags)/$@
 
 server-prod: server-js $(shell find $(server)/ops $(find_options))
 	$(log_start)
-	docker build --file $(server)/ops/prod.dockerfile $(cache_from) --build-arg="CONTENT_REPO=$(content_repo)" --tag $(project)_server:$(commit) .
+	docker build --file $(server)/ops/prod.dockerfile $(cache_from) --tag $(project)_server:$(commit) .
 	$(log_finish) && mv -f $(totalTime) $(flags)/$@
 
 server-js: node-modules $(shell find $(server)/src $(find_options))
