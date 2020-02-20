@@ -1,3 +1,9 @@
+export type ServerConfig = {
+  contentBranch: string;
+  contentDir: string;
+  contentUrl: string;
+}
+
 export type PostData = {
   category: string;
   slug: string;

@@ -5,9 +5,9 @@ import path from "path";
 const trimSlash = (pathPart: string) => pathPart.replace(/^\/+/, "").replace(/\/+$/, "");
 
 export const env = {
-  branch: trimSlash(process.env.BLOG_CONTENT_BRANCH || "master"),
+  contentBranch: trimSlash(process.env.BLOG_CONTENT_BRANCH || "master"),
   contentDir: trimSlash(process.env.BLOG_CONTENT_DIR || ""),
-  contentURL: trimSlash(
+  contentUrl: trimSlash(
     process.env.BLOG_CONTENT_URL || "https://gitlab.com/bohendo/blog-content/raw",
   ),
   devMode: process.env.NODE_ENV === "development",
@@ -24,9 +24,9 @@ app.use((req, res, next) => { console.log(`=> ${req.path}`); next(); });
 // Second: return config if requested
 app.use("/config", (req, res, next): void => {
   res.json({
-    branch: env.branch,
+    contentBranch: env.contentBranch,
+    contentDir: env.contentDir,
     contentUrl: env.contentUrl,
-    dir: env.contentDir,
   });
 });
 
