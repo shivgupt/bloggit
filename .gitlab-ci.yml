@@ -11,7 +11,6 @@ build:
       alias: localhost
   script:
     - apk add bash curl git jq make
-    - echo "REACT_APP_CONTENT_URL=$BLOG_CONTENT_URL" > modules/client/.env
     - make pull-latest
     - make prod
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
@@ -47,6 +46,9 @@ deploy:
     - >
       docker build --tag ssh-action ops/ssh-action;
       docker run \
+        --env=BLOG_CONTENT_BRANCH=$BLOG_CONTENT_BRANCH \
+        --env=BLOG_CONTENT_DIR=$BLOG_CONTENT_DIR \
+        --env=BLOG_CONTENT_REPO=$BLOG_CONTENT_REPO \
         --env=BLOG_CONTENT_URL=$BLOG_CONTENT_URL \
         --env=BLOG_DOMAINNAME=$BLOG_DOMAINNAME \
         --env=CI_COMMIT_SHA=$CI_COMMIT_SHA \
@@ -55,6 +57,9 @@ deploy:
         ssh-action $BLOG_SERVER $SSH_KEY '
           git checkout --force master;
           git reset --hard $CI_COMMIT_SHA;
+          export BLOG_CONTENT_BRANCH="$BLOG_CONTENT_BRANCH";
+          export BLOG_CONTENT_DIR="$BLOG_CONTENT_DIR";
+          export BLOG_CONTENT_REPO="$BLOG_CONTENT_REPO";
           export BLOG_CONTENT_URL="$BLOG_CONTENT_URL";
           export BLOG_DOMAINNAME="$BLOG_DOMAINNAME";
           make pull-commit;

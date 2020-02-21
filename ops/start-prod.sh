@@ -7,7 +7,10 @@ docker swarm init 2> /dev/null || true
 ####################
 # External Env Vars
 
-BLOG_CONTENT_URL=$BLOG_CONTENT_URL
+BLOG_CONTENT_BRANCH="${BLOG_CONTENT_BRANCH:-master}"
+BLOG_CONTENT_DIR="${BLOG_CONTENT_DIR:-}"
+BLOG_CONTENT_REPO="${BLOG_CONTENT_REPO:-https://gitlab.com/bohendo/blog-content.git}"
+BLOG_CONTENT_URL="${BLOG_CONTENT_URL:-https://gitlab.com/bohendo/blog-content/raw}"
 BLOG_DOMAINNAME="${BLOG_DOMAINNAME:-localhost}"
 BLOG_EMAIL="${BLOG_EMAIL:-noreply@gmail.com}" # for notifications when ssl certs expire
 
@@ -54,6 +57,7 @@ version: '3.4'
 
 volumes:
   certs:
+  content:
 
 services:
   proxy:
@@ -78,6 +82,9 @@ services:
     image: $server_image
     environment:
       NODE_ENV: production
+      BLOG_CONTENT_BRANCH: $BLOG_CONTENT_BRANCH
+      BLOG_CONTENT_DIR: $BLOG_CONTENT_DIR
+      BLOG_CONTENT_REPO: $BLOG_CONTENT_REPO
       BLOG_CONTENT_URL: $BLOG_CONTENT_URL
       PORT: $server_port
     logging:
@@ -85,6 +92,8 @@ services:
       options:
           max-file: 10
           max-size: 10m
+    volumes:
+      - content:/blog-content
 
 EOF
 
