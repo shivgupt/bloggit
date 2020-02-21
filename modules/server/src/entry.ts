@@ -50,6 +50,7 @@ app.use(async (req, res, next): Promise<void> => {
     result = e.message;
   }
   console.log(`Couldn't fetch content from ${url}: ${result}`);
+  next();
 });
 
 // Third: try to get file from default branch of static copy of content

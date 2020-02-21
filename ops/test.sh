@@ -11,10 +11,10 @@ else host="https://localhost"
 fi
 
 echo
-echo "$host/api/hello should connect to the server"
-$curl "$host/api/hello"
+echo "$host/api/config should connect to the server"
+$curl "$host/api/config"
 echo
-if [[ "`$curl --silent "$host/api/hello" | tr '[:upper:]' '[:lower:]'`" == "hello"* ]]
+if [[ "`$curl --silent "$host/api/config"`" == *"contentUrl"* ]]
 then echo "Looks good"
 else echo "Looks not good" && exit 1
 fi
