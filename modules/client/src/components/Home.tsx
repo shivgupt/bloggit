@@ -3,6 +3,7 @@ import {
   CardActionArea,
   CardContent,
   CardHeader,
+  CardMedia,
   Grid,
   Theme,
   Typography,
@@ -17,6 +18,9 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
     width: 345,
     height: 245,
   },
+  media: {
+    maxHeight: 100,
+  },
 }));
 
 export const Home = (props: any) => {
@@ -27,16 +31,22 @@ export const Home = (props: any) => {
       {Object.keys(posts).map(slug => {
         return (
           <Grid item key={slug}>
-            <CardActionArea component={Link} to={`/${slug}`}>
-              <Card className={classes.card}>
+            <Card className={classes.card}>
+              <CardActionArea component={Link} to={`/${slug}`}>
                 <CardHeader title={posts[slug].title} />
+                <CardMedia
+                  className={classes.media}
+                  component="img"
+                  image={posts[slug].img}
+                  title={slug}
+                />
                 <CardContent>
                   <Typography variant="body2" color="textSecondary" component="p">
                     {posts[slug].tldr}
                   </Typography>
                 </CardContent>
-              </Card>
-            </CardActionArea>
+              </CardActionArea>
+            </Card>
           </Grid>
         );
       })}

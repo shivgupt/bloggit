@@ -1,11 +1,12 @@
 export type PostData = {
   category: string;
-  slug: string;
-  path: string;
-  tags: string[];
-  tldr: string;
-  title: string;
   content?: string;
+  img?: string;
+  path: string;
+  slug: string;
+  tags: string[];
+  title: string;
+  tldr: string;
 };
 
 export type PostIndex = {
