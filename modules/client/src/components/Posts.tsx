@@ -25,11 +25,20 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
 export const PostPage = (props: any) => {
   const classes = useStyles();
 
-  const emojiSupport = text => text.value.replace(/:\w+:/gi, name => emoji.getUnicode(name) ? emoji.getUnicode(name) : name);
+  const emojiSupport = text => text.value.replace(
+    /:\w+:/gi, name => emoji.getUnicode(name)
+      ? emoji.getUnicode(name)
+      : name
+  );
 
   const Image = (props: any) => {
-    return <img {...props} style={{maxWidth: '100%', height: '200px', width: '200px'}} />
-  }
+    return <img
+      { ...props }
+      src={props.src}
+      alt={props.alt}
+      style={{ maxWidth: "100%", height: "200px", width: "200px" }}
+    />;
+  };
 
   return (
     <Paper variant="outlined">
