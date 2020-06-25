@@ -16,10 +16,10 @@ import { Link } from "react-router-dom";
 const useStyles = makeStyles((theme: Theme) => createStyles({
   card: {
     width: 345,
-    height: 245,
+    height: 300,
   },
   media: {
-    maxHeight: 100,
+    maxHeight: 150,
   },
 }));
 
