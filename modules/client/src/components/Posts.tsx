@@ -27,6 +27,10 @@ export const PostPage = (props: any) => {
 
   const emojiSupport = text => text.value.replace(/:\w+:/gi, name => emoji.getUnicode(name) ? emoji.getUnicode(name) : name);
 
+  const Image = (props: any) => {
+    return <img {...props} style={{maxWidth: '100%', height: '200px', width: '200px'}} />
+  }
+
   return (
     <Paper variant="outlined">
       <Markdown
@@ -36,6 +40,7 @@ export const PostPage = (props: any) => {
           heading: HeadingRenderer,
           code: CodeBlockRenderer,
           text: emojiSupport,
+          image: Image,
         }}
       />
     </Paper>
