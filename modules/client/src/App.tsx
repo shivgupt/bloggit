@@ -8,7 +8,7 @@ import {
 import React, { useEffect, useState } from "react";
 import { Route, Switch } from "react-router-dom";
 
-import { FoodLog } from "./components/FoodLog";
+import { FitnessTracker } from "./components/FitnessTracker";
 import { Home } from "./components/Home";
 import { NavBar } from "./components/NavBar";
 import { PostPage } from "./components/Posts";
@@ -103,8 +103,7 @@ const App: React.FC = () => {
             render={() => {
               setCurrentSlug("");
               return (
-                <FoodLog
-                />
+                <FitnessTracker />
               );
             }}
           />

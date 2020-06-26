@@ -30,39 +30,14 @@ import { emptyFoodLog } from "../utils/constants";
 
 export const FoodLog = (props: any) => {
 
-  const [profile, setProfile] = useState(store.load("FitnessProfile"));
-  const [open, setOpen] = useState(false);
+  const { foodLog } = props;
 
-  const handleProfileDialog = (dialogState: boolean) => setOpen(dialogState);
-  const handleProfileSave = () => store.save("FitnessProfile", profile);
-  const handleEditProfile = (event: React.ChangeEvent<{ value: any, id: string }>) => {
-    //console.log(event.target.id);
-    const newProfile = {...profile, [event.target.id]: event.target.value}
-    setProfile(newProfile);
-  }
-
-  console.log(JSON.stringify(profile.foodLog) === JSON.stringify(emptyFoodLog))
+  let msg = "Here is your food log";
+  if (JSON.stringify(foodLog) === JSON.stringify(emptyFoodLog))
+    msg = "You have no meal entry yet!!";
   return (
     <>
-      <Typography>
-        Hello {profile.name || "Stranger"}!
-        <IconButton onClick={() => handleProfileDialog(true)}>
-          <EditIcon />
-        </IconButton>
-      </Typography>
-      <Dialog open={open} onClose={() => handleProfileDialog(false)}>
-        <DialogContent>
-          <ProfileEdit profile={profile} handleEditProfile={handleEditProfile} />
-        </DialogContent>
-        <DialogActions>
-          <IconButton onClick={handleProfileSave}>
-            <SaveIcon />
-          </IconButton>
-          <IconButton onClick={() => handleProfileDialog(false)}>
-            <CloseIcon />
-          </IconButton>
-        </DialogActions>
-      </Dialog>
+      {msg} 
     </>
   )
 }
