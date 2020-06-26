@@ -18,7 +18,7 @@ import { store } from "../utils/cache";
 export const FoodLog = (props: any) => {
 
   const [profile, setProfile] = useState(store.load("FitnessProfile"));
-  console.log(profile);
+
   return (
     <>
       FoodLog

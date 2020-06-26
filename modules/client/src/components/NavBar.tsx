@@ -47,7 +47,7 @@ export const NavBar = (props: any) => {
   };
 
   return (
-    <div className={classes.grow}>
+    <>
       <AppBar position="fixed">
         <Toolbar>
           <IconButton
@@ -97,6 +97,6 @@ export const NavBar = (props: any) => {
       >
         <Toc posts={posts} node={node} setNode={setNode}/>
       </SwipeableDrawer>
-    </div>
+    </>
   );
 };

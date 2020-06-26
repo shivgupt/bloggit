@@ -30,7 +30,7 @@ export const Home = (props: any) => {
     <Grid container spacing={3} justify={"space-around"} alignItems={"center"}>
       {Object.keys(posts).map(slug => {
         return (
-          <Grid item key={slug}>
+          <Grid item xs={12} md={5} lg={4} key={slug}>
             <Card className={classes.card}>
               <CardActionArea component={Link} to={`/${slug}`}>
                 <CardHeader title={posts[slug].title} />

@@ -15,11 +15,18 @@ import { PostPage } from "./components/Posts";
 import { emptyIndex, fetchContent, fetchIndex, getPostsByCategories } from "./utils";
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
+  appBarSpacer: theme.mixins.toolbar,
   root: {
     backgroundColor: "linen",
+    display: "flex",
+  },
+  container: {
+    paddingTop: theme.spacing(4),
+    paddingBottom: theme.spacing(4),
   },
   main: {
-    marginTop: "80px",
+    flexGrow: 1,
+    overflow: "auto",
   },
 }));
 
@@ -69,54 +76,55 @@ const App: React.FC = () => {
   return (
     <div className={classes.root}>
       <CssBaseline />
-      <Container maxWidth="lg">
-        <NavBar
-          node={node}
-          setNode={setNode}
-          posts={getPostsByCategories(index.posts)}
-          title={title}
-        />
-        <main className={classes.main}>
-          <Switch>
-            <Route exact
-              path="/"
-              render={() => {
-                setCurrentSlug("");
-                return (
-                  <Home
-                    posts={index.posts}
-                    title={title}
-                  />
-                );
-              }}
-            />
-            <Route exact
-              path="/foodlog"
-              render={() => {
-                setCurrentSlug("");
-                return (
-                  <FoodLog
-                  />
-                );
-              }}
-            />
-            <Route
-              path="/:slug"
-              render={({ match }) => {
-                const slug = match.params.slug;
-                setCurrentSlug(slug);
-                return (<PostPage
-                  content={
-                    index.posts[slug]
-                      ? (index.posts[slug].content || "Loading Page")
-                      : "Post does not exist"
-                  }
-                />);
-              }}
-            />
-          </Switch>
-        </main>
-      </Container>
+      <NavBar
+        node={node}
+        setNode={setNode}
+        posts={getPostsByCategories(index.posts)}
+        title={title}
+      />
+      <main className={classes.main}>
+        <div className={classes.appBarSpacer} />
+        <Container maxWidth="lg" className={classes.container}>
+        <Switch>
+          <Route exact
+            path="/"
+            render={() => {
+              setCurrentSlug("");
+              return (
+                <Home
+                  posts={index.posts}
+                  title={title}
+                />
+              );
+            }}
+          />
+          <Route exact
+            path="/foodlog"
+            render={() => {
+              setCurrentSlug("");
+              return (
+                <FoodLog
+                />
+              );
+            }}
+          />
+          <Route
+            path="/:slug"
+            render={({ match }) => {
+              const slug = match.params.slug;
+              setCurrentSlug(slug);
+              return (<PostPage
+                content={
+                  index.posts[slug]
+                    ? (index.posts[slug].content || "Loading Page")
+                    : "Post does not exist"
+                }
+              />);
+            }}
+          />
+        </Switch>
+        </Container>
+      </main>
     </div>
   );
 };
