@@ -1,4 +1,10 @@
-import { PostIndex, PostData } from "../types";
+import {
+  FitnessProfile,
+  FoodItem,
+  FoodLog,
+  PostData,
+  PostIndex,
+} from "../types";
 
 export const emptyIndex: PostIndex = {
   posts: {},
@@ -12,4 +18,21 @@ export const emptyPost: PostData = {
   tags: [],
   tldr: "",
   title: "",
+};
+
+export const emptyFoodItem: FoodItem = {
+  name: "",
+  nutrients: {
+    carbohydrates: "",
+    protein: "",
+    fat: "",
+  },
+};
+
+export const emptyFoodLog = {} as FoodLog;
+
+export const emptyFitnessProfile: FitnessProfile = {
+  name: "",
+  age: 0,
+  foodLog: emptyFoodLog,
 };
