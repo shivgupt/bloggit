@@ -34,5 +34,6 @@ export const emptyFoodLog = {} as FoodLog;
 export const emptyFitnessProfile: FitnessProfile = {
   name: "",
   age: 0,
+  height: "",
   foodLog: emptyFoodLog,
 };

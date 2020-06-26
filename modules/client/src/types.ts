@@ -36,5 +36,6 @@ export type FoodLog = {
 export type FitnessProfile = {
   name: string;
   age: number;
+  height: string;
   foodLog: FoodLog;
 }
