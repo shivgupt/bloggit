@@ -24,7 +24,9 @@ import {
   SaveAlt as SaveIcon,
 } from "@material-ui/icons";
 
+import { ProfileEdit } from "./ProfileEdit";
 import { store } from "../utils/cache";
+import { emptyFoodLog } from "../utils/constants";
 
 export const FoodLog = (props: any) => {
 
@@ -39,6 +41,7 @@ export const FoodLog = (props: any) => {
     setProfile(newProfile);
   }
 
+  console.log(JSON.stringify(profile.foodLog) === JSON.stringify(emptyFoodLog))
   return (
     <>
       <Typography>
@@ -49,30 +52,7 @@ export const FoodLog = (props: any) => {
       </Typography>
       <Dialog open={open} onClose={() => handleProfileDialog(false)}>
         <DialogContent>
-          <TextField
-            id="name"
-            label="Profile Name"
-            defaultValue={profile.name || "Stranger"}
-            onChange={handleEditProfile}
-            margin="normal"
-            variant="outlined"
-          />
-          <TextField
-            id="age"
-            label="Age"
-            defaultValue={profile.age || "0"}
-            onChange={handleEditProfile}
-            margin="normal"
-            variant="outlined"
-          />
-          <TextField
-            id="height"
-            label="Height"
-            defaultValue={profile.height || "5ft"}
-            onChange={handleEditProfile}
-            margin="normal"
-            variant="outlined"
-          />
+          <ProfileEdit profile={profile} handleEditProfile={handleEditProfile} />
         </DialogContent>
         <DialogActions>
           <IconButton onClick={handleProfileSave}>
