@@ -1,27 +1,11 @@
-import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
 
 import {
-  Card,
-  CardActionArea,
-  CardContent,
-  CardHeader,
-  CardMedia,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  Grid,
   IconButton,
-  TextField,
-  Theme,
   Typography,
-  createStyles,
-  makeStyles,
 } from "@material-ui/core";
 import {
-  Close as CloseIcon,
   Edit as EditIcon,
-  SaveAlt as SaveIcon,
 } from "@material-ui/icons";
 
 import { ProfileEdit } from "./ProfileEdit";
@@ -31,38 +15,33 @@ import { store } from "../utils/cache";
 export const FitnessTracker = (props: any) => {
 
   const [profile, setProfile] = useState(store.load("FitnessProfile"));
-  const [open, setOpen] = useState(false);
+  const [dialog, setDialog] = useState(false);
 
-  const handleProfileDialog = (dialogState: boolean) => setOpen(dialogState);
-  const handleProfileSave = () => store.save("FitnessProfile", profile);
   const handleEditProfile = (event: React.ChangeEvent<{ value: any, id: string }>) => {
-    //console.log(event.target.id);
-    const newProfile = {...profile, [event.target.id]: event.target.value}
+    const newProfile = { ...profile, [event.target.id]: event.target.value };
     setProfile(newProfile);
-  }
+  };
+
+  const handleProfileSave = () => store.save("FitnessProfile", profile);
+
+  const toggleProfileDialog = () => setDialog(!dialog);
 
   return (
     <>
       <Typography>
         Hello {profile.name || "Stranger"}!
-        <IconButton onClick={() => handleProfileDialog(true)}>
+        <IconButton onClick={toggleProfileDialog}>
           <EditIcon />
         </IconButton>
       </Typography>
-      <Dialog open={open} onClose={() => handleProfileDialog(false)}>
-        <DialogContent>
-          <ProfileEdit profile={profile} handleEditProfile={handleEditProfile} />
-        </DialogContent>
-        <DialogActions>
-          <IconButton onClick={handleProfileSave}>
-            <SaveIcon />
-          </IconButton>
-          <IconButton onClick={() => handleProfileDialog(false)}>
-            <CloseIcon />
-          </IconButton>
-        </DialogActions>
-      </Dialog>
+      <ProfileEdit
+        dialog={dialog}
+        profile={profile}
+        handleEditProfile={handleEditProfile}
+        handleProfileSave={handleProfileSave}
+        toggleProfileDialog={toggleProfileDialog}
+      />
       <FoodLog foodLog={profile.foodLog} />
     </>
-  )
-}
+  );
+};
