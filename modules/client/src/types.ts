@@ -15,21 +15,30 @@ export type PostIndex = {
   title: string;
 }
 
-export type FoodItem = {
+// Types for Food logger
+
+// Basic constituents of the Dish like cheese, mushroom, potato
+export type Ingredient = {
   name: string;
-  nutrients: {
-    carbohydrates: string;
-    protein: string;
-    fat: string;
+  quantity: string; /* quantity in grams */
+  nutrients: { /* nutrient percentage */
+    carbohydrates: number;
+    protein: number;
+    fat: number;
   };
+};
+
+export type Dish = {
+  name: string;
+  serving: number; /* serving size in grams */
+  ingredients: Ingredient[];
+
+
 }
 
 export type FoodLog = {
   [date: string]: {
-    [time: string]: Array<{
-      item: FoodItem;
-      serving: number; /* serving size in grams */
-    }>;
+    [time: string]: Dish[];
   };
 }
 

@@ -1,6 +1,6 @@
 import {
   FitnessProfile,
-  FoodItem,
+  Dish,
   FoodLog,
   PostData,
   PostIndex,
@@ -20,13 +20,21 @@ export const emptyPost: PostData = {
   title: "",
 };
 
-export const emptyFoodItem: FoodItem = {
+export const emptyIngredient = {
   name: "",
+  quantity: "",
   nutrients: {
     carbohydrates: "",
     protein: "",
     fat: "",
   },
+
+};
+
+export const emptyDish: Dish = {
+  name: "",
+  serving: 0,
+  ingredients: [],
 };
 
 export const emptyFoodLog = {} as FoodLog;
