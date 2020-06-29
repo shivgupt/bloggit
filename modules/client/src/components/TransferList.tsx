@@ -12,7 +12,7 @@ import Button from "@material-ui/core/Button";
 import Divider from "@material-ui/core/Divider";
 
 import { Dish, } from "../types";
-import { AlmondCaschewCrustPizza, } from "../utils/dishes";
+import { dishes, } from "../utils/dishes";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -50,7 +50,7 @@ export const TransferList = () => {
   const classes = useStyles();
   const [checked, setChecked] = React.useState<Dish[]>([]);
   const [left, setLeft] = React.useState<Dish[]>([]);
-  const [right, setRight] = React.useState<Dish[]>([AlmondCaschewCrustPizza]);
+  const [right, setRight] = React.useState<Dish[]>(dishes);
 
   const leftChecked = intersection(checked, left);
   const rightChecked = intersection(checked, right);
@@ -68,15 +68,7 @@ export const TransferList = () => {
     setChecked(newChecked);
   };
 
-  const numberOfChecked = (dishes: Dish[]) => intersection(checked, dishes).length;
-
-  const handleToggleAll = (dishes: Dish[]) => () => {
-    if (numberOfChecked(dishes) === dishes.length) {
-      setChecked(not(checked, dishes));
-    } else {
-      setChecked(union(checked, dishes));
-    }
-  };
+  const numberOfChecked = (total: Dish[]) => intersection(checked, total).length;
 
   const handleCheckedRight = () => {
     setRight(right.concat(leftChecked));
@@ -90,38 +82,29 @@ export const TransferList = () => {
     setChecked(not(checked, rightChecked));
   };
 
-  const customList = (title: React.ReactNode, dishes: Dish[]) => (
+  const customList = (title: React.ReactNode, items: Dish[]) => (
     <Card>
       <CardHeader
         className={classes.cardHeader}
-        avatar={
-          <Checkbox
-            onClick={handleToggleAll(dishes)}
-            checked={numberOfChecked(dishes) === dishes.length && dishes.length !== 0}
-            indeterminate={numberOfChecked(dishes) !== dishes.length && numberOfChecked(dishes) !== 0}
-            disabled={dishes.length === 0}
-            inputProps={{ "aria-label": "all dishes selected" }}
-          />
-        }
         title={title}
-        subheader={`${numberOfChecked(dishes)}/${dishes.length} selected`}
+        subheader={`${numberOfChecked(items)}/${items.length} selected`}
       />
       <Divider />
       <List className={classes.list} dense component="div" role="list">
-        {dishes.map((dish: Dish) => {
-          const labelId = `transfer-list-all-item-${dish}-label`;
+        {items.map((item: Dish) => {
+          const labelId = `transfer-list-all-item-${item}-label`;
 
           return (
-            <ListItem key={dish.name} role="listitem" button onClick={handleToggle(dish)}>
+            <ListItem key={item.name} role="listitem" button onClick={handleToggle(item)}>
               <ListItemIcon>
                 <Checkbox
-                  checked={checked.indexOf(dish) !== -1}
+                  checked={checked.indexOf(item) !== -1}
                   tabIndex={-1}
                   disableRipple
                   inputProps={{ "aria-labelledby": labelId }}
                 />
               </ListItemIcon>
-              <ListItemText id={labelId} primary={dish.name} />
+              <ListItemText id={labelId} primary={item.name} />
             </ListItem>
           );
         })}

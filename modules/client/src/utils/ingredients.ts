@@ -30,6 +30,16 @@ export const Caschew = {
   },
 } as Ingredient;
 
+export const Cheese = {
+  name: "Caschew",
+  quantity: "100 g",
+  nutrients: {
+    carbohydrates: 3.7,
+    protein: 18,
+    fat: 32,
+  },
+} as Ingredient;
+
 export const Egg = {
   name: "Egg",
   quantity: "100 g",
