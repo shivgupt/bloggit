@@ -1,4 +1,5 @@
-import { PostData } from "../types";
+import { PostData, Ingredient, Dish } from "../types";
+import { emptyNutrients } from "./constants";
 
 export const getChildValue = (child) => {
   if (!child) return;
@@ -16,3 +17,15 @@ export const getPostsByCategories = (posts: { [slug: string]: PostData }) => {
   });
   return postsByCategory;
 };
+
+export const sumNutrientsOfIngredients = (dish: Dish) => {
+  const total = { ...emptyNutrients };
+
+  dish.ingredients.forEach((ingredient: Ingredient) => {
+    Object.keys(ingredient.nutrients).forEach((nutrient: string) => {
+      total[nutrient] += Number(ingredient.quantity) * ingredient.nutrients[nutrient]/100;
+    })
+  })
+
+  return total;
+}

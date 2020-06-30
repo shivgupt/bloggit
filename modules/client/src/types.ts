@@ -17,15 +17,17 @@ export type PostIndex = {
 
 // Types for Food logger
 
+export type Nutrients = { /* nutrient percentage */
+  carbohydrates: number;
+  protein: number;
+  fat: number;
+};
+
 // Basic constituents of the Dish like cheese, mushroom, potato
 export type Ingredient = {
   name: string;
   quantity: string; /* quantity in grams */
-  nutrients: { /* nutrient percentage */
-    carbohydrates: number;
-    protein: number;
-    fat: number;
-  };
+  nutrients: Nutrients;
 };
 
 export type Dish = {

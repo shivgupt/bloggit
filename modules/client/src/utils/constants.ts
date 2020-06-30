@@ -20,15 +20,16 @@ export const emptyPost: PostData = {
   title: "",
 };
 
+export const emptyNutrients = {
+  carbohydrates: 0.0,
+  protein: 0.0,
+  fat: 0.0,
+};
+
 export const emptyIngredient = {
   name: "",
   quantity: "",
-  nutrients: {
-    carbohydrates: "",
-    protein: "",
-    fat: "",
-  },
-
+  nutrients: emptyNutrients,
 };
 
 export const emptyDish: Dish = {

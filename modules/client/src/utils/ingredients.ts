@@ -2,7 +2,7 @@ import { Ingredient } from "../types";
 
 export const Almond = {
   name: "Almond",
-  quantity: "100 g",
+  quantity: "100",
   nutrients: {
     carbohydrates: 22,
     protein: 21,
@@ -12,7 +12,7 @@ export const Almond = {
 
 export const Broccoli = {
   name: "Broccoli",
-  quantity: "100 g",
+  quantity: "100",
   nutrients: {
     carbohydrates: 6,
     protein: 2.5,
@@ -22,7 +22,7 @@ export const Broccoli = {
 
 export const Caschew = {
   name: "Caschew",
-  quantity: "100 g",
+  quantity: "100",
   nutrients: {
     carbohydrates: 30,
     protein: 18,
@@ -32,7 +32,7 @@ export const Caschew = {
 
 export const Cheese = {
   name: "Caschew",
-  quantity: "100 g",
+  quantity: "100",
   nutrients: {
     carbohydrates: 3.7,
     protein: 18,
@@ -42,7 +42,7 @@ export const Cheese = {
 
 export const Egg = {
   name: "Egg",
-  quantity: "100 g",
+  quantity: "100",
   nutrients: {
     carbohydrates: 1.1,
     protein: 13,
@@ -52,7 +52,7 @@ export const Egg = {
 
 export const WholeMilk = {
   name: "Whole Milk",
-  quantity: "100 g",
+  quantity: "100",
   nutrients: {
     carbohydrates: 4.8,
     protein: 3.2,
@@ -62,7 +62,7 @@ export const WholeMilk = {
 
 export const Onion = {
   name: "Onion",
-  quantity: "100 g",
+  quantity: "100",
   nutrients: {
     carbohydrates: 9.3,
     protein: 1.1,
@@ -72,7 +72,7 @@ export const Onion = {
 
 export const Tomato = {
   name: "Onion",
-  quantity: "100 g",
+  quantity: "100",
   nutrients: {
     carbohydrates: 3.9,
     protein: 0.9,

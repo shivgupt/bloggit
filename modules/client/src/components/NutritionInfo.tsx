@@ -12,6 +12,7 @@ import {
 } from "@material-ui/icons";
 
 import { Ingredient } from "../types";
+import { sumNutrientsOfIngredients } from "../utils/helper";
 
 export const NutritionInfo = (props: any) => {
   const { open, dish, toggleOpen } = props;
@@ -32,10 +33,12 @@ export const NutritionInfo = (props: any) => {
         {dish.ingredients.map((item: Ingredient) => {
           return (
             <li key={item.name}>
-              {`${item.quantity} ${item.name}`}
+              {`${item.quantity}g ${item.name}`}
             </li>
           )
         })}
+        <Typography variant="button"> Total </Typography>
+        {console.log(sumNutrientsOfIngredients(dish))}
       </DialogContent>
       <DialogActions>
         <IconButton onClick={toggleOpen}>
