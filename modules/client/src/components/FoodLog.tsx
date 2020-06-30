@@ -1,31 +1,12 @@
-import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
 
 import {
-  Card,
-  CardActionArea,
-  CardContent,
-  CardHeader,
-  CardMedia,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  Grid,
   IconButton,
-  TextField,
-  Theme,
-  Typography,
-  createStyles,
-  makeStyles,
 } from "@material-ui/core";
 import {
   AddCircle as AddIcon,
-  Close as CloseIcon,
-  Edit as EditIcon,
-  SaveAlt as SaveIcon,
 } from "@material-ui/icons";
 
-import { store } from "../utils/cache";
 import { AddMeal } from "./AddMeal";
 import { emptyFoodLog } from "../utils/constants";
 
@@ -54,5 +35,5 @@ export const FoodLog = (props: any) => {
         toggleMealDialog={toggleMealDialog}
       />
     </>
-  )
-}
+  );
+};

@@ -1,10 +1,9 @@
-import React, { useState, } from "react";
+import React, { useState } from "react";
 import {
   Dialog,
   DialogActions,
   DialogContent,
   IconButton,
-  TextField,
   Typography,
 } from "@material-ui/core";
 import {
@@ -12,7 +11,7 @@ import {
   SaveAlt as SaveIcon,
 } from "@material-ui/icons";
 
-import { DateTime } from "./DateTimePicker"
+import { DateTime } from "./DateTimePicker";
 import { TransferList } from "./TransferList";
 
 export const AddMeal = (props: any) => {

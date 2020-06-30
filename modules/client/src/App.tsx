@@ -85,43 +85,43 @@ const App: React.FC = () => {
       <main className={classes.main}>
         <div className={classes.appBarSpacer} />
         <Container maxWidth="lg" className={classes.container}>
-        <Switch>
-          <Route exact
-            path="/"
-            render={() => {
-              setCurrentSlug("");
-              return (
-                <Home
-                  posts={index.posts}
-                  title={title}
-                />
-              );
-            }}
-          />
-          <Route exact
-            path="/foodlog"
-            render={() => {
-              setCurrentSlug("");
-              return (
-                <FitnessTracker />
-              );
-            }}
-          />
-          <Route
-            path="/:slug"
-            render={({ match }) => {
-              const slug = match.params.slug;
-              setCurrentSlug(slug);
-              return (<PostPage
-                content={
-                  index.posts[slug]
-                    ? (index.posts[slug].content || "Loading Page")
-                    : "Post does not exist"
-                }
-              />);
-            }}
-          />
-        </Switch>
+          <Switch>
+            <Route exact
+              path="/"
+              render={() => {
+                setCurrentSlug("");
+                return (
+                  <Home
+                    posts={index.posts}
+                    title={title}
+                  />
+                );
+              }}
+            />
+            <Route exact
+              path="/foodlog"
+              render={() => {
+                setCurrentSlug("");
+                return (
+                  <FitnessTracker />
+                );
+              }}
+            />
+            <Route
+              path="/:slug"
+              render={({ match }) => {
+                const slug = match.params.slug;
+                setCurrentSlug(slug);
+                return (<PostPage
+                  content={
+                    index.posts[slug]
+                      ? (index.posts[slug].content || "Loading Page")
+                      : "Post does not exist"
+                  }
+                />);
+              }}
+            />
+          </Switch>
         </Container>
       </main>
     </div>

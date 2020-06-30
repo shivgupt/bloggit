@@ -22,11 +22,6 @@ export const FitnessTracker = (props: any) => {
     setProfile(newProfile);
   };
 
-  const handleEditFoodLog = (event: React.ChangeEvent<{ value: any, id: string }>) => {
-    const newProfile = { ...profile, [event.target.id]: event.target.value };
-    setProfile(newProfile);
-  };
-
   const handleProfileSave = () => store.save("FitnessProfile", profile);
 
   const toggleProfileDialog = () => setDialog(!dialog);
