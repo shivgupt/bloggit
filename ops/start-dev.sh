@@ -28,7 +28,7 @@ builder_image="${project}_builder"
 ui_image="$builder_image"
 server_image="${project}_server"
 proxy_image="${project}_proxy"
-ipfs_image="ipfs/go-ipfs"
+ipfs_image="ipfs/go-ipfs:latest"
 
 ####################
 # Deploy according to above configuration
