@@ -1,11 +1,7 @@
 import React from "react";
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles";
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
   Chip,
-  Typography,
 } from "@material-ui/core";
 import {
   Info as InfoIcon,
@@ -21,6 +17,7 @@ import Divider from "@material-ui/core/Divider";
 import { emptyDish } from "../utils/constants";
 import { Dish } from "../types";
 import { Dishes } from "../utils/dishes";
+import { NutritionInfo } from "./NutritionInfo";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -46,8 +43,8 @@ export const TransferList = () => {
   const classes = useStyles();
   const [dishOptions, setDishOptions] = React.useState<Dish[]>([]);
   const [selected, setSelected] = React.useState<Dish[]>(Dishes);
-  const [backDropOpen, setBackDropOpen] = React.useState(false);
-  const [dishInfo, setDishInfo] = React.useState<Dish>(emptyDish);
+  const [open, setOpen] = React.useState(false);
+  const [selectedDish, setSelectedDish] = React.useState<Dish>(emptyDish);
 
   const handleToggle = (dish: Dish) => () => {
     const optionsIndex = dishOptions.indexOf(dish);
@@ -67,9 +64,13 @@ export const TransferList = () => {
     setDishOptions(newOptions);
   };
 
+  const toggleOpen = () => {
+    setOpen(!open);
+  };
+
   const handleInfo = (dish: Dish) => () => {
-    setDishInfo(dish);
-    setBackDropOpen(true);
+    setSelectedDish(dish);
+    setOpen(true);
   };
 
   const customList = (title: React.ReactNode, list: Dish[]) => (
@@ -95,23 +96,20 @@ export const TransferList = () => {
         })}
         <ListItem />
       </List>
-      <Dialog
-        open={backDropOpen}
-      >
-        <DialogTitle id="dish-info">
-          <Typography> Nutrition Info of {dishInfo.name} </Typography>
-        </DialogTitle>
-        <DialogContent>
-          <Typography> Ingrdients </Typography>
-        </DialogContent>
-      </Dialog>
     </Card>
   );
 
   return (
-    <Grid container spacing={2} justify="center" alignItems="center" className={classes.root}>
-      <Grid item>{customList("What did you eat?", dishOptions)}</Grid>
-      <Grid item>{customList("Dish Options", selected)}</Grid>
-    </Grid>
+    <>
+      <Grid container spacing={2} justify="center" alignItems="center" className={classes.root}>
+        <Grid item>{customList("What did you eat?", dishOptions)}</Grid>
+        <Grid item>{customList("Dish Options", selected)}</Grid>
+      </Grid>
+      <NutritionInfo
+        open={open}
+        dish={selectedDish}
+        toggleOpen={toggleOpen}
+      />
+    </>
   );
 };
