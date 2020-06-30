@@ -1,5 +1,8 @@
 import React from "react";
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles";
+import {
+  Chip,
+} from "@material-ui/core";
 import Grid from "@material-ui/core/Grid";
 import List from "@material-ui/core/List";
 import Card from "@material-ui/core/Card";
@@ -12,7 +15,7 @@ import Button from "@material-ui/core/Button";
 import Divider from "@material-ui/core/Divider";
 
 import { Dish, } from "../types";
-import { dishes, } from "../utils/dishes";
+import { Dishes, } from "../utils/dishes";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -23,7 +26,7 @@ const useStyles = makeStyles((theme: Theme) =>
       padding: theme.spacing(1, 2),
     },
     list: {
-      width: 200,
+      width: 300,
       height: 230,
       backgroundColor: theme.palette.background.paper,
       overflow: "auto",
@@ -48,63 +51,47 @@ function union(a: Dish[], b: Dish[]) {
 
 export const TransferList = () => {
   const classes = useStyles();
-  const [checked, setChecked] = React.useState<Dish[]>([]);
-  const [left, setLeft] = React.useState<Dish[]>([]);
-  const [right, setRight] = React.useState<Dish[]>(dishes);
+  const [dishOptions, setDishOptions] = React.useState<Dish[]>([]);
+  const [selected, setSelected] = React.useState<Dish[]>(Dishes);
 
-  const leftChecked = intersection(checked, left);
-  const rightChecked = intersection(checked, right);
 
   const handleToggle = (dish: Dish) => () => {
-    const currentIndex = checked.indexOf(dish);
-    const newChecked = [...checked];
+    const optionsIndex = dishOptions.indexOf(dish);
+    const selectedIndex = selected.indexOf(dish);
+    console.log(optionsIndex);
+    console.log(selectedIndex);
 
-    if (currentIndex === -1) {
-      newChecked.push(dish);
+    const newOptions = [ ... dishOptions ];
+    const newSelected = [ ... selected ];
+
+    if (optionsIndex === -1) {
+      newOptions.push(dish);
+      newSelected.splice(selectedIndex, 1);
     } else {
-      newChecked.splice(currentIndex, 1);
+      newOptions.splice(optionsIndex, 1);
+      newSelected.push(dish);
     }
 
-    setChecked(newChecked);
+    setSelected(newSelected);
+    setDishOptions(newOptions);
   };
 
-  const numberOfChecked = (total: Dish[]) => intersection(checked, total).length;
-
-  const handleCheckedRight = () => {
-    setRight(right.concat(leftChecked));
-    setLeft(not(left, leftChecked));
-    setChecked(not(checked, leftChecked));
-  };
-
-  const handleCheckedLeft = () => {
-    setLeft(left.concat(rightChecked));
-    setRight(not(right, rightChecked));
-    setChecked(not(checked, rightChecked));
-  };
-
-  const customList = (title: React.ReactNode, items: Dish[]) => (
+  const customList = (title: React.ReactNode, list: Dish[]) => (
     <Card>
       <CardHeader
         className={classes.cardHeader}
         title={title}
-        subheader={`${numberOfChecked(items)}/${items.length} selected`}
       />
       <Divider />
       <List className={classes.list} dense component="div" role="list">
-        {items.map((item: Dish) => {
-          const labelId = `transfer-list-all-item-${item}-label`;
+        {list.map((dish: Dish) => {
 
           return (
-            <ListItem key={item.name} role="listitem" button onClick={handleToggle(item)}>
-              <ListItemIcon>
-                <Checkbox
-                  checked={checked.indexOf(item) !== -1}
-                  tabIndex={-1}
-                  disableRipple
-                  inputProps={{ "aria-labelledby": labelId }}
-                />
-              </ListItemIcon>
-              <ListItemText id={labelId} primary={item.name} />
+            <ListItem key={dish.name} role="listitem" button onClick={handleToggle(dish)}>
+              <Chip
+                color="secondary"
+                label={dish.name}
+              />
             </ListItem>
           );
         })}
@@ -115,8 +102,8 @@ export const TransferList = () => {
 
   return (
     <Grid container spacing={2} justify="center" alignItems="center" className={classes.root}>
-      <Grid item>{customList("Choices", left)}</Grid>
-      <Grid item>{customList("Chosen", right)}</Grid>
+      <Grid item>{customList("What did you eat?", dishOptions)}</Grid>
+      <Grid item>{customList("Dish Options", selected)}</Grid>
     </Grid>
   );
 }

@@ -41,4 +41,4 @@ const AlmondCaschewCastrol = {
   ],
 } as Dish;
 
-export const dishes = [ AlmondCaschewCrustPizza, AlmondCaschewCastrol ] as Dish[]
+export const Dishes = [ AlmondCaschewCrustPizza, AlmondCaschewCastrol ] as Dish[]
