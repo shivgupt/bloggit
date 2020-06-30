@@ -51,7 +51,7 @@ pull_if_unavailable "$proxy_image"
 echo "Deploying $server_image & $proxy_image to $BLOG_DOMAINNAME"
 
 mkdir -p /tmp/$project
-mkdir -p `pwd`/../images
+mkdir -p `pwd`/../media
 cat - > /tmp/$project/docker-compose.yml <<EOF
 version: '3.4'
 
@@ -81,13 +81,9 @@ services:
 
   ipfs:
     image: $ipfs_image
-    networks:
-      - $project
     volumes:
       - ipfs:/data/ipfs
-      - `pwd`/../images:/images
-    ports:
-      - 5001:5001
+      - `pwd`/../media:/media
 
   server:
     image: $server_image
