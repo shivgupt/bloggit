@@ -16,7 +16,7 @@ BLOG_EMAIL="${BLOG_EMAIL:-noreply@gmail.com}" # for notifications when ssl certs
 
 dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 project="`cat $dir/../package.json | jq .name | tr -d '"'`"
-number_of_services="2" # NOTE: Gotta update this manually when adding/removing services :(
+number_of_services="3" # NOTE: Gotta update this manually when adding/removing services :(
 server_port=8080
 ipfs_port=8080
 
