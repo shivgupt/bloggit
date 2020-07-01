@@ -13,15 +13,20 @@ import {
 
 export const ProfileEdit = (props: any) => {
   const {
-    dialog,
+    open,
     profile,
-    handleEditProfile,
     handleProfileSave,
+    setProfile,
     toggleProfileDialog,
   } = props;
 
+  const handleEditProfile = (event: React.ChangeEvent<{ value: any, id: string }>) => {
+    const newProfile = { ...profile, [event.target.id]: event.target.value };
+    setProfile(newProfile);
+  };
+
   return (
-    <Dialog open={dialog} onClose={toggleProfileDialog}>
+    <Dialog open={open} onClose={toggleProfileDialog}>
       <DialogContent>
         <TextField
           id="name"

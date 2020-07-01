@@ -18,45 +18,47 @@ import { store } from "../utils/cache";
 export const FitnessTracker = (props: any) => {
 
   const [profile, setProfile] = useState(store.load("FitnessProfile"));
-  const [dialog, setDialog] = useState(false);
-
-  const handleEditProfile = (event: React.ChangeEvent<{ value: any, id: string }>) => {
-    const newProfile = { ...profile, [event.target.id]: event.target.value };
-    setProfile(newProfile);
-  };
+  const [openProfileDialog, setOpenProfileDialog] = useState(false);
+  const [openMealDialog, setOpenMealDialog] = useState(false);
 
   const handleProfileSave = () => store.save("FitnessProfile", profile);
-  const toggleProfileDialog = () => setDialog(!dialog);
-  const toggleMealDialog = () => setDialog(!dialog);
+  const toggleProfileDialog = () => setOpenProfileDialog(!openProfileDialog);
+  const toggleMealDialog = () => setOpenMealDialog(!openMealDialog);
 
   const today = new Date();
 
   console.log(profile);
   return (
     <>
-      <Typography>
+      <Typography> {today.toDateString()} </Typography>
+
+      <Typography display="inline">
         Hello {profile.name || "Stranger"}!
-        <IconButton onClick={toggleProfileDialog}>
-          <EditIcon />
-        </IconButton>
       </Typography>
+      <IconButton onClick={toggleProfileDialog}>
+        <EditIcon />
+      </IconButton>
       <ProfileEdit
-        dialog={dialog}
+        open={openProfileDialog}
         profile={profile}
-        handleEditProfile={handleEditProfile}
         handleProfileSave={handleProfileSave}
+        setProfile={setProfile}
         toggleProfileDialog={toggleProfileDialog}
       />
-      <Typography> {today.toDateString()} </Typography>
+
       <FoodLog
         foodLog={profile.foodLog}
         handleProfileSave={handleProfileSave}
       />
+
+      <Typography display="inline">
+        Add new Meal entry
+      </Typography>
       <IconButton onClick={toggleMealDialog}>
         <AddIcon />
       </IconButton>
       <AddMeal
-        dialog={dialog}
+        open={openMealDialog}
         profile={profile}
         handleProfileSave={handleProfileSave}
         setProfile={setProfile}

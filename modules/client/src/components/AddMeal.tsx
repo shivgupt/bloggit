@@ -20,7 +20,7 @@ import { Dishes } from "../utils/dishes";
 
 export const AddMeal = (props: any) => {
   const {
-    dialog,
+    open,
     profile,
     handleProfileSave,
     setProfile,
@@ -36,21 +36,39 @@ export const AddMeal = (props: any) => {
     setFoodLog(profile.foodLog);
   }, [profile.foodLog]);
 
+  useEffect(() => {
+    handleProfileSave();
+  }, [profile]);
+
   const handleAddMeal = () => {
-    const newFoodLog = { ...foodLog,
-      [mealTime.toLocaleDateString()]: {
-        [mealTime.toLocaleTimeString()]: selected
+    const date = mealTime.toLocaleDateString();
+    const time = mealTime.toLocaleTimeString();
+    const newFoodLog = { ...foodLog };
+
+    if (newFoodLog[date]) {
+      if (newFoodLog[time]) {
+        console.log('found date and time concatinating');
+        newFoodLog[date][time].concat(selected);
+      } else {
+        console.log('found date adding time');
+        newFoodLog[date][time] = selected;
+      }
+    } else {
+      newFoodLog[date] = {
+        [time]: selected
       }
     }
+
     setFoodLog(newFoodLog);
     setProfile({
       ...profile,
       foodLog: newFoodLog,
     });
+    toggleMealDialog();
   };
 
   return (
-    <Dialog open={dialog} onClose={toggleMealDialog}>
+    <Dialog open={open} onClose={toggleMealDialog}>
       <DialogTitle>
         Meal Details
       </DialogTitle>
