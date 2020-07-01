@@ -8,6 +8,7 @@ import {
   Typography,
 } from "@material-ui/core";
 import {
+  AddCircle as AddIcon,
   Close as CloseIcon,
 } from "@material-ui/icons";
 
@@ -16,7 +17,7 @@ import { sumNutrientsOfIngredients } from "../utils/helper";
 
 export const NutritionInfo = (props: any) => {
   const { open, dish, toggleOpen } = props;
-  console.log(dish);
+  const total = sumNutrientsOfIngredients(dish);
 
   return (
     <Dialog
@@ -25,8 +26,13 @@ export const NutritionInfo = (props: any) => {
     >
       <DialogTitle disableTypography id="dish-info">
         <Typography variant="h4"> Nutrition Info </Typography>
-        <Typography variant="subtitle1" display="block" > {dish.name} </Typography>
-        <Typography variant="subtitle2" display="block" > Serving: {dish.serving} </Typography>
+        <Typography variant="subtitle1" display="block"> {dish.name} </Typography>
+        <Typography variant="subtitle2" display="block">
+          Serving: {dish.serving}
+          <IconButton>
+            <AddIcon />
+          </IconButton>
+        </Typography>
       </DialogTitle>
       <DialogContent>
         <Typography variant="button"> Ingrdients </Typography>
@@ -37,8 +43,16 @@ export const NutritionInfo = (props: any) => {
             </li>
           );
         })}
+        <br/>
+        <br/>
         <Typography variant="button"> Total </Typography>
-        {console.log(sumNutrientsOfIngredients(dish))}
+        {Object.keys(total).map((key) => {
+          return (
+            <li key={key}>
+              {`${key}: ${total[key].toFixed(2)}g`}
+            </li>
+          );
+        })}
       </DialogContent>
       <DialogActions>
         <IconButton onClick={toggleOpen}>

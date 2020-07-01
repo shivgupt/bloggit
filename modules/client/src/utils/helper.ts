@@ -26,6 +26,5 @@ export const sumNutrientsOfIngredients = (dish: Dish) => {
       total[nutrient] += Number(ingredient.quantity) * ingredient.nutrients[nutrient]/100;
     });
   });
-
   return total;
 };
