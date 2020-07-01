@@ -34,12 +34,13 @@ export const Home = (props: any) => {
             <Card className={classes.card}>
               <CardActionArea component={Link} to={`/${slug}`}>
                 <CardHeader title={posts[slug].title} />
-                <CardMedia
-                  className={classes.media}
-                  component="img"
-                  image={posts[slug].img}
-                  title={slug}
-                />
+                {posts[slug].img
+                  ? <CardMedia
+                    className={classes.media}
+                    component="img"
+                    image={posts[slug].img}
+                    title={slug}/>
+                  : null}
                 <CardContent>
                   <Typography variant="body2" color="textSecondary" component="p">
                     {posts[slug].tldr}

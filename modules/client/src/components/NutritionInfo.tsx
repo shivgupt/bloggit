@@ -35,7 +35,7 @@ export const NutritionInfo = (props: any) => {
             <li key={item.name}>
               {`${item.quantity}g ${item.name}`}
             </li>
-          )
+          );
         })}
         <Typography variant="button"> Total </Typography>
         {console.log(sumNutrientsOfIngredients(dish))}

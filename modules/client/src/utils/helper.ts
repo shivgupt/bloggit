@@ -24,8 +24,8 @@ export const sumNutrientsOfIngredients = (dish: Dish) => {
   dish.ingredients.forEach((ingredient: Ingredient) => {
     Object.keys(ingredient.nutrients).forEach((nutrient: string) => {
       total[nutrient] += Number(ingredient.quantity) * ingredient.nutrients[nutrient]/100;
-    })
-  })
+    });
+  });
 
   return total;
-}
+};
