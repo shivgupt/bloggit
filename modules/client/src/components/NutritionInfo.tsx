@@ -23,7 +23,7 @@ export const NutritionInfo = (props: any) => {
       open={open}
       onClose={toggleOpen}
     >
-      <DialogTitle id="dish-info">
+      <DialogTitle disableTypography id="dish-info">
         <Typography variant="h4"> Nutrition Info </Typography>
         <Typography variant="subtitle1" display="block" > {dish.name} </Typography>
         <Typography variant="subtitle2" display="block" > Serving: {dish.serving} </Typography>

@@ -31,7 +31,7 @@ export const Caschew = {
 } as Ingredient;
 
 export const Cheese = {
-  name: "Caschew",
+  name: "Cheese",
   quantity: "100",
   nutrients: {
     carbohydrates: 3.7,
@@ -71,7 +71,7 @@ export const Onion = {
 } as Ingredient;
 
 export const Tomato = {
-  name: "Onion",
+  name: "Tomato",
   quantity: "100",
   nutrients: {
     carbohydrates: 3.9,
