@@ -18,11 +18,12 @@ import { TransferList } from "./TransferList";
 import { Dish } from "../types";
 import { Dishes } from "../utils/dishes";
 
+import { store } from "../utils/cache";
+
 export const AddMeal = (props: any) => {
   const {
     open,
     profile,
-    handleProfileSave,
     setProfile,
     toggleMealDialog,
   } = props;
@@ -35,10 +36,6 @@ export const AddMeal = (props: any) => {
   useEffect(() => {
     setFoodLog(profile.foodLog);
   }, [profile.foodLog]);
-
-  useEffect(() => {
-    handleProfileSave();
-  }, [profile, handleProfileSave]);
 
   const handleAddMeal = () => {
     const date = mealTime.toLocaleDateString();
@@ -58,10 +55,13 @@ export const AddMeal = (props: any) => {
     }
 
     setFoodLog(newFoodLog);
-    setProfile({
+    const newProfile = {
       ...profile,
       foodLog: newFoodLog,
-    });
+    };
+
+    setProfile(newProfile);
+    store.save("FitnessProfile", newProfile);
     toggleMealDialog();
   };
 

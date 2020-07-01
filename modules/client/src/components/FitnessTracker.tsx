@@ -21,13 +21,11 @@ export const FitnessTracker = (props: any) => {
   const [openProfileDialog, setOpenProfileDialog] = useState(false);
   const [openMealDialog, setOpenMealDialog] = useState(false);
 
-  const handleProfileSave = () => store.save("FitnessProfile", profile);
   const toggleProfileDialog = () => setOpenProfileDialog(!openProfileDialog);
   const toggleMealDialog = () => setOpenMealDialog(!openMealDialog);
 
   const today = new Date();
 
-  console.log(profile);
   return (
     <>
       <Typography> {today.toDateString()} </Typography>
@@ -41,14 +39,12 @@ export const FitnessTracker = (props: any) => {
       <ProfileEdit
         open={openProfileDialog}
         profile={profile}
-        handleProfileSave={handleProfileSave}
         setProfile={setProfile}
         toggleProfileDialog={toggleProfileDialog}
       />
 
       <FoodLog
         foodLog={profile.foodLog}
-        handleProfileSave={handleProfileSave}
       />
 
       <Typography display="inline">
@@ -60,7 +56,6 @@ export const FitnessTracker = (props: any) => {
       <AddMeal
         open={openMealDialog}
         profile={profile}
-        handleProfileSave={handleProfileSave}
         setProfile={setProfile}
         toggleMealDialog={toggleMealDialog}
       />

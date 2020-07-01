@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 
 import {
+  Chip,
   Paper,
   Table,
   TableBody,
@@ -50,12 +51,25 @@ export const FoodLog = (props: any) => {
                   <TableRow key={date+time}>
                     <TableCell> {time} </TableCell>
                     <TableCell>
-                      {foodLog[date][time].map((dish) => <> {dish.name}, &nbsp; </>)}
+                      {foodLog[date][time].map((dish) =>
+                        <Chip
+                          color="secondary"
+                          label={dish.name}
+                          variant="outlined"
+                        />
+                      )}
                     </TableCell>
                     <TableCell>
-                      {Object.keys(totalNutrientMeal).map((nutrient) => <>
-                        {nutrient}: {totalNutrientMeal[nutrient].toFixed(2)}g, &nbsp;
-                        </>)}
+                      {Object.keys(totalNutrientMeal).map((nutrient) => {
+                        let value = totalNutrientMeal[nutrient].toFixed(2);
+                        return (
+                          <Chip
+                            color="primary"
+                            label={`(${nutrient.charAt(0)}) ${value}`}
+                            variant="outlined"
+                          />
+                        );
+                      })}
                     </TableCell>
                   </TableRow>
                 );

@@ -11,11 +11,12 @@ import {
   SaveAlt as SaveIcon,
 } from "@material-ui/icons";
 
+import { store } from "../utils/cache";
+
 export const ProfileEdit = (props: any) => {
   const {
     open,
     profile,
-    handleProfileSave,
     setProfile,
     toggleProfileDialog,
   } = props;
@@ -54,7 +55,7 @@ export const ProfileEdit = (props: any) => {
         />
       </DialogContent>
       <DialogActions>
-        <IconButton onClick={handleProfileSave}>
+        <IconButton onClick={() => store.save("FitnessProfile", profile)}>
           <SaveIcon />
         </IconButton>
         <IconButton onClick={toggleProfileDialog}>
