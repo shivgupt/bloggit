@@ -13,11 +13,11 @@ import {
 } from "@material-ui/icons";
 
 import { Ingredient } from "../types";
-import { sumNutrientsOfIngredients } from "../utils/helper";
+import { getTotalNutrientsDish } from "../utils/helper";
 
 export const NutritionInfo = (props: any) => {
   const { open, dish, toggleOpen } = props;
-  const total = sumNutrientsOfIngredients(dish);
+  const total = getTotalNutrientsDish(dish);
 
   return (
     <Dialog

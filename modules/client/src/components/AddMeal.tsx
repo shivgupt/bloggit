@@ -38,7 +38,7 @@ export const AddMeal = (props: any) => {
 
   useEffect(() => {
     handleProfileSave();
-  }, [profile]);
+  }, [profile, handleProfileSave]);
 
   const handleAddMeal = () => {
     const date = mealTime.toLocaleDateString();
@@ -47,16 +47,14 @@ export const AddMeal = (props: any) => {
 
     if (newFoodLog[date]) {
       if (newFoodLog[time]) {
-        console.log('found date and time concatinating');
+        console.log("found date and time concatinating");
         newFoodLog[date][time].concat(selected);
       } else {
-        console.log('found date adding time');
+        console.log("found date adding time");
         newFoodLog[date][time] = selected;
       }
     } else {
-      newFoodLog[date] = {
-        [time]: selected
-      }
+      newFoodLog[date] = { [time]: selected };
     }
 
     setFoodLog(newFoodLog);

@@ -18,7 +18,7 @@ export const getPostsByCategories = (posts: { [slug: string]: PostData }) => {
   return postsByCategory;
 };
 
-export const sumNutrientsOfIngredients = (dish: Dish) => {
+export const getTotalNutrientsDish = (dish: Dish) => {
   const total = { ...emptyNutrients };
 
   dish.ingredients.forEach((ingredient: Ingredient) => {
@@ -26,5 +26,18 @@ export const sumNutrientsOfIngredients = (dish: Dish) => {
       total[nutrient] += Number(ingredient.quantity) * ingredient.nutrients[nutrient]/100;
     });
   });
+  return total;
+};
+
+export const getTotalNutrientsMeal = (dishes: Dish[]) => {
+  const total = { ...emptyNutrients };
+
+  dishes.forEach((dish: Dish) => {
+    let dishTotal = getTotalNutrientsDish(dish);
+    Object.keys(total).forEach((nutrient: string) => {
+      total[nutrient] += dishTotal[nutrient];
+    });
+  })
+
   return total;
 };
