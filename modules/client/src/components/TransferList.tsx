@@ -16,7 +16,6 @@ import Divider from "@material-ui/core/Divider";
 
 import { emptyDish } from "../utils/constants";
 import { Dish } from "../types";
-import { Dishes } from "../utils/dishes";
 import { NutritionInfo } from "./NutritionInfo";
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -39,11 +38,16 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-export const TransferList = () => {
+export const TransferList = (props: any) => {
   const classes = useStyles();
-  const [dishOptions, setDishOptions] = React.useState<Dish[]>([]);
-  const [selected, setSelected] = React.useState<Dish[]>(Dishes);
-  const [open, setOpen] = React.useState(false);
+  const {
+    selected,
+    setSelected,
+    dishOptions,
+    setDishOptions,
+  } = props;
+
+  const [infoDialog, setInfoDialog] = React.useState(false);
   const [selectedDish, setSelectedDish] = React.useState<Dish>(emptyDish);
 
   const handleToggle = (dish: Dish) => () => {
@@ -64,13 +68,13 @@ export const TransferList = () => {
     setDishOptions(newOptions);
   };
 
-  const toggleOpen = () => {
-    setOpen(!open);
+  const toggleInfoDialog = () => {
+    setInfoDialog(!infoDialog);
   };
 
   const handleInfo = (dish: Dish) => () => {
     setSelectedDish(dish);
-    setOpen(true);
+    setInfoDialog(true);
   };
 
   const customList = (title: React.ReactNode, list: Dish[]) => (
@@ -102,13 +106,13 @@ export const TransferList = () => {
   return (
     <>
       <Grid container spacing={2} justify="center" alignItems="center" className={classes.root}>
-        <Grid item>{customList("What did you eat?", dishOptions)}</Grid>
-        <Grid item>{customList("Dish Options", selected)}</Grid>
+        <Grid item>{customList("What did you eat?", selected)}</Grid>
+        <Grid item>{customList("Dish Options", dishOptions)}</Grid>
       </Grid>
       <NutritionInfo
-        open={open}
+        open={infoDialog}
         dish={selectedDish}
-        toggleOpen={toggleOpen}
+        toggleOpen={toggleInfoDialog}
       />
     </>
   );
