@@ -79,3 +79,63 @@ export const Tomato = {
     fat: 0.2,
   },
 } as Ingredient;
+
+export const CoconutOil = {
+  name: "CoconutOil",
+  quantity: "100",
+  nutrients: {
+    carbohydrates: 0,
+    protein: 0,
+    fat: 100,
+  },
+} as Ingredient;
+
+export const DoubleChocolateProtein = {
+  name: "DoubleChocolateProtein",
+  quantity: "30",
+  nutrients: {
+    carbohydrates: 1,
+    protein: 80,
+    fat: 0.33,
+  },
+} as Ingredient;
+
+export const Cherry = {
+  name: "Cherry",
+  quantity: "100",
+  nutrients: {
+    carbohydrates: 12,
+    protein: 1,
+    fat: 0.3,
+  },
+} as Ingredient;
+
+export const Litchi = {
+  name: "Litchi",
+  quantity: "50",
+  nutrients: {
+    carbohydrates: 17,
+      protein: 0.8,
+      fat: 0.4,
+  },
+} as Ingredient;
+
+export const RefinedFlour = {
+  name: "RefinedFlour aka Maida",
+  quantity: "50",
+  nutrients: {
+    carbohydrates: 0.76,
+      protein: 0.1,
+      fat: 0.009,
+  },
+} as Ingredient;
+
+export const Oats = {
+  name: "Oats",
+  quantity: "100",
+  nutrients: {
+    carbohydrates: 66,
+      protein: 14.2,
+      fat: 8.5,
+  },
+} as Ingredient;

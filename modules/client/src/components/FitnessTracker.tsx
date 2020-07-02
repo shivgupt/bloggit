@@ -43,10 +43,7 @@ export const FitnessTracker = (props: any) => {
         toggleProfileDialog={toggleProfileDialog}
       />
 
-      <FoodLog
-        foodLog={profile.foodLog}
-      />
-
+      <br />
       <Typography display="inline">
         Add new Meal entry
       </Typography>
@@ -58,6 +55,10 @@ export const FitnessTracker = (props: any) => {
         profile={profile}
         setProfile={setProfile}
         toggleMealDialog={toggleMealDialog}
+      />
+
+      <FoodLog
+        profile={profile}
       />
     </>
   );

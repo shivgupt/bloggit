@@ -17,7 +17,9 @@ import { getTotalNutrientsMeal } from "../utils/helper";
 
 export const FoodLog = (props: any) => {
 
-  const { foodLog } = props;
+  const { profile } = props;
+
+  let foodLog = profile.foodLog;
 
   if (JSON.stringify(foodLog) === JSON.stringify(emptyFoodLog)) {
     return (
@@ -29,12 +31,12 @@ export const FoodLog = (props: any) => {
 
   return (
     <TableContainer component={Paper}>
-      <Table aria-label="mealLog">
+      <Table aria-label="mealLog" size="small">
         <TableHead>
           <TableRow>
-            <TableCell> Time </TableCell>
-            <TableCell> Meal </TableCell>
             <TableCell> Nutrition </TableCell>
+            <TableCell> Meal </TableCell>
+            <TableCell> Time </TableCell>
           </TableRow>
         </TableHead>
         {Object.keys(foodLog).map((date, i) => {
@@ -49,21 +51,12 @@ export const FoodLog = (props: any) => {
                 let totalNutrientMeal = getTotalNutrientsMeal(foodLog[date][time]);
                 return (
                   <TableRow key={date+time}>
-                    <TableCell> {time} </TableCell>
-                    <TableCell>
-                      {foodLog[date][time].map((dish) =>
-                        <Chip
-                          color="secondary"
-                          label={dish.name}
-                          variant="outlined"
-                        />
-                      )}
-                    </TableCell>
                     <TableCell>
                       {Object.keys(totalNutrientMeal).map((nutrient) => {
                         let value = totalNutrientMeal[nutrient].toFixed(2);
                         return (
                           <Chip
+                            size="small"
                             color="primary"
                             label={`(${nutrient.charAt(0)}) ${value}`}
                             variant="outlined"
@@ -71,6 +64,17 @@ export const FoodLog = (props: any) => {
                         );
                       })}
                     </TableCell>
+                    <TableCell>
+                      {foodLog[date][time].map((dish) =>
+                        <Chip
+                          size="small"
+                          color="secondary"
+                          label={dish.name}
+                          variant="outlined"
+                        />
+                      )}
+                    </TableCell>
+                    <TableCell> {time} </TableCell>
                   </TableRow>
                 );
               })}

@@ -19,6 +19,7 @@ import { Dish } from "../types";
 import { Dishes } from "../utils/dishes";
 
 import { store } from "../utils/cache";
+import { dateOptions, timeOptions } from "../utils/constants";
 
 export const AddMeal = (props: any) => {
   const {
@@ -38,8 +39,8 @@ export const AddMeal = (props: any) => {
   }, [profile.foodLog]);
 
   const handleAddMeal = () => {
-    const date = mealTime.toLocaleDateString();
-    const time = mealTime.toLocaleTimeString();
+    const date = mealTime.toLocaleDateString([], dateOptions);
+    const time = mealTime.toLocaleTimeString([], timeOptions);
     const newFoodLog = { ...foodLog };
 
     if (newFoodLog[date]) {
@@ -91,4 +92,3 @@ export const AddMeal = (props: any) => {
     </Dialog>
   );
 };
-
