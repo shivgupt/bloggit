@@ -34,9 +34,9 @@ export const FoodLog = (props: any) => {
       <Table aria-label="mealLog" size="small">
         <TableHead>
           <TableRow>
-            <TableCell> Nutrition </TableCell>
-            <TableCell> Meal </TableCell>
             <TableCell> Time </TableCell>
+            <TableCell> Meal </TableCell>
+            <TableCell> Nutrition </TableCell>
           </TableRow>
         </TableHead>
         {Object.keys(foodLog).map((date, i) => {
@@ -51,6 +51,14 @@ export const FoodLog = (props: any) => {
                 let totalNutrientMeal = getTotalNutrientsMeal(foodLog[date][time]);
                 return (
                   <TableRow key={date+time}>
+                    <TableCell> {time} </TableCell>
+                    <TableCell>
+                      {foodLog[date][time].map((dish) =>
+                        <>
+                          {dish.name}, &nbsp;
+                        </>
+                      )}
+                    </TableCell>
                     <TableCell>
                       {Object.keys(totalNutrientMeal).map((nutrient) => {
                         let value = totalNutrientMeal[nutrient].toFixed(2);
@@ -64,17 +72,6 @@ export const FoodLog = (props: any) => {
                         );
                       })}
                     </TableCell>
-                    <TableCell>
-                      {foodLog[date][time].map((dish) =>
-                        <Chip
-                          size="small"
-                          color="secondary"
-                          label={dish.name}
-                          variant="outlined"
-                        />
-                      )}
-                    </TableCell>
-                    <TableCell> {time} </TableCell>
                   </TableRow>
                 );
               })}
