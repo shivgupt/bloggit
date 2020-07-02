@@ -1,6 +1,7 @@
 import axios from "axios";
 import { PostIndex } from "../types";
 import { env } from "./env";
+import { store } from "./cache";
 
 let indexCache: Promise<PostIndex> | undefined;
 let contentCache: { [key: string]: Promise<string>; } = {};
@@ -13,7 +14,7 @@ const contentUrls = (file: string): string[] => [
 // Remember which contentUrl worked & try that one first from now on
 const smartIndexKey = "contentUrlIndex";
 const smartIndex = (i: number) => {
-  const contentUrlIndex = localStorage.getItem(smartIndexKey) || "0";
+  const contentUrlIndex = store.load(smartIndexKey);
   return (i + parseInt(contentUrlIndex, 10)) % contentUrls("").length;
 };
 
@@ -26,7 +27,7 @@ const get = async (file: string): Promise<string | PostIndex> => {
       if (response && response.data) {
         if (i !== 0) {
           console.log(`Setting default content url to ${i}: ${url.replace(file, "")}`);
-          localStorage.setItem(smartIndexKey, smartIndex(i).toString());
+          store.save(smartIndexKey, smartIndex(i).toString());
         }
         return response.data;
       }
