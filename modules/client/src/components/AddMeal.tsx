@@ -9,21 +9,23 @@ import {
   Chip,
   IconButton,
   ListItem,
+  Popper,
   Typography,
 } from "@material-ui/core";
 import {
   RestaurantMenu as FoodIcon,
+  Info as InfoIcon,
   AddCircle as AddIcon,
 } from "@material-ui/icons";
 
 import { DateTime } from "./DateTimePicker";
-import { TransferList } from "./TransferList";
+import { NutritionInfo } from "./NutritionInfo";
 
 import { Dish } from "../types";
 import { Dishes } from "../utils/dishes";
 
 import { store } from "../utils/cache";
-import { dateOptions, timeOptions } from "../utils/constants";
+import { dateOptions, timeOptions, emptyDish } from "../utils/constants";
 
 export const AddMeal = (props: any) => {
   const {
@@ -38,10 +40,20 @@ export const AddMeal = (props: any) => {
   const [selected, setSelected] = React.useState<Dish[]>([]);
   const [dishOptions, setDishOptions] = React.useState<Dish[]>(Dishes);
   const [dishOptionsView, setDishOptionsView] = useState(false);
+  const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
+  const [infoDialog, setInfoDialog] = React.useState(false);
+  const [selectedDish, setSelectedDish] = React.useState<Dish>(emptyDish);
 
   useEffect(() => {
     setFoodLog(profile.foodLog);
   }, [profile.foodLog]);
+
+  const toggleInfoDialog = () => setInfoDialog(!infoDialog);
+
+  const handleInfo = (dish: Dish) => () => {
+    setSelectedDish(dish);
+    setInfoDialog(true);
+  };
 
   const handleToggle = (dish: Dish) => () => {
     const optionsIndex = dishOptions.indexOf(dish);
@@ -61,8 +73,8 @@ export const AddMeal = (props: any) => {
     setDishOptions(newOptions);
   }
 
-  const toggleDishOptionsView = () => {
-    console.log(`Toggling dishOptions to ${!dishOptionsView}`)
+  const toggleDishOptionsView = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
     setDishOptionsView(!dishOptionsView);
   }
 
@@ -103,6 +115,11 @@ export const AddMeal = (props: any) => {
         <br />
         <Typography variant="caption" color="textSecondary"> What all did you eat? </Typography>
         <Paper variant="outlined">
+          <NutritionInfo
+            open={infoDialog}
+            dish={selectedDish}
+            toggleOpen={toggleInfoDialog}
+          />
           <IconButton onClick={toggleDishOptionsView}>
             <FoodIcon />
           </IconButton>
@@ -112,22 +129,26 @@ export const AddMeal = (props: any) => {
                 <Chip
                   color="secondary"
                   label={dish.name}
+                  onDelete={handleToggle(dish)}
                 />
               </ListItem>
             ))}
           </List>
-        </Paper>
-        <Paper component="ul">
-          <label> Dish Options </label>
-          {dishOptions.map((dish) => (
-            <ListItem key={dish.name} role="listitem" button onClick={handleToggle(dish)}>
-              <Chip
-                color="secondary"
-                label={dish.name}
-                onDelete={handleToggle(dish)}
-              />
-            </ListItem>
-          ))}
+          <Popper id="dish-options-menu" anchorEl={anchorEl} open={dishOptionsView} placement="bottom-start">
+            <Paper>
+              <label> Dish Options </label>
+              {dishOptions.map((dish) => (
+                <ListItem key={dish.name} role="listitem" button onClick={handleToggle(dish)}>
+                  <Chip
+                    color="secondary"
+                    label={dish.name}
+                    onDelete={handleInfo(dish)}
+                    deleteIcon={<InfoIcon />}
+                  />
+                </ListItem>
+              ))}
+            </Paper>
+          </Popper>
         </Paper>
       </CardContent>
       <CardActions>
@@ -137,46 +158,4 @@ export const AddMeal = (props: any) => {
       </CardActions>
     </Card>
   );
-
 };
-
-/*
-
-        <List subheader={<ListSubheader>What did you eat?</ListSubheader>}>
-          {selected.map((dish: Dish) => {
-            return (
-              <ListItem key={dish.name} role="listitem" button onClick={handleToggle(dish)}>
-                <Chip
-                  color="secondary"
-                  label={dish.name}
-                />
-              </ListItem>
-            );
-          })}
-        </List>
-  return (
-    <Dialog open={open} onClose={toggleMealDialog}>
-      <DialogTitle>
-        Meal Details
-      </DialogTitle>
-      <DialogContent>
-        <DateTime date={mealTime} label="Time" setDate={setMealTime}/>
-        <Typography> Dishes </Typography>
-        <TransferList
-          selected={selected}
-          dishOptions={dishOptions}
-          setSelected={setSelected}
-          setDishOptions={setDishOptions}
-        />
-      </DialogContent>
-      <DialogActions>
-        <IconButton onClick={handleAddMeal}>
-          <AddIcon />
-        </IconButton>
-        <IconButton onClick={toggleMealDialog}>
-          <CloseIcon />
-        </IconButton>
-      </DialogActions>
-    </Dialog>
-  );
- * */
