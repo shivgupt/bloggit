@@ -37,7 +37,10 @@ export const AddMeal = (props: any) => {
   } = props;
 
   const [foodLog, setFoodLog] = useState(profile.foodLog);
-  const [mealEntryError, setMealEntryError] = useState("");
+  const [mealEntryAlert, setMealEntryAlert] = useState({
+    severity: "" as "error" | "info" | "success" | "warning",
+    msg: "",
+  });
   const [mealTime, setMealTime] = useState(new Date());
   const [selected, setSelected] = React.useState<Dish[]>([]);
   const [dishOptions, setDishOptions] = React.useState<Dish[]>(Dishes);
@@ -82,12 +85,13 @@ export const AddMeal = (props: any) => {
 
   const handleAddMeal = () => {
     if (selected.length === 0) {
-      setMealEntryError("You have not selected any dish! What did you eat in your meal?");
+      setMealEntryAlert({ severity: "error", msg: "You have not selected any dish! What did you eat in your meal?" });
       return;
     }
 
     const date = mealTime.toLocaleDateString([], dateOptions);
     const time = mealTime.toLocaleTimeString([], timeOptions);
+    setMealEntryAlert({ severity: "success", msg: `You have successfully added your meal at ${time} on ${date}` });
     const newFoodLog = { ...foodLog };
 
     if (newFoodLog[date]) {
@@ -117,10 +121,10 @@ export const AddMeal = (props: any) => {
     <Card>
       <CardHeader title="New Meal Entry" />
       <CardContent>
-        {mealEntryError ?
-          <Alert severity="error">
-            <AlertTitle>Error</AlertTitle>
-            <strong> {mealEntryError} </strong>
+        {mealEntryAlert.severity ?
+          <Alert severity={mealEntryAlert.severity}>
+            <AlertTitle> {mealEntryAlert.severity} </AlertTitle>
+            <strong> {mealEntryAlert.msg} </strong>
           </Alert>
           : null
         }
