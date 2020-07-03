@@ -74,12 +74,3 @@ export const CheeseNutsPlatter = {
     { ...ing.Caschew, quantity: "50" },
   ],
 } as Dish;
-
-export const Dishes = [
-  AlmondCaschewCastrol,
-  AlmondCaschewCrustPizza,
-  CheeseNutsPlatter,
-  OatsNMilk,
-  ProteinPotion,
-  ThinCrustPizza,
-] as Dish[];

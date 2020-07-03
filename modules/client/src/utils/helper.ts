@@ -35,7 +35,7 @@ export const getTotalNutrientsMeal = (dishes: Dish[]) => {
   dishes.forEach((dish: Dish) => {
     let dishTotal = getTotalNutrientsDish(dish);
     Object.keys(total).forEach((nutrient: string) => {
-      total[nutrient] += dishTotal[nutrient];
+      total[nutrient] += Number(dish.serving) * dishTotal[nutrient];
     });
   })
 
