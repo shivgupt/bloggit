@@ -10,7 +10,7 @@ import {
   Chip,
   IconButton,
   ListItem,
-  Popper,
+  Popover,
   Typography,
 } from "@material-ui/core";
 import {
@@ -152,7 +152,7 @@ export const AddMeal = (props: any) => {
               </ListItem>
             ))}
           </List>
-          <Popper id="dish-options-menu" anchorEl={anchorEl} open={dishOptionsView} placement="bottom-start">
+          <Popover id="dish-options-menu" anchorEl={anchorEl} open={dishOptionsView} onClose={toggleDishOptionsView}>
             <Paper>
               <label> Dish Options </label>
               {dishOptions.map((dish) => (
@@ -166,7 +166,7 @@ export const AddMeal = (props: any) => {
                 </ListItem>
               ))}
             </Paper>
-          </Popper>
+          </Popover>
         </Paper>
       </CardContent>
       <CardActions>

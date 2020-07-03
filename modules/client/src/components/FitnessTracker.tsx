@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 
 import {
+  Button,
+  Modal,
   IconButton,
   Typography,
 } from "@material-ui/core";
@@ -44,18 +46,20 @@ export const FitnessTracker = (props: any) => {
       />
 
       <br />
-      <Typography display="inline">
+      <Button onClick={toggleMealDialog}>
         Add new Meal entry
-      </Typography>
-      <IconButton onClick={toggleMealDialog}>
-        <AddIcon />
-      </IconButton>
-      <AddMeal
+      </Button>
+      <Modal
         open={openMealDialog}
-        profile={profile}
-        setProfile={setProfile}
-        toggleMealDialog={toggleMealDialog}
-      />
+        onClose={toggleMealDialog}
+      >
+        <AddMeal
+          open={openMealDialog}
+          profile={profile}
+          setProfile={setProfile}
+          toggleMealDialog={toggleMealDialog}
+        />
+      </Modal>
 
       <br />
       <FoodLog
