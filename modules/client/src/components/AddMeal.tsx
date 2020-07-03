@@ -1,27 +1,18 @@
 import React, { useState, useEffect } from "react";
 import {
-  InputLabel,
+  List,
+  Paper,
   Card,
   CardActions,
   CardContent,
   CardHeader,
   Chip,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  Select,
-  DialogTitle,
-  FormControl,
   IconButton,
-  List,
   ListItem,
-  ListSubheader,
-  MenuItem,
-  TextField,
   Typography,
 } from "@material-ui/core";
 import {
-  Close as CloseIcon,
+  RestaurantMenu as FoodIcon,
   AddCircle as AddIcon,
 } from "@material-ui/icons";
 
@@ -44,13 +35,13 @@ export const AddMeal = (props: any) => {
 
   const [foodLog, setFoodLog] = useState(profile.foodLog);
   const [mealTime, setMealTime] = useState(new Date());
-  const [selected, setSelected] = React.useState<Dish[]>([Dishes[0]]);
+  const [selected, setSelected] = React.useState<Dish[]>([]);
   const [dishOptions, setDishOptions] = React.useState<Dish[]>(Dishes);
+  const [dishOptionsView, setDishOptionsView] = useState(false);
 
   useEffect(() => {
     setFoodLog(profile.foodLog);
   }, [profile.foodLog]);
-
 
   const handleToggle = (dish: Dish) => () => {
     const optionsIndex = dishOptions.indexOf(dish);
@@ -68,6 +59,11 @@ export const AddMeal = (props: any) => {
 
     setSelected(newSelected);
     setDishOptions(newOptions);
+  }
+
+  const toggleDishOptionsView = () => {
+    console.log(`Toggling dishOptions to ${!dishOptionsView}`)
+    setDishOptionsView(!dishOptionsView);
   }
 
   const handleAddMeal = () => {
@@ -103,60 +99,36 @@ export const AddMeal = (props: any) => {
       <CardHeader title="New Meal Entry" />
       <CardContent>
         <DateTime date={mealTime} label="What time did you eat?" setDate={setMealTime}/>
-
-
-        <FormControl variant="outlined">
-            <InputLabel id="meal">What did you eat?</InputLabel>
-            <Select
-              labelId="dish-select-drop"
-              id="dish-select"
-              multiple
-              value={selected || []}
-              name="meal"
-              onChange={handleChange}
-              renderValue={() => (
-                <List>
-                  {selected.map((dish: Dish) => (
-                    <ListItem key={dish.name} role="listitem" button onClick={handleToggle(dish)}>
-                      <Chip
-                        color="secondary"
-                        label={dish.name}
-                      />
-                    </ListItem>
-                  ))}
-                </List>
-              )}
-            >
-              {dishOptions.map((dish) => (
-                <MenuItem key={dish.name} value={dish.name}>
-                  {dish.name}
-                </MenuItem>
-              ))}
-            </Select>
-            <FormHelperText>Select relevant tags for this address</FormHelperText>
-          </FormControl>
-
-
-
-
-
-
-
-
-
-
-        <List subheader={<ListSubheader>What did you eat?</ListSubheader>}>
-          {selected.map((dish: Dish) => {
-            return (
+        <br />
+        <br />
+        <Typography variant="caption" color="textSecondary"> What all did you eat? </Typography>
+        <Paper variant="outlined">
+          <IconButton onClick={toggleDishOptionsView}>
+            <FoodIcon />
+          </IconButton>
+          <List>
+            {selected.map((dish: Dish) => (
               <ListItem key={dish.name} role="listitem" button onClick={handleToggle(dish)}>
                 <Chip
                   color="secondary"
                   label={dish.name}
                 />
               </ListItem>
-            );
-          })}
-        </List>
+            ))}
+          </List>
+        </Paper>
+        <Paper component="ul">
+          <label> Dish Options </label>
+          {dishOptions.map((dish) => (
+            <ListItem key={dish.name} role="listitem" button onClick={handleToggle(dish)}>
+              <Chip
+                color="secondary"
+                label={dish.name}
+                onDelete={handleToggle(dish)}
+              />
+            </ListItem>
+          ))}
+        </Paper>
       </CardContent>
       <CardActions>
         <IconButton onClick={handleAddMeal}>
@@ -170,6 +142,18 @@ export const AddMeal = (props: any) => {
 
 /*
 
+        <List subheader={<ListSubheader>What did you eat?</ListSubheader>}>
+          {selected.map((dish: Dish) => {
+            return (
+              <ListItem key={dish.name} role="listitem" button onClick={handleToggle(dish)}>
+                <Chip
+                  color="secondary"
+                  label={dish.name}
+                />
+              </ListItem>
+            );
+          })}
+        </List>
   return (
     <Dialog open={open} onClose={toggleMealDialog}>
       <DialogTitle>
