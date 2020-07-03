@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Alert, AlertTitle } from "@material-ui/lab";
 import {
   List,
   Paper,
@@ -36,6 +37,7 @@ export const AddMeal = (props: any) => {
   } = props;
 
   const [foodLog, setFoodLog] = useState(profile.foodLog);
+  const [mealEntryError, setMealEntryError] = useState("");
   const [mealTime, setMealTime] = useState(new Date());
   const [selected, setSelected] = React.useState<Dish[]>([]);
   const [dishOptions, setDishOptions] = React.useState<Dish[]>(Dishes);
@@ -79,6 +81,11 @@ export const AddMeal = (props: any) => {
   }
 
   const handleAddMeal = () => {
+    if (selected.length === 0) {
+      setMealEntryError("You have not selected any dish! What did you eat in your meal?");
+      return;
+    }
+
     const date = mealTime.toLocaleDateString([], dateOptions);
     const time = mealTime.toLocaleTimeString([], timeOptions);
     const newFoodLog = { ...foodLog };
@@ -110,6 +117,13 @@ export const AddMeal = (props: any) => {
     <Card>
       <CardHeader title="New Meal Entry" />
       <CardContent>
+        {mealEntryError ?
+          <Alert severity="error">
+            <AlertTitle>Error</AlertTitle>
+            <strong> {mealEntryError} </strong>
+          </Alert>
+          : null
+        }
         <DateTime date={mealTime} label="What time did you eat?" setDate={setMealTime}/>
         <br />
         <br />
