@@ -39,7 +39,7 @@ export const FoodLog = (props: any) => {
             <TableCell> Nutrition </TableCell>
           </TableRow>
         </TableHead>
-        {Object.keys(foodLog).map((date, i) => {
+        {Object.keys(foodLog).sort((a, b) => new Date(a) > new Date(b) ? -1 : 1).map((date, i) => {
           return (
             <TableBody key={i}>
               <TableRow key={date}>
@@ -47,7 +47,7 @@ export const FoodLog = (props: any) => {
                   {date}
                 </TableCell>
               </TableRow>
-              {Object.keys(foodLog[date]).map((time) => {
+              {Object.keys(foodLog[date]).sort().map((time) => {
                 let totalNutrientMeal = getTotalNutrientsMeal(foodLog[date][time]);
                 return (
                   <TableRow key={date+time}>

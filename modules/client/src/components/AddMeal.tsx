@@ -186,8 +186,8 @@ export const AddMeal = (props: any) => {
               color="secondary"
               label={
                 selected[dish].serving > 1
-                ? selected[dish].serving + " x " + dish
-                : dish
+                  ? selected[dish].serving + " x " + dish
+                  : dish
               }
               onDelete={handleDeleteDish(dish)}
             />
