@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 
 import {
+  Snackbar,
   Button,
   Dialog,
   IconButton,
@@ -9,6 +10,7 @@ import {
 import {
   Edit as EditIcon,
 } from "@material-ui/icons";
+import { Alert, AlertTitle } from "@material-ui/lab";
 
 import { AddMeal } from "./AddMeal";
 import { ProfileEdit } from "./ProfileEdit";
@@ -21,6 +23,11 @@ export const FitnessTracker = (props: any) => {
   const [profile, setProfile] = useState(store.load("FitnessProfile"));
   const [openProfileDialog, setOpenProfileDialog] = useState(false);
   const [openMealDialog, setOpenMealDialog] = useState(false);
+  const [mealEntryAlert, setMealEntryAlert] = useState({
+    open: false,
+    severity: "" as "error" | "info" | "success" | "warning",
+    msg: "",
+  });
 
   const toggleProfileDialog = () => setOpenProfileDialog(!openProfileDialog);
   const toggleMealDialog = () => setOpenMealDialog(!openMealDialog);
@@ -54,6 +61,7 @@ export const FitnessTracker = (props: any) => {
       >
         <AddMeal
           profile={profile}
+          setMealEntryAlert={setMealEntryAlert}
           setProfile={setProfile}
           toggleMealDialog={toggleMealDialog}
         />
@@ -63,6 +71,12 @@ export const FitnessTracker = (props: any) => {
       <FoodLog
         profile={profile}
       />
+      <Snackbar open={mealEntryAlert.open} autoHideDuration={6000}>
+        <Alert severity={mealEntryAlert.severity}>
+          <AlertTitle> {mealEntryAlert.severity} </AlertTitle>
+          <strong> {mealEntryAlert.msg} </strong>
+        </Alert>
+      </Snackbar>
     </>
   );
 };
