@@ -31,7 +31,6 @@ import { dateOptions, timeOptions, emptyDish } from "../utils/constants";
 
 export const AddMeal = (props: any) => {
   const {
-    open,
     profile,
     setProfile,
     toggleMealDialog,
@@ -44,7 +43,6 @@ export const AddMeal = (props: any) => {
   });
   const [mealTime, setMealTime] = useState(new Date());
   const [selected, setSelected] = React.useState<any>({});
-  const [dishOptions, setDishOptions] = React.useState<any>(Dishes);
   const [dishOptionsView, setDishOptionsView] = useState(false);
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
   const [infoDialog, setInfoDialog] = React.useState(false);
@@ -86,11 +84,14 @@ export const AddMeal = (props: any) => {
   const toggleDishOptionsView = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
     setDishOptionsView(!dishOptionsView);
-  }
+  };
 
   const handleAddMeal = () => {
     if (Object.keys(selected).length === 0) {
-      setMealEntryAlert({ severity: "error", msg: "You have not selected any dish! What did you eat in your meal?" });
+      setMealEntryAlert({
+        severity: "error",
+        msg: "You have not selected any dish! What did you eat in your meal?"
+      });
       return;
     }
 
@@ -101,12 +102,17 @@ export const AddMeal = (props: any) => {
 
     const date = mealTime.toLocaleDateString([], dateOptions);
     const time = mealTime.toLocaleTimeString([], timeOptions);
-    setMealEntryAlert({ severity: "success", msg: `You have successfully added your meal at ${time} on ${date}` });
+    setMealEntryAlert({
+      severity: "success",
+      msg: `You have successfully added your meal at ${time} on ${date}`
+    });
     const newFoodLog = { ...foodLog };
 
     if (newFoodLog[date]) {
       if (newFoodLog[time]) {
         console.log("found date and time concatinating");
+
+        // TODO: Smart concat to increase serving of already existing dish
         newFoodLog[date][time].concat(meal);
       } else {
         console.log("found date adding time");
@@ -162,10 +168,15 @@ export const AddMeal = (props: any) => {
               </ListItem>
             ))}
           </List>
-          <Popover id="dish-options-menu" anchorEl={anchorEl} open={dishOptionsView} onClose={toggleDishOptionsView}>
+          <Popover
+            id="dish-options-menu"
+            anchorEl={anchorEl}
+            open={dishOptionsView}
+            onClose={toggleDishOptionsView}
+          >
             <Paper>
               <label> Dish Options </label>
-              {Object.keys(dishOptions).map((dish: string) => (
+              {Object.keys(Dishes).map((dish: string) => (
                 <ListItem key={dish} role="listitem" button onClick={handleAdd(dish)}>
                   <Chip
                     color="secondary"

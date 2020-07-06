@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 
 import {
   Chip,
@@ -54,9 +54,9 @@ export const FoodLog = (props: any) => {
                     <TableCell> {time} </TableCell>
                     <TableCell>
                       {foodLog[date][time].map((dish) =>
-                        <>
+                        <div key={dish.name}>
                           {dish.name}, &nbsp;
-                        </>
+                        </div>
                       )}
                     </TableCell>
                     <TableCell>
@@ -64,6 +64,7 @@ export const FoodLog = (props: any) => {
                         let value = totalNutrientMeal[nutrient].toFixed(2);
                         return (
                           <Chip
+                            key={nutrient}
                             size="small"
                             color="primary"
                             label={`(${nutrient.charAt(0)}) ${value}`}
