@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from "react";
 import {
-  Paper,
   Card,
   CardActions,
   CardContent,
   CardHeader,
   Chip,
   IconButton,
+  Paper,
   Popover,
-  Typography,
   Theme,
+  Typography,
   makeStyles,
   createStyles,
 } from "@material-ui/core";
@@ -23,7 +23,6 @@ import { DateTime } from "./DateTimePicker";
 import { NutritionInfo } from "./NutritionInfo";
 
 import { Dish } from "../types";
-// import { Dishes } from "../utils/dishes";
 import * as Dishes from "../utils/dishes";
 import { smartConcatMeal } from "../utils/helper";
 
@@ -53,26 +52,22 @@ export const AddMeal = (props: any) => {
     toggleMealDialog,
   } = props;
 
+  const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
+  const [dishOptionsView, setDishOptionsView] = useState(false);
   const [foodLog, setFoodLog] = useState(profile.foodLog);
+  const [infoDialog, setInfoDialog] = React.useState({ open: false, dish: emptyDish });
   const [mealTime, setMealTime] = useState(new Date());
   const [selected, setSelected] = React.useState<any>({});
-  const [dishOptionsView, setDishOptionsView] = useState(false);
-  const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
-  const [infoDialog, setInfoDialog] = React.useState(false);
-  const [selectedDish, setSelectedDish] = React.useState<Dish>(emptyDish);
 
   useEffect(() => {
     setFoodLog(profile.foodLog);
   }, [profile.foodLog]);
 
-  const toggleInfoDialog = () => setInfoDialog(!infoDialog);
+  const toggleInfoDialog = () => setInfoDialog({ ...infoDialog, open: !infoDialog.open });
 
-  const handleInfo = (dish: string) => () => {
-    setSelectedDish(Dishes[dish]);
-    setInfoDialog(true);
-  };
+  const handleInfo = (dish: string) => () => setInfoDialog({ open: true, dish: Dishes[dish] });
 
-  const handleAdd = (dish: string) => () => {
+  const handleAddDish = (dish: string) => () => {
     const newSelected = { ...selected };
     try {
       newSelected[dish].serving += 1;
@@ -83,7 +78,7 @@ export const AddMeal = (props: any) => {
     setDishOptionsView(!dishOptionsView);
   };
 
-  const handleDelete = (dish: string) => () => {
+  const handleDeleteDish = (dish: string) => () => {
     const newSelected = { ...selected };
     try {
       newSelected[dish].serving -= 1;
@@ -173,7 +168,7 @@ export const AddMeal = (props: any) => {
                 color="secondary"
                 label={dish}
                 onDelete={handleInfo(dish)}
-                onClick={handleAdd(dish)}
+                onClick={handleAddDish(dish)}
                 deleteIcon={<InfoIcon />}
               />
             ))}
@@ -181,8 +176,8 @@ export const AddMeal = (props: any) => {
         </Popover>
         <Paper variant="outlined" className={classes.chipList}>
           <NutritionInfo
-            open={infoDialog}
-            dish={selectedDish}
+            open={infoDialog.open}
+            dish={infoDialog.dish}
             toggleOpen={toggleInfoDialog}
           />
           {Object.keys(selected).map((dish: string) => (
@@ -190,7 +185,7 @@ export const AddMeal = (props: any) => {
               key={dish}
               color="secondary"
               label={dish}
-              onDelete={handleDelete(dish)}
+              onDelete={handleDeleteDish(dish)}
             />
           ))}
         </Paper>
