@@ -41,3 +41,16 @@ export const getTotalNutrientsMeal = (dishes: Dish[]) => {
 
   return total;
 };
+
+export const smartConcatMeal = (meal: Dish[], newDishes: Dish[]) => {
+  newDishes.forEach((dish: Dish) => {
+    let i = 0;
+    for (i; i < meal.length; i++) {
+      if(dish.name === meal[i].name) {
+        meal[i].serving += 1;
+        break;
+      }
+    }
+    if (i === meal.length) meal.push(dish);
+  });
+};

@@ -25,6 +25,7 @@ import { NutritionInfo } from "./NutritionInfo";
 import { Dish } from "../types";
 // import { Dishes } from "../utils/dishes";
 import * as Dishes from "../utils/dishes";
+import { smartConcatMeal } from "../utils/helper";
 
 import { store } from "../utils/cache";
 import { dateOptions, timeOptions, emptyDish } from "../utils/constants";
@@ -97,11 +98,12 @@ export const AddMeal = (props: any) => {
 
     const meal = [] as Dish[];
     Object.values(selected).forEach((dish) => meal.push(dish as Dish));
-    console.log(selected);
-    console.log(meal);
+    // console.log(selected);
+    // console.log(meal);
 
     const date = mealTime.toLocaleDateString([], dateOptions);
     const time = mealTime.toLocaleTimeString([], timeOptions);
+    
     setMealEntryAlert({
       severity: "success",
       msg: `You have successfully added your meal at ${time} on ${date}`
@@ -109,11 +111,13 @@ export const AddMeal = (props: any) => {
     const newFoodLog = { ...foodLog };
 
     if (newFoodLog[date]) {
-      if (newFoodLog[time]) {
+      if (newFoodLog[date][time]) {
         console.log("found date and time concatinating");
 
         // TODO: Smart concat to increase serving of already existing dish
-        newFoodLog[date][time].concat(meal);
+        smartConcatMeal(newFoodLog[date][time], meal);
+        console.log(newFoodLog[date][time]);
+        newFoodLog[date][time] = newFoodLog[date][time];
       } else {
         console.log("found date adding time");
         newFoodLog[date][time] = meal;
