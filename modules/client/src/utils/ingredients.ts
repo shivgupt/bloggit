@@ -115,8 +115,8 @@ export const Litchi = {
   quantity: "50",
   nutrients: {
     carbohydrates: 17,
-      protein: 0.8,
-      fat: 0.4,
+    protein: 0.8,
+    fat: 0.4,
   },
 } as Ingredient;
 
@@ -125,8 +125,8 @@ export const RefinedFlour = {
   quantity: "50",
   nutrients: {
     carbohydrates: 0.76,
-      protein: 0.1,
-      fat: 0.009,
+    protein: 0.1,
+    fat: 0.009,
   },
 } as Ingredient;
 
@@ -135,7 +135,7 @@ export const Oats = {
   quantity: "100",
   nutrients: {
     carbohydrates: 66,
-      protein: 14.2,
-      fat: 8.5,
+    protein: 14.2,
+    fat: 8.5,
   },
 } as Ingredient;
