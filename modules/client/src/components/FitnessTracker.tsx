@@ -70,6 +70,8 @@ export const FitnessTracker = (props: any) => {
       <br />
       <FoodLog
         profile={profile}
+        setProfile={setProfile}
+        setMealEntryAlert={setMealEntryAlert}
       />
       <Snackbar open={mealEntryAlert.open} autoHideDuration={6000}>
         <Alert severity={mealEntryAlert.severity}>
