@@ -55,7 +55,10 @@ export const FoodLog = (props: any) => {
                     <TableCell>
                       {foodLog[date][time].map((dish) =>
                         <div key={dish.name}>
-                          {dish.name}, &nbsp;
+                          {dish.serving > 1
+                            ? dish.serving + " x " + dish.name
+                            : dish.name
+                          }, &nbsp;
                         </div>
                       )}
                     </TableCell>

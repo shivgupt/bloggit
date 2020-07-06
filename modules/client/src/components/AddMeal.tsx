@@ -184,7 +184,11 @@ export const AddMeal = (props: any) => {
             <Chip
               key={dish}
               color="secondary"
-              label={dish}
+              label={
+                selected[dish].serving > 1
+                ? selected[dish].serving + " x " + dish
+                : dish
+              }
               onDelete={handleDeleteDish(dish)}
             />
           ))}
