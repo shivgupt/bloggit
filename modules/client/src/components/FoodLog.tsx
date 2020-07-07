@@ -22,17 +22,17 @@ export const FoodLog = (props: any) => {
   const { profile, setProfile, setMealEntryAlert } = props;
 
   const [openMealUpdateDialog, setOpenMealUpdateDialog] = useState(false);
-  const [updateEntry, setUpdateEntry] = useState({date: new Date(), meal: [] as Dish[]});
+  const [updateEntry, setUpdateEntry] = useState({ date: new Date(), meal: [] as Dish[] });
 
   const toggleMealDialog = () => setOpenMealUpdateDialog(!openMealUpdateDialog);
 
   const handleEditMeal = (date: string, time: string) => () => {
-    console.log('I will let you edit meal entry');
+    console.log("I will let you edit meal entry");
     setOpenMealUpdateDialog(true);
     let updateDT = new Date(date);
     updateDT.setHours(Number(time.substring(0,2)));
     updateDT.setMinutes(Number(time.substring(3,5)));
-    setUpdateEntry({date: updateDT, meal: foodLog[date][time]});
+    setUpdateEntry({ date: updateDT, meal: foodLog[date][time] });
   };
 
   const foodLog = profile.foodLog;

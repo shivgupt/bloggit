@@ -31,7 +31,7 @@ export const FitnessTracker = (props: any) => {
 
   const toggleProfileDialog = () => setOpenProfileDialog(!openProfileDialog);
   const toggleMealDialog = () => setOpenMealDialog(!openMealDialog);
-  const handleCloseSnackbar = () => setMealEntryAlert({ ...mealEntryAlert, open: false});
+  const handleCloseSnackbar = () => setMealEntryAlert({ ...mealEntryAlert, open: false });
 
   const today = new Date();
 
