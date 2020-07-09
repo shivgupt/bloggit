@@ -109,7 +109,7 @@ export const FoodLog = (props: any) => {
           toggleMealDialog={() => setOpenMealDialog(!openMealDialog)}
           title="Update Meal Entry"
         />
-    </Dialog>
+      </Dialog>
     </TableContainer>
   );
 };

@@ -154,7 +154,7 @@ export const MealDialog = (props: any) => {
         setMealEntryAlert({
           open: true,
           severity: "info",
-          msg: "You have deleted your meal at ${time} on ${date}"
+          msg: `You have deleted your meal at ${time} on ${date}`
         });
       }
       // TODO delete old entry if date &| time has changed
