@@ -151,11 +151,21 @@ export const MealDialog = (props: any) => {
         delete newFoodLog[date][time];
       } finally {
         // TODO if date &| time has changed then abort ?warning/info
-        setMealEntryAlert({
-          open: true,
-          severity: "info",
-          msg: `You have deleted your meal at ${time} on ${date}`
-        });
+        if ( newFoodLog[date] && Object.keys(newFoodLog[date]).length === 0) {
+          delete newFoodLog[date];
+          setMealEntryAlert({
+            open: true,
+            severity: "info",
+            msg: `You have deleted all your meals on ${date}`
+          });
+        // TODO if date &| time has changed then abort ?warning/info
+        } else {
+          setMealEntryAlert({
+            open: true,
+            severity: "info",
+            msg: `You have deleted your meal at ${time} on ${date}`
+          });
+        }
       }
       // TODO delete old entry if date &| time has changed
     } else {
