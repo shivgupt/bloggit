@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import {
   Chip,
   Dialog,
+  IconButton,
   Paper,
   Table,
   TableBody,
@@ -12,6 +13,9 @@ import {
   TableRow,
   Typography,
 } from "@material-ui/core";
+import {
+  Edit as EditIcon,
+} from "@material-ui/icons";
 
 import { Dish } from "../types";
 import { emptyFoodLog } from "../utils/constants";
@@ -51,6 +55,7 @@ export const FoodLog = (props: any) => {
             <TableCell> Time </TableCell>
             <TableCell> Meal </TableCell>
             <TableCell> Nutrition </TableCell>
+            <TableCell> Edit </TableCell>
           </TableRow>
         </TableHead>
         {Object.keys(foodLog).sort((a, b) => new Date(a) > new Date(b) ? -1 : 1).map((date, i) => {
@@ -64,7 +69,7 @@ export const FoodLog = (props: any) => {
               {Object.keys(foodLog[date]).sort().map((time) => {
                 let totalNutrientMeal = getTotalNutrientsMeal(foodLog[date][time]);
                 return (
-                  <TableRow key={date+time} onClick={handleEditMeal(date, time)}>
+                  <TableRow key={date+time}>
                     <TableCell> {time} </TableCell>
                     <TableCell>
                       {foodLog[date][time].map((dish) =>
@@ -77,18 +82,22 @@ export const FoodLog = (props: any) => {
                       )}
                     </TableCell>
                     <TableCell>
-                      {Object.keys(totalNutrientMeal).map((nutrient) => {
-                        let value = totalNutrientMeal[nutrient].toFixed(2);
+                      {Object.entries(totalNutrientMeal).map((nutrient) => {
                         return (
                           <Chip
-                            key={nutrient}
+                            key={nutrient[0]}
                             size="small"
                             color="primary"
-                            label={`(${nutrient.charAt(0)}) ${value}`}
+                            label={`(${nutrient[0].charAt(0)}) ${nutrient[1].toFixed(2)}`}
                             variant="outlined"
                           />
                         );
                       })}
+                    </TableCell>
+                    <TableCell>
+                      <IconButton onClick={handleEditMeal(date, time)}>
+                        <EditIcon />
+                      </IconButton>
                     </TableCell>
                   </TableRow>
                 );
