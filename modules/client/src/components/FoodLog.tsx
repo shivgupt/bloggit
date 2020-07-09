@@ -29,7 +29,7 @@ export const FoodLog = (props: any) => {
     let updateDT = new Date(date);
     updateDT.setHours(Number(time.substring(0,2)));
     updateDT.setMinutes(Number(time.substring(3,5)));
-    setUpdateEntry({ date: updateDT, meal: [ ...foodLog[date][time] ] });
+    setUpdateEntry({ date: updateDT, meal: JSON.parse(JSON.stringify(foodLog[date][time]))  });
     setOpenMealDialog(true);
   };
 

@@ -55,7 +55,6 @@ export const MealDialog = (props: any) => {
 
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
   const [viewDishOptions, setViewDishOptions] = useState(false);
-  const [foodLog, setFoodLog] = useState(profile.foodLog);
   const [infoDialog, setInfoDialog] = React.useState({ open: false, dish: emptyDish });
   const [mealTime, setMealTime] = useState(new Date());
   const [mealEntry, setMealEntry] = useState({ date: new Date(), meal: [] as Dish[] });
@@ -64,15 +63,12 @@ export const MealDialog = (props: any) => {
   // Set meal entry 
   useEffect(() => { if (props.entry) setMealEntry(props.entry); }, [props.entry]);
 
-  // Trigger save profile to local storage
-  useEffect(() => { setFoodLog(profile.foodLog); }, [profile.foodLog]);
-
   const toggleInfoDialog = () => setInfoDialog({ ...infoDialog, open: !infoDialog.open });
 
   const handleInfo = (dish: Dish) => () => setInfoDialog({ open: true, dish });
 
   const handleAddDish = (dish: Dish) => () => {
-    const newMealEntry = { ...mealEntry };
+    const newMealEntry = JSON.parse(JSON.stringify(mealEntry));
     const dishIndex = newMealEntry.meal.findIndex(o => o.name === dish.name);
 
     if (dishIndex === -1) {
@@ -86,7 +82,7 @@ export const MealDialog = (props: any) => {
   };
 
   const handleDeleteDish = (dish: Dish) => () => {
-    const newMealEntry = { ...mealEntry };
+    const newMealEntry = JSON.parse(JSON.stringify(mealEntry));
     const dishIndex = newMealEntry.meal.findIndex(o => o.name === dish.name);
 
     if (dishIndex === -1) {
@@ -117,7 +113,7 @@ export const MealDialog = (props: any) => {
 
     const date = mealEntry.date.toLocaleDateString([], dateOptions);
     const time = mealEntry.date.toLocaleTimeString([], timeOptions);
-    const newFoodLog = { ...foodLog };
+    const newFoodLog = JSON.parse(JSON.stringify(profile.foodLog));
 
     if (newFoodLog[date]) {
       if (newFoodLog[date][time]) {
@@ -134,7 +130,6 @@ export const MealDialog = (props: any) => {
 
     const newProfile = { ...profile, foodLog: newFoodLog };
 
-    setFoodLog(newFoodLog);
     setMealEntryAlert({
       open: true,
       severity: "success",
@@ -145,7 +140,6 @@ export const MealDialog = (props: any) => {
   };
 
   const updateMealEntry = () => {
-    console.log("I will Update")
     return null;
   };
 
