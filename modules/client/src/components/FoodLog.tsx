@@ -15,20 +15,17 @@ import {
 import { Dish } from "../types";
 import { emptyFoodLog } from "../utils/constants";
 import { getTotalNutrientsMeal } from "../utils/helper";
-import { UpdateMeal } from "./UpdateMeal";
+import { MealDialog } from "./MealDialog";
 
 export const FoodLog = (props: any) => {
 
   const { profile, setProfile, setMealEntryAlert } = props;
 
-  const [openMealUpdateDialog, setOpenMealUpdateDialog] = useState(false);
+  const [openMealDialog, setOpenMealDialog] = useState(false);
   const [updateEntry, setUpdateEntry] = useState({ date: new Date(), meal: [] as Dish[] });
 
-  const toggleMealDialog = () => setOpenMealUpdateDialog(!openMealUpdateDialog);
-
   const handleEditMeal = (date: string, time: string) => () => {
-    console.log("I will let you edit meal entry");
-    setOpenMealUpdateDialog(true);
+    setOpenMealDialog(true);
     let updateDT = new Date(date);
     updateDT.setHours(Number(time.substring(0,2)));
     updateDT.setMinutes(Number(time.substring(3,5)));
@@ -99,13 +96,13 @@ export const FoodLog = (props: any) => {
           );
         })}
       </Table>
-      <UpdateMeal
+      <MealDialog
         entry={updateEntry}
-        open={openMealUpdateDialog}
+        open={openMealDialog}
         profile={profile}
         setMealEntryAlert={setMealEntryAlert}
         setProfile={setProfile}
-        toggleMealDialog={toggleMealDialog}
+        toggleMealDialog={() => setOpenMealDialog(!openMealDialog)}
         title="Update Meal Entry"
       />
     </TableContainer>

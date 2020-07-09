@@ -43,7 +43,7 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-export const UpdateMeal = (props: any) => {
+export const MealDialog = (props: any) => {
   const classes = useStyles();
 
   const {
@@ -63,9 +63,12 @@ export const UpdateMeal = (props: any) => {
   const [mealTime, setMealTime] = useState(new Date());
   const [selected, setSelected] = React.useState<any>({});
 
-  
+
   useEffect(() => {
-    console.log(entry);
+    let newSelected = {};
+    entry.meal.forEach((dish: Dish) => newSelected[dish.name] = dish);
+    setSelected(newSelected);
+    setMealTime(entry.date);
   }, [entry]);
 
   useEffect(() => {
@@ -104,7 +107,7 @@ export const UpdateMeal = (props: any) => {
     setDishOptionsView(!dishOptionsView);
   };
 
-  const handleAddMeal = () => {
+  const addNewMealEntry = () => {
     if (Object.keys(selected).length === 0) {
       setMealEntryAlert({
         open: true,
@@ -119,7 +122,7 @@ export const UpdateMeal = (props: any) => {
 
     const date = mealTime.toLocaleDateString([], dateOptions);
     const time = mealTime.toLocaleTimeString([], timeOptions);
-    
+
     const newFoodLog = { ...foodLog };
 
     if (newFoodLog[date]) {
@@ -136,16 +139,29 @@ export const UpdateMeal = (props: any) => {
     }
 
     setFoodLog(newFoodLog);
-    const newProfile = {
-      ...profile,
-      foodLog: newFoodLog,
-    };
+    const newProfile = { ...profile, foodLog: newFoodLog };
 
     setMealEntryAlert({
       open: true,
       severity: "success",
       msg: `You have successfully added your meal at ${time} on ${date}`
     });
+
+    return newProfile;
+  };
+
+  const updateMealEntry = () => {
+    console.log("I will Update")
+    return null;
+  };
+
+  const handleAddMeal = () => {
+    let newProfile;
+    if (entry) {
+      newProfile = updateMealEntry();
+    } else {
+      newProfile = addNewMealEntry();
+    }
 
     setProfile(newProfile);
     store.save("FitnessProfile", newProfile);
@@ -216,4 +232,3 @@ export const UpdateMeal = (props: any) => {
     </Dialog>
   );
 };
-

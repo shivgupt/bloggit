@@ -25,13 +25,13 @@ export const FitnessTracker = (props: any) => {
   const [openMealDialog, setOpenMealDialog] = useState(false);
   const [mealEntryAlert, setMealEntryAlert] = useState({
     open: false,
-    severity: "" as "error" | "info" | "success" | "warning",
+    severity: "" as "error" | "info" | "success" | "warning" | undefined,
     msg: "",
   });
 
   const toggleProfileDialog = () => setOpenProfileDialog(!openProfileDialog);
   const toggleMealDialog = () => setOpenMealDialog(!openMealDialog);
-  const handleCloseSnackbar = () => setMealEntryAlert({ ...mealEntryAlert, open: false });
+  const handleCloseSnackbar = () => setMealEntryAlert({ severity: undefined, msg: "", open: false });
 
   const today = new Date();
 
