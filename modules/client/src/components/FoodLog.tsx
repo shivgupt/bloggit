@@ -14,9 +14,11 @@ import {
   Typography,
 } from "@material-ui/core";
 import {
+  Delete as DeleteIcon,
   Edit as EditIcon,
 } from "@material-ui/icons";
 
+import { store } from "../utils/cache";
 import { Dish } from "../types";
 import { emptyFoodLog } from "../utils/constants";
 import { getTotalNutrientsMeal } from "../utils/helper";
@@ -35,6 +37,17 @@ export const FoodLog = (props: any) => {
     updateDT.setMinutes(Number(time.substring(3,5)));
     setUpdateEntry({ date: updateDT, meal: JSON.parse(JSON.stringify(foodLog[date][time]))  });
     setOpenMealDialog(true);
+  };
+
+  const handleDeleteMeal = (date: string, time: string) => () => {
+    console.log(profile, date, time);
+    const newProfile = { ...profile };
+    delete newProfile.foodLog[date][time];
+    if (Object.keys(newProfile.foodLog[date]).length === 0) {
+      delete newProfile.foodLog[date];
+    }
+    setProfile(newProfile);
+    store.save("FitnessProfile", newProfile);
   };
 
   const foodLog = profile.foodLog;
@@ -97,6 +110,9 @@ export const FoodLog = (props: any) => {
                     <TableCell>
                       <IconButton onClick={handleEditMeal(date, time)}>
                         <EditIcon />
+                      </IconButton>
+                      <IconButton onClick={handleDeleteMeal(date, time)}>
+                        <DeleteIcon />
                       </IconButton>
                     </TableCell>
                   </TableRow>

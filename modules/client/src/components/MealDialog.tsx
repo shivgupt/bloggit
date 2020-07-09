@@ -141,7 +141,6 @@ export const MealDialog = (props: any) => {
   };
 
   const updateMealEntry = () => {
-    console.log(typeof(mealEntry.date));
     const date = mealEntry.date.toLocaleDateString([], dateOptions);
     const time = mealEntry.date.toLocaleTimeString([], timeOptions);
     const newFoodLog = JSON.parse(JSON.stringify(profile.foodLog));
