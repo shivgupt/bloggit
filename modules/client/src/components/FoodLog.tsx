@@ -2,6 +2,7 @@ import React, { useState } from "react";
 
 import {
   Chip,
+  Dialog,
   Paper,
   Table,
   TableBody,
@@ -25,11 +26,11 @@ export const FoodLog = (props: any) => {
   const [updateEntry, setUpdateEntry] = useState({ date: new Date(), meal: [] as Dish[] });
 
   const handleEditMeal = (date: string, time: string) => () => {
-    setOpenMealDialog(true);
     let updateDT = new Date(date);
     updateDT.setHours(Number(time.substring(0,2)));
     updateDT.setMinutes(Number(time.substring(3,5)));
-    setUpdateEntry({ date: updateDT, meal: foodLog[date][time] });
+    setUpdateEntry({ date: updateDT, meal: [ ...foodLog[date][time] ] });
+    setOpenMealDialog(true);
   };
 
   const foodLog = profile.foodLog;
@@ -96,15 +97,19 @@ export const FoodLog = (props: any) => {
           );
         })}
       </Table>
-      <MealDialog
-        entry={updateEntry}
+      <Dialog
         open={openMealDialog}
-        profile={profile}
-        setMealEntryAlert={setMealEntryAlert}
-        setProfile={setProfile}
-        toggleMealDialog={() => setOpenMealDialog(!openMealDialog)}
-        title="Update Meal Entry"
-      />
+        onClose={() => setOpenMealDialog(!openMealDialog)}
+      >
+        <MealDialog
+          entry={updateEntry}
+          profile={profile}
+          setMealEntryAlert={setMealEntryAlert}
+          setProfile={setProfile}
+          toggleMealDialog={() => setOpenMealDialog(!openMealDialog)}
+          title="Update Meal Entry"
+        />
+    </Dialog>
     </TableContainer>
   );
 };

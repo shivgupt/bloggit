@@ -12,7 +12,7 @@ import {
 } from "@material-ui/icons";
 import { Alert, AlertTitle } from "@material-ui/lab";
 
-import { AddMeal } from "./AddMeal";
+import { MealDialog } from "./MealDialog";
 import { ProfileEdit } from "./ProfileEdit";
 import { FoodLog } from "./FoodLog";
 
@@ -60,10 +60,11 @@ export const FitnessTracker = (props: any) => {
         open={openMealDialog}
         onClose={toggleMealDialog}
       >
-        <AddMeal
+        <MealDialog
           profile={profile}
           setMealEntryAlert={setMealEntryAlert}
           setProfile={setProfile}
+          title="Add New Meal Entry"
           toggleMealDialog={toggleMealDialog}
         />
       </Dialog>

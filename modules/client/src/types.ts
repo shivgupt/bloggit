@@ -34,8 +34,6 @@ export type Dish = {
   name: string;
   serving: number; /* serving size in grams */
   ingredients: Ingredient[];
-
-
 }
 
 export type FoodLog = {
