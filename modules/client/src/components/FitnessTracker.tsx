@@ -39,6 +39,7 @@ export const FitnessTracker = (props: any) => {
     <>
       <Typography> {today.toDateString()} </Typography>
 
+      <br />
       <Typography display="inline">
         Hello {profile.name || "Stranger"}!
       </Typography>
@@ -56,10 +57,7 @@ export const FitnessTracker = (props: any) => {
       <Button onClick={toggleMealDialog}>
         Add new Meal entry
       </Button>
-      <Dialog
-        open={openMealDialog}
-        onClose={toggleMealDialog}
-      >
+      <Dialog open={openMealDialog} onClose={toggleMealDialog}>
         <MealDialog
           profile={profile}
           setMealEntryAlert={setMealEntryAlert}

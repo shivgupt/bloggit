@@ -69,6 +69,7 @@ export const MealDialog = (props: any) => {
 
   const handleAddDish = (dish: Dish) => () => {
     const newMealEntry = JSON.parse(JSON.stringify(mealEntry));
+    newMealEntry.date = new Date(newMealEntry.date);
     const dishIndex = newMealEntry.meal.findIndex(o => o.name === dish.name);
 
     if (dishIndex === -1) {
@@ -82,7 +83,9 @@ export const MealDialog = (props: any) => {
   };
 
   const handleDeleteDish = (dish: Dish) => () => {
+    // TODO better deep copy
     const newMealEntry = JSON.parse(JSON.stringify(mealEntry));
+    newMealEntry.date = new Date(newMealEntry.date);
     const dishIndex = newMealEntry.meal.findIndex(o => o.name === dish.name);
 
     if (dishIndex === -1) {
@@ -102,6 +105,10 @@ export const MealDialog = (props: any) => {
   };
 
   const addNewMealEntry = () => {
+    const date = mealEntry.date.toLocaleDateString([], dateOptions);
+    const time = mealEntry.date.toLocaleTimeString([], timeOptions);
+    const newFoodLog = JSON.parse(JSON.stringify(profile.foodLog));
+
     if (mealEntry.meal.length === 0) {
       setMealEntryAlert({
         open: true,
@@ -110,10 +117,6 @@ export const MealDialog = (props: any) => {
       });
       return;
     }
-
-    const date = mealEntry.date.toLocaleDateString([], dateOptions);
-    const time = mealEntry.date.toLocaleTimeString([], timeOptions);
-    const newFoodLog = JSON.parse(JSON.stringify(profile.foodLog));
 
     if (newFoodLog[date]) {
       if (newFoodLog[date][time]) {
@@ -128,19 +131,48 @@ export const MealDialog = (props: any) => {
       newFoodLog[date] = { [time]: mealEntry.meal };
     }
 
-    const newProfile = { ...profile, foodLog: newFoodLog };
-
     setMealEntryAlert({
       open: true,
       severity: "success",
       msg: `You have successfully added your meal at ${time} on ${date}`
     });
 
-    return newProfile;
+    return { ...profile, foodLog: newFoodLog };
   };
 
   const updateMealEntry = () => {
-    return null;
+    console.log(typeof(mealEntry.date));
+    const date = mealEntry.date.toLocaleDateString([], dateOptions);
+    const time = mealEntry.date.toLocaleTimeString([], timeOptions);
+    const newFoodLog = JSON.parse(JSON.stringify(profile.foodLog));
+
+    if (mealEntry.meal.length === 0) {
+      try {
+        delete newFoodLog[date][time];
+      } finally {
+        // TODO if date &| time has changed then abort ?warning/info
+        setMealEntryAlert({
+          open: true,
+          severity: "info",
+          msg: "You have deleted your meal at ${time} on ${date}"
+        });
+      }
+      // TODO delete old entry if date &| time has changed
+    } else {
+      try {
+        newFoodLog[date][time] = mealEntry.meal;
+      } catch {
+        newFoodLog[date] = { [time]: mealEntry.meal };
+      } finally {
+        setMealEntryAlert({
+          open: true,
+          severity: "success",
+          msg: `You have successfully updated your meal at ${time} on ${date}`
+        });
+      }
+    }
+
+    return { ...profile, foodLog: newFoodLog };
   };
 
   const handleAddMeal = () => {
