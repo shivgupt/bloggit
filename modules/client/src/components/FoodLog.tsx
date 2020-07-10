@@ -75,9 +75,7 @@ export const FoodLog = (props: any) => {
           return (
             <TableBody key={i}>
               <TableRow key={date}>
-                <TableCell colSpan={3} align="center">
-                  {date}
-                </TableCell>
+                <TableCell colSpan={4} align="center"> {date} </TableCell>
               </TableRow>
               {Object.keys(foodLog[date]).sort().map((time) => {
                 let totalNutrientMeal = getTotalNutrientsMeal(foodLog[date][time]);

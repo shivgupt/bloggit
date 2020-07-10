@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {
+  Button,
   Card,
   CardActions,
   CardContent,
@@ -14,7 +15,6 @@ import {
   createStyles,
 } from "@material-ui/core";
 import {
-  RestaurantMenu as FoodIcon,
   Info as InfoIcon,
   AddCircle as AddIcon,
 } from "@material-ui/icons";
@@ -208,7 +208,7 @@ export const MealDialog = (props: any) => {
         <br />
         <Typography variant="caption" color="textSecondary"> What all did you eat? </Typography>
         <IconButton onClick={toggleDishOptionsView}>
-          <FoodIcon />
+          <AddIcon />
         </IconButton>
         <Popover
           id="dish-options-menu"
@@ -251,9 +251,12 @@ export const MealDialog = (props: any) => {
         </Paper>
       </CardContent>
       <CardActions>
-        <IconButton onClick={handleAddMeal}>
-          <AddIcon />
-        </IconButton>
+        <Button onClick={handleAddMeal}>
+          Save
+        </Button>
+        <Button onClick={toggleMealDialog}>
+          Cancel
+        </Button>
       </CardActions>
     </Card>
   );
