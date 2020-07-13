@@ -1,22 +1,23 @@
 import React, { useState, useEffect } from "react";
 import {
   Button,
-  Card,
-  CardActions,
-  CardContent,
-  CardHeader,
   Chip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   IconButton,
   Paper,
   Popover,
   Theme,
   Typography,
-  makeStyles,
   createStyles,
+  makeStyles,
 } from "@material-ui/core";
 import {
-  Info as InfoIcon,
   AddCircle as AddIcon,
+  Edit as EditIcon,
+  Info as InfoIcon,
 } from "@material-ui/icons";
 
 import { DateTime } from "./DateTimePicker";
@@ -42,14 +43,13 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-export const MealDialog = (props: any) => {
+export const MealEntry = (props: any) => {
   const classes = useStyles();
 
   const {
     profile,
     setMealEntryAlert,
     setProfile,
-    toggleMealDialog,
     title,
   } = props;
 
@@ -58,12 +58,16 @@ export const MealDialog = (props: any) => {
   const [infoDialog, setInfoDialog] = React.useState({ open: false, dish: emptyDish });
   const [mealTime, setMealTime] = useState(new Date());
   const [mealEntry, setMealEntry] = useState({ date: new Date(), meal: [] as Dish[] });
+  const [openMealDialog, setOpenMealDialog] = useState(false);
+  const [updateEntry, setUpdateEntry] = useState({ date: new Date(), meal: [] as Dish[] });
+
 
 
   // Set meal entry 
   useEffect(() => { if (props.entry) setMealEntry(props.entry); }, [props.entry]);
 
   const toggleInfoDialog = () => setInfoDialog({ ...infoDialog, open: !infoDialog.open });
+  const toggleMealDialog = () => setOpenMealDialog(!openMealDialog);
 
   const handleInfo = (dish: Dish) => () => setInfoDialog({ open: true, dish });
 
@@ -200,64 +204,69 @@ export const MealDialog = (props: any) => {
   };
 
   return (
-    <Card>
-      <CardHeader title={title} />
-      <CardContent>
-        <DateTime date={mealTime} label="What time did you eat?" setDate={setMealTime}/>
-        <br />
-        <br />
-        <Typography variant="caption" color="textSecondary"> What all did you eat? </Typography>
-        <IconButton onClick={toggleDishOptionsView}>
-          <AddIcon />
-        </IconButton>
-        <Popover
-          id="dish-options-menu"
-          anchorEl={anchorEl}
-          open={viewDishOptions}
-          onClose={toggleDishOptionsView}
-        >
-          <Paper className={classes.chipList}>
-            <Typography variant="h5"> Dish Options </Typography>
-            {Object.values(Dishes).map((dish: Dish) => (
+    <>
+      <IconButton color="primary" onClick={toggleMealDialog}>
+        { props.entry ? <EditIcon /> : <AddIcon /> }
+      </IconButton>
+      <Dialog open={openMealDialog} onClose={toggleMealDialog}>
+        <DialogTitle children={title} />
+        <DialogContent>
+          <DateTime date={mealTime} label="What time did you eat?" setDate={setMealTime}/>
+          <br />
+          <br />
+          <Typography variant="caption" color="textSecondary"> What all did you eat? </Typography>
+          <IconButton onClick={toggleDishOptionsView}>
+            <AddIcon />
+          </IconButton>
+          <Popover
+            id="dish-options-menu"
+            anchorEl={anchorEl}
+            open={viewDishOptions}
+            onClose={toggleDishOptionsView}
+          >
+            <Paper className={classes.chipList}>
+              <Typography variant="h5"> Dish Options </Typography>
+              {Object.values(Dishes).map((dish: Dish) => (
+                <Chip
+                  key={dish.name}
+                  color="secondary"
+                  label={dish.name}
+                  onDelete={handleInfo(dish)}
+                  onClick={handleAddDish(dish)}
+                  deleteIcon={<InfoIcon />}
+                />
+              ))}
+            </Paper>
+          </Popover>
+          <Paper variant="outlined" className={classes.chipList}>
+            <NutritionInfo
+              open={infoDialog.open}
+              dish={infoDialog.dish}
+              toggleOpen={toggleInfoDialog}
+            />
+            {mealEntry.meal.map((dish: Dish) => (
               <Chip
                 key={dish.name}
                 color="secondary"
-                label={dish.name}
-                onDelete={handleInfo(dish)}
-                onClick={handleAddDish(dish)}
-                deleteIcon={<InfoIcon />}
+                label={
+                  dish.serving > 1
+                    ? dish.serving + " x " + dish.name
+                    : dish.name
+                }
+                onDelete={handleDeleteDish(dish)}
               />
             ))}
           </Paper>
-        </Popover>
-        <Paper variant="outlined" className={classes.chipList}>
-          <NutritionInfo
-            open={infoDialog.open}
-            dish={infoDialog.dish}
-            toggleOpen={toggleInfoDialog}
-          />
-          {mealEntry.meal.map((dish: Dish) => (
-            <Chip
-              key={dish.name}
-              color="secondary"
-              label={
-                dish.serving > 1
-                  ? dish.serving + " x " + dish.name
-                  : dish.name
-              }
-              onDelete={handleDeleteDish(dish)}
-            />
-          ))}
-        </Paper>
-      </CardContent>
-      <CardActions>
-        <Button onClick={handleAddMeal}>
-          Save
-        </Button>
-        <Button onClick={toggleMealDialog}>
-          Cancel
-        </Button>
-      </CardActions>
-    </Card>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleAddMeal}>
+            Save
+          </Button>
+          <Button onClick={toggleMealDialog}>
+            Cancel
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 };

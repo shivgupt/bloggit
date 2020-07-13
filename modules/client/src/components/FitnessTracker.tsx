@@ -12,7 +12,7 @@ import {
 } from "@material-ui/icons";
 import { Alert, AlertTitle } from "@material-ui/lab";
 
-import { MealDialog } from "./MealDialog";
+import { MealEntry } from "./MealEntry";
 import { Profile } from "./Profile";
 import { FoodLog } from "./FoodLog";
 
@@ -25,11 +25,9 @@ export const FitnessTracker = (props: any) => {
     severity: "" as "error" | "info" | "success" | "warning" | undefined,
     msg: "",
   });
-  const [openMealDialog, setOpenMealDialog] = useState(false);
   const [openResetDialog, setOpenResetDialog] = useState(false);
   const [profile, setProfile] = useState(store.load("FitnessProfile"));
 
-  const toggleMealDialog = () => setOpenMealDialog(!openMealDialog);
   const toggleResetDialog = () => setOpenResetDialog(!openResetDialog);
   const closeSnackbar = () => setMealEntryAlert({ severity: undefined, msg: "", open: false });
 
@@ -41,18 +39,12 @@ export const FitnessTracker = (props: any) => {
       <Typography display="inline"> {today.toDateString()} </Typography>
 
       <br />
-      <Button variant="contained" color="primary" onClick={toggleMealDialog}>
-        Add new Meal entry
-      </Button>
-      <Dialog open={openMealDialog} onClose={toggleMealDialog}>
-        <MealDialog
+        <MealEntry
           profile={profile}
           setMealEntryAlert={setMealEntryAlert}
           setProfile={setProfile}
           title="Add New Meal Entry"
-          toggleMealDialog={toggleMealDialog}
         />
-      </Dialog>
 
       <br />
       <FoodLog

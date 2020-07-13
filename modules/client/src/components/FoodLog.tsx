@@ -15,28 +15,28 @@ import {
 } from "@material-ui/core";
 import {
   Delete as DeleteIcon,
-  Edit as EditIcon,
 } from "@material-ui/icons";
 
 import { store } from "../utils/cache";
 import { Dish } from "../types";
 import { emptyFoodLog } from "../utils/constants";
 import { getTotalNutrientsMeal } from "../utils/helper";
-import { MealDialog } from "./MealDialog";
+import { MealEntry } from "./MealEntry";
 
 export const FoodLog = (props: any) => {
 
   const { profile, setProfile, setMealEntryAlert } = props;
 
-  const [openMealDialog, setOpenMealDialog] = useState(false);
   const [updateEntry, setUpdateEntry] = useState({ date: new Date(), meal: [] as Dish[] });
 
   const handleEditMeal = (date: string, time: string) => () => {
     let updateDT = new Date(date);
     updateDT.setHours(Number(time.substring(0,2)));
     updateDT.setMinutes(Number(time.substring(3,5)));
-    setUpdateEntry({ date: updateDT, meal: JSON.parse(JSON.stringify(foodLog[date][time]))  });
-    setOpenMealDialog(true);
+    return {
+      date: updateDT,
+      meal: JSON.parse(JSON.stringify(foodLog[date][time]))
+    };
   };
 
   const handleDeleteMeal = (date: string, time: string) => () => {
@@ -106,9 +106,13 @@ export const FoodLog = (props: any) => {
                       })}
                     </TableCell>
                     <TableCell>
-                      <IconButton onClick={handleEditMeal(date, time)}>
-                        <EditIcon />
-                      </IconButton>
+                      <MealEntry
+                        entry={handleEditMeal(date, time)}
+                        profile={profile}
+                        setMealEntryAlert={setMealEntryAlert}
+                        setProfile={setProfile}
+                        title="Update Meal Entry"
+                      />
                       <IconButton onClick={handleDeleteMeal(date, time)}>
                         <DeleteIcon />
                       </IconButton>
@@ -120,19 +124,6 @@ export const FoodLog = (props: any) => {
           );
         })}
       </Table>
-      <Dialog
-        open={openMealDialog}
-        onClose={() => setOpenMealDialog(!openMealDialog)}
-      >
-        <MealDialog
-          entry={updateEntry}
-          profile={profile}
-          setMealEntryAlert={setMealEntryAlert}
-          setProfile={setProfile}
-          toggleMealDialog={() => setOpenMealDialog(!openMealDialog)}
-          title="Update Meal Entry"
-        />
-      </Dialog>
     </TableContainer>
   );
 };
