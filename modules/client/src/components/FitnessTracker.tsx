@@ -8,53 +8,40 @@ import {
   Typography,
 } from "@material-ui/core";
 import {
-  Edit as EditIcon,
+  DeleteForever as ResetIcon,
 } from "@material-ui/icons";
 import { Alert, AlertTitle } from "@material-ui/lab";
 
 import { MealDialog } from "./MealDialog";
-import { ProfileEdit } from "./ProfileEdit";
+import { Profile } from "./Profile";
 import { FoodLog } from "./FoodLog";
 
 import { store } from "../utils/cache";
 
 export const FitnessTracker = (props: any) => {
 
-  const [profile, setProfile] = useState(store.load("FitnessProfile"));
-  const [openProfileDialog, setOpenProfileDialog] = useState(false);
-  const [openMealDialog, setOpenMealDialog] = useState(false);
   const [mealEntryAlert, setMealEntryAlert] = useState({
     open: false,
     severity: "" as "error" | "info" | "success" | "warning" | undefined,
     msg: "",
   });
+  const [openMealDialog, setOpenMealDialog] = useState(false);
+  const [openResetDialog, setOpenResetDialog] = useState(false);
+  const [profile, setProfile] = useState(store.load("FitnessProfile"));
 
-  const toggleProfileDialog = () => setOpenProfileDialog(!openProfileDialog);
   const toggleMealDialog = () => setOpenMealDialog(!openMealDialog);
+  const toggleResetDialog = () => setOpenResetDialog(!openResetDialog);
   const closeSnackbar = () => setMealEntryAlert({ severity: undefined, msg: "", open: false });
 
   const today = new Date();
 
   return (
     <>
-      <Typography> {today.toDateString()} </Typography>
+      <Profile profile={profile} setProfile={setProfile} />
+      <Typography display="inline"> {today.toDateString()} </Typography>
 
       <br />
-      <Typography display="inline">
-        Hello {profile.name || "Stranger"}!
-      </Typography>
-      <IconButton onClick={toggleProfileDialog}>
-        <EditIcon />
-      </IconButton>
-      <ProfileEdit
-        open={openProfileDialog}
-        profile={profile}
-        setProfile={setProfile}
-        toggleProfileDialog={toggleProfileDialog}
-      />
-
-      <br />
-      <Button onClick={toggleMealDialog}>
+      <Button variant="contained" color="primary" onClick={toggleMealDialog}>
         Add new Meal entry
       </Button>
       <Dialog open={openMealDialog} onClose={toggleMealDialog}>
@@ -73,6 +60,18 @@ export const FitnessTracker = (props: any) => {
         setProfile={setProfile}
         setMealEntryAlert={setMealEntryAlert}
       />
+      <IconButton onClick={toggleResetDialog}>
+        <ResetIcon />
+      </IconButton>
+      <Snackbar open={openResetDialog} onClose={toggleResetDialog}>
+        <Alert severity="warning" onClose={toggleResetDialog}>
+          <AlertTitle> Reset FoodLog </AlertTitle>
+          <strong>
+            All the meal entries will be deleted and this action cannot be undo.
+            Do you wish to proceed?
+          </strong>
+        </Alert>
+      </Snackbar>
       <Snackbar open={mealEntryAlert.open} autoHideDuration={6000} onClose={closeSnackbar}>
         <Alert severity={mealEntryAlert.severity}>
           <AlertTitle> {mealEntryAlert.severity} </AlertTitle>
