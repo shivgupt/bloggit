@@ -51,6 +51,7 @@ export const FitnessTracker = (props: any) => {
         setProfile={setProfile}
         setMealEntryAlert={setMealEntryAlert}
       />
+
       <Snackbar open={mealEntryAlert.open} autoHideDuration={6000} onClose={closeSnackbar}>
         <Alert severity={mealEntryAlert.severity}>
           <AlertTitle> {mealEntryAlert.severity} </AlertTitle>

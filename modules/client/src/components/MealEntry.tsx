@@ -56,7 +56,6 @@ export const MealEntry = (props: any) => {
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
   const [viewDishOptions, setViewDishOptions] = useState(false);
   const [infoDialog, setInfoDialog] = React.useState({ open: false, dish: emptyDish });
-  const [mealTime, setMealTime] = useState(new Date());
   const [mealEntry, setMealEntry] = useState(emptyMealEntry);
   const [openMealDialog, setOpenMealDialog] = useState(false);
 
@@ -65,6 +64,7 @@ export const MealEntry = (props: any) => {
 
   const toggleInfoDialog = () => setInfoDialog({ ...infoDialog, open: !infoDialog.open });
   const toggleMealDialog = () => setOpenMealDialog(!openMealDialog);
+  const setMealTime = (date) => setMealEntry({ ...mealEntry, date});
 
   const handleInfo = (dish: Dish) => () => setInfoDialog({ open: true, dish });
 
@@ -219,7 +219,7 @@ export const MealEntry = (props: any) => {
       <Dialog open={openMealDialog} onClose={toggleMealDialog}>
         <DialogTitle children={title} />
         <DialogContent dividers>
-          <DateTime date={mealTime} label="What time did you eat?" setDate={setMealTime}/>
+          <DateTime date={mealEntry.date} label="What time did you eat?" setDate={setMealTime}/>
           <br/>
           <Typography variant="caption" color="textSecondary"> What all did you eat? </Typography>
           <IconButton onClick={toggleDishOptionsView}>

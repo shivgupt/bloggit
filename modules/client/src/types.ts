@@ -27,6 +27,7 @@ export type Nutrients = { /* nutrient percentage */
 export type Ingredient = {
   name: string;
   quantity: string; /* quantity in grams */
+  calories: number;
   nutrients: Nutrients;
 };
 

@@ -40,6 +40,17 @@ export const Cheese = {
   },
 } as Ingredient;
 
+export const Chicken = {
+  name: "Chicken",
+  quantity: "100",
+  calories: 239,
+  nutrients: {
+    carbohydrates: 0,
+    protein: 27,
+    fat: 14,
+  },
+} as Ingredient;
+
 export const Egg = {
   name: "Egg",
   quantity: "100",
@@ -122,11 +133,12 @@ export const Litchi = {
 
 export const RefinedFlour = {
   name: "RefinedFlour aka Maida",
-  quantity: "50",
+  quantity: "100",
+  calories: 364,
   nutrients: {
-    carbohydrates: 0.76,
-    protein: 0.1,
-    fat: 0.009,
+    carbohydrates: 76,
+    protein: 10,
+    fat: 1,
   },
 } as Ingredient;
 
