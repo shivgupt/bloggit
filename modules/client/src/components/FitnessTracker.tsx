@@ -28,7 +28,6 @@ export const FitnessTracker = (props: any) => {
   const [openResetDialog, setOpenResetDialog] = useState(false);
   const [profile, setProfile] = useState(store.load("FitnessProfile"));
 
-  const toggleResetDialog = () => setOpenResetDialog(!openResetDialog);
   const closeSnackbar = () => setMealEntryAlert({ severity: undefined, msg: "", open: false });
 
   const today = new Date();
@@ -52,18 +51,6 @@ export const FitnessTracker = (props: any) => {
         setProfile={setProfile}
         setMealEntryAlert={setMealEntryAlert}
       />
-      <IconButton onClick={toggleResetDialog}>
-        <ResetIcon />
-      </IconButton>
-      <Snackbar open={openResetDialog} onClose={toggleResetDialog}>
-        <Alert severity="warning" onClose={toggleResetDialog}>
-          <AlertTitle> Reset FoodLog </AlertTitle>
-          <strong>
-            All the meal entries will be deleted and this action cannot be undo.
-            Do you wish to proceed?
-          </strong>
-        </Alert>
-      </Snackbar>
       <Snackbar open={mealEntryAlert.open} autoHideDuration={6000} onClose={closeSnackbar}>
         <Alert severity={mealEntryAlert.severity}>
           <AlertTitle> {mealEntryAlert.severity} </AlertTitle>

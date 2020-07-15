@@ -59,9 +59,6 @@ export const MealEntry = (props: any) => {
   const [mealTime, setMealTime] = useState(new Date());
   const [mealEntry, setMealEntry] = useState(emptyMealEntry);
   const [openMealDialog, setOpenMealDialog] = useState(false);
-  const [updateEntry, setUpdateEntry] = useState({ date: new Date(), meal: [] as Dish[] });
-
-
 
   // Set meal entry 
   useEffect(() => { if (props.entry) setMealEntry(props.entry); }, [props.entry]);
@@ -223,8 +220,7 @@ export const MealEntry = (props: any) => {
         <DialogTitle children={title} />
         <DialogContent dividers>
           <DateTime date={mealTime} label="What time did you eat?" setDate={setMealTime}/>
-          <br />
-          <br />
+          <br/>
           <Typography variant="caption" color="textSecondary"> What all did you eat? </Typography>
           <IconButton onClick={toggleDishOptionsView}>
             <AddIcon />

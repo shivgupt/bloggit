@@ -32,7 +32,7 @@ export const Profile = (props: any) => {
       
       <Dialog open={openProfileDialog} onClose={toggleProfileDialog}>
         <DialogContent>
-          <Typography display="inline">
+          <Typography>
             Hello {profile.name || "Stranger"}!
           </Typography>
           <TextField
