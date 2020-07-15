@@ -28,7 +28,7 @@ import * as Dishes from "../utils/dishes";
 import { smartConcatMeal } from "../utils/helper";
 
 import { store } from "../utils/cache";
-import { dateOptions, timeOptions, emptyDish } from "../utils/constants";
+import { dateOptions, timeOptions, emptyDish, emptyMealEntry } from "../utils/constants";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -57,7 +57,7 @@ export const MealEntry = (props: any) => {
   const [viewDishOptions, setViewDishOptions] = useState(false);
   const [infoDialog, setInfoDialog] = React.useState({ open: false, dish: emptyDish });
   const [mealTime, setMealTime] = useState(new Date());
-  const [mealEntry, setMealEntry] = useState({ date: new Date(), meal: [] as Dish[] });
+  const [mealEntry, setMealEntry] = useState(emptyMealEntry);
   const [openMealDialog, setOpenMealDialog] = useState(false);
   const [updateEntry, setUpdateEntry] = useState({ date: new Date(), meal: [] as Dish[] });
 
@@ -198,19 +198,30 @@ export const MealEntry = (props: any) => {
 
     if (newProfile) {
       setProfile(newProfile);
+      setMealEntry(emptyMealEntry);
       store.save("FitnessProfile", newProfile);
       toggleMealDialog();
     }
   };
 
   return (
-    <>
-      <IconButton color="primary" onClick={toggleMealDialog}>
-        { props.entry ? <EditIcon /> : <AddIcon /> }
-      </IconButton>
+    <div>
+      { props.entry ?
+        <IconButton color="primary" onClick={toggleMealDialog}>
+          <EditIcon />
+        </IconButton> :
+        <Button
+          variant="contained"
+          color="primary"
+          startIcon={<AddIcon />}
+          onClick={toggleMealDialog}
+        >
+          Add Meal
+        </Button>
+      }
       <Dialog open={openMealDialog} onClose={toggleMealDialog}>
         <DialogTitle children={title} />
-        <DialogContent>
+        <DialogContent dividers>
           <DateTime date={mealTime} label="What time did you eat?" setDate={setMealTime}/>
           <br />
           <br />
@@ -267,6 +278,6 @@ export const MealEntry = (props: any) => {
           </Button>
         </DialogActions>
       </Dialog>
-    </>
+    </div>
   );
 };

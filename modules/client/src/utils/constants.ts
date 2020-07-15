@@ -38,6 +38,11 @@ export const emptyDish: Dish = {
   ingredients: [],
 };
 
+export const emptyMealEntry = {
+  date: new Date(),
+  meal: [] as Dish[],
+};
+
 export const emptyFoodLog = {} as FoodLog;
 
 export const emptyFitnessProfile: FitnessProfile = {

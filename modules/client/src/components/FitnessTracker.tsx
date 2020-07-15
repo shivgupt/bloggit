@@ -34,17 +34,17 @@ export const FitnessTracker = (props: any) => {
   const today = new Date();
 
   return (
-    <>
+    <div>
       <Profile profile={profile} setProfile={setProfile} />
       <Typography display="inline"> {today.toDateString()} </Typography>
 
       <br />
-        <MealEntry
-          profile={profile}
-          setMealEntryAlert={setMealEntryAlert}
-          setProfile={setProfile}
-          title="Add New Meal Entry"
-        />
+      <MealEntry
+        profile={profile}
+        setMealEntryAlert={setMealEntryAlert}
+        setProfile={setProfile}
+        title="Add New Meal Entry"
+      />
 
       <br />
       <FoodLog
@@ -70,6 +70,6 @@ export const FitnessTracker = (props: any) => {
           <strong> {mealEntryAlert.msg} </strong>
         </Alert>
       </Snackbar>
-    </>
+    </div>
   );
 };
