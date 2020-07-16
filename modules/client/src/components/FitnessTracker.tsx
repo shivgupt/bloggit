@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import {
   Snackbar,
@@ -27,6 +27,10 @@ export const FitnessTracker = (props: any) => {
   });
   const [openResetDialog, setOpenResetDialog] = useState(false);
   const [profile, setProfile] = useState(store.load("FitnessProfile"));
+
+  useEffect(() => {
+    store.save("FitnessProfile", profile);
+  }, [profile]);
 
   const closeSnackbar = () => setMealEntryAlert({ severity: undefined, msg: "", open: false });
 

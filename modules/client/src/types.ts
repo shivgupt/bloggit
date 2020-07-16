@@ -21,13 +21,13 @@ export type Nutrients = { /* nutrient percentage */
   carbohydrates: number;
   protein: number;
   fat: number;
+  calories: number;
 };
 
 // Basic constituents of the Dish like cheese, mushroom, potato
 export type Ingredient = {
   name: string;
   quantity: string; /* quantity in grams */
-  calories: number;
   nutrients: Nutrients;
 };
 

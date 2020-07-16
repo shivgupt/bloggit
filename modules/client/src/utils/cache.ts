@@ -1,4 +1,11 @@
+import { Dish } from "../types";
+import {
+  getProfileStoreObjFromState,
+  getProfileStateFromStoreObj,
+  deepCopy,
+} from "./helper";
 import { emptyFitnessProfile } from "./constants";
+import * as Dishes from "../utils/dishes";
 
 const emptryStore: any = {
   FitnessProfile: emptyFitnessProfile,
@@ -8,8 +15,13 @@ const emptryStore: any = {
 const load = (key: string): any => {
   try {
     let data = localStorage.getItem(key);
-    // console.log(`Loaded ${JSON.stringify(data)} for key ${key}`);
-    if (data) return JSON.parse(data);
+    if (data) {
+      // console.log(`Loaded ${(data)} for key ${key}`);
+      if (key === "FitnessProfile") {
+        return getProfileStateFromStoreObj(data);
+      }
+      return JSON.parse(data);
+    }
     return emptryStore[key];
   } catch (e) {
     return emptryStore[key];
@@ -17,7 +29,11 @@ const load = (key: string): any => {
 };
 
 const save = (key: string, value?: any): void => {
-  // console.log(`Saving ${JSON.stringify(value, null, 2)} for key ${key}`);
+  if (value) {
+    if (key === "FitnessProfile") {
+      value = getProfileStoreObjFromState(value);
+    }
+  }
   localStorage.setItem(key, JSON.stringify(value || emptryStore[key]));
 };
 

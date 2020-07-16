@@ -17,7 +17,6 @@ import {
   Delete as DeleteIcon,
 } from "@material-ui/icons";
 
-import { store } from "../utils/cache";
 import { Dish } from "../types";
 import { emptyFoodLog } from "../utils/constants";
 import { getTotalNutrientsMeal } from "../utils/helper";
@@ -40,14 +39,12 @@ export const FoodLog = (props: any) => {
   };
 
   const handleDeleteMeal = (date: string, time: string) => () => {
-    console.log(profile, date, time);
     const newProfile = { ...profile };
     delete newProfile.foodLog[date][time];
     if (Object.keys(newProfile.foodLog[date]).length === 0) {
       delete newProfile.foodLog[date];
     }
     setProfile(newProfile);
-    store.save("FitnessProfile", newProfile);
   };
 
   const foodLog = profile.foodLog;

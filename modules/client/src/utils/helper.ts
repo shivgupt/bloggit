@@ -1,5 +1,10 @@
-import { PostData, Ingredient, Dish } from "../types";
+import { PostData, Ingredient, Dish, FitnessProfile } from "../types";
 import { emptyNutrients } from "./constants";
+import * as Dishes from "../utils/dishes";
+
+export const deepCopy = (value) => {
+  return JSON.parse(JSON.stringify(value));
+};
 
 export const getChildValue = (child) => {
   if (!child) return;
@@ -53,4 +58,44 @@ export const smartConcatMeal = (meal: Dish[], newDishes: Dish[]) => {
     }
     if (i === meal.length) meal.push(dish);
   });
+};
+
+export const getProfileStateFromStoreObj = (profile: string) => {
+  const newProfile = JSON.parse(profile);
+
+  for (let date in newProfile.foodLog) {
+    for (let time in newProfile.foodLog[date]) {
+      let newMeal = [] as Dish[];
+      newProfile.foodLog[date][time].forEach((dishName: string) => {
+        const dishObj = Object.values(Dishes).find((dish: Dish) => dish.name === dishName);
+        try {
+          newMeal.push(dishObj as Dish);
+        } catch {
+          console.log(dishName);
+        }
+      });
+      newProfile.foodLog[date][time] = newMeal;
+    }
+  }
+
+  return newProfile;
+}
+
+export const getProfileStoreObjFromState = (profile: FitnessProfile) => {
+
+  let newProfile = deepCopy(profile);
+  for (let date in newProfile.foodLog) {
+    for (let time in newProfile.foodLog[date]) {
+      let newMeal = [] as string[];
+      newProfile.foodLog[date][time].forEach((dish: Dish) => {
+        try {
+          newMeal.push(dish.name);
+        } catch {
+          console.log(dish);
+        }
+      })
+      newProfile.foodLog[date][time] = newMeal;
+    }
+  }
+  return newProfile;
 };

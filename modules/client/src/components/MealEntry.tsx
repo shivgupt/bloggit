@@ -27,7 +27,6 @@ import { Dish } from "../types";
 import * as Dishes from "../utils/dishes";
 import { smartConcatMeal } from "../utils/helper";
 
-import { store } from "../utils/cache";
 import { dateOptions, timeOptions, emptyDish, emptyMealEntry } from "../utils/constants";
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -196,7 +195,6 @@ export const MealEntry = (props: any) => {
     if (newProfile) {
       setProfile(newProfile);
       setMealEntry(emptyMealEntry);
-      store.save("FitnessProfile", newProfile);
       toggleMealDialog();
     }
   };
