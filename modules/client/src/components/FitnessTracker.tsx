@@ -6,7 +6,13 @@ import {
   Dialog,
   IconButton,
   Typography,
+  makeStyles,
 } from "@material-ui/core";
+import {
+  grey,
+  green,
+} from "@material-ui/core/colors";
+
 import {
   DeleteForever as ResetIcon,
 } from "@material-ui/icons";
@@ -18,6 +24,15 @@ import { FoodLog } from "./FoodLog";
 
 import { store } from "../utils/cache";
 
+const useStyles = makeStyles({
+  root: {
+    backgroundColor: grey[900],
+  },
+  typography: {
+    color: green[500],
+  },
+});
+
 export const FitnessTracker = (props: any) => {
 
   const [mealEntryAlert, setMealEntryAlert] = useState({
@@ -27,15 +42,16 @@ export const FitnessTracker = (props: any) => {
   });
   const [openResetDialog, setOpenResetDialog] = useState(false);
   const [profile, setProfile] = useState(store.load("FitnessProfile"));
+  const classes = useStyles();
 
   const closeSnackbar = () => setMealEntryAlert({ severity: undefined, msg: "", open: false });
 
   const today = new Date();
 
   return (
-    <div>
+    <div className={classes.root}>
       <Profile profile={profile} setProfile={setProfile} />
-      <Typography display="inline"> {today.toDateString()} </Typography>
+      <Typography className={classes.typography} display="inline" color={"secondary"}> {today.toDateString()} </Typography>
 
       <br />
       <MealEntry
