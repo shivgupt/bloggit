@@ -6,16 +6,33 @@ import {
   IconButton,
   TextField,
   Typography,
+  makeStyles,
 } from "@material-ui/core";
 import {
   AccountCircle as ProfileIcon,
   Close as CloseIcon,
   SaveAlt as SaveIcon,
 } from "@material-ui/icons";
+import {
+  grey,
+  green,
+} from "@material-ui/core/colors";
+
 
 import { store } from "../utils/cache";
 
+const useStyles = makeStyles({
+  root: {
+    backgroundColor: grey[900],
+  },
+  typography: {
+    color: green[500],
+  },
+});
+
 export const Profile = (props: any) => {
+  const classes = useStyles();
+
   const { profile, setProfile } = props;
 
   const [openProfileDialog, setOpenProfileDialog] = useState(false);
@@ -27,7 +44,7 @@ export const Profile = (props: any) => {
 
   return (
     <>
-      <IconButton onClick={toggleProfileDialog}> <ProfileIcon /> </IconButton>
+      <IconButton color="secondary" onClick={toggleProfileDialog}> <ProfileIcon /> </IconButton>
       
       <Dialog open={openProfileDialog} onClose={toggleProfileDialog}>
         <DialogContent>

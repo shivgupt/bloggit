@@ -3,7 +3,12 @@ import React, { useState, useEffect } from "react";
 import {
   Snackbar,
   Typography,
+  makeStyles,
 } from "@material-ui/core";
+import {
+  grey,
+  green,
+} from "@material-ui/core/colors";
 import { Alert, AlertTitle } from "@material-ui/lab";
 
 import { MealEntry } from "./MealEntry";
@@ -11,6 +16,15 @@ import { Profile } from "./Profile";
 import { FoodTimeLine } from "./FoodTimeLine";
 
 import { store } from "../utils/cache";
+
+const useStyles = makeStyles({
+  root: {
+    backgroundColor: grey[900],
+  },
+  typography: {
+    color: green[500],
+  },
+});
 
 export const FitnessTracker = (props: any) => {
 
@@ -20,6 +34,7 @@ export const FitnessTracker = (props: any) => {
     msg: "",
   });
   const [profile, setProfile] = useState(store.load("FitnessProfile"));
+  const classes = useStyles();
 
   useEffect(() => {
     store.save("FitnessProfile", profile);
@@ -30,9 +45,9 @@ export const FitnessTracker = (props: any) => {
   const today = new Date();
 
   return (
-    <>
+    <div className={classes.root}>
       <Profile profile={profile} setProfile={setProfile} />
-      <Typography display="inline"> {today.toDateString()} </Typography>
+      <Typography className={classes.typography} display="inline" color={"secondary"}> {today.toDateString()} </Typography>
 
       <br />
       <MealEntry
@@ -55,6 +70,6 @@ export const FitnessTracker = (props: any) => {
           <strong> {mealEntryAlert.msg} </strong>
         </Alert>
       </Snackbar>
-    </>
+    </div>
   );
 };
