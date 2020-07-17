@@ -202,7 +202,7 @@ export const MealEntry = (props: any) => {
   return (
     <div>
       { props.entry ?
-        <IconButton color="primary" onClick={toggleMealDialog}>
+        <IconButton color="secondary" onClick={toggleMealDialog}>
           <EditIcon />
         </IconButton> :
         <Button

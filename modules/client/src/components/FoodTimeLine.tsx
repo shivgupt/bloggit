@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 
 import {
   IconButton,
@@ -17,13 +17,28 @@ import {
   TimelineSeparator,
 } from "@material-ui/lab";
 
-import { compareObj, getTotalNutrientsMeal } from "../utils/helper";
+import {
+  compareObj,
+  deepCopy,
+  getTotalNutrientsMeal,
+} from "../utils/helper";
 import { emptyFoodLog } from "../utils/constants";
+import { MealEntry } from "./MealEntry";
 
 export const FoodTimeLine = (props: any) => {
 
   const { profile, setProfile, setMealEntryAlert } = props;
   const foodLog = profile.foodLog;
+
+  const handleEditMeal = (date: string, time: string) => () => {
+    let updateDT = new Date(date);
+    updateDT.setHours(Number(time.substring(0,2)));
+    updateDT.setMinutes(Number(time.substring(3,5)));
+    return {
+      date: updateDT,
+      meal: deepCopy(foodLog[date][time]),
+    };
+  };
 
   const handleDeleteMeal = (date: string, time: string) => () => {
     const newProfile = { ...profile };
@@ -57,9 +72,16 @@ export const FoodTimeLine = (props: any) => {
                   <TimelineItem key={time}>
                     <TimelineOppositeContent>
                       <Typography variant="button"> {time} </Typography>
-                      <IconButton onClick={handleDeleteMeal(date, time)}>
+                      <IconButton color="secondary" onClick={handleDeleteMeal(date, time)}>
                         <DeleteIcon />
                       </IconButton>
+                      <MealEntry
+                        entry={handleEditMeal(date, time)}
+                        profile={profile}
+                        setMealEntryAlert={setMealEntryAlert}
+                        setProfile={setProfile}
+                        title="Update Meal Entry"
+                      />
                     </TimelineOppositeContent>
                     <TimelineSeparator>
                       <TimelineDot>
@@ -84,4 +106,4 @@ export const FoodTimeLine = (props: any) => {
       })}
     </>
   );
-}
+};

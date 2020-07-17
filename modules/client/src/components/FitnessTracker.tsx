@@ -30,7 +30,7 @@ export const FitnessTracker = (props: any) => {
   const today = new Date();
 
   return (
-    <div>
+    <>
       <Profile profile={profile} setProfile={setProfile} />
       <Typography display="inline"> {today.toDateString()} </Typography>
 
@@ -55,6 +55,6 @@ export const FitnessTracker = (props: any) => {
           <strong> {mealEntryAlert.msg} </strong>
         </Alert>
       </Snackbar>
-    </div>
+    </>
   );
 };
