@@ -206,9 +206,10 @@ export const MealEntry = (props: any) => {
           <EditIcon />
         </IconButton> :
         <Button
-          variant="contained"
           color="primary"
           startIcon={<AddIcon />}
+          size="small"
+          variant="outlined"
           onClick={toggleMealDialog}
         >
           Add Meal

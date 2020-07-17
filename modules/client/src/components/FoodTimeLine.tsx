@@ -3,7 +3,15 @@ import React from "react";
 import {
   IconButton,
   Typography,
+  makeStyles,
 } from "@material-ui/core";
+import {
+  blue,
+  cyan,
+  green,
+  red,
+  yellow,
+} from "@material-ui/core/colors";
 import {
   Delete as DeleteIcon,
 } from "@material-ui/icons";
@@ -25,10 +33,29 @@ import {
 import { emptyFoodLog } from "../utils/constants";
 import { MealEntry } from "./MealEntry";
 
+const useStyles = makeStyles({
+  calories: {
+    color: red[700],
+  },
+  meal: {
+    color: yellow[700],
+  },
+  mealTime: {
+    color: cyan[400],
+  },
+  today: {
+    color: blue[400],
+  },
+  typography: {
+    color: green[500],
+  },
+});
+
 export const FoodTimeLine = (props: any) => {
 
   const { profile, setProfile, setMealEntryAlert } = props;
   const foodLog = profile.foodLog;
+  const classes = useStyles();
 
   const handleEditMeal = (date: string, time: string) => () => {
     let updateDT = new Date(date);
@@ -51,7 +78,7 @@ export const FoodTimeLine = (props: any) => {
 
   if (compareObj(profile.foodLog, emptyFoodLog)) {
     return (
-      <Typography>
+      <Typography className={classes.typography}>
         You have no meal entry yet!!
       </Typography>
     );
@@ -62,7 +89,7 @@ export const FoodTimeLine = (props: any) => {
       {Object.keys(foodLog).sort((a,b) => new Date(a) > new Date(b) ? -1: 1).map((date) => {
         return (
           <div key={"div-" + date}>
-            <Typography variant="subtitle2" color="textSecondary" key={"typography" + date}>
+            <Typography align="center" className={classes.today} variant="subtitle2" key={"typography" + date}>
               {date}
             </Typography>
             <Timeline align="alternate" key={date}>
@@ -71,7 +98,7 @@ export const FoodTimeLine = (props: any) => {
                 return (
                   <TimelineItem key={time}>
                     <TimelineOppositeContent>
-                      <Typography variant="button"> {time} </Typography>
+                      <Typography className={classes.mealTime} variant="button"> {time} </Typography>
                       <IconButton color="secondary" onClick={handleDeleteMeal(date, time)}>
                         <DeleteIcon />
                       </IconButton>
@@ -85,12 +112,14 @@ export const FoodTimeLine = (props: any) => {
                     </TimelineOppositeContent>
                     <TimelineSeparator>
                       <TimelineDot>
-                        {totalNutrientMeal["calories"]}
+                        <Typography align="center" className={classes.calories} variant="body2">
+                          {totalNutrientMeal["calories"]} Cal
+                        </Typography>
                       </TimelineDot>
                       <TimelineConnector />
                     </TimelineSeparator>
                     <TimelineContent>
-                      <Typography variant="caption">
+                      <Typography className={classes.meal} variant="caption">
                         {foodLog[date][time].map(dish => {
                           if (dish.serving > 1) return "2x " + dish.name + ", ";
                           else return dish.name + ", ";
