@@ -43,8 +43,8 @@ export const Cheese = {
 export const Chicken = {
   name: "Chicken",
   quantity: "100",
-  calories: 239,
   nutrients: {
+    calories: 239,
     carbohydrates: 0,
     protein: 27,
     fat: 14,
@@ -105,6 +105,7 @@ export const DoubleChocolateProtein = {
   name: "DoubleChocolateProtein",
   quantity: "30",
   nutrients: {
+    calories: 117,
     carbohydrates: 1,
     protein: 80,
     fat: 0.33,
@@ -134,8 +135,8 @@ export const Litchi = {
 export const RefinedFlour = {
   name: "RefinedFlour aka Maida",
   quantity: "100",
-  calories: 364,
   nutrients: {
+    calories: 364,
     carbohydrates: 76,
     protein: 10,
     fat: 1,

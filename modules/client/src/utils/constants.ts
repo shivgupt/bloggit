@@ -24,6 +24,7 @@ export const emptyNutrients = {
   carbohydrates: 0.0,
   protein: 0.0,
   fat: 0.0,
+  calories: 0,
 };
 
 export const emptyIngredient = {

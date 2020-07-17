@@ -11,7 +11,6 @@ import {
 import {
   AccountCircle as ProfileIcon,
   Close as CloseIcon,
-  Edit as EditIcon,
   SaveAlt as SaveIcon,
 } from "@material-ui/icons";
 import {

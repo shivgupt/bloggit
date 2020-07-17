@@ -17,7 +17,7 @@ import { emptyIndex, fetchContent, fetchIndex, getPostsByCategories } from "./ut
 const useStyles = makeStyles((theme: Theme) => createStyles({
   appBarSpacer: theme.mixins.toolbar,
   root: {
-    backgroundColor: "linen",
+    backgroundColor: "#282725",
     display: "flex",
   },
   container: {

@@ -27,7 +27,6 @@ import { Dish } from "../types";
 import * as Dishes from "../utils/dishes";
 import { smartConcatMeal } from "../utils/helper";
 
-import { store } from "../utils/cache";
 import { dateOptions, timeOptions, emptyDish, emptyMealEntry } from "../utils/constants";
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -64,7 +63,7 @@ export const MealEntry = (props: any) => {
 
   const toggleInfoDialog = () => setInfoDialog({ ...infoDialog, open: !infoDialog.open });
   const toggleMealDialog = () => setOpenMealDialog(!openMealDialog);
-  const setMealTime = (date) => setMealEntry({ ...mealEntry, date});
+  const setMealTime = (date) => setMealEntry({ ...mealEntry, date });
 
   const handleInfo = (dish: Dish) => () => setInfoDialog({ open: true, dish });
 
@@ -196,7 +195,6 @@ export const MealEntry = (props: any) => {
     if (newProfile) {
       setProfile(newProfile);
       setMealEntry(emptyMealEntry);
-      store.save("FitnessProfile", newProfile);
       toggleMealDialog();
     }
   };
@@ -204,7 +202,7 @@ export const MealEntry = (props: any) => {
   return (
     <div>
       { props.entry ?
-        <IconButton color="primary" onClick={toggleMealDialog}>
+        <IconButton color="secondary" onClick={toggleMealDialog}>
           <EditIcon />
         </IconButton> :
         <Button
@@ -217,7 +215,7 @@ export const MealEntry = (props: any) => {
         </Button>
       }
       <Dialog open={openMealDialog} onClose={toggleMealDialog}>
-        <DialogTitle children={title} />
+        <DialogTitle> {title} </DialogTitle>
         <DialogContent dividers>
           <DateTime date={mealEntry.date} label="What time did you eat?" setDate={setMealTime}/>
           <br/>
