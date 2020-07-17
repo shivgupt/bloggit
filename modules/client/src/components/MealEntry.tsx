@@ -63,7 +63,7 @@ export const MealEntry = (props: any) => {
 
   const toggleInfoDialog = () => setInfoDialog({ ...infoDialog, open: !infoDialog.open });
   const toggleMealDialog = () => setOpenMealDialog(!openMealDialog);
-  const setMealTime = (date) => setMealEntry({ ...mealEntry, date});
+  const setMealTime = (date) => setMealEntry({ ...mealEntry, date });
 
   const handleInfo = (dish: Dish) => () => setInfoDialog({ open: true, dish });
 
@@ -215,7 +215,7 @@ export const MealEntry = (props: any) => {
         </Button>
       }
       <Dialog open={openMealDialog} onClose={toggleMealDialog}>
-        <DialogTitle children={title} />
+        <DialogTitle> {title} </DialogTitle>
         <DialogContent dividers>
           <DateTime date={mealEntry.date} label="What time did you eat?" setDate={setMealTime}/>
           <br/>

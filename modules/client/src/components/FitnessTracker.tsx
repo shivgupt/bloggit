@@ -2,19 +2,13 @@ import React, { useState, useEffect } from "react";
 
 import {
   Snackbar,
-  Button,
-  Dialog,
-  IconButton,
   Typography,
 } from "@material-ui/core";
-import {
-  DeleteForever as ResetIcon,
-} from "@material-ui/icons";
 import { Alert, AlertTitle } from "@material-ui/lab";
 
 import { MealEntry } from "./MealEntry";
 import { Profile } from "./Profile";
-import { FoodLog } from "./FoodLog";
+import { FoodTimeLine } from "./FoodTimeLine";
 
 import { store } from "../utils/cache";
 
@@ -25,7 +19,6 @@ export const FitnessTracker = (props: any) => {
     severity: "" as "error" | "info" | "success" | "warning" | undefined,
     msg: "",
   });
-  const [openResetDialog, setOpenResetDialog] = useState(false);
   const [profile, setProfile] = useState(store.load("FitnessProfile"));
 
   useEffect(() => {
@@ -50,7 +43,7 @@ export const FitnessTracker = (props: any) => {
       />
 
       <br />
-      <FoodLog
+      <FoodTimeLine
         profile={profile}
         setProfile={setProfile}
         setMealEntryAlert={setMealEntryAlert}

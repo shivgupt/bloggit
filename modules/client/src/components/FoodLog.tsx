@@ -1,8 +1,7 @@
-import React, { useState } from "react";
+import React from "react";
 
 import {
   Chip,
-  Dialog,
   IconButton,
   Paper,
   Table,
@@ -17,7 +16,6 @@ import {
   Delete as DeleteIcon,
 } from "@material-ui/icons";
 
-import { Dish } from "../types";
 import { emptyFoodLog } from "../utils/constants";
 import { getTotalNutrientsMeal } from "../utils/helper";
 import { MealEntry } from "./MealEntry";
@@ -25,8 +23,6 @@ import { MealEntry } from "./MealEntry";
 export const FoodLog = (props: any) => {
 
   const { profile, setProfile, setMealEntryAlert } = props;
-
-  const [updateEntry, setUpdateEntry] = useState({ date: new Date(), meal: [] as Dish[] });
 
   const handleEditMeal = (date: string, time: string) => () => {
     let updateDT = new Date(date);

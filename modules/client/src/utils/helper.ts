@@ -2,6 +2,10 @@ import { PostData, Ingredient, Dish, FitnessProfile } from "../types";
 import { emptyNutrients } from "./constants";
 import * as Dishes from "../utils/dishes";
 
+export const compareObj = (o1: any, o2: any) => {
+  return JSON.stringify(o1) === JSON.stringify(o2);
+};
+
 export const deepCopy = (value) => {
   return JSON.parse(JSON.stringify(value));
 };
@@ -79,7 +83,7 @@ export const getProfileStateFromStoreObj = (profile: string) => {
   }
 
   return newProfile;
-}
+};
 
 export const getProfileStoreObjFromState = (profile: FitnessProfile) => {
 
@@ -93,7 +97,7 @@ export const getProfileStoreObjFromState = (profile: FitnessProfile) => {
         } catch {
           console.log(dish);
         }
-      })
+      });
       newProfile.foodLog[date][time] = newMeal;
     }
   }

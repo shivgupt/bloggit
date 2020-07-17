@@ -1,11 +1,8 @@
-import { Dish } from "../types";
 import {
   getProfileStoreObjFromState,
   getProfileStateFromStoreObj,
-  deepCopy,
 } from "./helper";
 import { emptyFitnessProfile } from "./constants";
-import * as Dishes from "../utils/dishes";
 
 const emptryStore: any = {
   FitnessProfile: emptyFitnessProfile,
