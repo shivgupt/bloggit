@@ -70,12 +70,15 @@ export const getProfileStateFromStoreObj = (profile: string) => {
   for (let date in newProfile.foodLog) {
     for (let time in newProfile.foodLog[date]) {
       let newMeal = [] as Dish[];
-      newProfile.foodLog[date][time].forEach((dishName: string) => {
-        const dishObj = Object.values(Dishes).find((dish: Dish) => dish.name === dishName);
+      newProfile.foodLog[date][time].forEach((mealItem) => {
         try {
+          const dishObj = deepCopy(Object.values(Dishes)
+            .find((dish: Dish) => dish.name === mealItem.dish)
+          );
+          dishObj.serving = mealItem.serving;
           newMeal.push(dishObj as Dish);
         } catch {
-          console.log(dishName);
+          console.log(mealItem.dish);
         }
       });
       newProfile.foodLog[date][time] = newMeal;
@@ -90,10 +93,10 @@ export const getProfileStoreObjFromState = (profile: FitnessProfile) => {
   let newProfile = deepCopy(profile);
   for (let date in newProfile.foodLog) {
     for (let time in newProfile.foodLog[date]) {
-      let newMeal = [] as string[];
+      let newMeal = [] as Array<{ dish: string, serving: number }>;
       newProfile.foodLog[date][time].forEach((dish: Dish) => {
         try {
-          newMeal.push(dish.name);
+          newMeal.push({ dish: dish.name, serving: dish.serving });
         } catch {
           console.log(dish);
         }

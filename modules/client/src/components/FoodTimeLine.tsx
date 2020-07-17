@@ -46,42 +46,40 @@ export const FoodTimeLine = (props: any) => {
     <>
       {Object.keys(foodLog).sort((a,b) => new Date(a) > new Date(b) ? -1: 1).map((date) => {
         return (
-          <Timeline align="alternate" key={date}>
-            <TimelineItem key={date}>
-              <TimelineContent>
-                <Typography variant="subtitle2" color="textSecondary">
-                  {date}
-                </Typography>
-              </TimelineContent>
-            </TimelineItem>
-            {Object.keys(foodLog[date]).sort().map((time) => {
-              let totalNutrientMeal = getTotalNutrientsMeal(foodLog[date][time]);
-              return (
-                <TimelineItem key={date+time}>
-                  <TimelineOppositeContent>
-                    <Typography variant="button"> {time} </Typography>
-                    <IconButton onClick={handleDeleteMeal(date, time)}>
-                      <DeleteIcon />
-                    </IconButton>
-                  </TimelineOppositeContent>
-                  <TimelineSeparator>
-                    <TimelineDot>
-                      {totalNutrientMeal["calories"]}
-                    </TimelineDot>
-                    <TimelineConnector />
-                  </TimelineSeparator>
-                  <TimelineContent>
-                    <Typography variant="caption">
-                      {foodLog[date][time].map(dish => {
-                        if (dish.serving > 1) return "2x " + dish.name + ", ";
-                        else return dish.name + ", ";
-                      })}
-                    </Typography>
-                  </TimelineContent>
-                </TimelineItem>
-              );
-            })}
-          </Timeline>
+          <div key={"div-" + date}>
+            <Typography variant="subtitle2" color="textSecondary" key={"typography" + date}>
+              {date}
+            </Typography>
+            <Timeline align="alternate" key={date}>
+              {Object.keys(foodLog[date]).sort().map((time) => {
+                let totalNutrientMeal = getTotalNutrientsMeal(foodLog[date][time]);
+                return (
+                  <TimelineItem key={time}>
+                    <TimelineOppositeContent>
+                      <Typography variant="button"> {time} </Typography>
+                      <IconButton onClick={handleDeleteMeal(date, time)}>
+                        <DeleteIcon />
+                      </IconButton>
+                    </TimelineOppositeContent>
+                    <TimelineSeparator>
+                      <TimelineDot>
+                        {totalNutrientMeal["calories"]}
+                      </TimelineDot>
+                      <TimelineConnector />
+                    </TimelineSeparator>
+                    <TimelineContent>
+                      <Typography variant="caption">
+                        {foodLog[date][time].map(dish => {
+                          if (dish.serving > 1) return "2x " + dish.name + ", ";
+                          else return dish.name + ", ";
+                        })}
+                      </Typography>
+                    </TimelineContent>
+                  </TimelineItem>
+                );
+              })}
+            </Timeline>
+          </div>
         );
       })}
     </>
