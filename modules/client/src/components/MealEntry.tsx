@@ -31,6 +31,9 @@ import { dateOptions, timeOptions, emptyDish, emptyMealEntry } from "../utils/co
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
+    button: {
+      margin: theme.spacing(1),
+    },
     chipList: {
       display: "flex",
       justifyContent: "center",
@@ -200,16 +203,16 @@ export const MealEntry = (props: any) => {
   };
 
   return (
-    <div>
+    <>
       { props.entry ?
         <IconButton color="secondary" onClick={toggleMealDialog}>
           <EditIcon />
         </IconButton> :
         <Button
           color="primary"
+          className={classes.button}
           startIcon={<AddIcon />}
           size="small"
-          variant="outlined"
           onClick={toggleMealDialog}
         >
           Add Meal
@@ -273,6 +276,6 @@ export const MealEntry = (props: any) => {
           </Button>
         </DialogActions>
       </Dialog>
-    </div>
+    </>
   );
 };
