@@ -31,15 +31,15 @@ const getDataFromTotalNutrients = (totalNutrients: Nutrients) => {
 
     switch(n) {
     case "protein":
-      newEntry.label = 'p';
+      newEntry.label = "p";
       newEntry.color = "red";
       break;
     case "carbohydrates":
-      newEntry.label = 'c';
+      newEntry.label = "c";
       newEntry.color = "yellow";
       break;
     case "fat":
-      newEntry.label = 'f';
+      newEntry.label = "f";
       newEntry.color = "orange";
       break;
     }
@@ -63,7 +63,6 @@ export const NutrientDistribution = (props: any) => {
         width={52}
         height={52}
         radius={26}
-        center={{x: 0, y: 0}}
         colorType="literal"
       />
       <div className={classes.text}>
