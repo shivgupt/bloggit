@@ -43,11 +43,11 @@ const useStyles = makeStyles({
   mealTime: {
     color: cyan[400],
   },
+  root: {
+    color: green[500],
+  },
   today: {
     color: blue[400],
-  },
-  typography: {
-    color: green[500],
   },
 });
 
@@ -78,7 +78,7 @@ export const FoodTimeLine = (props: any) => {
 
   if (compareObj(profile.foodLog, emptyFoodLog)) {
     return (
-      <Typography className={classes.typography}>
+      <Typography className={classes.root}>
         You have no meal entry yet!!
       </Typography>
     );
@@ -89,7 +89,12 @@ export const FoodTimeLine = (props: any) => {
       {Object.keys(foodLog).sort((a,b) => new Date(a) > new Date(b) ? -1: 1).map((date) => {
         return (
           <div key={"div-" + date}>
-            <Typography align="center" className={classes.today} variant="subtitle2" key={"typography" + date}>
+            <Typography
+              align="center"
+              className={classes.today}
+              variant="subtitle2"
+              key={"div" + date}
+            >
               {date}
             </Typography>
             <Timeline align="alternate" key={date}>
@@ -98,7 +103,12 @@ export const FoodTimeLine = (props: any) => {
                 return (
                   <TimelineItem key={time}>
                     <TimelineOppositeContent>
-                      <Typography className={classes.mealTime} variant="button"> {time} </Typography>
+                      <Typography
+                        className={classes.mealTime}
+                        variant="button"
+                      >
+                        {time}
+                      </Typography>
                       <IconButton color="secondary" onClick={handleDeleteMeal(date, time)}>
                         <DeleteIcon />
                       </IconButton>

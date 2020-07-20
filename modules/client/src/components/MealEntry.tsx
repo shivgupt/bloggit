@@ -209,7 +209,7 @@ export const MealEntry = (props: any) => {
           <EditIcon />
         </IconButton> :
         <Button
-          color="primary"
+          color="secondary"
           className={classes.button}
           startIcon={<AddIcon />}
           size="small"

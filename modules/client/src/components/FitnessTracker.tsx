@@ -20,8 +20,6 @@ import { store } from "../utils/cache";
 const useStyles = makeStyles({
   root: {
     backgroundColor: grey[900],
-  },
-  typography: {
     color: green[500],
   },
 });
@@ -47,7 +45,13 @@ export const FitnessTracker = (props: any) => {
   return (
     <div className={classes.root}>
       <Profile profile={profile} setProfile={setProfile} />
-      <Typography className={classes.typography} display="inline" color={"secondary"}> {today.toDateString()} </Typography>
+      <Typography
+        className={classes.root}
+        display="inline"
+        color={"secondary"}
+      >
+        {today.toDateString()}
+      </Typography>
 
       <br />
       <MealEntry
