@@ -17,6 +17,8 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
   card: {
     width: 345,
     height: 300,
+    backgroundColor: "black",
+    color: "#04f89c",
   },
   media: {
     maxHeight: 150,
@@ -42,7 +44,7 @@ export const Home = (props: any) => {
                     title={slug}/>
                   : null}
                 <CardContent>
-                  <Typography variant="body2" color="textSecondary" component="p">
+                  <Typography variant="body2" component="p">
                     {posts[slug].tldr}
                   </Typography>
                 </CardContent>
