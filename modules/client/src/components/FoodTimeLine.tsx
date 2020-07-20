@@ -123,7 +123,7 @@ export const FoodTimeLine = (props: any) => {
                     </TimelineOppositeContent>
                     <TimelineSeparator>
                       <TimelineDot>
-                        <NutrientDistribution />
+                        <NutrientDistribution totalNutrients={totalNutrientMeal} />
                       </TimelineDot>
                       <TimelineConnector />
                     </TimelineSeparator>

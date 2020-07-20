@@ -68,12 +68,12 @@ export const CoconutOil = {
 
 export const DoubleChocolateProtein = {
   name: "DoubleChocolateProtein",
-  quantity: "30",
+  quantity: "100",
   nutrients: {
-    calories: 117,
-    carbohydrates: 1,
-    protein: 80,
-    fat: 0.33,
+    calories: 383,
+    carbohydrates: 10,
+    protein: 79,
+    fat: 3,
   },
 } as Ingredient;
 
@@ -101,7 +101,7 @@ export const Egg = {
 
 export const Litchi = {
   name: "Litchi",
-  quantity: "50",
+  quantity: "100",
   nutrients: {
     calories: 66,
     carbohydrates: 17,
