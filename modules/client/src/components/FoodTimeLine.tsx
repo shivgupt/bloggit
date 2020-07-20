@@ -24,6 +24,7 @@ import {
   TimelineOppositeContent,
   TimelineSeparator,
 } from "@material-ui/lab";
+import { NutrientDistribution } from "./NutrientDistribution";
 
 import {
   compareObj,
@@ -122,9 +123,7 @@ export const FoodTimeLine = (props: any) => {
                     </TimelineOppositeContent>
                     <TimelineSeparator>
                       <TimelineDot>
-                        <Typography align="center" className={classes.calories} variant="body2">
-                          {totalNutrientMeal["calories"]} Cal
-                        </Typography>
+                        <NutrientDistribution />
                       </TimelineDot>
                       <TimelineConnector />
                     </TimelineSeparator>
