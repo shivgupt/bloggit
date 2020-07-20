@@ -98,7 +98,7 @@ export const FoodTimeLine = (props: any) => {
             >
               {date}
             </Typography>
-            <Timeline align="alternate" key={date}>
+            <Timeline align="right" key={date}>
               {Object.keys(foodLog[date]).sort().map((time) => {
                 let totalNutrientMeal = getTotalNutrientsMeal(foodLog[date][time]);
                 return (
