@@ -14,11 +14,16 @@ import React from "react";
 import { Link } from "react-router-dom";
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
+  root: {
+    display: "flex",
+    alignContent: "center",
+    alignItems: "center",
+  },
   card: {
-    width: 345,
+    width: "100%",
     height: 300,
-    backgroundColor: "black",
-    color: "#04f89c",
+    backgroundColor: "#031112",
+    color: "#edf9fa",
   },
   media: {
     maxHeight: 150,
@@ -32,7 +37,7 @@ export const Home = (props: any) => {
     <Grid container spacing={3} justify={"space-around"} alignItems={"center"}>
       {Object.keys(posts).map(slug => {
         return (
-          <Grid item xs={12} md={5} lg={4} key={slug}>
+          <Grid className={classes.root} item xs={12} md={6} lg={4} key={slug}>
             <Card className={classes.card}>
               <CardActionArea component={Link} to={`/${slug}`}>
                 <CardHeader title={posts[slug].title} />

@@ -8,7 +8,6 @@ import {
 import {
   blue,
   cyan,
-  green,
   red,
   yellow,
 } from "@material-ui/core/colors";
@@ -45,7 +44,7 @@ const useStyles = makeStyles({
     color: cyan[400],
   },
   root: {
-    color: green[500],
+    color: blue[500],
   },
   today: {
     color: blue[400],

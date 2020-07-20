@@ -5,10 +5,7 @@ import {
   Typography,
   makeStyles,
 } from "@material-ui/core";
-import {
-  grey,
-  green,
-} from "@material-ui/core/colors";
+import { blue } from "@material-ui/core/colors";
 import { Alert, AlertTitle } from "@material-ui/lab";
 
 import { MealEntry } from "./MealEntry";
@@ -19,8 +16,8 @@ import { store } from "../utils/cache";
 
 const useStyles = makeStyles({
   root: {
-    backgroundColor: grey[900],
-    color: green[500],
+    backgroundColor: "#031112",
+    color: blue[500],
   },
 });
 
