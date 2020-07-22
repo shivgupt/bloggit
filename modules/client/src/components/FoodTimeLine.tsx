@@ -93,9 +93,7 @@ export const FoodTimeLine = (props: any) => {
                 return (
                   <TimelineItem key={time}>
                     <TimelineOppositeContent>
-                      <Typography variant="button">
-                        {time}
-                      </Typography>
+                      <Typography variant="button"> {time} </Typography>
                       <IconButton color="secondary" onClick={handleDeleteMeal(date, time)}>
                         <DeleteIcon />
                       </IconButton>
