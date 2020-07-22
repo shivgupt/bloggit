@@ -34,20 +34,11 @@ import { emptyFoodLog } from "../utils/constants";
 import { MealEntry } from "./MealEntry";
 
 const useStyles = makeStyles({
-  calories: {
-    color: red[700],
-  },
   meal: {
-    color: yellow[700],
+    color: blue[200],
   },
   mealTime: {
-    color: cyan[400],
-  },
-  root: {
-    color: blue[500],
-  },
-  today: {
-    color: blue[400],
+    color: cyan[200],
   },
 });
 
@@ -78,7 +69,7 @@ export const FoodTimeLine = (props: any) => {
 
   if (compareObj(profile.foodLog, emptyFoodLog)) {
     return (
-      <Typography className={classes.root}>
+      <Typography color={"primary"}>
         You have no meal entry yet!!
       </Typography>
     );
@@ -91,7 +82,6 @@ export const FoodTimeLine = (props: any) => {
           <div key={"div-" + date}>
             <Typography
               align="center"
-              className={classes.today}
               variant="subtitle2"
               key={"div" + date}
             >
@@ -103,10 +93,7 @@ export const FoodTimeLine = (props: any) => {
                 return (
                   <TimelineItem key={time}>
                     <TimelineOppositeContent>
-                      <Typography
-                        className={classes.mealTime}
-                        variant="button"
-                      >
+                      <Typography variant="button">
                         {time}
                       </Typography>
                       <IconButton color="secondary" onClick={handleDeleteMeal(date, time)}>

@@ -32,15 +32,15 @@ const getDataFromTotalNutrients = (totalNutrients: Nutrients) => {
     switch(n) {
     case "protein":
       newEntry.label = "p";
-      newEntry.color = "red";
+      newEntry.color = "#FFAB91";
       break;
     case "carbohydrates":
       newEntry.label = "c";
-      newEntry.color = "yellow";
+      newEntry.color = "#FFF59D";
       break;
     case "fat":
       newEntry.label = "f";
-      newEntry.color = "orange";
+      newEntry.color = "#90CAF9";
       break;
     }
 

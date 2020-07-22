@@ -102,7 +102,7 @@ export const Toc = (props: any) => {
           {posts[node.child].map((p) => {
             return (
               <div key={p.slug}>
-                <ListItem key={p.title} component={Link} to={`/${p.slug}`}>
+                <ListItem button={true} key={p.title} component={Link} to={`/${p.slug}`}>
                   {p.title}
                   {p.content ? 
                     <IconButton

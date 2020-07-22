@@ -4,7 +4,10 @@ import {
   Theme,
   createStyles,
   makeStyles,
+  createMuiTheme,
+  ThemeProvider,
 } from "@material-ui/core";
+import { grey, green } from "@material-ui/core/colors";
 import React, { useEffect, useState } from "react";
 import { Route, Switch } from "react-router-dom";
 
@@ -14,10 +17,21 @@ import { NavBar } from "./components/NavBar";
 import { PostPage } from "./components/Posts";
 import { emptyIndex, fetchContent, fetchIndex, getPostsByCategories } from "./utils";
 
+const darkTheme = createMuiTheme({
+  palette: {
+    primary: {
+      main: "#deaa56",
+    },
+    secondary: {
+      main: "#e699a6",
+    },
+    type: "dark",
+  },
+});
+
 const useStyles = makeStyles((theme: Theme) => createStyles({
   appBarSpacer: theme.mixins.toolbar,
   root: {
-    backgroundColor: "#273131",
     display: "flex",
   },
   container: {
@@ -74,6 +88,7 @@ const App: React.FC = () => {
   }, [index, currentSlug]);
 
   return (
+  <ThemeProvider theme={darkTheme}>
     <div className={classes.root}>
       <CssBaseline />
       <NavBar
@@ -125,6 +140,7 @@ const App: React.FC = () => {
         </Container>
       </main>
     </div>
+  </ThemeProvider>
   );
 };
 
