@@ -88,7 +88,6 @@ const App: React.FC = () => {
 
   return (
     <ThemeProvider theme={darkTheme}>
-      <div className={classes.root}>
         <CssBaseline />
         <NavBar
           node={node}
@@ -138,7 +137,6 @@ const App: React.FC = () => {
             </Switch>
           </Container>
         </main>
-      </div>
     </ThemeProvider>
   );
 };

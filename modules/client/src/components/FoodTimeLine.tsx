@@ -91,10 +91,7 @@ export const FoodTimeLine = (props: any) => {
                 return (
                   <TimelineItem key={time}>
                     <TimelineOppositeContent>
-                      <Typography variant="button"> {time} </Typography>
-                      <IconButton color="secondary" onClick={handleDeleteMeal(date, time)}>
-                        <DeleteIcon />
-                      </IconButton>
+                      <Typography variant="caption"> {time} </Typography>
                       <MealEntry
                         entry={handleEditMeal(date, time)}
                         profile={profile}
@@ -102,6 +99,9 @@ export const FoodTimeLine = (props: any) => {
                         setProfile={setProfile}
                         title="Update Meal Entry"
                       />
+                      <IconButton color="secondary" onClick={handleDeleteMeal(date, time)} size={"small"}>
+                        <DeleteIcon />
+                      </IconButton>
                     </TimelineOppositeContent>
                     <TimelineSeparator>
                       <TimelineDot>

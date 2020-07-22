@@ -60,9 +60,9 @@ export const NutrientDistribution = (props: any) => {
     <div className={classes.root} >
       <RadialChart
         data={getDataFromTotalNutrients(totalNutrients)}
-        width={52}
-        height={52}
-        radius={26}
+        width={40}
+        height={40}
+        radius={20}
         colorType="literal"
       />
       <div className={classes.text}>
