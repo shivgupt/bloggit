@@ -54,6 +54,46 @@ export const ChickenRoll = {
   ],
 } as Dish;
 
+/*
+export const DalMakhani = {
+  name: "Dal Makhni",
+  serving: 0.5,
+  ingredients: [
+    { ...ing.Lentil, quantity: "50" },
+    { ...ing.Butter, quantity: "25" },
+    { ...ing.Onion, quantity: "25" },
+    { ...ing.Tomato, quantity: "35" },
+    { ...ing.Cream, quantity: "25" },
+  ],
+} as Dish;
+
+export const ButterPaneerMasala = {
+  name: "Butter Paneer masala",
+  serving: 0.5,
+  ingredients: [
+    { ...ing.Paneer, quantity: "50" },
+    { ...ing.Butter, quantity: "25" },
+    { ...ing.Onion, quantity: "25" },
+    { ...ing.Tomato, quantity: "35" },
+    { ...ing.Cream, quantity: "25" },
+    { ...ing.Cashew, quantity: "25" },
+  ],
+} as Dish;
+
+export const GarlicNaan = {
+  name: "Garlic Naan",
+  serving: 0.5,
+  ingredients: [
+    { ...ing.Paneer, quantity: "50" },
+    { ...ing.Butter, quantity: "25" },
+    { ...ing.Onion, quantity: "25" },
+    { ...ing.Tomato, quantity: "35" },
+    { ...ing.Cream, quantity: "25" },
+    { ...ing.Cashew, quantity: "25" },
+  ],
+} as Dish;
+*/
+
 export const OatsNMilk = {
   name: "Oats, milk & cherry",
   serving: 1,
