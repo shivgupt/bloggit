@@ -8,8 +8,6 @@ import {
 import {
   blue,
   cyan,
-  red,
-  yellow,
 } from "@material-ui/core/colors";
 import {
   Delete as DeleteIcon,
