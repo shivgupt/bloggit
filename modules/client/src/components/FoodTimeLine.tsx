@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { IconButton, Typography, makeStyles, } from "@material-ui/core";
-import { blue, cyan, } from "@material-ui/core/colors";
+import { IconButton, Typography, makeStyles } from "@material-ui/core";
+import { blue, cyan } from "@material-ui/core/colors";
 import {
   Delete as DeleteIcon,
   Edit as EditIcon,
@@ -16,7 +16,7 @@ import {
 } from "@material-ui/lab";
 
 import { NutrientDistribution } from "./NutrientDistribution";
-import { compareObj, deepCopy, } from "../utils/helper";
+import { compareObj, deepCopy } from "../utils/helper";
 import { emptyFoodLog } from "../utils/constants";
 import { MealEntry } from "./MealEntry";
 
