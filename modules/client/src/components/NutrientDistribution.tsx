@@ -1,6 +1,7 @@
 import React from "react";
 import { RadialChart } from "react-vis";
 import { makeStyles } from "@material-ui/core";
+import { getTotalNutrientsMeal } from "../utils/helper";
 
 import { Nutrients } from "../types";
 
@@ -47,14 +48,14 @@ const getDataFromTotalNutrients = (totalNutrients: Nutrients) => {
     data.push(newEntry);
   }
 
-  console.log(data);
   return data;
 };
 
 export const NutrientDistribution = (props: any) => {
   const classes = useStyles();
-  const { totalNutrients } = props;
-  if (!totalNutrients) return <> 0 </>;
+  const { meal } = props;
+  if (!meal) return <> 0 </>;
+  const totalNutrients = getTotalNutrientsMeal(meal);
 
   return (
     <div className={classes.root} >

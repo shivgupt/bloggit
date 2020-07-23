@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from "react";
 
 import {
+  Button,
   Snackbar,
   Typography,
 } from "@material-ui/core";
+import {
+  AddCircle as AddIcon,
+} from "@material-ui/icons";
 import { Alert, AlertTitle } from "@material-ui/lab";
 
 import { MealEntry } from "./MealEntry";
@@ -14,6 +18,7 @@ import { store } from "../utils/cache";
 
 export const FitnessTracker = (props: any) => {
 
+  const [add, setAdd] = useState(false);
   const [mealEntryAlert, setMealEntryAlert] = useState({
     open: false,
     severity: "" as "error" | "info" | "success" | "warning" | undefined,
@@ -37,7 +42,17 @@ export const FitnessTracker = (props: any) => {
       </Typography>
 
       <br />
+      <Button
+        color="secondary"
+        startIcon={<AddIcon />}
+        size="small"
+        onClick={() => setAdd(!add)}
+      >
+        Add Meal
+      </Button>
       <MealEntry
+        open={add}
+        setOpen={setAdd}
         profile={profile}
         setMealEntryAlert={setMealEntryAlert}
         setProfile={setProfile}

@@ -1,16 +1,9 @@
-import React from "react";
-
-import {
-  IconButton,
-  Typography,
-  makeStyles,
-} from "@material-ui/core";
-import {
-  blue,
-  cyan,
-} from "@material-ui/core/colors";
+import React, { useState } from "react";
+import { IconButton, Typography, makeStyles, } from "@material-ui/core";
+import { blue, cyan, } from "@material-ui/core/colors";
 import {
   Delete as DeleteIcon,
+  Edit as EditIcon,
 } from "@material-ui/icons";
 import {
   Timeline,
@@ -21,13 +14,9 @@ import {
   TimelineOppositeContent,
   TimelineSeparator,
 } from "@material-ui/lab";
-import { NutrientDistribution } from "./NutrientDistribution";
 
-import {
-  compareObj,
-  deepCopy,
-  getTotalNutrientsMeal,
-} from "../utils/helper";
+import { NutrientDistribution } from "./NutrientDistribution";
+import { compareObj, deepCopy, } from "../utils/helper";
 import { emptyFoodLog } from "../utils/constants";
 import { MealEntry } from "./MealEntry";
 
@@ -41,10 +30,11 @@ const useStyles = makeStyles({
 });
 
 export const FoodTimeLine = (props: any) => {
+  const classes = useStyles();
+
+  const [edit, setEdit] = useState(false);
 
   const { profile, setProfile, setMealEntryAlert } = props;
-  const foodLog = profile.foodLog;
-  const classes = useStyles();
 
   const handleEditMeal = (date: string, time: string) => () => {
     let updateDT = new Date(date);
@@ -52,7 +42,7 @@ export const FoodTimeLine = (props: any) => {
     updateDT.setMinutes(Number(time.substring(3,5)));
     return {
       date: updateDT,
-      meal: deepCopy(foodLog[date][time]),
+      meal: deepCopy(profile.foodLog[date][time]),
     };
   };
 
@@ -75,43 +65,47 @@ export const FoodTimeLine = (props: any) => {
 
   return (
     <>
-      {Object.keys(foodLog).sort((a,b) => new Date(a) > new Date(b) ? -1: 1).map((date) => {
+      {Object.keys(profile.foodLog).sort((a,b) => new Date(a) > new Date(b) ? -1: 1).map((date) => {
         return (
-          <div key={"div-" + date}>
-            <Typography
-              align="center"
-              variant="subtitle2"
-              key={"div" + date}
-            >
+          <div key={"div" + date}>
+            <Typography align="center" variant="subtitle2" key={"div" + date}>
               {date}
             </Typography>
             <Timeline align="right" key={date}>
-              {Object.keys(foodLog[date]).sort().map((time) => {
-                let totalNutrientMeal = getTotalNutrientsMeal(foodLog[date][time]);
+              {Object.keys(profile.foodLog[date]).sort().map((time) => {
                 return (
                   <TimelineItem key={time}>
                     <TimelineOppositeContent>
                       <Typography variant="caption"> {time} </Typography>
+                      <IconButton color="secondary" onClick={() => setEdit(!edit)} size={"small"}>
+                        <EditIcon />
+                      </IconButton>
+                      <IconButton
+                        color="secondary"
+                        onClick={handleDeleteMeal(date, time)}
+                        size={"small"}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
                       <MealEntry
+                        open={edit}
+                        setOpen={setEdit}
                         entry={handleEditMeal(date, time)}
                         profile={profile}
                         setMealEntryAlert={setMealEntryAlert}
                         setProfile={setProfile}
                         title="Update Meal Entry"
                       />
-                      <IconButton color="secondary" onClick={handleDeleteMeal(date, time)} size={"small"}>
-                        <DeleteIcon />
-                      </IconButton>
                     </TimelineOppositeContent>
                     <TimelineSeparator>
                       <TimelineDot>
-                        <NutrientDistribution totalNutrients={totalNutrientMeal} />
+                        <NutrientDistribution meal={profile.foodLog[date][time]} />
                       </TimelineDot>
                       <TimelineConnector />
                     </TimelineSeparator>
                     <TimelineContent>
                       <Typography className={classes.meal} variant="caption">
-                        {foodLog[date][time].map(dish => {
+                        {profile.foodLog[date][time].map(dish => {
                           if (dish.serving > 1) return "2x " + dish.name + ", ";
                           else return dish.name + ", ";
                         })}
