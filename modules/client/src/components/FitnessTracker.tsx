@@ -19,7 +19,7 @@ import { store } from "../utils/cache";
 export const FitnessTracker = (props: any) => {
 
   const [add, setAdd] = useState(false);
-  const [mealEntryAlert, setMealEntryAlert] = useState({
+  const [alert, setAlert] = useState({
     open: false,
     severity: "" as "error" | "info" | "success" | "warning" | undefined,
     msg: "",
@@ -30,7 +30,7 @@ export const FitnessTracker = (props: any) => {
     store.save("FitnessProfile", profile);
   }, [profile]);
 
-  const closeSnackbar = () => setMealEntryAlert({ severity: undefined, msg: "", open: false });
+  const closeSnackbar = () => setAlert({ severity: undefined, msg: "", open: false });
 
   const today = new Date();
 
@@ -54,7 +54,7 @@ export const FitnessTracker = (props: any) => {
         open={add}
         setOpen={setAdd}
         profile={profile}
-        setMealEntryAlert={setMealEntryAlert}
+        setAlert={setAlert}
         setProfile={setProfile}
         title="Add New Meal Entry"
       />
@@ -63,13 +63,13 @@ export const FitnessTracker = (props: any) => {
       <FoodTimeLine
         profile={profile}
         setProfile={setProfile}
-        setMealEntryAlert={setMealEntryAlert}
+        setAlert={setAlert}
       />
 
-      <Snackbar open={mealEntryAlert.open} autoHideDuration={6000} onClose={closeSnackbar}>
-        <Alert severity={mealEntryAlert.severity}>
-          <AlertTitle> {mealEntryAlert.severity} </AlertTitle>
-          <strong> {mealEntryAlert.msg} </strong>
+      <Snackbar open={alert.open} autoHideDuration={6000} onClose={closeSnackbar}>
+        <Alert severity={alert.severity}>
+          <AlertTitle> {alert.severity} </AlertTitle>
+          <strong> {alert.msg} </strong>
         </Alert>
       </Snackbar>
     </>

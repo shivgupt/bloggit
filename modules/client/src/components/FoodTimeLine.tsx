@@ -34,9 +34,9 @@ export const FoodTimeLine = (props: any) => {
 
   const [edit, setEdit] = useState(false);
 
-  const { profile, setProfile, setMealEntryAlert } = props;
+  const { profile, setProfile, setAlert } = props;
 
-  const handleEditMeal = (date: string, time: string) => () => {
+  const editMeal = (date: string, time: string) => () => {
     let updateDT = new Date(date);
     updateDT.setHours(Number(time.substring(0,2)));
     updateDT.setMinutes(Number(time.substring(3,5)));
@@ -46,7 +46,7 @@ export const FoodTimeLine = (props: any) => {
     };
   };
 
-  const handleDeleteMeal = (date: string, time: string) => () => {
+  const deleteMeal = (date: string, time: string) => () => {
     const newProfile = { ...profile };
     delete newProfile.foodLog[date][time];
     if (Object.keys(newProfile.foodLog[date]).length === 0) {
@@ -77,22 +77,19 @@ export const FoodTimeLine = (props: any) => {
                   <TimelineItem key={time}>
                     <TimelineOppositeContent>
                       <Typography variant="caption"> {time} </Typography>
-                      <IconButton color="secondary" onClick={() => setEdit(!edit)} size={"small"}>
+                      <IconButton color="secondary" onClick={() => setEdit(!edit)} size="small">
                         <EditIcon />
                       </IconButton>
-                      <IconButton
-                        color="secondary"
-                        onClick={handleDeleteMeal(date, time)}
-                        size={"small"}
-                      >
+                      <IconButton color="secondary" onClick={deleteMeal(date, time)} size="small">
                         <DeleteIcon />
                       </IconButton>
+
                       <MealEntry
                         open={edit}
                         setOpen={setEdit}
-                        entry={handleEditMeal(date, time)}
+                        entry={editMeal(date, time)}
                         profile={profile}
-                        setMealEntryAlert={setMealEntryAlert}
+                        setAlert={setAlert}
                         setProfile={setProfile}
                         title="Update Meal Entry"
                       />

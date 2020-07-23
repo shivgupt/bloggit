@@ -17,6 +17,7 @@ import {
 import {
   AddCircle as AddIcon,
   Info as InfoIcon,
+  RemoveCircle as RemoveIcon,
 } from "@material-ui/icons";
 
 import { DateTime } from "./DateTimePicker";
@@ -30,8 +31,12 @@ import { dateOptions, timeOptions, emptyDish, emptyMealEntry } from "../utils/co
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
+    root: {
+      width: "320",
+      height: "290",
+    },
     button: {
-      margin: theme.spacing(1),
+      padding: "0px",
     },
     chipList: {
       display: "flex",
@@ -51,7 +56,7 @@ export const MealEntry = (props: any) => {
     open,
     setOpen,
     profile,
-    setMealEntryAlert,
+    setAlert,
     setProfile,
     title,
   } = props;
@@ -113,7 +118,7 @@ export const MealEntry = (props: any) => {
     const newFoodLog = JSON.parse(JSON.stringify(profile.foodLog));
 
     if (mealEntry.meal.length === 0) {
-      setMealEntryAlert({
+      setAlert({
         open: true,
         severity: "error",
         msg: "You have not selected any dish! What did you eat in your meal?"
@@ -134,7 +139,7 @@ export const MealEntry = (props: any) => {
       newFoodLog[date] = { [time]: mealEntry.meal };
     }
 
-    setMealEntryAlert({
+    setAlert({
       open: true,
       severity: "success",
       msg: `You have successfully added your meal at ${time} on ${date}`
@@ -155,14 +160,14 @@ export const MealEntry = (props: any) => {
         // TODO if date &| time has changed then abort ?warning/info
         if ( newFoodLog[date] && Object.keys(newFoodLog[date]).length === 0) {
           delete newFoodLog[date];
-          setMealEntryAlert({
+          setAlert({
             open: true,
             severity: "info",
             msg: `You have deleted all your meals on ${date}`
           });
         // TODO if date &| time has changed then abort ?warning/info
         } else {
-          setMealEntryAlert({
+          setAlert({
             open: true,
             severity: "info",
             msg: `You have deleted your meal at ${time} on ${date}`
@@ -176,7 +181,7 @@ export const MealEntry = (props: any) => {
       } catch {
         newFoodLog[date] = { [time]: mealEntry.meal };
       } finally {
-        setMealEntryAlert({
+        setAlert({
           open: true,
           severity: "success",
           msg: `You have successfully updated your meal at ${time} on ${date}`
@@ -203,7 +208,7 @@ export const MealEntry = (props: any) => {
   };
 
   return (
-    <Dialog open={open} onClose={toggleMealDialog}>
+    <Dialog className={classes.root} open={open} onClose={toggleMealDialog}>
       <DialogTitle> {title} </DialogTitle>
       <DialogContent dividers>
         <DateTime date={mealEntry.date} label="What time did you eat?" setDate={setMealTime}/>
@@ -242,12 +247,14 @@ export const MealEntry = (props: any) => {
             <Chip
               key={dish.name}
               color="secondary"
+              icon={<IconButton className={classes.button}> <AddIcon /> </IconButton>}
               label={
                 dish.serving > 1
                   ? dish.serving + " x " + dish.name
                   : dish.name
               }
               onDelete={handleDeleteDish(dish)}
+              deleteIcon={<RemoveIcon />}
             />
           ))}
         </Paper>
