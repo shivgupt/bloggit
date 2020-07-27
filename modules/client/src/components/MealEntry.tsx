@@ -42,7 +42,7 @@ const useStyles = makeStyles((theme: Theme) =>
         margin: theme.spacing(0.5),
       },
     },
-    paper: {
+    root: {
       width: "320px",
       height: "290px",
     },
@@ -58,7 +58,6 @@ export const MealEntry = (props: any) => {
     profile,
     setAlert,
     setProfile,
-    title,
   } = props;
 
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
@@ -208,8 +207,8 @@ export const MealEntry = (props: any) => {
   };
 
   return (
-    <Dialog PaperProps={{ classes: { root: classes.paper}}} open={open} onClose={toggleMealDialog}>
-      <DialogTitle> {title} </DialogTitle>
+    <Dialog PaperProps={{ classes: { root: classes.root } }} open={open} onClose={toggleMealDialog}>
+      <DialogTitle> {props.entry ? "Update": "Add New"} Meal Entry </DialogTitle>
       <DialogContent dividers>
         <DateTime date={mealEntry.date} label="What time did you eat?" setDate={setMealTime}/>
         <br/>
@@ -222,6 +221,7 @@ export const MealEntry = (props: any) => {
           anchorEl={anchorEl}
           open={viewDishOptions}
           onClose={toggleDishOptionsView}
+          PaperProps={{ classes: { root: classes.root } }}
         >
           <Paper className={classes.chipList}>
             <Typography variant="h5"> Dish Options </Typography>
