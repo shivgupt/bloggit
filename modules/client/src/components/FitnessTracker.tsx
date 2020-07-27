@@ -56,7 +56,6 @@ export const FitnessTracker = (props: any) => {
         profile={profile}
         setAlert={setAlert}
         setProfile={setProfile}
-        title="Add New Meal Entry"
       />
 
       <br />

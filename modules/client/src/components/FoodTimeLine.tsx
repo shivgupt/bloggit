@@ -33,6 +33,7 @@ export const FoodTimeLine = (props: any) => {
   const classes = useStyles();
 
   const [edit, setEdit] = useState(false);
+  const [entry, setEntry] = useState();
 
   const { profile, setProfile, setAlert } = props;
 
@@ -40,10 +41,11 @@ export const FoodTimeLine = (props: any) => {
     let updateDT = new Date(date);
     updateDT.setHours(Number(time.substring(0,2)));
     updateDT.setMinutes(Number(time.substring(3,5)));
-    return {
+    setEdit(!edit);
+    setEntry({
       date: updateDT,
       meal: deepCopy(profile.foodLog[date][time]),
-    };
+    });
   };
 
   const deleteMeal = (date: string, time: string) => () => {
@@ -77,22 +79,13 @@ export const FoodTimeLine = (props: any) => {
                   <TimelineItem key={time}>
                     <TimelineOppositeContent>
                       <Typography variant="caption"> {time} </Typography>
-                      <IconButton color="secondary" onClick={() => setEdit(!edit)} size="small">
+                      <IconButton color="secondary" onClick={editMeal(date, time)} size="small">
                         <EditIcon />
                       </IconButton>
                       <IconButton color="secondary" onClick={deleteMeal(date, time)} size="small">
                         <DeleteIcon />
                       </IconButton>
 
-                      <MealEntry
-                        open={edit}
-                        setOpen={setEdit}
-                        entry={editMeal(date, time)}
-                        profile={profile}
-                        setAlert={setAlert}
-                        setProfile={setProfile}
-                        title="Update Meal Entry"
-                      />
                     </TimelineOppositeContent>
                     <TimelineSeparator>
                       <TimelineDot>
@@ -115,6 +108,15 @@ export const FoodTimeLine = (props: any) => {
           </div>
         );
       })}
+      <MealEntry
+        open={edit}
+        setOpen={setEdit}
+        entry={entry}
+        profile={profile}
+        setAlert={setAlert}
+        setProfile={setProfile}
+        title="Update Meal Entry"
+      />
     </>
   );
 };
