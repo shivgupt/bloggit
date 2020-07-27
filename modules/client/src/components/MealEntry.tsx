@@ -31,10 +31,6 @@ import { dateOptions, timeOptions, emptyDish, emptyMealEntry } from "../utils/co
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    root: {
-      width: "320",
-      height: "290",
-    },
     button: {
       padding: "0px",
     },
@@ -45,6 +41,10 @@ const useStyles = makeStyles((theme: Theme) =>
       "& > *": {
         margin: theme.spacing(0.5),
       },
+    },
+    paper: {
+      width: "320px",
+      height: "290px",
     },
   }),
 );
@@ -208,7 +208,7 @@ export const MealEntry = (props: any) => {
   };
 
   return (
-    <Dialog className={classes.root} open={open} onClose={toggleMealDialog}>
+    <Dialog PaperProps={{ classes: { root: classes.paper}}} open={open} onClose={toggleMealDialog}>
       <DialogTitle> {title} </DialogTitle>
       <DialogContent dividers>
         <DateTime date={mealEntry.date} label="What time did you eat?" setDate={setMealTime}/>
@@ -247,12 +247,7 @@ export const MealEntry = (props: any) => {
             <Chip
               key={dish.name}
               color="secondary"
-              icon={<IconButton className={classes.button}> <AddIcon /> </IconButton>}
-              label={
-                dish.serving > 1
-                  ? dish.serving + " x " + dish.name
-                  : dish.name
-              }
+              label={ dish.serving > 1 ? dish.serving + " x " + dish.name : dish.name }
               onDelete={handleDeleteDish(dish)}
               deleteIcon={<RemoveIcon />}
             />
@@ -260,12 +255,8 @@ export const MealEntry = (props: any) => {
         </Paper>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleAddMeal}>
-          Save
-        </Button>
-        <Button onClick={toggleMealDialog}>
-          Cancel
-        </Button>
+        <Button onClick={handleAddMeal}> Save </Button>
+        <Button onClick={toggleMealDialog}> Cancel </Button>
       </DialogActions>
     </Dialog>
   );
