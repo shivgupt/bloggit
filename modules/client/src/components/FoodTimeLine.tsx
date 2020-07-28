@@ -95,7 +95,7 @@ export const FoodTimeLine = (props: any) => {
                     <TimelineContent>
                       <Typography className={classes.meal} variant="caption">
                         {profile.foodLog[date][time].map(dish => {
-                          if (dish.serving > 1) return "2x " + dish.name + ", ";
+                          if (dish.serving !== 1) return dish.serving + " x " + dish.name + ", ";
                           else return dish.name + ", ";
                         })}
                       </Typography>

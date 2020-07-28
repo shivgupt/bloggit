@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Button,
   Dialog,
@@ -19,22 +19,25 @@ import { deepCopy, getTotalNutrientsDish } from "../utils/helper";
 
 export const NutritionInfo = (props: any) => {
   const { info, setInfo } = props;
-  const total = getTotalNutrientsDish(info.dish);
+  const [total, setTotal] = useState(getTotalNutrientsDish(info.dish));
 
   const toggleInfo = () => setInfo({ ...info, open: !info.open });
   const addServing = () => {
     const newInfo = deepCopy(info);
     newInfo.dish.serving += 0.5;
     setInfo(newInfo);
+    console.log(getTotalNutrientsDish(newInfo.dish));
+    setTotal(getTotalNutrientsDish(newInfo.dish));
   };
   const subServing = () => {
-    console.log(info.dish.serving);
     if (info.dish.serving === 0) return;
-
     const newInfo = deepCopy(info);
     newInfo.dish.serving -= 0.5;
     setInfo(newInfo);
-  }; // setInfo({ ...info, dish: { ...info.dish, serving: info.dish.serving - 1 } });
+    console.log(getTotalNutrientsDish(newInfo.dish));
+    console.log(newInfo.dish)
+    setTotal(getTotalNutrientsDish(newInfo.dish));
+  };
   const save = () => { props.addDish(info.dish)(); toggleInfo(); };
 
   return (
