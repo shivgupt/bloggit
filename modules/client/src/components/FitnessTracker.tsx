@@ -37,19 +37,13 @@ export const FitnessTracker = (props: any) => {
   return (
     <>
       <Profile profile={profile} setProfile={setProfile} />
-      <Typography display="inline">
-        {today.toDateString()}
-      </Typography>
+      <Typography display="inline"> {today.toDateString()} </Typography>
 
       <br />
-      <Button
-        color="secondary"
-        startIcon={<AddIcon />}
-        size="small"
-        onClick={() => setAdd(!add)}
-      >
+      <Button color="secondary" startIcon={<AddIcon />} size="small" onClick={() => setAdd(!add)}>
         Add Meal
       </Button>
+
       <MealEntry
         open={add}
         setOpen={setAdd}
@@ -59,11 +53,7 @@ export const FitnessTracker = (props: any) => {
       />
 
       <br />
-      <FoodTimeLine
-        profile={profile}
-        setProfile={setProfile}
-        setAlert={setAlert}
-      />
+      <FoodTimeLine profile={profile} setProfile={setProfile} setAlert={setAlert} />
 
       <Snackbar open={alert.open} autoHideDuration={6000} onClose={closeSnackbar}>
         <Alert severity={alert.severity}>

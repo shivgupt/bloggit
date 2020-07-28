@@ -85,7 +85,6 @@ export const FoodTimeLine = (props: any) => {
                       <IconButton color="secondary" onClick={deleteMeal(date, time)} size="small">
                         <DeleteIcon />
                       </IconButton>
-
                     </TimelineOppositeContent>
                     <TimelineSeparator>
                       <TimelineDot>
@@ -115,7 +114,6 @@ export const FoodTimeLine = (props: any) => {
         profile={profile}
         setAlert={setAlert}
         setProfile={setProfile}
-        title="Update Meal Entry"
       />
     </>
   );

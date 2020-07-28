@@ -25,7 +25,7 @@ import { NutritionInfo } from "./NutritionInfo";
 
 import { Dish } from "../types";
 import * as Dishes from "../utils/dishes";
-import { smartConcatMeal } from "../utils/helper";
+import { deepCopy, smartConcatMeal } from "../utils/helper";
 
 import { dateOptions, timeOptions, emptyDish, emptyMealEntry } from "../utils/constants";
 
@@ -62,17 +62,16 @@ export const MealEntry = (props: any) => {
 
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
   const [viewDishOptions, setViewDishOptions] = useState(false);
-  const [infoDialog, setInfoDialog] = React.useState({ open: false, dish: emptyDish });
+  const [info, setInfo] = React.useState({ open: false, dish: emptyDish });
   const [mealEntry, setMealEntry] = useState(emptyMealEntry);
 
   // Set meal entry 
   useEffect(() => { if (props.entry) setMealEntry(props.entry); }, [props.entry]);
 
-  const toggleInfoDialog = () => setInfoDialog({ ...infoDialog, open: !infoDialog.open });
   const toggleMealDialog = () => setOpen(!open);
   const setMealTime = (date) => setMealEntry({ ...mealEntry, date });
 
-  const handleInfo = (dish: Dish) => () => setInfoDialog({ open: true, dish });
+  const handleInfo = (dish: Dish) => () => setInfo({ open: true, dish });
 
   const handleAddDish = (dish: Dish) => () => {
     const newMealEntry = JSON.parse(JSON.stringify(mealEntry));
@@ -91,16 +90,14 @@ export const MealEntry = (props: any) => {
 
   const handleDeleteDish = (dish: Dish) => () => {
     // TODO better deep copy
-    const newMealEntry = JSON.parse(JSON.stringify(mealEntry));
+    const newMealEntry = deepCopy(mealEntry);
     newMealEntry.date = new Date(newMealEntry.date);
     const dishIndex = newMealEntry.meal.findIndex(o => o.name === dish.name);
 
     if (dishIndex === -1) {
       console.log(`Error deleting ${dish.name}, Dish not found`);
-    } else if (newMealEntry.meal[dishIndex].serving === 1){
-      newMealEntry.meal.splice(dishIndex, 1);
     } else {
-      newMealEntry.meal[dishIndex].serving -= 1;
+      newMealEntry.meal.splice(dishIndex, 1);
     }
 
     setMealEntry(newMealEntry);
@@ -128,8 +125,8 @@ export const MealEntry = (props: any) => {
     if (newFoodLog[date]) {
       if (newFoodLog[date][time]) {
         console.log("found date and time concatinating");
-
         smartConcatMeal(newFoodLog[date][time], mealEntry.meal);
+
       } else {
         console.log("found date adding time");
         newFoodLog[date][time] = mealEntry.meal;
@@ -230,8 +227,8 @@ export const MealEntry = (props: any) => {
                 key={dish.name}
                 color="secondary"
                 label={dish.name}
-                onDelete={handleInfo(dish)}
                 onClick={handleAddDish(dish)}
+                onDelete={handleInfo(dish)}
                 deleteIcon={<InfoIcon />}
               />
             ))}
@@ -239,15 +236,15 @@ export const MealEntry = (props: any) => {
         </Popover>
         <Paper variant="outlined" className={classes.chipList}>
           <NutritionInfo
-            open={infoDialog.open}
-            dish={infoDialog.dish}
-            toggleOpen={toggleInfoDialog}
+            info={info}
+            setInfo={setInfo}
+            addDish={handleAddDish}
           />
           {mealEntry.meal.map((dish: Dish) => (
             <Chip
               key={dish.name}
               color="secondary"
-              label={ dish.serving > 1 ? dish.serving + " x " + dish.name : dish.name }
+              label={ dish.serving !== 1 ? dish.serving + " x " + dish.name : dish.name }
               onDelete={handleDeleteDish(dish)}
               deleteIcon={<RemoveIcon />}
             />
