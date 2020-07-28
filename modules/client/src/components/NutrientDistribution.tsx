@@ -53,22 +53,15 @@ const getDataFromTotalNutrients = (totalNutrients: Nutrients) => {
 
 export const NutrientDistribution = (props: any) => {
   const classes = useStyles();
-  const { meal } = props;
+  const { meal, w, h, r } = props;
   if (!meal) return <> 0 </>;
   const totalNutrients = getTotalNutrientsMeal(meal);
+  const data = getDataFromTotalNutrients(totalNutrients);
 
   return (
     <div className={classes.root} >
-      <RadialChart
-        data={getDataFromTotalNutrients(totalNutrients)}
-        width={40}
-        height={40}
-        radius={20}
-        colorType="literal"
-      />
-      <div className={classes.text}>
-        {Math.round(totalNutrients.calories)}
-      </div>
+      <RadialChart data={data} width={w} height={h} radius={r} colorType="literal" />
+      <div className={classes.text}> {Math.round(totalNutrients.calories)} </div>
     </div>
   );
 };

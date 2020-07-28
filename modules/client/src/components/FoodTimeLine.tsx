@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { IconButton, Typography, makeStyles } from "@material-ui/core";
 import { blue, cyan } from "@material-ui/core/colors";
 import {
@@ -32,10 +32,13 @@ const useStyles = makeStyles({
 export const FoodTimeLine = (props: any) => {
   const classes = useStyles();
 
+  const { profile, setProfile, setAlert } = props;
+
   const [edit, setEdit] = useState(false);
   const [entry, setEntry] = useState();
+  const [foodLog, setFoodLog] = useState();
 
-  const { profile, setProfile, setAlert } = props;
+  useEffect(() => { setFoodLog(profile.foodLog); }, [profile]);
 
   const editMeal = (date: string, time: string) => () => {
     let updateDT = new Date(date);
@@ -44,7 +47,7 @@ export const FoodTimeLine = (props: any) => {
     setEdit(!edit);
     setEntry({
       date: updateDT,
-      meal: deepCopy(profile.foodLog[date][time]),
+      meal: deepCopy(foodLog[date][time]),
     });
   };
 
@@ -57,7 +60,7 @@ export const FoodTimeLine = (props: any) => {
     setProfile(newProfile);
   };
 
-  if (compareObj(profile.foodLog, emptyFoodLog)) {
+  if (!foodLog || compareObj(foodLog, emptyFoodLog)) {
     return (
       <Typography color={"primary"}>
         You have no meal entry yet!!
@@ -67,14 +70,14 @@ export const FoodTimeLine = (props: any) => {
 
   return (
     <>
-      {Object.keys(profile.foodLog).sort((a,b) => new Date(a) > new Date(b) ? -1: 1).map((date) => {
+      {Object.keys(foodLog).sort((a,b) => new Date(a) > new Date(b) ? -1: 1).map((date) => {
         return (
           <div key={"div" + date}>
             <Typography align="center" variant="subtitle2" key={"div" + date}>
               {date}
             </Typography>
             <Timeline align="right" key={date}>
-              {Object.keys(profile.foodLog[date]).sort().map((time) => {
+              {Object.keys(foodLog[date]).sort().map((time) => {
                 return (
                   <TimelineItem key={time}>
                     <TimelineOppositeContent>
@@ -88,13 +91,13 @@ export const FoodTimeLine = (props: any) => {
                     </TimelineOppositeContent>
                     <TimelineSeparator>
                       <TimelineDot>
-                        <NutrientDistribution meal={profile.foodLog[date][time]} />
+                        <NutrientDistribution meal={foodLog[date][time]} w={40} h={40} r={20} />
                       </TimelineDot>
                       <TimelineConnector />
                     </TimelineSeparator>
                     <TimelineContent>
                       <Typography className={classes.meal} variant="caption">
-                        {profile.foodLog[date][time].map(dish => {
+                        {foodLog[date][time].map(dish => {
                           if (dish.serving !== 1) return dish.serving + " x " + dish.name + ", ";
                           else return dish.name + ", ";
                         })}

@@ -217,6 +217,7 @@ export const MealEntry = (props: any) => {
           id="dish-options-menu"
           anchorEl={anchorEl}
           open={viewDishOptions}
+          anchorOrigin={{ horizontal:"center", vertical:"center" }}
           onClose={toggleDishOptionsView}
           PaperProps={{ classes: { root: classes.root } }}
         >

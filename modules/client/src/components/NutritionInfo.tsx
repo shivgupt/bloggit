@@ -15,6 +15,7 @@ import {
 } from "@material-ui/icons";
 
 import { Ingredient } from "../types";
+import { NutrientDistribution } from "./NutrientDistribution";
 import { deepCopy, getTotalNutrientsDish } from "../utils/helper";
 
 export const NutritionInfo = (props: any) => {
@@ -55,18 +56,11 @@ export const NutritionInfo = (props: any) => {
       <DialogContent>
         <Typography variant="button"> Ingrdients </Typography>
         {info.dish.ingredients.map((item: Ingredient) => {
-          return (
-            <li key={item.name}>
-              {`${item.quantity}g ${item.name}`}
-            </li>
-          );
+          return <li key={item.name}> {`${item.quantity}g ${item.name}`} </li>;
         })}
         <br/>
         <br/>
-        <Typography variant="button"> Total </Typography>
-        {Object.keys(total).map((key) => {
-          return <li key={key}> {`${key}: ${total[key].toFixed(2)}g`} </li>;
-        })}
+        <NutrientDistribution meal={[info.dish]} h={60} w={60} r={30} />
       </DialogContent>
       <DialogActions>
         <Button onClick={toggleInfo}> Cancel </Button>
