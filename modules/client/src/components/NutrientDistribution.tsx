@@ -39,6 +39,7 @@ export const NutrientDistribution = (props: any) => {
     return (
       <div className={classes.root}>
         <Typography variant="body1" display="block"> {totalNutrients.calories} Cal </Typography>
+        <Divider variant="middle"/>
 
         <Typography variant="caption">
           🌾 {Math.round(totalNutrients.carbohydrates)}g
