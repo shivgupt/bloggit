@@ -5,8 +5,12 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Divider,
   IconButton,
+  Theme,
   Typography,
+  createStyles,
+  makeStyles,
 } from "@material-ui/core";
 import {
   AddCircle as AddIcon,
@@ -18,7 +22,18 @@ import { Ingredient } from "../types";
 import { NutrientDistribution } from "./NutrientDistribution";
 import { deepCopy, getTotalNutrientsDish } from "../utils/helper";
 
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    root: {
+      width: "320px",
+      height: "600px",
+    },
+  }),
+);
+
 export const NutritionInfo = (props: any) => {
+  const classes = useStyles();
+
   const { info, setInfo } = props;
   const [total, setTotal] = useState(getTotalNutrientsDish(info.dish));
 
@@ -42,10 +57,9 @@ export const NutritionInfo = (props: any) => {
   const save = () => { props.addDish(info.dish)(); toggleInfo(); };
 
   return (
-    <Dialog open={info.open} onClose={toggleInfo}>
+    <Dialog PaperProps={{ classes: { root: classes.root } }} open={info.open} onClose={toggleInfo}>
       <DialogTitle disableTypography id="dish-info">
-        <Typography variant="h4"> Nutrition Info </Typography>
-        <Typography variant="subtitle1" display="block"> {info.dish.name} </Typography>
+        <Typography variant="h6" display="block"> {info.dish.name} </Typography>
         <Typography variant="subtitle2" display="block">
           Serving:
           <IconButton onClick={subServing}> <RemoveIcon /> </IconButton>
@@ -54,17 +68,17 @@ export const NutritionInfo = (props: any) => {
         </Typography>
       </DialogTitle>
       <DialogContent>
-        <Typography variant="button"> Ingrdients </Typography>
+        <NutrientDistribution showTotals={true} meal={[info.dish]} h={60} w={60} r={30} />
+        <Divider />
+        <br />
+        <Typography variant="button"> Ingrdients (per 1 serving) </Typography>
         {info.dish.ingredients.map((item: Ingredient) => {
           return <li key={item.name}> {`${item.quantity}g ${item.name}`} </li>;
         })}
-        <br/>
-        <br/>
-        <NutrientDistribution meal={[info.dish]} h={60} w={60} r={30} />
       </DialogContent>
       <DialogActions>
         <Button onClick={toggleInfo}> Cancel </Button>
-        <Button onClick={save}> Ok </Button>
+        <Button onClick={save}> Add </Button>
       </DialogActions>
     </Dialog>
   );
