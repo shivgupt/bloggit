@@ -6,6 +6,7 @@ email="${EMAIL:-noreply@gmail.com}"
 mode="${MODE:-dev}"
 server_url="${SERVER_URL}"
 ui_url="${UI_URL}"
+ipfs_url="${IPFS_URL}"
 
 echo "domain=$domain email=$email mode=$mode server=$server_url ui=$ui_url"
 
@@ -26,6 +27,13 @@ echo "waiting for ${server_url#*://}..."
 bash wait_for.sh -t 60 ${server_url#*://} 2> /dev/null
 # Do a more thorough check to ensure the dashboard is online
 while ! curl -s $server_url > /dev/null
+do sleep 2
+done
+
+echo "waiting for ${ipfs_url#*://}..."
+bash wait_for.sh -t 60 ${ipfs_url#*://} 2> /dev/null
+# Do a more thorough check to ensure the dashboard is online
+while ! curl -s $ipfs_url > /dev/null
 do sleep 2
 done
 
@@ -71,6 +79,7 @@ ln -sf $letsencrypt/$domain/fullchain.pem /etc/certs/fullchain.pem
 # Hack way to implement variables in the nginx.conf file
 sed -i 's/$hostname/'"$domain"'/' /etc/nginx/nginx.conf
 sed -i 's|$UI_URL|'"$ui_url"'|' /etc/nginx/nginx.conf
+sed -i 's|$IPFS_URL|'"$ipfs_url"'|' /etc/nginx/nginx.conf
 sed -i 's|$SERVER_URL|'"$server_url"'|' /etc/nginx/nginx.conf
 
 # periodically fork off & see if our certs need to be renewed

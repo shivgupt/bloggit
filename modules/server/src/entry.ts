@@ -30,6 +30,7 @@ app.use("/config", (req, res, next): void => {
   });
 });
 
+// Third: try to fetch live content from remote git hosting service
 app.use(async (req, res, next): Promise<void> => {
   // We don't care about stale data in dev-mode, just want it to load as fast as possible
   if (env.devMode) { return next(); }
@@ -53,7 +54,7 @@ app.use(async (req, res, next): Promise<void> => {
   next();
 });
 
-// Third: try to get file from default branch of static copy of content
+// Fourth: try to get file from default branch of static copy of content
 app.use(`/${env.contentBranch}/`, async (req, res, next): Promise<void> => {
   const folder = path.normalize("/blog-content");
   console.log(`Attempting to get static file ${folder}${req.path}`);

@@ -19,8 +19,9 @@ BLOG_EMAIL="${BLOG_EMAIL:-noreply@gmail.com}" # for notifications when ssl certs
 
 dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 project="`cat $dir/../package.json | jq .name | tr -d '"'`"
-number_of_services="2" # NOTE: Gotta update this manually when adding/removing services :(
+number_of_services="3" # NOTE: Gotta update this manually when adding/removing services :(
 server_port=8080
+ipfs_port=8080
 
 ####################
 # Helper Functions
@@ -42,6 +43,7 @@ function pull_if_unavailable {
 version="`git rev-parse HEAD | head -c 8`"
 server_image="${project}_server:$version"
 proxy_image="${project}_proxy:$version"
+ipfs_image="ipfs/go-ipfs"
 
 pull_if_unavailable "$server_image"
 pull_if_unavailable "$proxy_image"
@@ -52,12 +54,14 @@ pull_if_unavailable "$proxy_image"
 echo "Deploying $server_image & $proxy_image to $BLOG_DOMAINNAME"
 
 mkdir -p /tmp/$project
+mkdir -p `pwd`/../media
 cat - > /tmp/$project/docker-compose.yml <<EOF
 version: '3.4'
 
 volumes:
   certs:
   content:
+  ipfs:
 
 services:
   proxy:
@@ -66,6 +70,7 @@ services:
       DOMAINNAME: $BLOG_DOMAINNAME
       EMAIL: $BLOG_EMAIL
       SERVER_URL: http://server:$server_port
+      IPFS_URL: http://ipfs:$ipfs_port
       MODE: prod
     logging:
       driver: "json-file"
@@ -77,6 +82,12 @@ services:
       - "443:443"
     volumes:
       - certs:/etc/letsencrypt
+
+  ipfs:
+    image: $ipfs_image
+    volumes:
+      - ipfs:/data/ipfs
+      - `pwd`/../media:/media
 
   server:
     image: $server_image
@@ -104,4 +115,3 @@ while [[ "`docker container ls | grep $project | wc -l | tr -d ' '`" != "$number
 do echo -n "." && sleep 2
 done
 echo " Good Morning!"
-

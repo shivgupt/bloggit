@@ -9,6 +9,7 @@ import {
 import {
   Home as HomeIcon,
   Menu as MenuIcon,
+  SettingsInputComposite as LogIcon,
 } from "@material-ui/icons";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
@@ -24,7 +25,7 @@ const useStyles = makeStyles(theme => ({
   list: {
     width: "40%",
   },
-  menuButton: {
+  rightButton: {
     marginLeft: theme.spacing(2),
   },
   title: {
@@ -46,7 +47,7 @@ export const NavBar = (props: any) => {
   };
 
   return (
-    <div className={classes.grow}>
+    <>
       <AppBar position="fixed">
         <Toolbar>
           <IconButton
@@ -68,11 +69,20 @@ export const NavBar = (props: any) => {
             {title.page ? title.page : title.site}
           </Typography>
           <IconButton
+            component={Link}
+            edge="start"
+            to={"/foodlog"}
+            color="inherit"
+            className={classes.rightButton}
+          >
+            <LogIcon />
+          </IconButton>
+          <IconButton
             edge="start"
             color="inherit"
             aria-label="open drawer"
             onClick={toggleDrawer(true)}
-            className={classes.menuButton}
+            className={classes.rightButton}
           >
             <MenuIcon />
           </IconButton>
@@ -87,6 +97,6 @@ export const NavBar = (props: any) => {
       >
         <Toc posts={posts} node={node} setNode={setNode}/>
       </SwipeableDrawer>
-    </div>
+    </>
   );
 };

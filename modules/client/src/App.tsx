@@ -4,21 +4,42 @@ import {
   Theme,
   createStyles,
   makeStyles,
+  createMuiTheme,
+  ThemeProvider,
 } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
 import { Route, Switch } from "react-router-dom";
 
+import { FitnessTracker } from "./components/FitnessTracker";
 import { Home } from "./components/Home";
 import { NavBar } from "./components/NavBar";
 import { PostPage } from "./components/Posts";
 import { emptyIndex, fetchContent, fetchIndex, getPostsByCategories } from "./utils";
 
+const darkTheme = createMuiTheme({
+  palette: {
+    primary: {
+      main: "#deaa56",
+    },
+    secondary: {
+      main: "#e699a6",
+    },
+    type: "dark",
+  },
+});
+
 const useStyles = makeStyles((theme: Theme) => createStyles({
+  appBarSpacer: theme.mixins.toolbar,
   root: {
-    backgroundColor: "linen",
+    display: "flex",
+  },
+  container: {
+    paddingTop: theme.spacing(4),
+    paddingBottom: theme.spacing(4),
   },
   main: {
-    marginTop: "80px",
+    flexGrow: 1,
+    overflow: "auto",
   },
 }));
 
@@ -66,16 +87,17 @@ const App: React.FC = () => {
   }, [index, currentSlug]);
 
   return (
-    <div className={classes.root}>
+    <ThemeProvider theme={darkTheme}>
       <CssBaseline />
-      <Container maxWidth="lg">
-        <NavBar
-          node={node}
-          setNode={setNode}
-          posts={getPostsByCategories(index.posts)}
-          title={title}
-        />
-        <main className={classes.main}>
+      <NavBar
+        node={node}
+        setNode={setNode}
+        posts={getPostsByCategories(index.posts)}
+        title={title}
+      />
+      <main className={classes.main}>
+        <div className={classes.appBarSpacer} />
+        <Container maxWidth="lg" className={classes.container}>
           <Switch>
             <Route exact
               path="/"
@@ -86,6 +108,15 @@ const App: React.FC = () => {
                     posts={index.posts}
                     title={title}
                   />
+                );
+              }}
+            />
+            <Route exact
+              path="/foodlog"
+              render={() => {
+                setCurrentSlug("");
+                return (
+                  <FitnessTracker />
                 );
               }}
             />
@@ -104,9 +135,9 @@ const App: React.FC = () => {
               }}
             />
           </Switch>
-        </main>
-      </Container>
-    </div>
+        </Container>
+      </main>
+    </ThemeProvider>
   );
 };
 

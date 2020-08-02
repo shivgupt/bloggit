@@ -5,7 +5,7 @@ dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 project="`cat $dir/../package.json | jq .name | tr -d '"'`"
 
 # Turn on swarm mode if it's not already on
-docker swarm init 2> /dev/null || true
+docker swarm init || true
 
 ####################
 # External Env Vars
@@ -19,17 +19,19 @@ BLOG_CONTENT_URL="${BLOG_CONTENT_URL:-https://gitlab.com/bohendo/blog-content/ra
 # Internal Config
 # config & hard-coded stuff you might want to change
 
-number_of_services=3 # NOTE: Gotta update this manually when adding/removing services :(
+number_of_services=4 # NOTE: Gotta update this manually when adding/removing services :(
 
 port=3000
 server_port=8080
 ui_port=3000
+ipfs_port=8080
 
 # docker images
 builder_image="${project}_builder"
 ui_image="$builder_image"
 server_image="${project}_server"
 proxy_image="${project}_proxy"
+ipfs_image="ipfs/go-ipfs:latest"
 
 ####################
 # Deploy according to above configuration
@@ -42,6 +44,7 @@ then
 fi
 
 mkdir -p /tmp/$project
+mkdir -p `pwd`/../blog-content/media
 cat - > /tmp/$project/docker-compose.yml <<EOF
 version: '3.4'
 
@@ -52,6 +55,7 @@ networks:
 volumes:
   certs:
   content:
+  ipfs:
 
 services:
   proxy:
@@ -61,6 +65,7 @@ services:
       MODE: dev
       SERVER_URL: http://server:$server_port
       UI_URL: http://ui:$ui_port
+      IPFS_URL: http://ipfs:$ipfs_port
     networks:
       - $project
     ports:
@@ -78,6 +83,16 @@ services:
     volumes:
       - `pwd`:/root
     working_dir: /root/modules/client
+
+  ipfs:
+    image: $ipfs_image
+    networks:
+      - $project
+    volumes:
+      - ipfs:/data/ipfs
+      - `pwd`/../blog-content/media:/media
+    ports:
+      - 5001:5001
 
   server:
     image: $server_image
@@ -107,4 +122,3 @@ while [[ "`docker container ls | grep $project | wc -l | tr -d ' '`" != "$number
 do echo -n "." && sleep 2
 done
 echo " Good Morning!"
-
