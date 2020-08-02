@@ -66,6 +66,8 @@ clean: stop
 	rm -rf modules/**/build
 	rm -rf modules/**/dist
 
+purge: clean reset
+
 push: push-commit
 push-commit:
 	bash ops/push-images.sh $(commit)
@@ -91,6 +93,20 @@ dls:
 
 test:
 	bash ops/test.sh
+
+########################################
+# Common Prerequisites
+
+builder: $(shell find ops/builder $(find_options))
+	$(log_start)
+	docker build --file ops/builder/Dockerfile $(cache_from) --tag $(project)_builder ops/builder
+	docker tag $(project)_builder $(project)_builder:$(commit)
+	$(log_finish) && mv -f $(totalTime) $(flags)/$@
+
+node-modules: builder package.json $(shell ls modules/**/package.json)
+	$(log_start)
+	$(docker_run) "lerna bootstrap --hoist --no-progress"
+	$(log_finish) && mv -f $(totalTime) $(flags)/$@
 
 ########################################
 # Core Build Rules
@@ -123,18 +139,4 @@ server-js: node-modules $(shell find $(server)/src $(find_options))
 client-js: node-modules $(shell find $(client)/src $(find_options))
 	$(log_start)
 	$(docker_run) "cd modules/client && npm run build"
-	$(log_finish) && mv -f $(totalTime) $(flags)/$@
-
-########################################
-# Common Prerequisites
-
-builder: ops/builder.dockerfile
-	$(log_start)
-	docker build --file ops/builder.dockerfile $(cache_from) --tag $(project)_builder:$(commit) .
-	docker tag $(project)_builder:$(commit) $(project)_builder:latest
-	$(log_finish) && mv -f $(totalTime) $(flags)/$@
-
-node-modules: builder package.json $(shell ls modules/**/package.json)
-	$(log_start)
-	$(docker_run) "lerna bootstrap --hoist --no-progress"
 	$(log_finish) && mv -f $(totalTime) $(flags)/$@
