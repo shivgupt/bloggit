@@ -1,13 +1,14 @@
+import React, { useEffect, useState } from "react";
+
 import {
   Container,
   CssBaseline,
   Theme,
+  ThemeProvider,
+  createMuiTheme,
   createStyles,
   makeStyles,
-  createMuiTheme,
-  ThemeProvider,
 } from "@material-ui/core";
-import React, { useEffect, useState } from "react";
 import { Route, Switch } from "react-router-dom";
 
 import { FitnessTracker } from "./components/FitnessTracker";
@@ -30,9 +31,6 @@ const darkTheme = createMuiTheme({
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
   appBarSpacer: theme.mixins.toolbar,
-  root: {
-    display: "flex",
-  },
   container: {
     paddingTop: theme.spacing(4),
     paddingBottom: theme.spacing(4),

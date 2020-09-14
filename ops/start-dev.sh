@@ -40,6 +40,16 @@ then
   echo "Created ATTACHABLE network with id $id"
 fi
 
+database_secret="${project}_database"
+
+if [[ -z "`docker secret ls | grep $project`" ]]
+then
+  head -c 32 /dev/urandom |\
+    xxd -plain -c 32 |\
+    tr -d '\n\r' |\
+    docker secret create $database_secret -
+fi
+
 mkdir -p /tmp/$project
 mkdir -p `pwd`/../blog-content/media
 cat - > /tmp/$project/docker-compose.yml <<EOF
@@ -52,6 +62,11 @@ networks:
 volumes:
   certs:
   ipfs:
+  database:
+
+secrets:
+  $database_secret:
+    external: true
 
 services:
   proxy:
@@ -90,12 +105,30 @@ services:
     ports:
       - 5001:5001
 
+  postgres:
+    image: postgres:12.3-alpine
+    networks:
+      - $project
+    environment:
+      POSTGRES_DB: $project
+      POSTGRES_PASSWORD_FILE: /run/secrets/$database_secret
+      POSTGRES_USER: $project
+    volumes:
+      - database:/var/lib/postgresql/data
+    secrets:
+      - $database_secret
+
   server:
     image: $server_image
     environment:
       NODE_ENV: development
       BLOG_CONTENT_URL: $BLOG_CONTENT_URL
       PORT: $server_port
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: $project
+      POSTGRES_PASSWORD_FILE: /run/secrets/$database_secret
+      POSTGRES_USER: $project
     networks:
       - $project
     ports:
@@ -104,6 +137,8 @@ services:
       - `pwd`:/root
       - `pwd`/../blog-content:/blog-content
     working_dir: /root/modules/server
+    secrets:
+      - $database_secret
 
 EOF
 

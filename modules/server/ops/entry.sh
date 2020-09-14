@@ -5,6 +5,8 @@ if [[ -d "modules/server" ]]
 then cd modules/server
 fi
 
+export POSTGRES_PASSWORD="`cat $POSTGRES_PASSWORD_FILE`"
+
 if [[ "$NODE_ENV" == "development" ]]
 then
   echo "Starting blog server in dev-mode"
@@ -20,5 +22,3 @@ else
   echo "Starting blog server in prod-mode"
   exec node --no-deprecation dist/entry.js
 fi
-
-
