@@ -1,6 +1,5 @@
 import axios from "axios";
 import { PostIndex, ServerConfig } from "../types";
-import { env } from "./env";
 import { store } from "./cache";
 
 let indexCache: Promise<PostIndex> | undefined;
