@@ -2,12 +2,7 @@
 set -e
 
 curl="curl --insecure "
-
-# if ui container exists then we're in dev mode
-if [[ "$BLOG_PROD" == "true" ]]
-then host="https://localhost"
-else host="http://localhost:3000"
-fi
+host="http://localhost:3000"
 
 echo
 echo "$host/api/config should connect to the server"
@@ -24,4 +19,3 @@ if [[ "$($curl --silent "$host" | tr '[:upper:]' '[:lower:]')" == "<!doctype htm
 then echo "Looks good"
 else echo "Looks not good" && exit 1
 fi
-
