@@ -66,15 +66,8 @@ fi
 
 echo "Let's go, deploying: $tag"
 
-# First, npm publish
-bash ops/npm-publish.sh <<EOF
-y
-$version
-y
-EOF
-
 git checkout prod
-git merge --no-ff main -m "Deploy $tag"
+git merge --no-ff main -m "deploy $tag"
 
 # edit package.json to set new version number
 mv package.json .package.json
