@@ -110,12 +110,12 @@ proxy: $(shell find ops/proxy $(find_options))
 	docker build --file ops/proxy/Dockerfile $(cache_from) --tag $(project)_proxy:latest .
 	$(log_finish) && mv -f $(totalTime) .flags/$@
 
+webserver: client-js $(shell find modules/client/ops $(find_options))
+	$(log_start)
+	docker build --file modules/client/ops/Dockerfile $(cache_from) --tag $(project)_webserver:latest modules/client
+	$(log_finish) && mv -f $(totalTime) .flags/$@
+
 server: server-js $(shell find modules/server/ops $(find_options))
 	$(log_start)
 	docker build --file modules/server/ops/dev.dockerfile $(cache_from) --tag $(project)_server:latest .
-	$(log_finish) && mv -f $(totalTime) .flags/$@
-
-server-prod: server-js $(shell find modules/server/ops $(find_options))
-	$(log_start)
-	docker build --file modules/server/ops/prod.dockerfile $(cache_from) --tag $(project)_server:$(commit) .
 	$(log_finish) && mv -f $(totalTime) .flags/$@
