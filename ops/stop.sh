@@ -8,7 +8,7 @@ docker swarm init 2> /dev/null || true
 # make sure a network for this project has been created
 docker network create --attachable --driver overlay "$project" 2> /dev/null || true
 
-target=$1
+target="${1:-$project}"
 shift
 
 # If a stack matches, stop it & wait for child servies to all exit

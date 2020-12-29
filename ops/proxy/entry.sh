@@ -9,7 +9,7 @@ echo "Proxy container launched in env:"
 echo "DOMAINNAME=$DOMAINNAME"
 echo "EMAIL=$EMAIL"
 echo "WEBSERVER_URL=$WEBSERVER_URL"
-echo "CONTENT_URL=$CONTENT_URL"
+echo "SERVER_URL=$SERVER_URL"
 echo "IPFS_URL=$IPFS_URL"
 
 # Provide a message indicating that we're still waiting for everything to wake up
@@ -30,9 +30,9 @@ while ! curl -s "$WEBSERVER_URL" > /dev/null
 do sleep 2
 done
 
-echo "waiting for $CONTENT_URL..."
-wait-for -q -t 60 "$CONTENT_URL" 2>&1 | sed '/nc: bad address/d'
-while ! curl -s "$CONTENT_URL" > /dev/null
+echo "waiting for $SERVER_URL..."
+wait-for -q -t 60 "$SERVER_URL" 2>&1 | sed '/nc: bad address/d'
+while ! curl -s "$SERVER_URL" > /dev/null
 do sleep 2
 done
 

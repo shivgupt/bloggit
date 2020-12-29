@@ -30,10 +30,13 @@ dev: server proxy
 prod: dev webserver
 
 start: dev
-	bash ops/start-dev.sh
+	bash ops/start.sh
+
+start-prod:
+	BLOG_PROD=true bash ops/start.sh
 
 restart: stop
-	bash ops/start-dev.sh
+	bash ops/start.sh
 
 stop:
 	bash ops/stop.sh
@@ -101,7 +104,7 @@ client-js: node-modules $(shell find modules/client/src $(find_options))
 
 proxy: $(shell find ops/proxy $(find_options))
 	$(log_start)
-	docker build --file ops/proxy/Dockerfile $(cache_from) --tag $(project)_proxy:latest .
+	docker build --file ops/proxy/Dockerfile $(cache_from) --tag $(project)_proxy:latest ops/proxy
 	$(log_finish) && mv -f $(totalTime) .flags/$@
 
 webserver: client-js $(shell find modules/client/ops $(find_options))
