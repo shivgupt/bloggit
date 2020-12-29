@@ -26,20 +26,14 @@ $(shell mkdir -p .flags)
 
 default: dev
 all: dev prod
-dev: proxy server
-prod: proxy-prod server-prod
+dev: server proxy
+prod: dev webserver
 
 start: dev
 	bash ops/start-dev.sh
 
-start-prod:
-	bash ops/start-prod.sh
-
 restart: stop
 	bash ops/start-dev.sh
-
-restart-prod: stop
-	bash ops/start-prod.sh
 
 stop:
 	bash ops/stop.sh
@@ -117,5 +111,5 @@ webserver: client-js $(shell find modules/client/ops $(find_options))
 
 server: server-js $(shell find modules/server/ops $(find_options))
 	$(log_start)
-	docker build --file modules/server/ops/dev.dockerfile $(cache_from) --tag $(project)_server:latest .
+	docker build --file modules/server/ops/Dockerfile $(cache_from) --tag $(project)_server:latest modules/server
 	$(log_finish) && mv -f $(totalTime) .flags/$@
