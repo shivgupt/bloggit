@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -e
 
-dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-project="`cat $dir/../package.json | jq .name | tr -d '"'`"
+root="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." >/dev/null 2>&1 && pwd )"
+project=$(grep -m 1 '"name":' "$root/package.json" | cut -d '"' -f 4)
 
 # Turn on swarm mode if it's not already on
 docker swarm init || true

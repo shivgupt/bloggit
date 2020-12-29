@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -e
 
+root="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." >/dev/null 2>&1 && pwd )"
+project="`cat $root/package.json | jq .name | tr -d '"'`"
+
 # turn on swarm mode if it's not already on
 docker swarm init 2> /dev/null || true
 
@@ -17,8 +20,6 @@ BLOG_EMAIL="${BLOG_EMAIL:-noreply@gmail.com}" # for notifications when ssl certs
 ####################
 # Internal Config
 
-dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-project="`cat $dir/../package.json | jq .name | tr -d '"'`"
 number_of_services="3" # NOTE: Gotta update this manually when adding/removing services :(
 server_port=8080
 ipfs_port=8080
