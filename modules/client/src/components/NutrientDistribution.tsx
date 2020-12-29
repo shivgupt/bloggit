@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { DiscreteColorLegend, RadialChart } from "react-vis";
+import { RadialChart } from "react-vis";
 import {
   Card,
   CardContent,
@@ -42,28 +42,28 @@ export const NutrientDistribution = (props: any) => {
         <Divider variant="middle"/>
 
         <Typography variant="caption">
-          🌾 {Math.round(totalNutrients.carbohydrates)}g
+          <span role="img" aria-label="carbs">🌾</span> {Math.round(totalNutrients.carbohydrates)}g
           <br />
-          ~ {Math.round(data[data.findIndex(o => o.label === 'c')].angle)}% Carb
+          ~ {Math.round(data[data.findIndex(o => o.label === "c")].angle)}% Carb
         </Typography>
         &nbsp;
         <Divider orientation="vertical" flexItem />
         &nbsp;
         <Typography variant="caption">
-          🥩 {Math.round(totalNutrients.protein)}g
+          <span role="img" aria-label="protein">🥩</span> {Math.round(totalNutrients.protein)}g
           <br />
-          ~ {Math.round(data[data.findIndex(o => o.label === 'p')].angle)}% Protein
+          ~ {Math.round(data[data.findIndex(o => o.label === "p")].angle)}% Protein
         </Typography>
         &nbsp;
         <Divider orientation="vertical" flexItem />
         &nbsp;
         <Typography variant="caption">
-          🧈 {Math.round(totalNutrients.fat)}g
+          <span role="img" aria-label="fat">🧈</span> {Math.round(totalNutrients.fat)}g
           <br />
-          ~ {Math.round(data[data.findIndex(o => o.label === 'f')].angle)}% Fat
+          ~ {Math.round(data[data.findIndex(o => o.label === "f")].angle)}% Fat
         </Typography>
       </div>
-    )
+    );
   };
 
   const openInfoDialog = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -120,8 +120,8 @@ export const NutrientDistribution = (props: any) => {
           onClose={() => setOpen(!open)}
           anchorEl={anchorEl}
           anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'left',
+            vertical: "bottom",
+            horizontal: "left",
           }}
         >
           <Card>

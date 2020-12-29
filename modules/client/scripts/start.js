@@ -81,6 +81,7 @@ checkBrowsers(paths.appPath, isInteractive)
     const useTypeScript = fs.existsSync(paths.appTsConfig);
     const tscCompileOnError = process.env.TSC_COMPILE_ON_ERROR === 'true';
     const urls = prepareUrls(protocol, HOST, port);
+    console.log(`Prepared urls: ${JSON.stringify(urls, null, 2)}`);
     const devSocket = {
       warnings: warnings =>
         devServer.sockWrite(devServer.sockets, 'warnings', warnings),

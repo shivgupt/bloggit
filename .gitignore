@@ -1,33 +1,15 @@
 # Cache
-.cache
-.config
-.node-gyp
-.npm
-modules/**/.cache
-modules/**/.config
-modules/**/.node-gyp
-modules/**/.npm
+**/.cache
+**/.config
+**/.docker-compose.yml
+**/.node-gyp
+**/.npm
 
 # Compiled output
+.flags
 build/
 dist/
 node_modules/
-.makeflags
-
-# Logs
-lerna-debug.log*
-npm-debug.log*
-package.json.lerna_backup
-
-# OS
-.bash_history
-.DS_Store
-
-# Tests
-.nyc_output
-coverage
-cypress/screenshots
-cypress/videos
 
 # IDEs and editors
 *.launch
@@ -40,7 +22,14 @@ cypress/videos
 .settings/
 .vscode
 
+# Logs
+*.log*
+package.json.lerna_backup
+
 # Misc
+**/.env
 .rpt2_cache
-.env
-modules/**/.env
+
+# OS
+.bash_history
+.DS_Store

@@ -14,7 +14,6 @@ import {
 } from "@material-ui/core";
 import {
   AddCircle as AddIcon,
-  Close as CloseIcon,
   RemoveCircle as RemoveIcon,
 } from "@material-ui/icons";
 
@@ -37,6 +36,7 @@ export const NutritionInfo = (props: any) => {
   const { info, setInfo } = props;
   const [total, setTotal] = useState(getTotalNutrientsDish(info.dish));
 
+  console.log(total);
   const toggleInfo = () => setInfo({ ...info, open: !info.open });
   const addServing = () => {
     const newInfo = deepCopy(info);
@@ -51,7 +51,7 @@ export const NutritionInfo = (props: any) => {
     newInfo.dish.serving -= 0.5;
     setInfo(newInfo);
     console.log(getTotalNutrientsDish(newInfo.dish));
-    console.log(newInfo.dish)
+    console.log(newInfo.dish);
     setTotal(getTotalNutrientsDish(newInfo.dish));
   };
   const save = () => { props.addDish(info.dish)(); toggleInfo(); };
