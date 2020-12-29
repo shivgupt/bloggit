@@ -3,12 +3,12 @@
 null_ui=localhost
 
 EMAIL="${EMAIL:-noreply@gmail.com}"
-UI_URL="${UI_URL:-$null_ui}"
+WEBSERVER_URL="${WEBSERVER_URL:-$null_ui}"
 
 echo "Proxy container launched in env:"
 echo "DOMAINNAME=$DOMAINNAME"
 echo "EMAIL=$EMAIL"
-echo "UI_URL=$UI_URL"
+echo "WEBSERVER_URL=$WEBSERVER_URL"
 echo "CONTENT_URL=$CONTENT_URL"
 echo "IPFS_URL=$IPFS_URL"
 
@@ -24,6 +24,12 @@ loading_pid="$!"
 ########################################
 # Wait for downstream services to wake up
 
+echo "waiting for $WEBSERVER_URL..."
+wait-for -q -t 60 "$WEBSERVER_URL" 2>&1 | sed '/nc: bad address/d'
+while ! curl -s "$WEBSERVER_URL" > /dev/null
+do sleep 2
+done
+
 echo "waiting for $CONTENT_URL..."
 wait-for -q -t 60 "$CONTENT_URL" 2>&1 | sed '/nc: bad address/d'
 while ! curl -s "$CONTENT_URL" > /dev/null
@@ -35,15 +41,6 @@ wait-for -q -t 60 "$IPFS_URL" 2>&1 | sed '/nc: bad address/d'
 while ! curl -s "$IPFS_URL" > /dev/null
 do sleep 2
 done
-
-if [[ "$UI_URL" == "$null_ui" ]]
-then
-  echo "waiting for ${UI_URL#*://}..."
-  wait-for -q -t 60 "$UI_URL" 2>&1 | sed '/nc: bad address/d'
-  while ! curl -s "$UI_URL" > /dev/null
-  do sleep 2
-  done
-fi
 
 # Kill the loading message server
 kill "$loading_pid" && pkill nc
