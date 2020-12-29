@@ -32,9 +32,6 @@ prod: dev webserver
 start: dev
 	bash ops/start.sh
 
-start-prod:
-	BLOG_PROD=true bash ops/start.sh
-
 restart: stop
 	bash ops/start.sh
 

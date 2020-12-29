@@ -55,11 +55,11 @@ bash "$root/ops/pull-images.sh" "$ipfs_image"
 
 server_internal_port=8080
 server_env="environment:
-      NODE_ENV: development
       BLOG_CONTENT_BRANCH: $BLOG_CONTENT_BRANCH
       BLOG_CONTENT_DIR: $BLOG_CONTENT_DIR
       BLOG_CONTENT_REPO: $BLOG_CONTENT_REPO
       BLOG_CONTENT_URL: $BLOG_CONTENT_URL
+      BLOG_PROD: $BLOG_PROD
       PORT: $server_internal_port"
 
 if [[ "$BLOG_PROD" == "true" ]]
