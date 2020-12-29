@@ -106,14 +106,9 @@ client-js: node-modules $(shell find modules/client/src $(find_options))
 ########################################
 # Build docker images
 
-proxy: $(shell find modules/proxy $(find_options))
+proxy: $(shell find ops/proxy $(find_options))
 	$(log_start)
-	docker build --file modules/proxy/dev.dockerfile $(cache_from) --tag $(project)_proxy:latest .
-	$(log_finish) && mv -f $(totalTime) $(flags)/$@
-
-proxy-prod: client-js $(shell find modules/proxy $(find_options))
-	$(log_start)
-	docker build --file modules/proxy/prod.dockerfile $(cache_from) --tag $(project)_proxy:$(commit) .
+	docker build --file ops/proxy/Dockerfile $(cache_from) --tag $(project)_proxy:latest .
 	$(log_finish) && mv -f $(totalTime) $(flags)/$@
 
 server: server-js $(shell find modules/server/ops $(find_options))

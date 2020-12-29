@@ -1,19 +1,21 @@
 #!/bin/bash
 
-# Set default email & domain name
-domain="${DOMAINNAME:-localhost}"
-email="${EMAIL:-noreply@gmail.com}"
-mode="${MODE:-dev}"
-server_url="${SERVER_URL}"
-ui_url="${UI_URL}"
-ipfs_url="${IPFS_URL}"
+null_ui=localhost
 
-echo "domain=$domain email=$email mode=$mode server=$server_url ui=$ui_url"
+EMAIL="${EMAIL:-noreply@gmail.com}"
+UI_URL="${UI_URL:-$null_ui}"
+
+echo "Proxy container launched in env:"
+echo "DOMAINNAME=$DOMAINNAME"
+echo "EMAIL=$EMAIL"
+echo "UI_URL=$UI_URL"
+echo "CONTENT_URL=$CONTENT_URL"
+echo "IPFS_URL=$IPFS_URL"
 
 # Provide a message indicating that we're still waiting for everything to wake up
 function loading_msg {
   while true # unix.stackexchange.com/a/37762
-  do echo 'Waiting for the rest of the app to wake up..' | nc -lk -p 80
+  do echo -e "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\nWaiting for proxy to wake up" | nc -lk -p 80
   done > /dev/null
 }
 loading_msg &
@@ -21,28 +23,24 @@ loading_pid="$!"
 
 ########################################
 # Wait for downstream services to wake up
-# Define service hostnames & ports we depend on
 
-echo "waiting for ${server_url#*://}..."
-bash wait_for.sh -t 60 ${server_url#*://} 2> /dev/null
-# Do a more thorough check to ensure the dashboard is online
-while ! curl -s $server_url > /dev/null
+echo "waiting for $CONTENT_URL..."
+wait-for -q -t 60 "$CONTENT_URL" 2>&1 | sed '/nc: bad address/d'
+while ! curl -s "$CONTENT_URL" > /dev/null
 do sleep 2
 done
 
-echo "waiting for ${ipfs_url#*://}..."
-bash wait_for.sh -t 60 ${ipfs_url#*://} 2> /dev/null
-# Do a more thorough check to ensure the dashboard is online
-while ! curl -s $ipfs_url > /dev/null
+echo "waiting for $IPFS_URL..."
+wait-for -q -t 60 "$IPFS_URL" 2>&1 | sed '/nc: bad address/d'
+while ! curl -s "$IPFS_URL" > /dev/null
 do sleep 2
 done
 
-if [[ "$mode" == "dev" ]]
+if [[ "$UI_URL" == "$null_ui" ]]
 then
-  echo "waiting for ${ui_url#*://}..."
-  bash wait_for.sh -t 60 ${ui_url#*://} 2> /dev/null
-  # Do a more thorough check to ensure the dashboard is online
-  while ! curl -s $ui_url > /dev/null
+  echo "waiting for ${UI_URL#*://}..."
+  wait-for -q -t 60 "$UI_URL" 2>&1 | sed '/nc: bad address/d'
+  while ! curl -s "$UI_URL" > /dev/null
   do sleep 2
   done
 fi
@@ -51,57 +49,79 @@ fi
 kill "$loading_pid" && pkill nc
 
 ########################################
+# If no domain name provided, start up in http mode
+
+if [[ -z "$DOMAINNAME" ]]
+then
+  cp /etc/ssl/cert.pem ca-certs.pem
+  echo "Entrypoint finished, executing haproxy in http mode..."; echo
+  exec haproxy -db -f http.cfg
+fi
+
+########################################
 # Setup SSL Certs
 
 letsencrypt=/etc/letsencrypt/live
-devcerts=$letsencrypt/localhost
-mkdir -p $devcerts
-mkdir -p /etc/certs
+certsdir=$letsencrypt/$DOMAINNAME
+mkdir -p /etc/haproxy/certs
 mkdir -p /var/www/letsencrypt
 
-if [[ "$domain" == "localhost" && ! -f "$devcerts/privkey.pem" ]]
+if [[ "$DOMAINNAME" == "localhost" && ! -f "$certsdir/privkey.pem" ]]
 then
   echo "Developing locally, generating self-signed certs"
-  openssl req -x509 -newkey rsa:4096 -keyout $devcerts/privkey.pem -out $devcerts/fullchain.pem -days 365 -nodes -subj '/CN=localhost'
+  mkdir -p "$certsdir"
+  openssl req -x509 -newkey rsa:4096 -keyout "$certsdir/privkey.pem" -out "$certsdir/fullchain.pem" -days 365 -nodes -subj '/CN=localhost'
 fi
 
-if [[ ! -f "$letsencrypt/$domain/privkey.pem" ]]
+if [[ ! -f "$certsdir/privkey.pem" ]]
 then
-  echo "Couldn't find certs for $domain, using certbot to initialize those now.."
-  certbot certonly --standalone -m $email --agree-tos --no-eff-email -d $domain -n
-  [[ $? -eq 0 ]] || sleep 9999 # FREEZE! Don't pester eff & get throttled
+  echo "Couldn't find certs for $DOMAINNAME, using certbot to initialize those now.."
+  certbot certonly --standalone -m "$EMAIL" --agree-tos --no-eff-email -d "$DOMAINNAME" -n --cert-name "$DOMAINNAME"
+  code=$?
+  if [[ "$code" -ne 0 ]]
+  then
+    echo "certbot exited with code $code, freezing to debug (and so we don't get throttled)"
+    sleep 9999 # FREEZE! Don't pester eff & get throttled
+    exit 1;
+  fi
 fi
 
-echo "Using certs for $domain"
-ln -sf $letsencrypt/$domain/privkey.pem /etc/certs/privkey.pem
-ln -sf $letsencrypt/$domain/fullchain.pem /etc/certs/fullchain.pem
+echo "Using certs for $DOMAINNAME"
 
-# Hack way to implement variables in the nginx.conf file
-sed -i 's/$hostname/'"$domain"'/' /etc/nginx/nginx.conf
-sed -i 's|$UI_URL|'"$ui_url"'|' /etc/nginx/nginx.conf
-sed -i 's|$IPFS_URL|'"$ipfs_url"'|' /etc/nginx/nginx.conf
-sed -i 's|$SERVER_URL|'"$server_url"'|' /etc/nginx/nginx.conf
+export CERTBOT_PORT=31820
+
+function copycerts {
+  if [[ -f $certsdir/fullchain.pem && -f $certsdir/privkey.pem ]]
+  then cat "$certsdir/fullchain.pem" "$certsdir/privkey.pem" > "$DOMAINNAME.pem"
+  else
+    echo "Couldn't find certs, freezing to debug"
+    sleep 9999;
+    exit 1
+  fi
+}
 
 # periodically fork off & see if our certs need to be renewed
 function renewcerts {
+  sleep 3 # give proxy a sec to wake up before attempting first renewal
   while true
   do
     echo -n "Preparing to renew certs... "
-    if [[ -d "/etc/letsencrypt/live/$domain" ]]
+    if [[ -d "$certsdir" ]]
     then
-      echo -n "Found certs to renew for $domain... "
-      certbot renew --webroot -w /var/www/letsencrypt/ -n
+      echo -n "Found certs to renew for $DOMAINNAME... "
+      certbot renew -n --standalone --http-01-port=$CERTBOT_PORT
+      copycerts
       echo "Done!"
     fi
     sleep 48h
   done
 }
 
-if [[ "$domain" != "localhost" ]]
-then renewcerts &
-fi
+renewcerts &
 
-sleep 3 # give renewcerts a sec to do it's first check
+copycerts
 
-echo "Entrypoint finished, executing nginx..."; echo
-exec nginx
+cp /etc/ssl/cert.pem ca-certs.pem
+
+echo "Entrypoint finished, executing haproxy in https mode..."; echo
+exec haproxy -db -f https.cfg
