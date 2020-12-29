@@ -55,33 +55,33 @@ bash "$root/ops/pull-images.sh" "$ipfs_image"
 
 server_internal_port=8080
 server_env="environment:
-      NODE_ENV: development
-      BLOG_CONTENT_BRANCH: $BLOG_CONTENT_BRANCH
-      BLOG_CONTENT_DIR: $BLOG_CONTENT_DIR
-      BLOG_CONTENT_REPO: $BLOG_CONTENT_REPO
-      BLOG_CONTENT_URL: $BLOG_CONTENT_URL
-      PORT: $server_internal_port"
+      BLOG_CONTENT_BRANCH: '$BLOG_CONTENT_BRANCH'
+      BLOG_CONTENT_DIR: '$BLOG_CONTENT_DIR'
+      BLOG_CONTENT_REPO: '$BLOG_CONTENT_REPO'
+      BLOG_CONTENT_URL: '$BLOG_CONTENT_URL'
+      BLOG_PROD: '$BLOG_PROD'
+      PORT: '$server_internal_port'"
 
 if [[ "$BLOG_PROD" == "true" ]]
 then
   server_image="${project}_server:$version"
   server_service="server:
-    image: $server_image
+    image: '$server_image'
     $common
     $server_env
     volumes:
-      - content:/blog-content"
+      - 'content:/blog-content'"
 
 else
   server_image="${project}_builder:$version"
   server_service="server:
-    image: $server_image
+    image: '$server_image'
     $common
     $server_env
     entrypoint: 'bash modules/server/ops/entry.sh'
     volumes:
-      - $root:/root
-      - content:/blog-content"
+      - '$root:/root'
+      - 'content:/blog-content'"
 
 fi
 bash "$root/ops/pull-images.sh" "$server_image"
@@ -95,20 +95,20 @@ if [[ "$BLOG_PROD" == "true" ]]
 then
   webserver_image="${project}_webserver:$version"
   webserver_service="webserver:
-    image: $webserver_image
+    image: '$webserver_image'
     $common"
 
 else
   webserver_image="${project}_builder:$version"
   webserver_service="webserver:
-    image: $webserver_image
+    image: '$webserver_image'
     $common
     entrypoint: 'npm start'
     environment:
-      NODE_ENV: development
+      NODE_ENV: 'development'
     volumes:
-      - $root:/root
-    working_dir: /root/modules/client"
+      - '$root:/root'
+    working_dir: '/root/modules/client'"
 
 fi
 bash "$root/ops/pull-images.sh" "$webserver_image"
@@ -154,32 +154,32 @@ volumes:
 
 services:
   proxy:
-    image: $proxy_image
+    image: '$proxy_image'
     $common
     $proxy_ports
     environment:
-      DOMAINNAME: $BLOG_DOMAINNAME
-      EMAIL: $BLOG_EMAIL
-      IPFS_URL: ipfs:$ipfs_internal_port
-      SERVER_URL: server:$server_internal_port
-      WEBSERVER_URL: webserver:$webserver_internal_port
+      DOMAINNAME: '$BLOG_DOMAINNAME'
+      EMAIL: '$BLOG_EMAIL'
+      IPFS_URL: 'ipfs:$ipfs_internal_port'
+      SERVER_URL: 'server:$server_internal_port'
+      WEBSERVER_URL: 'webserver:$webserver_internal_port'
     ports:
-      - "$public_port:80"
+      - '$public_port:80'
     volumes:
-      - certs:/etc/letsencrypt
+      - 'certs:/etc/letsencrypt'
 
   $webserver_service
 
   $server_service
 
   ipfs:
-    image: $ipfs_image
+    image: '$ipfs_image'
     $common
     volumes:
-      - ipfs:/data/ipfs
-      - $BLOG_MEDIA_DIR:/media
+      - 'ipfs:/data/ipfs'
+      - '$BLOG_MEDIA_DIR:/media'
     ports:
-      - 5001:5001
+      - '5001:5001'
 
 EOF
 

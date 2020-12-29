@@ -32,9 +32,6 @@ prod: dev webserver
 start: dev
 	bash ops/start.sh
 
-start-prod:
-	BLOG_PROD=true bash ops/start.sh
-
 restart: stop
 	bash ops/start.sh
 
@@ -105,14 +102,17 @@ client-js: node-modules $(shell find modules/client/src $(find_options))
 proxy: $(shell find ops/proxy $(find_options))
 	$(log_start)
 	docker build --file ops/proxy/Dockerfile $(cache_from) --tag $(project)_proxy:latest ops/proxy
+	docker tag $(project)_proxy:latest $(project)_proxy:$(commit)
 	$(log_finish) && mv -f $(totalTime) .flags/$@
 
 webserver: client-js $(shell find modules/client/ops $(find_options))
 	$(log_start)
 	docker build --file modules/client/ops/Dockerfile $(cache_from) --tag $(project)_webserver:latest modules/client
+	docker tag $(project)_webserver:latest $(project)_webserver:$(commit)
 	$(log_finish) && mv -f $(totalTime) .flags/$@
 
 server: server-js $(shell find modules/server/ops $(find_options))
 	$(log_start)
 	docker build --file modules/server/ops/Dockerfile $(cache_from) --tag $(project)_server:latest modules/server
+	docker tag $(project)_server:latest $(project)_server:$(commit)
 	$(log_finish) && mv -f $(totalTime) .flags/$@
