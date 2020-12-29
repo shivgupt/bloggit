@@ -57,11 +57,6 @@ deploy:
         ssh-action $BLOG_SERVER $SSH_KEY '
           git checkout --force prod;
           git reset --hard $CI_COMMIT_SHA;
-          export BLOG_CONTENT_BRANCH="$BLOG_CONTENT_BRANCH";
-          export BLOG_CONTENT_DIR="$BLOG_CONTENT_DIR";
-          export BLOG_CONTENT_REPO="$BLOG_CONTENT_REPO";
-          export BLOG_CONTENT_URL="$BLOG_CONTENT_URL";
-          export BLOG_DOMAINNAME="$BLOG_DOMAINNAME";
           export BLOG_PROD="true";
           make pull-commit;
           make restart;
