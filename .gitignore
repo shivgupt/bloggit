@@ -12,7 +12,7 @@ modules/**/.npm
 build/
 dist/
 node_modules/
-.makeflags
+.flags
 
 # Logs
 lerna-debug.log*

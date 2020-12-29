@@ -1,6 +1,5 @@
 # Specify make-specific variables (VPATH = prerequisite search path)
-flags=.makeflags
-VPATH=$(flags)
+VPATH=.flags
 SHELL=/bin/bash
 
 dir=$(shell cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )
@@ -14,13 +13,13 @@ registry=registry.gitlab.com/$(user)/$(project)
 # Pool of images to pull cached layers from during docker build steps
 cache_from=$(shell if [[ -n "${CI}" ]]; then echo "--cache-from=$(project)_server:$(commit),$(project)_server:latest,$(project)_builder:latest,$(project)_proxy:$(commit),$(project)_proxy:latest"; else echo ""; fi)
 
-startTime=$(flags)/.startTime
-totalTime=$(flags)/.totalTime
+startTime=.flags/.startTime
+totalTime=.flags/.totalTime
 log_start=@echo "=============";echo "[Makefile] => Start building $@"; date "+%s" > $(startTime)
 log_finish=@echo $$((`date "+%s"` - `cat $(startTime)`)) > $(totalTime); rm $(startTime); echo "[Makefile] => Finished building $@ in `cat $(totalTime)` seconds";echo "=============";echo
 
 # Env setup
-$(shell mkdir -p .makeflags)
+$(shell mkdir -p .flags)
 
 ########################################
 # Command & Control Shortcuts
@@ -50,7 +49,7 @@ reset: stop
 
 clean: stop
 	docker container prune -f
-	rm -rf $(flags)/*
+	rm -rf .flags/*
 	rm -rf modules/**/build
 	rm -rf modules/**/dist
 
@@ -89,7 +88,7 @@ builder: $(shell find ops/builder $(find_options))
 	$(log_start)
 	docker build --file ops/builder/Dockerfile $(cache_from) --tag $(project)_builder ops/builder
 	docker tag $(project)_builder $(project)_builder:$(commit)
-	$(log_finish) && mv -f $(totalTime) $(flags)/$@
+	$(log_finish) && mv -f $(totalTime) .flags/$@
 
 node-modules: builder package.json $(shell ls modules/**/package.json)
 	bash ops/maketh.sh $@
@@ -109,14 +108,14 @@ client-js: node-modules $(shell find modules/client/src $(find_options))
 proxy: $(shell find ops/proxy $(find_options))
 	$(log_start)
 	docker build --file ops/proxy/Dockerfile $(cache_from) --tag $(project)_proxy:latest .
-	$(log_finish) && mv -f $(totalTime) $(flags)/$@
+	$(log_finish) && mv -f $(totalTime) .flags/$@
 
 server: server-js $(shell find modules/server/ops $(find_options))
 	$(log_start)
 	docker build --file modules/server/ops/dev.dockerfile $(cache_from) --tag $(project)_server:latest .
-	$(log_finish) && mv -f $(totalTime) $(flags)/$@
+	$(log_finish) && mv -f $(totalTime) .flags/$@
 
 server-prod: server-js $(shell find modules/server/ops $(find_options))
 	$(log_start)
 	docker build --file modules/server/ops/prod.dockerfile $(cache_from) --tag $(project)_server:$(commit) .
-	$(log_finish) && mv -f $(totalTime) $(flags)/$@
+	$(log_finish) && mv -f $(totalTime) .flags/$@
