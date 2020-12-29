@@ -45,15 +45,6 @@ restart-prod: stop
 stop:
 	bash ops/stop.sh
 
-reset: stop
-	docker container prune -f
-
-clean: stop
-	docker container prune -f
-	rm -rf $(flags)/*
-	rm -rf modules/**/build
-	rm -rf modules/**/dist
-
 purge: clean reset
 
 push: push-commit
@@ -76,35 +67,19 @@ pull-release:
 build-report:
 	bash ops/build-report.sh
 
-dls:
-	@docker service ls && echo '=====' && docker container ls -a
-
 test:
 	bash ops/test.sh
 
 ########################################
 # Common Prerequisites
 
-builder: $(shell find ops/builder $(find_options))
+node-modules: package.json $(shell ls modules/**/package.json)
 	$(log_start)
-	docker build --file ops/builder/Dockerfile $(cache_from) --tag $(project)_builder ops/builder
-	docker tag $(project)_builder $(project)_builder:$(commit)
+	lerna bootstrap --hoist --no-progress
 	$(log_finish) && mv -f $(totalTime) $(flags)/$@
 
-node-modules: builder package.json $(shell ls modules/**/package.json)
-	bash ops/maketh.sh $@
-
 ########################################
-# Compile/Transpile src
-
-server-js: node-modules $(shell find modules/server/src $(find_options))
-	bash ops/maketh.sh $@
-
-client-js: node-modules $(shell find modules/client/src $(find_options))
-	bash ops/maketh.sh $@
-
-########################################
-# Build docker images
+# Core Build Rules
 
 proxy: $(shell find modules/proxy $(find_options))
 	$(log_start)
@@ -124,4 +99,14 @@ server: server-js $(shell find modules/server/ops $(find_options))
 server-prod: server-js $(shell find modules/server/ops $(find_options))
 	$(log_start)
 	docker build --file modules/server/ops/prod.dockerfile $(cache_from) --tag $(project)_server:$(commit) .
+	$(log_finish) && mv -f $(totalTime) $(flags)/$@
+
+server-js: node-modules $(shell find modules/server/src $(find_options))
+	$(log_start)
+	cd modules/server && npm run build
+	$(log_finish) && mv -f $(totalTime) $(flags)/$@
+
+client-js: node-modules $(shell find modules/client/src $(find_options))
+	$(log_start)
+	cd modules/client && npm run build
 	$(log_finish) && mv -f $(totalTime) $(flags)/$@
