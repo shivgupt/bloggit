@@ -25,7 +25,7 @@ test:
   script:
     - apk add bash curl git jq make
     - make pull-commit
-    - BLOG_PROD=true make start
+    - BLOG_PROD=true make restart
     - sleep 15
     - make dls
     - docker service logs --raw --tail 100 blog_server
