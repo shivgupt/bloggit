@@ -56,14 +56,14 @@ if [[ -z "$version" || "$version" == "$current_version" ]]
 then echo "Aborting: A new, unique $project version is required" && exit 1
 fi
 
-echo "Confirm: we'll deploy the current main branch as $project-$version (y/n)?"
+tag=v$version
+echo "Confirm: we'll deploy the current main branch as $tag (y/n)?"
 read -p "> " -r
 echo
 if [[ ! "$REPLY" =~ ^[Yy]$ ]]
 then echo "Aborting by user request" && exit 1 # abort!
 fi
 
-tag=v$version
 echo "Let's go, deploying: $tag"
 
 # First, npm publish
