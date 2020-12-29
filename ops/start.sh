@@ -163,8 +163,6 @@ services:
       IPFS_URL: 'ipfs:$ipfs_internal_port'
       SERVER_URL: 'server:$server_internal_port'
       WEBSERVER_URL: 'webserver:$webserver_internal_port'
-    ports:
-      - '$public_port:80'
     volumes:
       - 'certs:/etc/letsencrypt'
 
