@@ -47,7 +47,6 @@ export const fetchIndex = async(): Promise<PostIndex> => {
   // Set some default values
   Object.keys(index!.posts).forEach(slug => {
     const post = index.posts[slug];
-    index.posts[slug].category = post.path.substring(0, post.path.indexOf("/")) || "default";
     index.posts[slug].content = post.content || "";
     index.posts[slug].slug = slug;
   });

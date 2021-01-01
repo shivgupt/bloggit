@@ -1,55 +1,66 @@
 import {
+  Card,
+  CardActionArea,
+  CardContent,
+  CardHeader,
+  CardMedia,
+  Grid,
+  Theme,
+  Typography,
   createStyles,
   makeStyles,
-  Paper,
-  Theme,
+  Toolbar,
 } from "@material-ui/core";
-import React from "react";
-import Markdown from "react-markdown";
-import emoji from "emoji-dictionary";
-
-import { CodeBlockRenderer } from "./CodeBlock";
-import { HeadingRenderer } from "./HeadingRenderer";
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { groupByCategory } from "../utils";
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
   root: {
-    flexGrow: 1,
+    display: "flex",
+    alignContent: "center",
+    alignItems: "center",
   },
-  text: {
-    padding: "20px",
-    textAlign: "justify",
-    fontVariant: "discretionary-ligatures",
+  card: {
+    width: "100%",
+    height: 300,
+  },
+  media: {
+    maxHeight: 150,
   },
 }));
 
-export const PostPage = (props: any) => {
-  const classes = useStyles();
+export const Posts = (props: any) => {
+    const classes = useStyles();
+    const { posts } = props;
 
-  const emojiSupport = text =>
-    text.value.replace(/:\w+:/gi, name =>
-      emoji.getUnicode(name) || name);
-
-  const Image = (props: any) => {
-    return <img
-      { ...props }
-      src={props.src}
-      alt={props.alt}
-      style={{ maxWidth: "100%", height: "200px", width: "200px" }}
-    />;
-  };
-
-  return (
-    <Paper variant="outlined">
-      <Markdown
-        source={props.content}
-        className={classes.text}
-        renderers={{
-          heading: HeadingRenderer,
-          code: CodeBlockRenderer,
-          text: emojiSupport,
-          image: Image,
-        }}
-      />
-    </Paper>
-  );
+    console.log(posts)
+    if (!posts) return <p> Loading </p>;
+    return (
+    <Grid container spacing={3} justify={"space-around"} alignItems={"center"}>
+    {posts.map(post => {
+        return (
+        <Grid className={classes.root} item xs={12} md={6} lg={4} key={post.slug}>
+            <Card className={classes.card}>
+            <CardActionArea component={Link} to={`/${post.slug}`}>
+                <CardHeader title={post.title} />
+                {post.img
+                ? <CardMedia
+                    className={classes.media}
+                    component="img"
+                    image={post.img}
+                    title={post.slug}/>
+                : null}
+                <CardContent>
+                <Typography variant="body2" component="p">
+                    {post.tldr}
+                </Typography>
+                </CardContent>
+            </CardActionArea>
+            </Card>
+        </Grid>
+        );
+    })}
+    </Grid>
+    );
 };

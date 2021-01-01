@@ -107,3 +107,15 @@ export const getProfileStoreObjFromState = (profile: FitnessProfile) => {
   }
   return newProfile;
 };
+
+export const groupByCategory = (posts: { [slug: string]: PostData }) => {
+  return (
+    Object.values(posts).reduce((categories, post) => ({
+      ...categories,
+      [post.category]: [
+        ...(categories[post.category] || []),
+        post
+      ]
+    }), {})
+  );
+};
