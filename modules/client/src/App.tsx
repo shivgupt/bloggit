@@ -59,7 +59,7 @@ const App: React.FC = () => {
   useEffect(() => {
     (async () => { 
       const index = await fetchIndex();
-      setIndex(index)
+      setIndex(index);
       setPostsByCategories(getPostsByCategories(index.posts));
     })();
   }, []);
