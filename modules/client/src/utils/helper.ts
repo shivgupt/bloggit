@@ -17,14 +17,12 @@ export const getChildValue = (child) => {
 };
 
 export const getPostsByCategories = (posts: { [slug: string]: PostData }) => {
-  let postsByCategory = {};
-  Object.keys(posts).forEach(slug => {
-    if (postsByCategory[posts[slug].category])
-      postsByCategory[posts[slug].category].push(posts[slug]);
-    else
-      postsByCategory[posts[slug].category] = [posts[slug]];
-  });
-  return postsByCategory;
+  return (
+    Object.values(posts).reduce((categories, post) => ({
+      ...categories,
+      [post.category]: [...(categories[post.category]||[]), post]
+    }))
+  );
 };
 
 export const getTotalNutrientsDish = (dish: Dish) => {

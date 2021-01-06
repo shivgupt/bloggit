@@ -52,11 +52,16 @@ const App: React.FC = () => {
   });
   const [index, setIndex] = useState(emptyIndex);
   const [currentSlug, setCurrentSlug] = useState("");
+  const [postsByCategories, setPostsByCategories] = useState({});
   const [title, setTitle] = useState({ site: "", page: "" });
 
   // Only once: get the content index
   useEffect(() => {
-    (async () => setIndex(await fetchIndex()))();
+    (async () => { 
+      const index = await fetchIndex();
+      setIndex(index)
+      setPostsByCategories(getPostsByCategories(index.posts));
+    })();
   }, []);
 
   // Set post content if slug changes
@@ -92,7 +97,7 @@ const App: React.FC = () => {
       <NavBar
         node={node}
         setNode={setNode}
-        posts={getPostsByCategories(index.posts)}
+        posts={postsByCategories}
         title={title}
       />
       <main className={classes.main}>
