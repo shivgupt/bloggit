@@ -20,8 +20,8 @@ export const getPostsByCategories = (posts: { [slug: string]: PostData }) => {
   return (
     Object.values(posts).reduce((categories, post) => ({
       ...categories,
-      [post.category]: [...(categories[post.category]||[]), post]
-    }))
+      [post.category]: [ ...(categories[post.category]||[]), post ]
+    }), {})
   );
 };
 
