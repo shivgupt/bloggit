@@ -34,12 +34,14 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
     display: "flex",
   },
   container: {
-    paddingTop: theme.spacing(4),
-    paddingBottom: theme.spacing(4),
+    [theme.breakpoints.up("md")]: {
+      width: "80%",
+      marginRight: "20%",
+    },
   },
   main: {
     flexGrow: 1,
-    overflow: "auto",
+    padding: theme.spacing(3),
   },
 }));
 

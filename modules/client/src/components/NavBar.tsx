@@ -1,5 +1,7 @@
 import {
   AppBar,
+  Drawer,
+  Hidden,
   IconButton,
   SwipeableDrawer,
   Toolbar,
@@ -16,11 +18,26 @@ import { Link } from "react-router-dom";
 import { Toc } from "./ToC";
 
 const useStyles = makeStyles(theme => ({
+  appBar: {
+    [theme.breakpoints.up("md")]: {
+      width: "80%",
+      marginRight: "20%",
+    },
+  },
+  drawer: {
+    [theme.breakpoints.up("md")]: {
+      width: "20%",
+      flexShrink: 0,
+    },
+  },
   grow: {
     borderBottom: `5px solid ${theme.palette.divider}`,
   },
   homeButton: {
     marginRight: theme.spacing(2),
+  },
+  permanentDrawer: {
+    width: "20%",
   },
   list: {
     width: "40%",
@@ -48,7 +65,7 @@ export const NavBar = (props: any) => {
 
   return (
     <>
-      <AppBar position="fixed">
+      <AppBar position="fixed" className={classes.appBar}>
         <Toolbar>
           <IconButton
             component={Link}
@@ -77,26 +94,42 @@ export const NavBar = (props: any) => {
           >
             <LogIcon />
           </IconButton>
-          <IconButton
-            edge="start"
-            color="inherit"
-            aria-label="open drawer"
-            onClick={toggleDrawer(true)}
-            className={classes.rightButton}
-          >
-            <MenuIcon />
-          </IconButton>
+          <Hidden mdUp>
+            <IconButton
+              edge="start"
+              color="inherit"
+              aria-label="open drawer"
+              onClick={toggleDrawer(true)}
+              className={classes.rightButton}
+            >
+              <MenuIcon />
+            </IconButton>
+          </Hidden>
         </Toolbar>
       </AppBar>
-      <SwipeableDrawer
-        anchor="right"
-        open={drawer.open}
-        onClose={toggleDrawer(false)}
-        onOpen={toggleDrawer(true)}
-        classes={{ paper: classes.list }}
-      >
-        <Toc posts={posts} node={node} setNode={setNode}/>
-      </SwipeableDrawer>
+      <nav className={classes.drawer}>
+        <Hidden mdUp>
+          <SwipeableDrawer
+            anchor="right"
+            open={drawer.open}
+            onClose={toggleDrawer(false)}
+            onOpen={toggleDrawer(true)}
+            classes={{ paper: classes.list }}
+          >
+            <Toc posts={posts} node={node} setNode={setNode}/>
+          </SwipeableDrawer>
+        </Hidden>
+        <Hidden smDown>
+          <Drawer
+            anchor="right"
+            classes={{ paper: classes.permanentDrawer }}
+            variant="permanent"
+            open
+          >
+            <Toc posts={posts} node={node} setNode={setNode}/>
+          </Drawer>
+        </Hidden>
+      </nav>
     </>
   );
 };
