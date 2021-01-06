@@ -7,22 +7,14 @@ import {
   createMuiTheme,
   ThemeProvider,
 } from "@material-ui/core";
-import { Category } from "@material-ui/icons";
 import React, { useEffect, useState } from "react";
 import { Route, Switch } from "react-router-dom";
 
 import { FitnessTracker } from "./components/FitnessTracker";
 import { Home } from "./components/Home";
 import { NavBar } from "./components/NavBar";
-import { PostPage } from "./components/Post";
-import { Posts } from "./components/Posts";
-import {
-  emptyIndex,
-  fetchContent,
-  fetchIndex,
-  getPostsByCategories,
-  groupByCategory,
-} from "./utils";
+import { PostPage } from "./components/Posts";
+import { emptyIndex, fetchContent, fetchIndex, getPostsByCategories } from "./utils";
 
 const darkTheme = createMuiTheme({
   palette: {
@@ -60,17 +52,11 @@ const App: React.FC = () => {
   });
   const [index, setIndex] = useState(emptyIndex);
   const [currentSlug, setCurrentSlug] = useState("");
-  const [postsByCategories, setPostsByCategories] = useState({});
   const [title, setTitle] = useState({ site: "", page: "" });
 
   // Only once: get the content index
   useEffect(() => {
-    (async () => {
-        const index = await fetchIndex();
-        setIndex(index)
-        setPostsByCategories(groupByCategory(index.posts));
-      }
-    )();
+    (async () => setIndex(await fetchIndex()))();
   }, []);
 
   // Set post content if slug changes
@@ -119,7 +105,7 @@ const App: React.FC = () => {
                 setCurrentSlug("");
                 return (
                   <Home
-                    categories={Object.keys(postsByCategories)}
+                    posts={index.posts}
                     title={title}
                   />
                 );
@@ -132,14 +118,6 @@ const App: React.FC = () => {
                 return (
                   <FitnessTracker />
                 );
-              }}
-            />
-            <Route
-              path="/categories/:category"
-              render={({ match }) => {
-                const category = match.params.category;
-                setCurrentSlug("");
-                return (<Posts posts={postsByCategories[category]} />);
               }}
             />
             <Route
