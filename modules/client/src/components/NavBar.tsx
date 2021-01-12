@@ -1,5 +1,6 @@
 import {
   AppBar,
+  Box,
   Drawer,
   Hidden,
   IconButton,
@@ -11,13 +12,13 @@ import {
 import {
   Home as HomeIcon,
   Menu as MenuIcon,
-  SettingsInputComposite as LogIcon,
 } from "@material-ui/icons";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Toc } from "./ToC";
 
 const useStyles = makeStyles(theme => ({
+  appBarSpacer: theme.mixins.toolbar,
   appBar: {
     [theme.breakpoints.up("md")]: {
       width: "80%",
@@ -83,17 +84,8 @@ export const NavBar = (props: any) => {
             component={"h2"}
             noWrap
           >
-            {title.page ? title.page : title.site}
+            {title.page ? title.page : "Home"}
           </Typography>
-          <IconButton
-            component={Link}
-            edge="start"
-            to={"/foodlog"}
-            color="inherit"
-            className={classes.rightButton}
-          >
-            <LogIcon />
-          </IconButton>
           <Hidden mdUp>
             <IconButton
               edge="start"
@@ -116,6 +108,11 @@ export const NavBar = (props: any) => {
             onOpen={toggleDrawer(true)}
             classes={{ paper: classes.list }}
           >
+            <Typography variant="subtitle1" component="div" >
+              <Box fontFamily="Zapfino" fontStyle="italic" textAlign="center" m={1} p={1}>
+                {title.site}
+              </Box>
+            </Typography>
             <Toc posts={posts} node={node} setNode={setNode}/>
           </SwipeableDrawer>
         </Hidden>
@@ -126,6 +123,11 @@ export const NavBar = (props: any) => {
             variant="permanent"
             open
           >
+            <Typography variant="h6" component="div" >
+              <Box fontFamily="Zapfino" fontStyle="italic" textAlign="center" m={2} p={2}>
+                {title.site}
+              </Box>
+            </Typography>
             <Toc posts={posts} node={node} setNode={setNode}/>
           </Drawer>
         </Hidden>
