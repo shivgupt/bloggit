@@ -32,6 +32,7 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
 export const Home = (props: any) => {
   const classes = useStyles();
   const { posts } = props;
+  console.log(posts)
   return (
     <Grid container spacing={3} justify={"space-around"} alignItems={"center"}>
       {Object.keys(posts).map(slug => {
@@ -47,13 +48,15 @@ export const Home = (props: any) => {
                     title={slug}/>
                   : null}
                 <CardContent>
-                  <Typography variant="h5">{posts[slug].title}</Typography>
-                  <br />
-                  <Typography variant="body2">
+                  <Typography variant="h5" gutterBottom>{posts[slug].title}</Typography>
+                  <Typography variant="caption" gutterBottom display="block">
                     Last Edit: {prettyDateString(posts[slug].lastEdit)}
+                    &nbsp;
+                    &nbsp;
+                    Tags: {posts[slug].tags.map(tag => <> {tag} &nbsp;</>)}
                   </Typography>
                   <br />
-                  <Typography variant="subtitle1" component="p">
+                  <Typography variant="subtitle1" component="p" gutterBottom>
                     {posts[slug].tldr}
                   </Typography>
                 </CardContent>
