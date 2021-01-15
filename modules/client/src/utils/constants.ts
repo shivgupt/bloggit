@@ -13,6 +13,7 @@ export const emptyIndex: PostIndex = {
 
 export const emptyPost: PostData = {
   category: "",
+  lastEdit: "",
   slug: "",
   path: "",
   tags: [],
