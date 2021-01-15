@@ -6,9 +6,9 @@ SSH_KEY="$2"
 CMD="$3"
 
 SSH_DIR="$HOME/.ssh"
-KEY_FILE="$SSH_DIR/id_rsa"
-KEY_FOOTER='-----END OPENSSH PRIVATE KEY-----'
+KEY_FILE="$SSH_DIR/keyfile"
 KEY_HEADER='-----BEGIN OPENSSH PRIVATE KEY-----'
+KEY_FOOTER='-----END OPENSSH PRIVATE KEY-----'
 
 echo "ssh-action activated!"
 echo "Executing command \"$CMD\" on host $HOST"
@@ -24,7 +24,7 @@ touch "$KEY_FILE" "$SSH_DIR/known_hosts"
   echo "$SSH_KEY" | sed "s/$KEY_HEADER//" | sed "s/$KEY_FOOTER//" | tr -d '\n '
   echo
   echo "$KEY_FOOTER"
-} >> "$KEY_FILE"
+} > "$KEY_FILE"
 chmod 400 "$KEY_FILE"
 
 # Manually substitute env var values into CMD
@@ -32,7 +32,8 @@ chmod 400 "$KEY_FILE"
 subbed_cmd=$CMD
 oldIFS=$IFS
 unset IFS
-for var in $(compgen -e); do
+for var in $(compgen -e | awk '{ print length, $0 }' | sort -nsr | cut -d" " -f2-)
+do
   if [[ "$var" == *"|"* || "${!var}" == *"|"* ]]
   then
     echo "Warning, env var $var contains a | character, skipping"
