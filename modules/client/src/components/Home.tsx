@@ -9,8 +9,9 @@ import {
   createStyles,
   makeStyles,
 } from "@material-ui/core";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { Posts } from "./Posts"
 
 import { prettyDateString } from "../utils";
 
@@ -31,40 +32,21 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
 
 export const Home = (props: any) => {
   const classes = useStyles();
-  const { posts } = props;
-  console.log(posts)
+  const { index } = props;
+  const [featured, setFeatured] = useState({});
+
+  useEffect(() => {
+    if (index.featured) {
+      const f = {};
+      index.featured.forEach( p => {
+        f[p] = index.posts[p];
+      });
+      console.log(f)
+      setFeatured(f);
+    }
+  }, [index])
+
   return (
-    <Grid container spacing={3} justify={"space-around"} alignItems={"center"}>
-      {Object.keys(posts).map(slug => {
-        return (
-          <Grid className={classes.root} item xs={12} md={6} lg={4} key={slug}>
-            <Card className={classes.card}>
-              <CardActionArea component={Link} to={`/${slug}`}>
-                {posts[slug].img
-                  ? <CardMedia
-                    className={classes.media}
-                    component="img"
-                    image={posts[slug].img}
-                    title={slug}/>
-                  : null}
-                <CardContent>
-                  <Typography variant="h5" gutterBottom>{posts[slug].title}</Typography>
-                  <Typography variant="caption" gutterBottom display="block">
-                    Last Edit: {prettyDateString(posts[slug].lastEdit)}
-                    &nbsp;
-                    &nbsp;
-                    Tags: {posts[slug].tags.map(tag => <> {tag} &nbsp;</>)}
-                  </Typography>
-                  <br />
-                  <Typography variant="subtitle1" component="p" gutterBottom>
-                    {posts[slug].tldr}
-                  </Typography>
-                </CardContent>
-              </CardActionArea>
-            </Card>
-          </Grid>
-        );
-      })}
-    </Grid>
+    <Posts posts={featured} />
   );
 };

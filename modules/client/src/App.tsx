@@ -12,7 +12,7 @@ import { Route, Switch } from "react-router-dom";
 
 import { Home } from "./components/Home";
 import { NavBar } from "./components/NavBar";
-import { PostPage } from "./components/Posts";
+import { PostPage } from "./components/Post";
 import { emptyIndex, fetchContent, fetchIndex, getPostsByCategories } from "./utils";
 
 const darkTheme = createMuiTheme({
@@ -105,10 +105,7 @@ const App: React.FC = () => {
               render={() => {
                 setCurrentSlug("");
                 return (
-                  <Home
-                    posts={index.posts}
-                    title={title}
-                  />
+                  <Home index={index} />
                 );
               }}
             />
