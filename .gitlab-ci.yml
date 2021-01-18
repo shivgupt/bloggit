@@ -47,6 +47,8 @@ deploy:
       - prod
   script:
     - apk add bash curl git jq make
+    - make pull-commit
+    - make push $(grep -m 1 '"version":' package.json | cut -d '"' -f 4)
     - >
       docker build --tag ssh-action ops/ssh-action;
       docker run \
