@@ -16,14 +16,24 @@ if [[ -f .env ]]
 then source .env
 fi
 
-BLOG_MEDIA_DIR="${BLOG_MEDIA_DIR:-$root/../blog-content/media}" # mounted into IPFS
 BLOG_CONTENT_BRANCH="${BLOG_CONTENT_BRANCH:-main}"
 BLOG_CONTENT_DIR="${BLOG_CONTENT_DIR:-}"
 BLOG_CONTENT_REPO="${BLOG_CONTENT_REPO:-https://gitlab.com/bohendo/blog-content.git}"
 BLOG_CONTENT_URL="${BLOG_CONTENT_URL:-https://gitlab.com/bohendo/blog-content/raw}"
 BLOG_DOMAINNAME="${BLOG_DOMAINNAME:-}"
 BLOG_EMAIL="${BLOG_EMAIL:-noreply@gmail.com}" # for notifications when ssl certs expire
+BLOG_MEDIA_DIR="${BLOG_MEDIA_DIR:-$root/../blog-content/media}" # mounted into IPFS
 BLOG_PROD="${BLOG_PROD:-false}"
+
+echo "Launching $project in env:"
+echo "- BLOG_CONTENT_BRANCH=$BLOG_CONTENT_BRANCH"
+echo "- BLOG_CONTENT_DIR=$BLOG_CONTENT_DIR"
+echo "- BLOG_CONTENT_REPO=$BLOG_CONTENT_REPO"
+echo "- BLOG_CONTENT_URL=$BLOG_CONTENT_URL"
+echo "- BLOG_DOMAINNAME=$BLOG_DOMAINNAME"
+echo "- BLOG_EMAIL=$BLOG_EMAIL"
+echo "- BLOG_MEDIA_DIR=$BLOG_MEDIA_DIR"
+echo "- BLOG_PROD=$BLOG_PROD"
 
 ########################################
 # Misc Config
