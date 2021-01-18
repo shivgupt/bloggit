@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-branch="${BLOG_CONTENT_BRANCH:-master}"
+branch="${BLOG_CONTENT_BRANCH:-main}"
 repo="${BLOG_CONTENT_REPO}"
 
 if [[ ! -d "/blog-content/.git" ]]

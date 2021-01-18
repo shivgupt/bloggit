@@ -11,8 +11,13 @@ docker network create --attachable --driver overlay "$project" 2> /dev/null || t
 ####################
 # External Env Vars
 
+# shellcheck disable=SC1091
+if [[ -f .env ]]
+then source .env
+fi
+
 BLOG_MEDIA_DIR="${BLOG_MEDIA_DIR:-$root/../blog-content/media}" # mounted into IPFS
-BLOG_CONTENT_BRANCH="${BLOG_CONTENT_BRANCH:-master}"
+BLOG_CONTENT_BRANCH="${BLOG_CONTENT_BRANCH:-main}"
 BLOG_CONTENT_DIR="${BLOG_CONTENT_DIR:-}"
 BLOG_CONTENT_REPO="${BLOG_CONTENT_REPO:-https://gitlab.com/bohendo/blog-content.git}"
 BLOG_CONTENT_URL="${BLOG_CONTENT_URL:-https://gitlab.com/bohendo/blog-content/raw}"
