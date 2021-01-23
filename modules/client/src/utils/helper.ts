@@ -6,8 +6,6 @@ export const prettyDateString = (s: string) => {
   let month = s.substr(2,2);
   let m;
   
-  console.log(month, s);
-
   switch (month) {
   case "01": m = "Jan"; break;
   case "02": m = "Feb"; break;

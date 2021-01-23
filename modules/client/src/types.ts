@@ -20,6 +20,7 @@ export type PostData = {
 export type PostIndex = {
   posts: { [slug: string]: PostData };
   style?: any;
+  about: string;
   title: string;
 }
 

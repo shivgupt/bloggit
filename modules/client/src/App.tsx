@@ -94,6 +94,7 @@ const App: React.FC = () => {
         node={node}
         setNode={setNode}
         posts={getPostsByCategories(index.posts)}
+        about={index.about}
         title={title}
       />
       <main className={classes.main}>

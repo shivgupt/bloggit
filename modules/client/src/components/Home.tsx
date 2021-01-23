@@ -3,6 +3,7 @@ import {
   CardActionArea,
   CardContent,
   CardMedia,
+  Chip,
   Grid,
   Theme,
   Typography,
@@ -32,7 +33,6 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
 export const Home = (props: any) => {
   const classes = useStyles();
   const { posts } = props;
-  console.log(posts)
   return (
     <Grid container spacing={3} justify={"space-around"} alignItems={"center"}>
       {Object.keys(posts).map(slug => {
@@ -53,7 +53,7 @@ export const Home = (props: any) => {
                     {prettyDateString(posts[slug].lastEdit)}
                     &nbsp;
                     &nbsp;
-                    Tags: {posts[slug].tags.map(tag => <> {tag} &nbsp;</>)}
+                    Tags: {posts[slug].tags.map(tag => <Chip key={tag} label={tag} />)}
                   </Typography>
                   <br />
                   <Typography variant="subtitle1" component="p" gutterBottom>
