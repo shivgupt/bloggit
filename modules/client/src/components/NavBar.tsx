@@ -69,11 +69,12 @@ const DrawerContent = (props: any) => {
       </ThemeProvider>
       <Toc posts={posts} node={node} setNode={setNode}/>
       <IconButton
-       onClick={toggleTheme}
-       children={theme.palette.type === "dark" ? <LightIcon /> : <DarkIcon />}
-       size="small"
-       color="secondary"
-      />
+        onClick={toggleTheme}
+        size="small"
+        color="secondary"
+      >
+        {theme.palette.type === "dark" ? <LightIcon /> : <DarkIcon />}
+      </IconButton>
       <Box textAlign="center" m={2}>
         <Button
           size="small"
