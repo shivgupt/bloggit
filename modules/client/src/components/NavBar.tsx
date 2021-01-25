@@ -19,13 +19,13 @@ import {
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Toc } from "./ToC";
-import "@fontsource/monsieur-la-doulaise"
+import "@fontsource/monsieur-la-doulaise";
 
 const theme = createMuiTheme({
   typography: {
     fontFamily: [
       "Monsieur La Doulaise",
-    ].join(','),
+    ].join(","),
   },
 });
 
