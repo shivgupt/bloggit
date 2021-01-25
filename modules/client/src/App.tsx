@@ -39,6 +39,7 @@ const App: React.FC = () => {
     current: "categories",
     child: "posts",
   });
+  const [theme, setTheme] = useState(darkTheme);
   const [index, setIndex] = useState(emptyIndex);
   const [currentSlug, setCurrentSlug] = useState("");
   const [title, setTitle] = useState({ site: "", page: "" });
@@ -80,14 +81,23 @@ const App: React.FC = () => {
   // eslint-disable-next-line
   }, [index, currentSlug]);
 
+  const toggleTheme = () => {
+    if ( theme.palette.type === "dark")
+      setTheme(lightTheme);
+    else
+      setTheme(darkTheme);
+  };
+
   return (
-    <ThemeProvider theme={darkTheme}>
+    <ThemeProvider theme={theme}>
       <CssBaseline />
       <NavBar
         node={node}
         setNode={setNode}
         posts={getPostsByCategories(index.posts)}
         title={title}
+        theme={theme}
+        toggleTheme={toggleTheme}
       />
       <main className={classes.main}>
         <div className={classes.appBarSpacer} />

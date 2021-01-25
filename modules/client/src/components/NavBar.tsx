@@ -14,6 +14,8 @@ import {
 import {
   Home as HomeIcon,
   Menu as MenuIcon,
+  BrightnessHigh as LightIcon,
+  Brightness4 as DarkIcon,
 } from "@material-ui/icons";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
@@ -21,7 +23,6 @@ import { Toc } from "./ToC";
 import { siteTitleFont } from "../style";
 
 const useStyles = makeStyles(theme => ({
-  appBarSpacer: theme.mixins.toolbar,
   appBar: {
     [theme.breakpoints.up("md")]: {
       width: "80%",
@@ -55,7 +56,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const DrawerContent = (props: any) => {
-  const { title, posts, node, setNode } = props;
+  const { title, posts, node, setNode, toggleTheme, theme } = props;
 
   return (
     <>
@@ -67,18 +68,26 @@ const DrawerContent = (props: any) => {
         </Typography>
       </ThemeProvider>
       <Toc posts={posts} node={node} setNode={setNode}/>
-      <Button
-        size="small"
-        disableFocusRipple={false}
-        component={Link}
-        to={"/about"}
-      > About </Button>
+      <IconButton
+       onClick={toggleTheme}
+       children={theme.palette.type === "dark" ? <LightIcon /> : <DarkIcon />}
+       size="small"
+       color="secondary"
+      />
+      <Box textAlign="center" m={2}>
+        <Button
+          size="small"
+          disableFocusRipple={false}
+          component={Link}
+          to={"/about"}
+        > About </Button>
+      </Box>
     </>
-  )
+  );
 };
 
 export const NavBar = (props: any) => {
-  const { posts, setNode, node, title } = props;
+  const { title } = props;
   const classes = useStyles();
   const [drawer, setDrawer] = useState({ open: false });
 
