@@ -6,9 +6,11 @@ import {
   Hidden,
   IconButton,
   SwipeableDrawer,
+  ThemeProvider,
   Toolbar,
   Typography,
   makeStyles,
+  createMuiTheme,
 } from "@material-ui/core";
 import {
   Home as HomeIcon,
@@ -17,6 +19,15 @@ import {
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Toc } from "./ToC";
+import "@fontsource/monsieur-la-doulaise"
+
+const theme = createMuiTheme({
+  typography: {
+    fontFamily: [
+      "Monsieur La Doulaise",
+    ].join(','),
+  },
+});
 
 const useStyles = makeStyles(theme => ({
   appBarSpacer: theme.mixins.toolbar,
@@ -109,11 +120,13 @@ export const NavBar = (props: any) => {
             onOpen={toggleDrawer(true)}
             classes={{ paper: classes.list }}
           >
-            <Typography variant="subtitle1" component="div" >
-              <Box fontFamily="Zapfino" fontStyle="italic" textAlign="center" m={1} p={1}>
-                {title.site}
-              </Box>
-            </Typography>
+            <ThemeProvider theme={theme}>
+              <Typography variant="h5" component="div" >
+                <Box textAlign="center" m={1} p={1}>
+                  {title.site}
+                </Box>
+              </Typography>
+            </ThemeProvider>
             <Toc posts={posts} node={node} setNode={setNode}/>
             <Button
               size="small"
@@ -130,11 +143,13 @@ export const NavBar = (props: any) => {
             variant="permanent"
             open
           >
-            <Typography variant="h6" component="div" >
-              <Box fontFamily="Zapfino" fontStyle="italic" textAlign="center" m={2} p={2}>
-                {title.site}
-              </Box>
-            </Typography>
+            <ThemeProvider theme={theme}>
+              <Typography variant="h4" component="div" >
+                <Box textAlign="center" m={2} p={2}>
+                  {title.site}
+                </Box>
+              </Typography>
+            </ThemeProvider>
             <Toc posts={posts} node={node} setNode={setNode}/>
             <Button
               size="small"
