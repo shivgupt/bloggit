@@ -13,7 +13,7 @@ import { Route, Switch } from "react-router-dom";
 import { Home } from "./components/Home";
 import { NavBar } from "./components/NavBar";
 import { PostPage } from "./components/Posts";
-import { emptyIndex, fetchContent, fetchIndex, getPostsByCategories } from "./utils";
+import { emptyIndex, fetchAbout, fetchContent, fetchIndex, getPostsByCategories } from "./utils";
 
 const darkTheme = createMuiTheme({
   palette: {
@@ -54,11 +54,16 @@ const App: React.FC = () => {
   const [index, setIndex] = useState(emptyIndex);
   const [currentSlug, setCurrentSlug] = useState("");
   const [title, setTitle] = useState({ site: "", page: "" });
+  const [about, setAbout] = useState("");
 
   // Only once: get the content index
   useEffect(() => {
     (async () => setIndex(await fetchIndex()))();
   }, []);
+
+  useEffect(() => {
+    (async () => setAbout(await fetchAbout(index.about)))();
+  }, [index]);
 
   // Set post content if slug changes
   useEffect(() => {
@@ -94,7 +99,6 @@ const App: React.FC = () => {
         node={node}
         setNode={setNode}
         posts={getPostsByCategories(index.posts)}
-        about={index.about}
         title={title}
       />
       <main className={classes.main}>
@@ -111,6 +115,16 @@ const App: React.FC = () => {
                     title={title}
                   />
                 );
+              }}
+            />
+            <Route exact
+              path="/about"
+              render={() => {
+                setCurrentSlug("");
+                return (<PostPage content={index.about ?
+                  about
+                  : "Not added yet" }
+                />);
               }}
             />
             <Route

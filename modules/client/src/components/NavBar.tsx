@@ -1,5 +1,6 @@
 import {
   AppBar,
+  Button,
   Box,
   Drawer,
   Hidden,
@@ -114,6 +115,12 @@ export const NavBar = (props: any) => {
               </Box>
             </Typography>
             <Toc posts={posts} node={node} setNode={setNode}/>
+            <Button
+              size="small"
+              disableFocusRipple={false}
+              component={Link}
+              to={"/about"}
+            > About </Button>
           </SwipeableDrawer>
         </Hidden>
         <Hidden smDown>
@@ -129,6 +136,12 @@ export const NavBar = (props: any) => {
               </Box>
             </Typography>
             <Toc posts={posts} node={node} setNode={setNode}/>
+            <Button
+              size="small"
+              disableFocusRipple={false}
+              component={Link}
+              to={"/about"}
+            > About </Button>
           </Drawer>
         </Hidden>
       </nav>

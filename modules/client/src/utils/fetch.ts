@@ -4,7 +4,7 @@ import { store } from "./cache";
 
 let indexCache: Promise<PostIndex> | undefined;
 let contentCache: { [key: string]: Promise<string>; } = {};
-
+let aboutCache: Promise<string>;
 
 // Remember which contentUrl worked & try that one first from now on
 const smartIndexKey = "contentUrlIndex";
@@ -51,6 +51,14 @@ export const fetchIndex = async(): Promise<PostIndex> => {
     index.posts[slug].slug = slug;
   });
   return index;
+};
+
+export const fetchAbout = async(path: string): Promise<string> => {
+  if(!aboutCache) {
+    const about = (await fetchIndex()).about;
+    aboutCache = get(about) as Promise<string>;
+  }
+  return aboutCache;
 };
 
 export const fetchContent = async(slug: string): Promise<string> => {
