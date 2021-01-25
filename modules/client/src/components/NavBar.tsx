@@ -10,7 +10,6 @@ import {
   Toolbar,
   Typography,
   makeStyles,
-  createMuiTheme,
 } from "@material-ui/core";
 import {
   Home as HomeIcon,
@@ -19,15 +18,7 @@ import {
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Toc } from "./ToC";
-import "@fontsource/monsieur-la-doulaise";
-
-const theme = createMuiTheme({
-  typography: {
-    fontFamily: [
-      "Monsieur La Doulaise",
-    ].join(","),
-  },
-});
+import { siteTitleFont } from "../style";
 
 const useStyles = makeStyles(theme => ({
   appBarSpacer: theme.mixins.toolbar,
@@ -62,6 +53,29 @@ const useStyles = makeStyles(theme => ({
     flex: 1,
   },
 }));
+
+const DrawerContent = (props: any) => {
+  const { title, posts, node, setNode } = props;
+
+  return (
+    <>
+      <ThemeProvider theme={siteTitleFont}>
+        <Typography variant="h4" component="div" >
+          <Box textAlign="center" m={2} p={2}>
+            {title.site}
+          </Box>
+        </Typography>
+      </ThemeProvider>
+      <Toc posts={posts} node={node} setNode={setNode}/>
+      <Button
+        size="small"
+        disableFocusRipple={false}
+        component={Link}
+        to={"/about"}
+      > About </Button>
+    </>
+  )
+};
 
 export const NavBar = (props: any) => {
   const { posts, setNode, node, title } = props;
@@ -120,20 +134,7 @@ export const NavBar = (props: any) => {
             onOpen={toggleDrawer(true)}
             classes={{ paper: classes.list }}
           >
-            <ThemeProvider theme={theme}>
-              <Typography variant="h5" component="div" >
-                <Box textAlign="center" m={1} p={1}>
-                  {title.site}
-                </Box>
-              </Typography>
-            </ThemeProvider>
-            <Toc posts={posts} node={node} setNode={setNode}/>
-            <Button
-              size="small"
-              disableFocusRipple={false}
-              component={Link}
-              to={"/about"}
-            > About </Button>
+            <DrawerContent {...props} />
           </SwipeableDrawer>
         </Hidden>
         <Hidden smDown>
@@ -143,20 +144,7 @@ export const NavBar = (props: any) => {
             variant="permanent"
             open
           >
-            <ThemeProvider theme={theme}>
-              <Typography variant="h4" component="div" >
-                <Box textAlign="center" m={2} p={2}>
-                  {title.site}
-                </Box>
-              </Typography>
-            </ThemeProvider>
-            <Toc posts={posts} node={node} setNode={setNode}/>
-            <Button
-              size="small"
-              disableFocusRipple={false}
-              component={Link}
-              to={"/about"}
-            > About </Button>
+            <DrawerContent {...props} />
           </Drawer>
         </Hidden>
       </nav>

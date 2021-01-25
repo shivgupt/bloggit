@@ -4,7 +4,6 @@ import {
   Theme,
   createStyles,
   makeStyles,
-  createMuiTheme,
   ThemeProvider,
 } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
@@ -14,18 +13,7 @@ import { Home } from "./components/Home";
 import { NavBar } from "./components/NavBar";
 import { PostPage } from "./components/Posts";
 import { emptyIndex, fetchAbout, fetchContent, fetchIndex, getPostsByCategories } from "./utils";
-
-const darkTheme = createMuiTheme({
-  palette: {
-    primary: {
-      main: "#deaa56",
-    },
-    secondary: {
-      main: "#e699a6",
-    },
-    type: "dark",
-  },
-});
+import { darkTheme, lightTheme } from "./style";
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
   appBarSpacer: theme.mixins.toolbar,
