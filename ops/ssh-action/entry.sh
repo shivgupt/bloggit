@@ -55,9 +55,11 @@ echo "Running subbed command: $subbed_cmd"
 exec ssh -i "$KEY_FILE" -o StrictHostKeyChecking=no "$HOST" "bash -s" <<EOF
   set -e;
   # Run CMD in an up-to-date repo
-  git clone $CI_REPOSITORY_URL || true;
-  cd $CI_PROJECT_NAME;
-  git fetch --all --prune --tags;
+  git clone $GIT_REPOSITORY_URL || true;
+  cd $GIT_PROJECT_NAME;
+  git checkout --force $GIT_BRANCH;
+  git fetch $GIT_REMOTE --prune --tags;
+  git pull $GIT_REMOTE $GIT_BRANCH --force;
   $subbed_cmd
   exit;
 EOF
