@@ -1,31 +1,7 @@
-import fs from "fs";
-import path from "path";
-
 import express from "express";
-import fetch from "node-fetch";
-import git from "isomorphic-git";
-import http from "isomorphic-git/http/node";
 
-const trimSlash = (pathPart: string) => pathPart.replace(/^\/+/, "").replace(/\/+$/, "");
-export const env = {
-  contentBranch: trimSlash(process.env.BLOG_CONTENT_BRANCH || "master"),
-  contentDir: trimSlash(process.env.BLOG_CONTENT_DIR || ""),
-  contentRepo: trimSlash(process.env.BLOG_CONTENT_REPO || ""),
-  contentUrl: trimSlash(
-    process.env.BLOG_CONTENT_URL || "https://gitlab.com/bohendo/blog-content/raw",
-  ),
-  devMode: process.env.NODE_ENV === "development",
-  port: parseInt(process.env.PORT, 10) || 8080,
-};
-
-git.clone({
-  fs,
-  http,
-  dir: path.normalize("/blog-content"),
-  url: env.contentRepo,
-})
-  .then(res => console.log(`Git clone result: ${res}`))
-  .catch(e => console.log(`Git clone error: ${e}`));
+import { env } from "./env";
+import { gitRouter } from "./git";
 
 console.log(`Starting server in env: ${JSON.stringify(env, null, 2)}`);
 
@@ -43,41 +19,13 @@ app.use("/config", (req, res, _): void => {
   });
 });
 
-// Third: try to fetch live content from remote git hosting service
-app.use(async (req, res, next): Promise<void> => {
-  // We don't care about stale data in dev-mode, just want it to load as fast as possible
-  if (env.devMode) { return next(); }
-  // req.path must include the commit
-  const url = `${env.contentUrl}/${trimSlash(req.path)}`;
-  let result;
-  try {
-    const response = await fetch(url);
-    if (response.status === 200) {
-      console.log(`Forwarding content from ${url}`);
-      url.endsWith(".json")
-        ? res.json(await response.json())
-        : res.send(await response.text());
-      return;
-    }
-    result = `${response.status}: ${response.statusText}`;
-  } catch (e) {
-    result = e.message;
-  }
-  console.log(`Couldn't fetch content from ${url}: ${result}`);
-  next();
-});
-
-// Fourth: try to get file from default branch of static copy of content
-app.use(`/${env.contentBranch}/`, async (req, res, next): Promise<void> => {
-  const folder = path.normalize("/blog-content");
-  console.log(`Attempting to get static file ${folder}${req.path}`);
-  express.static(folder, { extensions: ["json", "md"] })(req, res, next);
-});
+// Third: return info from local git repo
+app.use("/git", gitRouter);
 
 // Last: 404
 app.use((req, res) => {
-  console.log("404: Hello World!!");
-  res.status(404).send("Hello World!!");
+  console.log("404: Not Found");
+  res.status(404).send("Not Found");
 });
 
 app.listen(env.port, () => console.log(`Listening on port ${env.port}!`));
