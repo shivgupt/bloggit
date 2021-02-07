@@ -15,7 +15,7 @@ const smartIndex = (i: number) => {
 
 const get = async (file: string): Promise<string | PostIndex> => {
   const config = (await axios("/api/config")).data as ServerConfig;
-  const path = `${config.contentBranch}/${config.contentDir}${file}`;
+  const path = `${config.contentBranch}/${config.contentDir || ""}${file}`;
   const urls = [`${config.contentUrl}/${path}`, `/api/${path}`];
   for (let i = 0; i < urls.length; i += 1) {
     const url = urls[smartIndex(i)];
