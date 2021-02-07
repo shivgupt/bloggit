@@ -11,7 +11,7 @@ const app = express();
 app.use((req, res, next) => { console.log(`=> ${req.path}`); next(); });
 
 // Second: return config if requested
-app.use("/config", (req, res, _): void => {
+app.use("/git/config", (req, res, _): void => {
   res.json({
     contentBranch: env.contentBranch,
     contentDir: env.contentDir,
@@ -29,4 +29,3 @@ app.use((req, res) => {
 });
 
 app.listen(env.port, () => console.log(`Listening on port ${env.port}!`));
-

@@ -13,47 +13,32 @@ gitRouter.get("/:ref/:category/:file", async (req, res, next): Promise<void> => 
   const filepath = `${category}/${file}`;
   let ref;
   try {
-    console.log(`Trying to expand given oid: ${givenRef}`);
     ref = await git.expandOid({ ...gitOpts, oid: givenRef });
   } catch (e) {
     console.log(`Failed to expand oid ${givenRef}: ${e.message}`);
     try {
       console.log(`Trying to expand given ref: ${givenRef}`);
-      ref = await git.expandRef({ ...gitOpts, ref: givenRef });
+      ref = await git.resolveRef({ ...gitOpts, ref: givenRef });
     } catch (e) {
-      console.log(`Failed to expand ref ${givenRef}: ${e.message}`);
+      console.log(`Failed to resolve ref ${givenRef}: ${e.message}`);
+      return next();
     }
   }
-  // does this ref exist?
-  try {
-    await git.checkout({
-      ...gitOpts,
-      dryRun: true,
-      force: true,
-      ref,
-    });
-  } catch (e) {
-    console.log(`Cannot find ref ${ref}: ${e.message}`);
-    return next();
-  }
-
-  console.log(`git checking out ref ${ref}`);
-  // checkout this ref
-  await git.checkout({
-    ...gitOpts,
-    force: true,
-    ref,
-  });
+  console.log(`Expanded given ref "${givenRef}" to "${ref}"`);
 
   try {
-    const blob = await git.readBlob({
+    const commit = (await git.readCommit({ ...gitOpts, oid: ref })).commit;
+    const content = Buffer.from((await git.readBlob({
       ...gitOpts,
       oid: ref,
       filepath,
+    })).blob).toString("utf8");
+    console.log(`Returning ${content.length} chars of content for ${filepath}`);
+    res.status(200).json({
+      author: commit.committer.name,
+      timestamp: commit.committer.timestamp,
+      content,
     });
-    console.log(`got a blob object w props: ${Object.keys(blob)}`);
-    const parsedBlob = Buffer.from(blob.blob).toString("utf8");
-    res.status(200).send(parsedBlob);
 
   } catch (e) {
     console.log(`Failed to read object w oid ${ref} and filepath ${filepath}: ${e.message}`);
