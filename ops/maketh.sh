@@ -10,7 +10,8 @@ fi
 
 docker run \
   "--name=${project}_builder" \
-  --tty \
-  --rm \
   "--volume=$root:/root" \
+  --interactive \
+  --rm \
+  --tty \
   "${project}_builder" "$id" make -f /Makefile "$@"

@@ -1,40 +1,59 @@
 module.exports = {
-    rules: {
-      "comma-dangle": ["error", "only-multiline"],
-      "indent": ["error", 2],
-      "max-len": ["error", 100],
-      "no-undef": ["error"],
-      "no-unused-vars": ["error"],
-      "no-var": ["error"],
-      "object-curly-spacing": ["error", "always"],
-      "quotes": ["error", "double"],
-      "semi": ["error", "always"],
+  env: {
+    browser: true,
+    node: true,
+    es6: true
+  },
+  extends: [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:import/errors",
+    "plugin:import/typescript",
+    "plugin:import/warnings",
+    "plugin:react/recommended",
+    "react-app",
+  ],
+  parser: "@typescript-eslint/parser",
+  parserOptions: {
+    ecmaFeatures: {
+      "jsx": true
     },
-    settings: {
-      react: {
-        version: "detect",
+    ecmaVersion: 2018,
+    sourceType: "module"
+  },
+  plugins: [
+    "@typescript-eslint",
+    "import",
+    "react",
+    "unused-imports",
+  ],
+  rules: {
+    "@typescript-eslint/no-unused-vars": "off",
+    "comma-dangle": ["error", "only-multiline"],
+    "import/order": [
+      1,
+      {
+        groups: ["builtin", "external", "internal", "parent", "sibling", "index"],
+        "newlines-between": "always",
       },
-    },
-    env: {
-      browser: true,
-      es6: true
-    },
-    extends: [
-      "react-app",
-      "eslint:recommended",
-      "plugin:react/recommended",
-      "plugin:@typescript-eslint/eslint-recommended",
     ],
-    parser: "@typescript-eslint/parser",
-    parserOptions: {
-      ecmaFeatures: {
-        "jsx": true
-      },
-      ecmaVersion: 2018,
-      sourceType: "module"
-    },
-    plugins: [
-      "react",
-      "@typescript-eslint"
+    "indent": ["error", 2],
+    "max-len": ["error", 100],
+    "no-undef": ["error"],
+    "no-unused-vars": ["error"],
+    "no-var": ["error"],
+    "object-curly-spacing": ["error", "always"],
+    "quotes": ["error", "double"],
+    "semi": ["error", "always"],
+    "unused-imports/no-unused-imports-ts": "warn",
+    "unused-imports/no-unused-vars-ts": [
+      "warn",
+      { "vars": "all", "varsIgnorePattern": "^_", "args": "after-used", "argsIgnorePattern": "^_" },
     ],
+  },
+  settings: {
+    react: {
+      version: "detect",
+    },
+  },
 };
