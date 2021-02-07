@@ -5,10 +5,10 @@ curl="curl --insecure "
 host="http://localhost:3000"
 
 echo
-echo "$host/api/config should connect to the server"
-$curl "$host/api/config"
+echo "$host/git/config should connect to the server"
+$curl "$host/git/config"
 echo
-if [[ "$($curl --silent "$host/api/config")" == *"contentUrl"* ]]
+if [[ "$($curl --silent "$host/git/config")" == *"contentUrl"* ]]
 then echo "Looks good"
 else echo "Looks not good" && exit 1
 fi
