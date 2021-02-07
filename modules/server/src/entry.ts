@@ -1,18 +1,31 @@
+import fs from "fs";
+import path from "path";
+
 import express from "express";
 import fetch from "node-fetch";
-import path from "path";
+import git from "isomorphic-git";
+import http from "isomorphic-git/http/node";
 
 const trimSlash = (pathPart: string) => pathPart.replace(/^\/+/, "").replace(/\/+$/, "");
 
 export const env = {
   contentBranch: trimSlash(process.env.BLOG_CONTENT_BRANCH || "master"),
   contentDir: trimSlash(process.env.BLOG_CONTENT_DIR || ""),
+  contentRepo: trimSlash(process.env.BLOG_CONTENT_REPO || ""),
   contentUrl: trimSlash(
     process.env.BLOG_CONTENT_URL || "https://gitlab.com/bohendo/blog-content/raw",
   ),
   devMode: process.env.NODE_ENV === "development",
   port: parseInt(process.env.PORT, 10) || 8080,
 };
+
+const dir = path.join(process.cwd(), "test-clone");
+git.clone({
+  fs,
+  http,
+  dir,
+  url: "https://github.com/isomorphic-git/lightning-fs",
+}).then(console.log);
 
 console.log(`Starting server in env: ${JSON.stringify(env, null, 2)}`);
 
@@ -22,7 +35,7 @@ const app = express();
 app.use((req, res, next) => { console.log(`=> ${req.path}`); next(); });
 
 // Second: return config if requested
-app.use("/config", (req, res, next): void => {
+app.use("/config", (req, res, _): void => {
   res.json({
     contentBranch: env.contentBranch,
     contentDir: env.contentDir,
