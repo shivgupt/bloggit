@@ -15,10 +15,11 @@ import {
   TimelineSeparator,
 } from "@material-ui/lab";
 
-import { NutrientDistribution } from "./NutrientDistribution";
 import { compareObj, deepCopy } from "../utils/helper";
 import { emptyFoodLog } from "../utils/constants";
+
 import { MealEntry } from "./MealEntry";
+import { NutrientDistribution } from "./NutrientDistribution";
 
 const useStyles = makeStyles({
   meal: {
@@ -35,13 +36,13 @@ export const FoodTimeLine = (props: any) => {
   const { profile, setProfile, setAlert } = props;
 
   const [edit, setEdit] = useState(false);
-  const [entry, setEntry] = useState();
-  const [foodLog, setFoodLog] = useState();
+  const [entry, setEntry] = useState(undefined as any);
+  const [foodLog, setFoodLog] = useState(undefined as any);
 
   useEffect(() => { setFoodLog(profile.foodLog); }, [profile]);
 
   const editMeal = (date: string, time: string) => () => {
-    let updateDT = new Date(date);
+    const updateDT = new Date(date);
     updateDT.setHours(Number(time.substring(0,2)));
     updateDT.setMinutes(Number(time.substring(3,5)));
     setEdit(!edit);

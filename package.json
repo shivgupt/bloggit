@@ -1,7 +1,7 @@
 {
   "name": "blog",
   "registry": "registry.gitlab.com",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "author": "Bo & Shiv Hendo",
   "license": "MIT",
   "devDependencies": {
@@ -11,6 +11,6 @@
     "eslint-plugin-import": "2.22.1",
     "eslint-plugin-react": "7.22.0",
     "eslint-plugin-unused-imports": "1.0.3",
-    "typescript": "3.7.5"
+    "typescript": "4.1.3"
   }
 }

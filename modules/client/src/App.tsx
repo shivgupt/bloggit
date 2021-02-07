@@ -12,7 +12,7 @@ import { Route, Switch } from "react-router-dom";
 import { Home } from "./components/Home";
 import { NavBar } from "./components/NavBar";
 import { PostPage } from "./components/Posts";
-import { emptyIndex, fetchAbout, fetchContent, fetchIndex, getPostsByCategories } from "./utils";
+import { emptyIndex, fetchFile, fetchContent, fetchIndex, getPostsByCategories } from "./utils";
 import { darkTheme, lightTheme } from "./style";
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
@@ -52,7 +52,7 @@ const App: React.FC = () => {
 
   useEffect(() => {
     if (index.about) {
-      (async () => setAbout(await fetchAbout(index.about)))();
+      (async () => setAbout(await fetchFile(index.about)))();
     }
   }, [index]);
 

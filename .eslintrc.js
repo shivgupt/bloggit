@@ -43,7 +43,7 @@ module.exports = {
     "no-unused-vars": ["error"],
     "no-var": ["error"],
     "object-curly-spacing": ["error", "always"],
-    "quotes": ["error", "double"],
+    "quotes": ["warn", "double", { allowTemplateLiterals: true, avoidEscape: true }],
     "semi": ["error", "always"],
     "unused-imports/no-unused-imports-ts": "warn",
     "unused-imports/no-unused-vars-ts": [
