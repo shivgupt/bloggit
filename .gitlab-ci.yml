@@ -57,6 +57,7 @@ deploy:
         --env=CI_REPOSITORY_URL=$CI_REPOSITORY_URL \
         ssh-action $SERVER_URL $SSH_KEY '
           git checkout --force prod;
+          echo "Resetting HEAD to git commit $CI_COMMIT_SHA"
           git reset --hard $CI_COMMIT_SHA;
           export BLOG_PROD="true";
           make pull-commit;
