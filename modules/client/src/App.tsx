@@ -14,6 +14,7 @@ import { NavBar } from "./components/NavBar";
 import { PostPage } from "./components/Posts";
 import { emptyIndex, fetchAbout, fetchContent, fetchIndex, getPostsByCategories } from "./utils";
 import { darkTheme, lightTheme } from "./style";
+import { store } from "./utils/cache";
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
   appBarSpacer: theme.mixins.toolbar,
@@ -39,7 +40,7 @@ const App: React.FC = () => {
     current: "categories",
     child: "posts",
   });
-  const [theme, setTheme] = useState(darkTheme);
+  const [theme, setTheme] = useState(lightTheme);
   const [index, setIndex] = useState(emptyIndex);
   const [currentSlug, setCurrentSlug] = useState("");
   const [title, setTitle] = useState({ site: "", page: "" });
@@ -48,6 +49,9 @@ const App: React.FC = () => {
   // Only once: get the content index
   useEffect(() => {
     (async () => setIndex(await fetchIndex()))();
+    const themeSelection = store.load("theme");
+    if (themeSelection === "light") setTheme(lightTheme);
+    else setTheme(darkTheme);
   }, []);
 
   useEffect(() => {
@@ -84,10 +88,14 @@ const App: React.FC = () => {
   }, [index, currentSlug]);
 
   const toggleTheme = () => {
-    if ( theme.palette.type === "dark")
+    if ( theme.palette.type === "dark") {
+      store.save("theme", "light");
       setTheme(lightTheme);
-    else
+    }
+    else {
+      store.save("theme", "dark");
       setTheme(darkTheme);
+    }
   };
 
   return (
