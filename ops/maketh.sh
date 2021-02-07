@@ -8,10 +8,15 @@ then id=0:0
 else id="$(id -u):$(id -g)"
 fi
 
+# If file descriptors 0-2 exist, then we're prob running via interactive shell instead of on CD/CI
+if [[ -t 0 && -t 1 && -t 2 ]]
+then interactive=(--interactive --tty)
+else echo "Running in non-interactive mode"
+fi
+
 docker run \
+  "${interactive[@]}" \
   "--name=${project}_builder" \
   "--volume=$root:/root" \
-  --interactive \
   --rm \
-  --tty \
   "${project}_builder" "$id" make -f /Makefile "$@"

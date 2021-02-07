@@ -7,7 +7,6 @@ import git from "isomorphic-git";
 import http from "isomorphic-git/http/node";
 
 const trimSlash = (pathPart: string) => pathPart.replace(/^\/+/, "").replace(/\/+$/, "");
-
 export const env = {
   contentBranch: trimSlash(process.env.BLOG_CONTENT_BRANCH || "master"),
   contentDir: trimSlash(process.env.BLOG_CONTENT_DIR || ""),
@@ -19,13 +18,14 @@ export const env = {
   port: parseInt(process.env.PORT, 10) || 8080,
 };
 
-const dir = path.join(process.cwd(), "test-clone");
 git.clone({
   fs,
   http,
-  dir,
-  url: "https://github.com/isomorphic-git/lightning-fs",
-}).then(console.log);
+  dir: path.normalize("/blog-content"),
+  url: env.contentRepo,
+})
+  .then(res => console.log(`Git clone result: ${res}`))
+  .catch(e => console.log(`Git clone error: ${e}`));
 
 console.log(`Starting server in env: ${JSON.stringify(env, null, 2)}`);
 
