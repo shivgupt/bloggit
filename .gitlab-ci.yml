@@ -54,6 +54,7 @@ deploy:
     - echo "CI_COMMIT_SHA=$CI_COMMIT_SHA"
     - >
       docker build --tag ssh-action ops/ssh-action;
+      docker run \
         --env=GIT_PROJECT_NAME=$CI_PROJECT_NAME \
         --env=GIT_REPOSITORY_URL=$CI_REPOSITORY_URL \
         --env=GIT_BRANCH=prod \
