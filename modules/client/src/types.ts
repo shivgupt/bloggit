@@ -7,6 +7,8 @@ export type ServerConfig = {
 export type PostData = {
   category: string;
   content?: string;
+  featured?: string;
+  lastEdit: string;
   img?: string;
   path: string;
   slug: string;
@@ -18,6 +20,7 @@ export type PostData = {
 export type PostIndex = {
   posts: { [slug: string]: PostData };
   style?: any;
+  about: string;
   title: string;
 }
 

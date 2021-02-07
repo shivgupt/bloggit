@@ -8,11 +8,13 @@ import {
 
 export const emptyIndex: PostIndex = {
   posts: {},
+  about: "",
   title: "My Personal Website",
 };
 
 export const emptyPost: PostData = {
   category: "",
+  lastEdit: "",
   slug: "",
   path: "",
   tags: [],

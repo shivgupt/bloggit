@@ -2,8 +2,8 @@ import {
   Card,
   CardActionArea,
   CardContent,
-  CardHeader,
   CardMedia,
+  Chip,
   Grid,
   Theme,
   Typography,
@@ -12,6 +12,8 @@ import {
 } from "@material-ui/core";
 import React from "react";
 import { Link } from "react-router-dom";
+
+import { prettyDateString } from "../utils";
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
   root: {
@@ -38,7 +40,6 @@ export const Home = (props: any) => {
           <Grid className={classes.root} item xs={12} md={6} lg={4} key={slug}>
             <Card className={classes.card}>
               <CardActionArea component={Link} to={`/${slug}`}>
-                <CardHeader title={posts[slug].title} />
                 {posts[slug].img
                   ? <CardMedia
                     className={classes.media}
@@ -47,7 +48,15 @@ export const Home = (props: any) => {
                     title={slug}/>
                   : null}
                 <CardContent>
-                  <Typography variant="body2" component="p">
+                  <Typography variant="h5" gutterBottom>{posts[slug].title}</Typography>
+                  <Typography variant="caption" gutterBottom display="block">
+                    {prettyDateString(posts[slug].lastEdit)}
+                    &nbsp;
+                    &nbsp;
+                    Tags: {posts[slug].tags.map(tag => <Chip key={tag} label={tag} />)}
+                  </Typography>
+                  <br />
+                  <Typography variant="subtitle1" component="p" gutterBottom>
                     {posts[slug].tldr}
                   </Typography>
                 </CardContent>

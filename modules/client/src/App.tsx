@@ -4,29 +4,16 @@ import {
   Theme,
   createStyles,
   makeStyles,
-  createMuiTheme,
   ThemeProvider,
 } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
 import { Route, Switch } from "react-router-dom";
 
-import { FitnessTracker } from "./components/FitnessTracker";
 import { Home } from "./components/Home";
 import { NavBar } from "./components/NavBar";
 import { PostPage } from "./components/Posts";
-import { emptyIndex, fetchContent, fetchIndex, getPostsByCategories } from "./utils";
-
-const darkTheme = createMuiTheme({
-  palette: {
-    primary: {
-      main: "#deaa56",
-    },
-    secondary: {
-      main: "#e699a6",
-    },
-    type: "dark",
-  },
-});
+import { emptyIndex, fetchAbout, fetchContent, fetchIndex, getPostsByCategories } from "./utils";
+import { darkTheme, lightTheme } from "./style";
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
   appBarSpacer: theme.mixins.toolbar,
@@ -34,12 +21,14 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
     display: "flex",
   },
   container: {
-    paddingTop: theme.spacing(4),
-    paddingBottom: theme.spacing(4),
+    [theme.breakpoints.up("md")]: {
+      width: "80%",
+      marginRight: "20%",
+    },
   },
   main: {
     flexGrow: 1,
-    overflow: "auto",
+    padding: theme.spacing(3),
   },
 }));
 
@@ -50,14 +39,20 @@ const App: React.FC = () => {
     current: "categories",
     child: "posts",
   });
+  const [theme, setTheme] = useState(darkTheme);
   const [index, setIndex] = useState(emptyIndex);
   const [currentSlug, setCurrentSlug] = useState("");
   const [title, setTitle] = useState({ site: "", page: "" });
+  const [about, setAbout] = useState("");
 
   // Only once: get the content index
   useEffect(() => {
     (async () => setIndex(await fetchIndex()))();
   }, []);
+
+  useEffect(() => {
+    (async () => setAbout(await fetchAbout(index.about)))();
+  }, [index]);
 
   // Set post content if slug changes
   useEffect(() => {
@@ -86,14 +81,23 @@ const App: React.FC = () => {
   // eslint-disable-next-line
   }, [index, currentSlug]);
 
+  const toggleTheme = () => {
+    if ( theme.palette.type === "dark")
+      setTheme(lightTheme);
+    else
+      setTheme(darkTheme);
+  };
+
   return (
-    <ThemeProvider theme={darkTheme}>
+    <ThemeProvider theme={theme}>
       <CssBaseline />
       <NavBar
         node={node}
         setNode={setNode}
         posts={getPostsByCategories(index.posts)}
         title={title}
+        theme={theme}
+        toggleTheme={toggleTheme}
       />
       <main className={classes.main}>
         <div className={classes.appBarSpacer} />
@@ -112,12 +116,13 @@ const App: React.FC = () => {
               }}
             />
             <Route exact
-              path="/foodlog"
+              path="/about"
               render={() => {
                 setCurrentSlug("");
-                return (
-                  <FitnessTracker />
-                );
+                return (<PostPage content={index.about ?
+                  about
+                  : "Not added yet" }
+                />);
               }}
             />
             <Route

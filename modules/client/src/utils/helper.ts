@@ -2,6 +2,28 @@ import { PostData, Ingredient, Dish, FitnessProfile } from "../types";
 import { emptyNutrients } from "./constants";
 import * as Dishes from "../utils/dishes";
 
+export const prettyDateString = (s: string) => {
+  let month = s.substr(2,2);
+  let m;
+  
+  switch (month) {
+  case "01": m = "Jan"; break;
+  case "02": m = "Feb"; break;
+  case "03": m = "Mar"; break;
+  case "04": m = "Apr"; break;
+  case "05": m = "May"; break;
+  case "06": m = "Jun"; break;
+  case "07": m = "Jul"; break;
+  case "08": m = "Aug"; break;
+  case "09": m = "Sep"; break;
+  case "10": m = "Oct"; break;
+  case "11": m = "Nov"; break;
+  case "12": m = "Dec"; break;
+  }
+
+  return `${s.substr(0,2)} ${m}, ${s.substr(4,4)}`;
+};
+
 export const compareObj = (o1: any, o2: any) => {
   return JSON.stringify(o1) === JSON.stringify(o2);
 };
@@ -17,14 +39,12 @@ export const getChildValue = (child) => {
 };
 
 export const getPostsByCategories = (posts: { [slug: string]: PostData }) => {
-  let postsByCategory = {};
-  Object.keys(posts).forEach(slug => {
-    if (postsByCategory[posts[slug].category])
-      postsByCategory[posts[slug].category].push(posts[slug]);
-    else
-      postsByCategory[posts[slug].category] = [posts[slug]];
-  });
-  return postsByCategory;
+  return (
+    Object.values(posts).reduce((categories, post) => ({
+      ...categories,
+      [post.category]: [ ...(categories[post.category]||[]), post ]
+    }), {})
+  );
 };
 
 export const getTotalNutrientsDish = (dish: Dish) => {
