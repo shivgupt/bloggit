@@ -51,7 +51,9 @@ const App: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    (async () => setAbout(await fetchAbout(index.about)))();
+    if (index.about) {
+      (async () => setAbout(await fetchAbout(index.about)))();
+    }
   }, [index]);
 
   // Set post content if slug changes
