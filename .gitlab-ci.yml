@@ -49,6 +49,7 @@ deploy:
     - apk add bash curl git jq make
     - make pull-commit
     - bash ops/push-images.sh $(grep -m 1 '"version":' package.json | cut -d '"' -f 4)
+    - env
     - >
       docker build --tag ssh-action ops/ssh-action;
       docker run \
@@ -57,6 +58,7 @@ deploy:
         --env=CI_REPOSITORY_URL=$CI_REPOSITORY_URL \
         ssh-action $SERVER_URL $SSH_KEY '
           git checkout --force prod;
+          env
           echo "Resetting HEAD to git commit $CI_COMMIT_SHA"
           git reset --hard $CI_COMMIT_SHA;
           export BLOG_PROD="true";
