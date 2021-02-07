@@ -16,7 +16,7 @@ import { PostPage } from "./components/Posts";
 import { emptyIndex, fetchAbout, fetchContent, fetchIndex, getPostsByCategories } from "./utils";
 import { darkTheme, lightTheme } from "./style";
 import { store } from "./utils/cache";
-import { AdminContext } from "./AdminContext";
+import { AdminContext, adminKeyType } from "./AdminContext";
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
   appBarSpacer: theme.mixins.toolbar,
@@ -47,7 +47,12 @@ const App: React.FC = () => {
   const [currentSlug, setCurrentSlug] = useState("");
   const [title, setTitle] = useState({ site: "", page: "" });
   const [about, setAbout] = useState("");
-  const [adminKey, setAdminKey] = useState({ id: "", pub: "", priv: "" });
+  const [adminKey, setAdminKey] = useState({} as adminKeyType);
+
+  const updateKey = (key: adminKeyType) => {
+    setAdminKey(key);
+    store.save("adminKey", key);
+  }
 
   // Only once: get the content index
   useEffect(() => {
@@ -109,7 +114,7 @@ const App: React.FC = () => {
 
   return (
     <ThemeProvider theme={theme}>
-      <AdminContext.Provider value={{ key: adminKey }}>
+      <AdminContext.Provider value={{ key: adminKey, updateKey: updateKey }}>
         <CssBaseline />
         <NavBar
           node={node}
