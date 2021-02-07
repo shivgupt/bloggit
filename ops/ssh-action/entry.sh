@@ -54,7 +54,7 @@ echo "Running subbed command: $subbed_cmd"
 
 exec ssh -i "$KEY_FILE" -o StrictHostKeyChecking=no "$HOST" "bash -s" <<EOF
   set -e;
-  # Run CMD in an up-to-date repo
+  # Run CMD in an up-to-date repo;
   git clone $GIT_REPOSITORY_URL || true;
   cd $GIT_PROJECT_NAME;
   git checkout --force $GIT_BRANCH;
