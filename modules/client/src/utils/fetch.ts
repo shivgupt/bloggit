@@ -1,46 +1,29 @@
 import axios from "axios";
-import { PostIndex, ServerConfig } from "../types";
-import { store } from "./cache";
+
+import { PostIndex } from "../types";
 
 let indexCache: Promise<PostIndex> | undefined;
-let contentCache: { [key: string]: Promise<string>; } = {};
-let aboutCache: Promise<string>;
-
-// Remember which contentUrl worked & try that one first from now on
-const smartIndexKey = "contentUrlIndex";
-const smartIndex = (i: number) => {
-  const contentUrlIndex = store.load(smartIndexKey);
-  return (i + parseInt(contentUrlIndex, 10)) % 2;
-};
+const contentCache: { [key: string]: Promise<string>; } = {};
 
 const get = async (file: string): Promise<string | PostIndex> => {
-  const config = (await axios("/api/config")).data as ServerConfig;
-  const path = `${config.contentBranch}/${config.contentDir || ""}${file}`;
-  const urls = [`${config.contentUrl}/${path}`, `/api/${path}`];
-  for (let i = 0; i < urls.length; i += 1) {
-    const url = urls[smartIndex(i)];
-    try {
-      const response = await axios(url);
-      if (response && response.data) {
-        if (i !== 0) {
-          console.log(`Setting default content url to ${i}: ${url.replace(path, "")}`);
-          store.save(smartIndexKey, smartIndex(i).toString());
-        }
-        return response.data;
-      }
-      console.warn(`Got bad data from ${url}: ${JSON.stringify(response.data)}`);
-    } catch (e) {
-      console.warn(e.message);
+  const url = `/git/master/${file}`;
+  try {
+    const response = await axios(url);
+    if (response && response.data && response.data.content) {
+      return response.data.content;
     }
+    console.warn(`Got bad data from ${url}: ${JSON.stringify(response.data)}`);
+  } catch (e) {
+    console.warn(e.message);
   }
-  throw new Error(`Couldn't get ${path}`);
+  throw new Error(`Couldn't get ${file}`);
 };
 
 export const fetchIndex = async(): Promise<PostIndex> => {
   if (!indexCache) {
     indexCache = get("index.json") as Promise<PostIndex>;
   }
-  const index = await indexCache;
+  const index = JSON.parse((await indexCache) as any);
   if (!index || !index.posts) {
     throw new Error(`Got invalid site index ${typeof index}: ${index}`);
   }
@@ -53,13 +36,7 @@ export const fetchIndex = async(): Promise<PostIndex> => {
   return index;
 };
 
-export const fetchAbout = async(path: string): Promise<string> => {
-  if(!aboutCache) {
-    const about = (await fetchIndex()).about;
-    aboutCache = get(about) as Promise<string>;
-  }
-  return aboutCache;
-};
+export const fetchFile = async (path: string): Promise<string> => get(path) as Promise<string>;
 
 export const fetchContent = async(slug: string): Promise<string> => {
   if (!contentCache[slug]) {

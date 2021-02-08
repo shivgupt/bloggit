@@ -28,7 +28,7 @@ find modules/*/package.json package.json \
   -type f \
   -not -path "*/node_modules/*" \
   -not -path "*/dist/*" \
-  -exec sed "${sedFlag[@]}" -E 's|"'"$package"'": "[a-z0-9.^-]+"|"'"$package"'": "'"$version"'"|g' {} \;
+  -exec sed "${sedFlag[@]}" -E 's|"'"$package"'": "[a-zA-Z0-9.^ -]+"|"'"$package"'": "'"$version"'"|g' {} \;
 
 echo "After:"
 grep -r '"'"$package"'": "' modules/*/package.json package.json

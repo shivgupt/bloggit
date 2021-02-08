@@ -4,6 +4,7 @@
 **/.docker-compose.yml
 **/.node-gyp
 **/.npm
+modules/*/package-lock.json
 
 # Compiled output
 .flags

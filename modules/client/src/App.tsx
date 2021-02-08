@@ -13,7 +13,7 @@ import { Home } from "./components/Home";
 import { AdminHome } from "./components/AdminHome";
 import { NavBar } from "./components/NavBar";
 import { PostPage } from "./components/Posts";
-import { emptyIndex, fetchAbout, fetchContent, fetchIndex, getPostsByCategories } from "./utils";
+import { emptyIndex, fetchFile, fetchContent, fetchIndex, getPostsByCategories } from "./utils";
 import { darkTheme, lightTheme } from "./style";
 import { store } from "./utils/cache";
 import { AdminContext, adminKeyType } from "./AdminContext";
@@ -70,7 +70,7 @@ const App: React.FC = () => {
 
   useEffect(() => {
     if (index.about) {
-      (async () => setAbout(await fetchAbout(index.about)))();
+      (async () => setAbout(await fetchFile(index.about)))();
     }
   }, [index]);
 
