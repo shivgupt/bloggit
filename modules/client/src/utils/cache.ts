@@ -2,11 +2,10 @@ import {
   getProfileStoreObjFromState,
   getProfileStateFromStoreObj,
 } from "./helper";
-import { emptyFitnessProfile } from "./constants";
 
-const emptryStore: any = {
-  FitnessProfile: emptyFitnessProfile,
+const emptyStore: any = {
   contentUrlIndex: 0,
+  theme: "light"
 };
 
 const load = (key: string): any => {
@@ -19,9 +18,9 @@ const load = (key: string): any => {
       }
       return JSON.parse(data);
     }
-    return emptryStore[key];
+    return emptyStore[key];
   } catch (e) {
-    return emptryStore[key];
+    return emptyStore[key];
   }
 };
 
@@ -31,7 +30,7 @@ const save = (key: string, value?: any): void => {
       value = getProfileStoreObjFromState(value);
     }
   }
-  localStorage.setItem(key, JSON.stringify(value || emptryStore[key]));
+  localStorage.setItem(key, JSON.stringify(value || emptyStore[key]));
 };
 
 export const store = { load, save };
