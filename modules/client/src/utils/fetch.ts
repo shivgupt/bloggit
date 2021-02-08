@@ -6,7 +6,7 @@ let indexCache: Promise<PostIndex> | undefined;
 const contentCache: { [key: string]: Promise<string>; } = {};
 
 const get = async (file: string): Promise<string | PostIndex> => {
-  const url = `/git/main/${file}`;
+  const url = `/git/master/${file}`;
   try {
     const response = await axios(url);
     if (response && response.data && response.data.content) {
