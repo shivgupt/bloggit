@@ -66,7 +66,10 @@ export const Toc = (props: any) => {
           {Object.keys(posts).map((c) => {
             return (
               <div key={c}>
-                <ListItem >
+                <ListItem
+                  button
+                  onClick={() => setNode({ parent: "categories", current: "posts", child: c })}
+                >
                   {c}
                   <IconButton
                     onClick={() => setNode({
