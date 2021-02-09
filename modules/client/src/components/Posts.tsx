@@ -1,5 +1,6 @@
 import {
   createStyles,
+  Link,
   makeStyles,
   Paper,
   Theme,
@@ -38,6 +39,10 @@ export const PostPage = (props: any) => {
     />;
   };
 
+  const LinkRenderer = (props: any) => {
+    return <Link color="secondary" href={props.href}> {props.children[0].props.value} </Link>
+  };
+
   return (
     <Paper variant="outlined">
       <Markdown
@@ -47,6 +52,7 @@ export const PostPage = (props: any) => {
           heading: HeadingRenderer,
           code: CodeBlockRenderer,
           text: emojiSupport,
+          link: LinkRenderer,
           image: Image,
         }}
       />

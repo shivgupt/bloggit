@@ -12,7 +12,7 @@ export const siteTitleFont = createMuiTheme({
 export const darkTheme = createMuiTheme({
   palette: {
     primary: {
-      main: "#702c40",
+      main: "#91374f",
     },
     secondary: {
       main: "#379179",
