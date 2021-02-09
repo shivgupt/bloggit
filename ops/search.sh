@@ -9,6 +9,7 @@ fi
 
 grep "$@" --exclude=*.swp --exclude=*.pdf --color=auto -r "$target" \
   Makefile \
+  modules/*/config \
   modules/*/ops \
   modules/*/package.json \
   modules/*/src \

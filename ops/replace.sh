@@ -22,6 +22,7 @@ if [[ "$response" == "y" ]]
 then
   find \
     Makefile \
+    modules/*/config \
     modules/*/ops \
     modules/*/package.json \
     modules/*/src \
