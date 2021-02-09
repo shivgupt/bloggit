@@ -62,10 +62,10 @@ Service.prototype.createStream = function () {
   stream._write = function (buf, enc, next) {
     // dont send terminate signal
     if (buf.length !== 4 && buf.toString() !== "0000") backend.push(buf);
-    else stream.needsPktFlush = true;
+    else (stream as any).needsPktFlush = true;
 
     if (backend._ready) next();
-    else stream._next = next;
+    else (stream as any)._next = next;
   };
 
   stream._read = function () {
@@ -78,7 +78,7 @@ Service.prototype.createStream = function () {
   };
 
   backend._stream = stream;
-  if (backend._ready) stream._read();
+  if (backend._ready) stream._read(128); // TODO how many bytes should we actually read?
 
   stream.on("finish", function f () {
     if (self._bands.length) {
@@ -96,7 +96,7 @@ Service.prototype.createStream = function () {
       if (next) next();
     }
     else {
-      if (stream.needsPktFlush) backend.push(new Buffer("0000"));
+      if ((stream as any).needsPktFlush) backend.push(new Buffer("0000"));
       backend.push(null);
     }
   });
@@ -108,8 +108,8 @@ Service.prototype.createStream = function () {
 Service.prototype.createBand = function () {
   const stream = new Writable();
   stream._write = function (buf, enc, next) {
-    stream._buffer = buf;
-    stream._next = next;
+    (stream as any)._buffer = buf;
+    (stream as any)._next = next;
   };
   this._bands.push(stream);
   return stream;
@@ -126,7 +126,7 @@ function infoPrelude (service) {
 inherits(Backend, Duplex);
 
 export function Backend (uri, cb) {
-  if (!(this instanceof Backend)) return new Backend(uri, cb);
+  if (!(this instanceof Backend)) return new (Backend as any)(uri, cb);
   const self = this;
   Duplex.call(this);
 
