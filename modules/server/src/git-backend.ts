@@ -1,6 +1,5 @@
 import { Duplex } from "stream";
 import * as url from "url";
-import { inherits } from "util";
 import qs from "querystring";
 
 const regex = {
@@ -108,15 +107,17 @@ export const getService = (opts: ServiceOpts, backend: any): IService => {
   };
 };
 
-inherits(GitBackend, Duplex);
+type IGitBackend = Duplex;
 
-export function GitBackend (uri, cb: (err: string, service: IService) => void) {
+export const getGitBackend = (
+  uri: string,
+  cb: (err: string, service: IService) => void,
+): IGitBackend | void => {
+  const self = new Duplex() as any;
   const error = (msg) => process.nextTick((): void => {
     self.emit("error", typeof msg === "string" ? new Error(msg) : msg);
   });
   console.log(`GitBackend(${uri}, ${typeof cb})`);
-  if (!(this instanceof GitBackend)) return new (GitBackend as any)(uri, cb);
-  const self = this;
   Duplex.call(self);
   if (cb) {
     self.on("service", (s) => { cb(null, s); });
@@ -145,50 +146,49 @@ export function GitBackend (uri, cb: (err: string, service: IService) => void) {
     const service = getService({ cmd: self.service, info: true }, self);
     process.nextTick(() => self.emit("service", service));
   }
-}
-
-GitBackend.prototype._read = function (n) {
-  console.log(`GitBackend.prototype._read`);
-  if (this._stream && this._stream.next) {
-    this._ready = false;
-    this._stream.next();
-  }
-  else this._ready = n;
-};
-
-GitBackend.prototype._write = function (buf, enc, next) {
-  console.log(`GitBackend.prototype._write`);
-  if (this._stream) {
-    this._next = next;
-    this._stream.push(buf);
-    return;
-  }
-  else if (this.info) {
-    this._buffer = buf;
-    this._next = next;
-    return;
-  }
-  if (this._prev) buf = Buffer.concat([ this._prev, buf ]);
-  const res = buf.slice(0,512).toString("utf8");
-  console.log(`Sliced buffer of length ${buf.length} into ${res}`);
-  const m = regex[this.service].exec(res);
-  console.log(`Got a regex match: ${m}`);
-  if (m) {
-    this._prev = null;
-    this._buffer = buf;
-    this._next = next;
-    const keys = fields[this.service];
-    const row = { cmd: this.service };
-    for (let i = 0; i < keys.length; i++) {
-      row[keys[i]] = m[i+1];
+  self._read = (n?: number) => {
+    console.log(`GitBackend.prototype._read`);
+    if (self._stream && self._stream.next) {
+      self._ready = false;
+      self._stream.next();
     }
-    this.emit("service", getService(row, this));
-  }
-  else if (buf.length >= 512) {
-    return this.emit("error", new Error("unrecognized input"));
-  }
-  else {
-    this._prev = buf;
-    next();
-  }
+    else self._ready = n;
+  };
+  self._write = (buf, enc, next) => {
+    console.log(`GitBackend.prototype._write`);
+    if (self._stream) {
+      self._next = next;
+      self._stream.push(buf);
+      return;
+    }
+    else if (self.info) {
+      self._buffer = buf;
+      self._next = next;
+      return;
+    }
+    if (self._prev) buf = Buffer.concat([ self._prev, buf ]);
+    const res = buf.slice(0,512).toString("utf8");
+    console.log(`Sliced buffer of length ${buf.length} into ${res}`);
+    const m = regex[self.service].exec(res);
+    console.log(`Got a regex match: ${m}`);
+    if (m) {
+      self._prev = null;
+      self._buffer = buf;
+      self._next = next;
+      const keys = fields[self.service];
+      const row = { cmd: self.service };
+      for (let i = 0; i < keys.length; i++) {
+        row[keys[i]] = m[i+1];
+      }
+      self.emit("service", getService(row, self));
+    }
+    else if (buf.length >= 512) {
+      return self.emit("error", new Error("unrecognized input"));
+    }
+    else {
+      self._prev = buf;
+      next();
+    }
+  };
+  return self;
 };

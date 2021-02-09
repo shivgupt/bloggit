@@ -3,7 +3,7 @@ import { spawn } from "child_process";
 import zlib from "zlib";
 
 import { env } from "./env";
-import { GitBackend } from "./git-backend";
+import { getGitBackend } from "./git-backend";
 
 const server = http.createServer(function (req, res) {
   console.log(`git server received a ${req.method} req for: ${req.url}`);
@@ -12,7 +12,7 @@ const server = http.createServer(function (req, res) {
     : req;
   reqStream.pipe(
 
-    GitBackend(req.url, function (err, service) {
+    getGitBackend(req.url, function (err, service) {
       if (err) {
         console.log(`Error, not launching service: ${err}`);
         return res.end(err + "\n");
@@ -29,7 +29,7 @@ const server = http.createServer(function (req, res) {
       ps.stderr.on("data", (data) => console.log(`===== Child produced errors: ${data}`));
 
       ps.stdout.pipe(service.createStream()).pipe(ps.stdin);
-    }),
+    }) as any,
 
   ).pipe(res);
 });
