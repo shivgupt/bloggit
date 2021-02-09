@@ -24,7 +24,6 @@ const resolveRef = async (givenRef: string): Promise<string> => {
 
 git.listBranches({ ...gitOpts }).then(lob => console.log(`list of branches: ${lob}`));
 
-// Second: return config if requested
 gitRouter.get("/config", (req, res, _): void => {
   res.json({
     defaultBranch: env.defaultBranch,
