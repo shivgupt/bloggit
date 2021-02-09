@@ -10,5 +10,7 @@ export const AdminContext = React.createContext({
     id: "",
     value: "",
   },
+
+  // eslint-disable-next-line
   updateKey: (key: adminKeyType) => {},
 });

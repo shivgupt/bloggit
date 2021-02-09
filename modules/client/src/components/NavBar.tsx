@@ -19,8 +19,10 @@ import {
 } from "@material-ui/icons";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { Toc } from "./ToC";
+
 import { siteTitleFont } from "../style";
+
+import { Toc } from "./ToC";
 
 const useStyles = makeStyles(theme => ({
   appBar: {

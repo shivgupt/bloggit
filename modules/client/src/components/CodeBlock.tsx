@@ -6,13 +6,13 @@ import { atomDark, vs } from "react-syntax-highlighter/dist/esm/styles/prism";
 export const CodeBlockRenderer = (props: any) => {
   const theme = useTheme();
 
- if (theme.palette.type === "dark") {
+  if (theme.palette.type === "dark") {
     return (
       <SyntaxHighlighter showLineNumbers language={props.language} style={atomDark}>
         {props.value}
       </SyntaxHighlighter>
     );
- }
+  }
 
   return (
     <SyntaxHighlighter language={props.language} style={vs}>

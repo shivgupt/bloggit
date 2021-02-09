@@ -31,7 +31,8 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
   },
   main: {
     flexGrow: 1,
-    padding: theme.spacing(3),
+    marginTop: theme.spacing(2),
+    padding: theme.spacing(0.25),
   },
 }));
 
@@ -52,7 +53,7 @@ const App: React.FC = () => {
   const updateKey = (key: adminKeyType) => {
     setAdminKey(key);
     store.save("adminKey", key);
-  }
+  };
 
   // Only once: get the content index
   useEffect(() => {

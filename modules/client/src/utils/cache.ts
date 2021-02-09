@@ -10,7 +10,7 @@ const emptyStore: any = {
 
 const load = (key: string): any => {
   try {
-    let data = localStorage.getItem(key);
+    const data = localStorage.getItem(key);
     if (data) {
       // console.log(`Loaded ${(data)} for key ${key}`);
       if (key === "FitnessProfile") {

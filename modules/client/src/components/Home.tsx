@@ -5,9 +5,7 @@ import {
   CardMedia,
   Chip,
   Grid,
-  Theme,
   Typography,
-  createStyles,
   makeStyles,
 } from "@material-ui/core";
 import React from "react";
@@ -15,7 +13,7 @@ import { Link } from "react-router-dom";
 
 import { prettyDateString } from "../utils";
 
-const useStyles = makeStyles((theme: Theme) => createStyles({
+const useStyles = makeStyles(() => ({
   root: {
     display: "flex",
     alignContent: "center",

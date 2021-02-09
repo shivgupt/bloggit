@@ -6,19 +6,20 @@ import {
   TextField,
   Theme,
   Typography,
- } from "@material-ui/core";
+} from "@material-ui/core";
 
 import { AdminContext } from "../AdminContext";
 
 const useStyles = makeStyles((theme: Theme) => ({
   section: {
     margin: theme.spacing(3, 2),
-    '& > *': {
+    "& > *": {
       margin: theme.spacing(1),
     }
   },
-}))
-export const AdminHome = (props: any) => {
+}));
+
+export const AdminHome = () => {
 
   const adminContext = useContext(AdminContext);
   const classes = useStyles();
@@ -26,12 +27,11 @@ export const AdminHome = (props: any) => {
   const handleRegister = () => {
     const id = (document.getElementById("key-id") as HTMLInputElement).value;
     const value = (document.getElementById("key-value") as HTMLInputElement).value;
-    console.log(adminContext.updateKey);
-    adminContext.updateKey({id, value});
-  }
+    adminContext.updateKey({ id, value });
+  };
+
   return (
     <div>
-      
       <Typography variant="h4"> Admin Key</Typography>
       {adminContext.key && adminContext.key.id
         ? (
@@ -86,7 +86,6 @@ export const AdminHome = (props: any) => {
         />
         <Button onClick={handleRegister}> Register </Button>
       </div>
-
     </div>
-  )
+  );
 };

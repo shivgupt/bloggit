@@ -1,9 +1,7 @@
 import {
-  createStyles,
   Link,
   makeStyles,
   Paper,
-  Theme,
 } from "@material-ui/core";
 import React from "react";
 import Markdown from "react-markdown";
@@ -12,7 +10,7 @@ import emoji from "emoji-dictionary";
 import { CodeBlockRenderer } from "./CodeBlock";
 import { HeadingRenderer } from "./HeadingRenderer";
 
-const useStyles = makeStyles((theme: Theme) => createStyles({
+const useStyles = makeStyles(() => ({
   root: {
     flexGrow: 1,
   },
@@ -40,7 +38,7 @@ export const PostPage = (props: any) => {
   };
 
   const LinkRenderer = (props: any) => {
-    return <Link color="secondary" href={props.href}> {props.children[0].props.value} </Link>
+    return (<Link color="secondary" href={props.href}> {props.children[0].props.value} </Link>);
   };
 
   return (
