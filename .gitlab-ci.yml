@@ -47,7 +47,7 @@ deploy:
       - prod
   script:
     - apk add bash curl git jq make
-    - bash ops/tag-images.sh
+    - make push-semver
     - >
       docker build --tag ssh-action ops/ssh-action;
       docker run \
@@ -58,6 +58,7 @@ deploy:
         ssh-action $SERVER_URL $SSH_KEY '
           export BLOG_PROD="true";
           make pull-commit;
+          make pull-semver;
           make restart;
           docker container prune -f;
           docker image ls -q | xargs docker image rm 2> /dev/null || true;
