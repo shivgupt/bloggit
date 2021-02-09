@@ -8,7 +8,7 @@ echo
 echo "$host/git/config should connect to the server"
 $curl "$host/git/config"
 echo
-if [[ "$($curl --silent "$host/git/config")" == *"contentUrl"* ]]
+if [[ "$($curl --silent "$host/git/config")" == *"contentBranch"* ]]
 then echo "Looks good"
 else echo "Looks not good" && exit 1
 fi

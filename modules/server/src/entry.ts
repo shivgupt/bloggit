@@ -15,7 +15,6 @@ app.use("/git/config", (req, res, _): void => {
   res.json({
     contentBranch: env.contentBranch,
     contentDir: env.contentDir,
-    contentUrl: env.contentUrl,
   });
 });
 

@@ -1,19 +1,11 @@
 #!/bin/bash
 set -e
 
-branch="${BLOG_CONTENT_BRANCH:-main}"
-repo="${BLOG_CONTENT_REPO}"
+BLOG_CONTENT_DIR="${BLOG_CONTENT_DIR:-/blog-content.git}"
 
-if [[ ! -d "/blog-content/.git" ]]
-then git clone "$repo" /blog-content
+if [[ ! -d "$BLOG_CONTENT_DIR" ]]
+then git init --bare "$BLOG_CONTENT_DIR"
 fi
-
-(
-  cd /blog-content
-  git fetch --all --prune --tags
-  git checkout --force "$branch"
-  git reset --hard "origin/$branch"
-)
 
 if [[ -d "modules/server" ]]
 then cd modules/server
@@ -27,7 +19,7 @@ then
 else
   echo "Starting blog server in dev-mode"
   export NODE_ENV=development
-  if [[ -z "$(which nodemon)" ]]
+  if [[ -z "$(command -v nodemon)" ]]
   then
     echo "Install deps & mount the monorepo into this container before running in dev-mode"
     exit 1
