@@ -1,15 +1,50 @@
 #!/bin/bash
 set -e
 
-BLOG_CONTENT_DIR="${BLOG_CONTENT_DIR:-/blog-content.git}"
+export BLOG_INTERNAL_CONTENT_DIR="${BLOG_INTERNAL_CONTENT_DIR:-/blog-content.git}"
+export BLOG_DEFAULT_BRANCH="${BLOG_DEFAULT_BRANCH:-main}"
 
-if [[ ! -d "$BLOG_CONTENT_DIR" ]]
-then git init --bare "$BLOG_CONTENT_DIR"
-fi
+echo "Starting server in env:"
+echo "- BLOG_INTERNAL_CONTENT_DIR=$BLOG_INTERNAL_CONTENT_DIR"
+echo "- BLOG_CONTENT_MIRROR=$BLOG_CONTENT_MIRROR"
+echo "- BLOG_DEFAULT_BRANCH=$BLOG_DEFAULT_BRANCH"
 
 if [[ -d "modules/server" ]]
 then cd modules/server
 fi
+
+########################################
+## Init & update local content git repo
+
+if [[ ! -d "$BLOG_INTERNAL_CONTENT_DIR" || ! -d "$BLOG_INTERNAL_CONTENT_DIR/refs" ]]
+then
+  echo "Initializing a bare git repo and setting the HEAD branch to $BLOG_DEFAULT_BRANCH"
+  git init --bare "$BLOG_INTERNAL_CONTENT_DIR"
+  (
+    cd "$BLOG_INTERNAL_CONTENT_DIR"
+    rm -rf HEAD
+    echo "ref: refs/heads/$BLOG_DEFAULT_BRANCH" > HEAD
+  )
+fi
+
+if [[ -n "$BLOG_CONTENT_MIRROR" ]]
+then
+  (
+    echo "Pulling updates from remote content mirror at $BLOG_CONTENT_MIRROR"
+    cd "$BLOG_INTERNAL_CONTENT_DIR"
+    if ! grep -qs "mirror" <<<"$(git remote)"
+    then git remote add mirror "$BLOG_CONTENT_MIRROR"
+    else git remote set-url mirror "$BLOG_CONTENT_MIRROR"
+    fi
+    git fetch mirror --prune --tags
+    if ! grep -qs "main" <<<"$(git branch -l)"
+    then git branch main mirror/main
+    fi
+  )
+fi
+
+########################################
+## Launch the server
 
 if [[ "$BLOG_PROD" == "true" ]]
 then
@@ -33,5 +68,3 @@ else
     --exec ts-node \
     ./src/entry.ts
 fi
-
-

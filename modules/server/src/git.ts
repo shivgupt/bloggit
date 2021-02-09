@@ -4,9 +4,11 @@ import path from "path";
 import express from "express";
 import git from "isomorphic-git";
 
+import { env } from "./env";
+
 export const gitRouter = express.Router();
 
-const gitOpts = { fs, dir: path.normalize("/blog-content") };
+const gitOpts = { fs, dir: path.normalize("/blog-content.git") };
 
 // Given a branch name or abreviated commit hash, return the full commit hash
 const resolveRef = async (givenRef: string): Promise<string> => {
@@ -18,6 +20,15 @@ const resolveRef = async (givenRef: string): Promise<string> => {
   }
   return ref;
 };
+
+git.listBranches({ ...gitOpts }).then(lob => console.log(`list of branches: ${lob}`));
+
+// Second: return config if requested
+gitRouter.get("/config", (req, res, _): void => {
+  res.json({
+    defaultBranch: env.defaultBranch,
+  });
+});
 
 gitRouter.get("/:ref/*", async (req, res, next): Promise<void> => {
   const { ref: givenRef } = req.params;
