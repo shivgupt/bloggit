@@ -39,7 +39,7 @@ export const Home = (props: any) => {
         return (
           <Grid className={classes.root} item xs={12} md={6} lg={4} key={slug}>
             <Card className={classes.card}>
-              <CardActionArea component={Link} to={`/${slug}`}>
+              <CardActionArea className={classes.card} component={Link} to={`/${slug}`}>
                 {posts[slug].img
                   ? <CardMedia
                     className={classes.media}
