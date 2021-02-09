@@ -23,6 +23,12 @@ BLOG_EMAIL="${BLOG_EMAIL:-noreply@gmail.com}" # for notifications when ssl certs
 BLOG_HOST_CONTENT_DIR="${BLOG_HOST_CONTENT_DIR:-content}"
 BLOG_HOST_MEDIA_DIR="${BLOG_HOST_MEDIA_DIR:-media}" # mounted into IPFS
 BLOG_PROD="${BLOG_PROD:-false}"
+BLOG_SEMVER="${BLOG_SEMVER:-false}"
+
+# If semver flag is given, we should ensure the prod flag is also active
+if [[ "$BLOG_SEMVER" == "true" ]]
+then export BLOG_PROD=true
+fi
 
 echo "Launching $project in env:"
 echo "- BLOG_CONTENT_MIRROR=$BLOG_CONTENT_MIRROR"
@@ -32,6 +38,7 @@ echo "- BLOG_DOMAINNAME=$BLOG_DOMAINNAME"
 echo "- BLOG_EMAIL=$BLOG_EMAIL"
 echo "- BLOG_HOST_MEDIA_DIR=$BLOG_HOST_MEDIA_DIR"
 echo "- BLOG_PROD=$BLOG_PROD"
+echo "- BLOG_SEMVER=$BLOG_SEMVER"
 
 ########################################
 # Misc Config
@@ -44,7 +51,9 @@ if [[ "$BLOG_HOST_MEDIA_DIR" == "/"* ]]
 then mkdir -p "$BLOG_HOST_MEDIA_DIR"
 fi
 
-if [[ "$BLOG_PROD" == "true" ]]
+if [[ "$BLOG_SEMVER" == "true" ]]
+then version=v$(grep -m 1 '"version":' "$root/package.json" | cut -d '"' -f 4)
+elif [[ "$BLOG_PROD" == "true" ]]
 then version=$(git rev-parse HEAD | head -c 8)
 else version="latest"
 fi
