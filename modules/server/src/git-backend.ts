@@ -18,15 +18,22 @@ const fields = {
 type ServiceOpts = {
   cmd: string,
   info?: boolean,
-  last?: any,
-  head?: any,
-  refname?: any,
-  tag?: any,
+  last?: string,
+  head?: string,
+  refname?: string,
+  tag?: string,
 };
 
-function Service (opts: ServiceOpts, backend): void {
+type IService = {
+  createStream: any;
+  type: string;
+  args: string[];
+  cmd: string;
+}
+
+export const getService = (opts: ServiceOpts, backend: any): IService => {
   console.log(`Service(${JSON.stringify(opts)}, ${typeof backend})`);
-  const self = this;
+  const self = {} as any;
   self.info = opts.info;
   self.cmd = opts.cmd;
   self.action = self.info ? "info" : {
@@ -50,62 +57,60 @@ function Service (opts: ServiceOpts, backend): void {
   }
   self.args = [ "--stateless-rpc" ];
   if (self.info) self.args.push("--advertise-refs");
-}
-
-Service.prototype.createStream = function () {
-  const self = this;
-  console.log(`Service.prototype.createStream w self._backend._ready=${self._backend._ready}`);
-  const stream = new Duplex();
-  const backend = self._backend;
-
-  stream._read = () => {
-    console.log(`stream._read()`);
-    const next = backend._next;
-    const buf = backend._buffer;
-    backend._next = null;
-    backend._buffer = null;
-    console.log(`buf=${typeof buf}`);
-    console.log(`next=${typeof next}`);
-    if (buf) stream.push(buf);
-    if (next) next();
+  return {
+    type: self.type,
+    args: self.args,
+    cmd: self.cmd,
+    createStream: () => {
+      console.log(
+        `Service.prototype.createStream w self._backend._ready=${self._backend._ready}`,
+      );
+      const stream = new Duplex();
+      const backend = self._backend;
+      stream._read = () => {
+        console.log(`stream._read()`);
+        const next = backend._next;
+        const buf = backend._buffer;
+        backend._next = null;
+        backend._buffer = null;
+        console.log(`buf=${typeof buf}`);
+        console.log(`next=${typeof next}`);
+        if (buf) stream.push(buf);
+        if (next) next();
+      };
+      stream._write = (buf, enc, next) => {
+        console.log(`stream._write() w backend._ready = ${backend._ready}`);
+        // dont send terminate signal
+        if (buf.length !== 4 && buf.toString() !== "0000") backend.push(buf);
+        else (stream as any).needsPktFlush = true;
+        if (backend._ready) next();
+        else (stream as any)._next = next;
+      };
+      backend._stream = stream;
+      if (backend._ready) {
+        console.log(`GitBackend is ready, _reading stream`);
+        stream._read(undefined as any);
+      }
+      stream.on("finish", () => {
+        if ((stream as any).needsPktFlush) backend.push(new Buffer("0000"));
+        backend.push(null);
+      });
+      if (self.info) {
+        console.log(`infoPrelude(${self.cmd})`);
+        const pack = (s: string): string => {
+          const n = (4 + s.length).toString(16);
+          return Array(4 - n.length + 1).join("0") + n + s;
+        };
+        backend.push(pack("# service=" + self.cmd + "\n") + "0000");
+      }
+      return stream;
+    },
   };
-
-  stream._write = (buf, enc, next) => {
-    console.log(`stream._write() w backend._ready = ${backend._ready}`);
-    // dont send terminate signal
-    if (buf.length !== 4 && buf.toString() !== "0000") backend.push(buf);
-    else (stream as any).needsPktFlush = true;
-    if (backend._ready) next();
-    else (stream as any)._next = next;
-  };
-
-  backend._stream = stream;
-
-  if (backend._ready) {
-    console.log(`GitBackend is ready, _reading stream`);
-    stream._read(undefined as any);
-  }
-
-  stream.on("finish", () => {
-    if ((stream as any).needsPktFlush) backend.push(new Buffer("0000"));
-    backend.push(null);
-  });
-
-  if (self.info) {
-    console.log(`infoPrelude(${self.cmd})`);
-    const pack = (s: string): string => {
-      const n = (4 + s.length).toString(16);
-      return Array(4 - n.length + 1).join("0") + n + s;
-    };
-    backend.push(pack("# service=" + self.cmd + "\n") + "0000");
-  }
-
-  return stream;
 };
 
 inherits(GitBackend, Duplex);
 
-export function GitBackend (uri, cb) {
+export function GitBackend (uri, cb: (err: string, service: IService) => void) {
   const error = (msg) => process.nextTick((): void => {
     self.emit("error", typeof msg === "string" ? new Error(msg) : msg);
   });
@@ -114,7 +119,7 @@ export function GitBackend (uri, cb) {
   const self = this;
   Duplex.call(self);
   if (cb) {
-    self.on("service", s => cb(null, s));
+    self.on("service", (s) => { cb(null, s); });
     self.on("error", cb);
   }
   try { uri = decodeURIComponent(uri); }
@@ -137,7 +142,7 @@ export function GitBackend (uri, cb) {
     return error("unsupported git service");
   }
   if (self.info) {
-    const service = new Service({ cmd: self.service, info: true }, self);
+    const service = getService({ cmd: self.service, info: true }, self);
     process.nextTick(() => self.emit("service", service));
   }
 }
@@ -177,7 +182,7 @@ GitBackend.prototype._write = function (buf, enc, next) {
     for (let i = 0; i < keys.length; i++) {
       row[keys[i]] = m[i+1];
     }
-    this.emit("service", new Service(row, this));
+    this.emit("service", getService(row, this));
   }
   else if (buf.length >= 512) {
     return this.emit("error", new Error("unrecognized input"));
