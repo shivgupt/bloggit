@@ -49,11 +49,14 @@ const App: React.FC = () => {
   const [title, setTitle] = useState({ site: "", page: "" });
   const [about, setAbout] = useState("");
   const [adminKey, setAdminKey] = useState({} as adminKeyType);
+  const [adminMode, setAdminMode] = useState(true);
 
   const updateKey = (key: adminKeyType) => {
     setAdminKey(key);
     store.save("adminKey", key);
   };
+
+  const viewAdminMode = (viewAdminMode: boolean) => setAdminMode(viewAdminMode);
 
   // Only once: get the content index
   useEffect(() => {
@@ -139,7 +142,7 @@ const App: React.FC = () => {
 
   return (
     <ThemeProvider theme={theme}>
-      <AdminContext.Provider value={{ key: adminKey, updateKey: updateKey }}>
+      <AdminContext.Provider value={{ key: adminKey, updateKey: updateKey, adminMode, viewAdminMode}}>
         <CssBaseline />
         <NavBar
           node={node}

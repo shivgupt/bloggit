@@ -11,6 +11,9 @@ export const AdminContext = React.createContext({
     value: "",
   },
 
+  adminMode: true,
+
   // eslint-disable-next-line
   updateKey: (key: adminKeyType) => {},
+  viewAdminMode: (viewAdminMode: boolean) => {},
 });
