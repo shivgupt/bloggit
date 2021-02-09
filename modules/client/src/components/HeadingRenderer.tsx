@@ -23,6 +23,10 @@ export const HeadingRenderer = (props: any) => {
     {
       "data-sourcepos": props["data-sourcepos"],
       "id": slug,
+      style: {
+        marginTop: "-65px",
+        paddingTop: "65px"
+      }
     },
     [
       props.children, 
