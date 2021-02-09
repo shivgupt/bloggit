@@ -37,10 +37,10 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
 
 const App: React.FC = () => {
   const classes = useStyles();
-  const [node, setNode] = useState({
-    parent: null,
-    current: "categories",
-    child: "posts",
+  const [node, setNode] = useState({} as {
+    parent: string | null,
+    current: string,
+    child: any,
   });
   const [theme, setTheme] = useState(lightTheme);
   const [index, setIndex] = useState(emptyIndex);
@@ -57,6 +57,13 @@ const App: React.FC = () => {
   // Only once: get the content index
   useEffect(() => {
     (async () => setIndex(await fetchIndex()))();
+
+    // Set top level node
+    setNode({
+      parent: "",
+      current: "categories",
+      child: "posts"
+    });
 
     // Set theme to local preference
     const themeSelection = store.load("theme");
@@ -87,6 +94,23 @@ const App: React.FC = () => {
       newIndex.posts[currentSlug].content = currentContent;
       setIndex(newIndex);
     })();
+
+    // Set sidebar node
+    if (currentSlug === ""){
+      setNode({
+        parent: "",
+        current: "categories",
+        child: "posts"
+      });
+    } else {
+      setNode({
+        parent: "posts",
+        current: "toc",
+        child: index.posts[currentSlug],
+      });
+
+    }
+
   // eslint-disable-next-line
   }, [currentSlug, index]);
 
