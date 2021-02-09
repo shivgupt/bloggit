@@ -2,6 +2,7 @@ import express from "express";
 
 import { env } from "./env";
 import { gitRouter } from "./git";
+import "./git-server";
 
 console.log(`Starting server in env: ${JSON.stringify(env, null, 2)}`);
 

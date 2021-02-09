@@ -18,6 +18,7 @@ const fields = {
 };
 
 function Service (opts, backend) {
+  console.log(`Service(${JSON.stringify(opts)}, ${typeof backend})`);
   this.info = opts.info;
   this.cmd = opts.cmd;
   this._bands = [];
@@ -55,11 +56,13 @@ function Service (opts, backend) {
 }
 
 Service.prototype.createStream = function () {
+  console.log(`Service.prototype.createStream w this._backend._ready=${this._backend._ready}`);
   const self = this;
   const stream = new Duplex();
   const backend = this._backend;
 
   stream._write = function (buf, enc, next) {
+    console.log(`stream._write() w backend._ready = ${backend._ready}`);
     // dont send terminate signal
     if (buf.length !== 4 && buf.toString() !== "0000") backend.push(buf);
     else (stream as any).needsPktFlush = true;
@@ -69,18 +72,26 @@ Service.prototype.createStream = function () {
   };
 
   stream._read = function () {
+    console.log(`stream._read()`);
     const next = backend._next;
     const buf = backend._buffer;
     backend._next = null;
     backend._buffer = null;
+    console.log(`buf=${typeof buf}`);
+    console.log(`next=${typeof next}`);
     if (buf) stream.push(buf);
     if (next) next();
   };
 
   backend._stream = stream;
-  if (backend._ready) stream._read(128); // TODO how many bytes should we actually read?
+  // TODO how many bytes should we actually read?
+  if (backend._ready) {
+    console.log(`Backend is ready, _reading stream`);
+    stream._read(undefined as any);
+  }
 
   stream.on("finish", function f () {
+    console.log(`stream.on(finish) w _bands.length=${self._bands.length}`);
     if (self._bands.length) {
       const s = self._bands.shift();
       s._write = function (buf, enc, next) {
@@ -106,6 +117,7 @@ Service.prototype.createStream = function () {
 };
 
 Service.prototype.createBand = function () {
+  console.log(`Service.prototype.createBand`);
   const stream = new Writable();
   stream._write = function (buf, enc, next) {
     (stream as any)._buffer = buf;
@@ -116,6 +128,7 @@ Service.prototype.createBand = function () {
 };
 
 function infoPrelude (service) {
+  console.log(`infoPrelude(${service})`);
   function pack (s) {
     const n = (4 + s.length).toString(16);
     return Array(4 - n.length + 1).join("0") + n + s;
@@ -126,6 +139,7 @@ function infoPrelude (service) {
 inherits(Backend, Duplex);
 
 export function Backend (uri, cb) {
+  console.log(`Backend(${uri}, ${typeof cb})`);
   if (!(this instanceof Backend)) return new (Backend as any)(uri, cb);
   const self = this;
   Duplex.call(this);
@@ -140,6 +154,7 @@ export function Backend (uri, cb) {
 
   const u = url.parse(uri);
   if (/\.\/|\.\./.test(u.pathname)) return error("invalid git path");
+  console.log(`Parsed uri to pathname=${u.pathname} and query=${u.query}`);
 
   this.parsed = false;
   const parts = u.pathname.split("/");
@@ -152,8 +167,9 @@ export function Backend (uri, cb) {
   else {
     this.service = parts[parts.length-1];
   }
+  console.log(`Set service to ${this.service} (info=${this.info})`);
 
-  if (this.service !== "git-upload-pack" || this.service !== "git-receive-pack") {
+  if (this.service !== "git-upload-pack" && this.service !== "git-receive-pack") {
     return error("unsupported git service");
   }
 
@@ -171,6 +187,7 @@ export function Backend (uri, cb) {
 }
 
 Backend.prototype._read = function (n) {
+  console.log(`Backend.prototype._read`);
   if (this._stream && this._stream.next) {
     this._ready = false;
     this._stream.next();
@@ -179,6 +196,7 @@ Backend.prototype._read = function (n) {
 };
 
 Backend.prototype._write = function (buf, enc, next) {
+  console.log(`Backend.prototype._write`);
   if (this._stream) {
     this._next = next;
     this._stream.push(buf);
@@ -192,8 +210,10 @@ Backend.prototype._write = function (buf, enc, next) {
 
   if (this._prev) buf = Buffer.concat([ this._prev, buf ]);
 
-  const [_, s] = buf.slice(0,512).toString("utf8");
-  const m = regex[this.service].exec(s);
+  const res = buf.slice(0,512).toString("utf8");
+  console.log(`Sliced buffer of length ${buf.length} into ${res}`);
+  const m = regex[this.service].exec(res);
+  console.log(`Got a regex match: ${m}`);
   if (m) {
     this._prev = null;
     this._buffer = buf;

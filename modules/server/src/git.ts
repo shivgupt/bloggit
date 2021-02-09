@@ -8,7 +8,7 @@ import { env } from "./env";
 
 export const gitRouter = express.Router();
 
-const gitdir = path.normalize("/blog-content.git");
+const gitdir = path.normalize(env.contentDir);
 const gitOpts = { fs, dir: gitdir, gitdir };
 
 // Given a branch name or abreviated commit hash, return the full commit hash

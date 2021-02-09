@@ -100,6 +100,8 @@ else
     $common
     $server_env
     entrypoint: 'bash modules/server/ops/entry.sh'
+    ports:
+      - '5000:5000'
     volumes:
       - '$root:/root'
       - '$BLOG_HOST_CONTENT_DIR:/blog-content.git'"
