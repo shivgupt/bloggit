@@ -36,6 +36,14 @@ echo "- BLOG_PROD=$BLOG_PROD"
 ########################################
 # Misc Config
 
+if [[ "$BLOG_HOST_CONTENT_DIR" == "/"* ]]
+then mkdir -p "$BLOG_HOST_CONTENT_DIR"
+fi
+
+if [[ "$BLOG_HOST_MEDIA_DIR" == "/"* ]]
+then mkdir -p "$BLOG_HOST_MEDIA_DIR"
+fi
+
 if [[ "$BLOG_PROD" == "true" ]]
 then version=$(git rev-parse HEAD | head -c 8)
 else version="latest"
