@@ -6,6 +6,9 @@ stages:
 build:
   image: docker:stable
   stage: build
+  only:
+    refs:
+      - branches
   services:
     - name: docker:dind
       alias: localhost
@@ -19,6 +22,9 @@ build:
 test:
   image: docker:stable
   stage: test
+  only:
+    refs:
+      - branches
   services:
     - name: docker:dind
       alias: localhost
