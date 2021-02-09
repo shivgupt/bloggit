@@ -53,6 +53,7 @@ deploy:
       - prod
   script:
     - apk add bash curl git jq make
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - make push-semver
     - >
       docker build --tag ssh-action ops/ssh-action;
