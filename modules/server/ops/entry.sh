@@ -40,7 +40,6 @@ then
     if ! grep -qs "main" <<<"$(git branch -l)"
     then git branch main mirror/main
     fi
-    gir remote remove mirror
   )
 fi
 

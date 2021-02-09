@@ -11,6 +11,8 @@ const app = express();
 // First: Log everything
 app.use((req, res, next) => { console.log(`=> ${req.path}`); next(); });
 
+// TODO: gunzip?
+
 // Second: return info from local git repo
 app.use("/git", gitRouter);
 
