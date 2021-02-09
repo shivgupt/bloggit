@@ -9,15 +9,13 @@ commit=$(git rev-parse HEAD | head -c 8)
 
 registry="$registryRoot/$organization/$project"
 
-images="builder proxy server webserver"
-
-for name in $images
+for name in builder proxy server webserver
 do
   image=${project}_$name
-  for version in latest ${1:-$commit}
+  for version in ${1:-latest $commit}
   do
     echo "Tagging image $image:$version as $registry/$image:$version"
-    docker tag "$image:$version" "$registry/$image:$version"  || true
+    docker tag "$image:$version" "$registry/$image:$version" || true
     echo "Pushing image: $registry/$image:$version"
     docker push "$registry/$image:$version" || true
   done
