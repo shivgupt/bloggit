@@ -16,27 +16,33 @@ if [[ -f .env ]]
 then source .env
 fi
 
-BLOG_CONTENT_BRANCH="${BLOG_CONTENT_BRANCH:-main}"
-BLOG_CONTENT_DIR="${BLOG_CONTENT_DIR:-}"
-BLOG_CONTENT_REPO="${BLOG_CONTENT_REPO:-https://gitlab.com/bohendo/blog-content.git}"
-BLOG_CONTENT_URL="${BLOG_CONTENT_URL:-https://gitlab.com/bohendo/blog-content/raw}"
+BLOG_CONTENT_MIRROR="${BLOG_CONTENT_MIRROR:-https://gitlab.com/bohendo/blog-content.git}"
+BLOG_DEFAULT_BRANCH="${BLOG_DEFAULT_BRANCH:-main}"
 BLOG_DOMAINNAME="${BLOG_DOMAINNAME:-}"
 BLOG_EMAIL="${BLOG_EMAIL:-noreply@gmail.com}" # for notifications when ssl certs expire
-BLOG_MEDIA_DIR="${BLOG_MEDIA_DIR:-$root/../blog-content/media}" # mounted into IPFS
+BLOG_HOST_CONTENT_DIR="${BLOG_HOST_CONTENT_DIR:-content}"
+BLOG_HOST_MEDIA_DIR="${BLOG_HOST_MEDIA_DIR:-media}" # mounted into IPFS
 BLOG_PROD="${BLOG_PROD:-false}"
 
 echo "Launching $project in env:"
-echo "- BLOG_CONTENT_BRANCH=$BLOG_CONTENT_BRANCH"
-echo "- BLOG_CONTENT_DIR=$BLOG_CONTENT_DIR"
-echo "- BLOG_CONTENT_REPO=$BLOG_CONTENT_REPO"
-echo "- BLOG_CONTENT_URL=$BLOG_CONTENT_URL"
+echo "- BLOG_CONTENT_MIRROR=$BLOG_CONTENT_MIRROR"
+echo "- BLOG_DEFAULT_BRANCH=$BLOG_DEFAULT_BRANCH"
+echo "- BLOG_HOST_CONTENT_DIR=$BLOG_HOST_CONTENT_DIR"
 echo "- BLOG_DOMAINNAME=$BLOG_DOMAINNAME"
 echo "- BLOG_EMAIL=$BLOG_EMAIL"
-echo "- BLOG_MEDIA_DIR=$BLOG_MEDIA_DIR"
+echo "- BLOG_HOST_MEDIA_DIR=$BLOG_HOST_MEDIA_DIR"
 echo "- BLOG_PROD=$BLOG_PROD"
 
 ########################################
 # Misc Config
+
+if [[ "$BLOG_HOST_CONTENT_DIR" == "/"* ]]
+then mkdir -p "$BLOG_HOST_CONTENT_DIR"
+fi
+
+if [[ "$BLOG_HOST_MEDIA_DIR" == "/"* ]]
+then mkdir -p "$BLOG_HOST_MEDIA_DIR"
+fi
 
 if [[ "$BLOG_PROD" == "true" ]]
 then version=$(git rev-parse HEAD | head -c 8)
@@ -53,8 +59,6 @@ common="networks:
 ########################################
 # IPFS config
 
-mkdir -p "$BLOG_MEDIA_DIR"
-
 ipfs_internal_port=8080
 
 ipfs_image="ipfs/go-ipfs:v0.7.0"
@@ -65,12 +69,10 @@ bash "$root/ops/pull-images.sh" "$ipfs_image"
 
 server_internal_port=8080
 server_env="environment:
-      BLOG_CONTENT_BRANCH: '$BLOG_CONTENT_BRANCH'
-      BLOG_CONTENT_DIR: '$BLOG_CONTENT_DIR'
-      BLOG_CONTENT_REPO: '$BLOG_CONTENT_REPO'
-      BLOG_CONTENT_URL: '$BLOG_CONTENT_URL'
+      BLOG_CONTENT_MIRROR: '$BLOG_CONTENT_MIRROR'
+      BLOG_DEFAULT_BRANCH: '$BLOG_DEFAULT_BRANCH'
       BLOG_PROD: '$BLOG_PROD'
-      PORT: '$server_internal_port'"
+      BLOG_PORT: '$server_internal_port'"
 
 if [[ "$BLOG_PROD" == "true" ]]
 then
@@ -80,7 +82,7 @@ then
     $common
     $server_env
     volumes:
-      - 'content:/blog-content'"
+      - '$BLOG_HOST_CONTENT_DIR:/blog-content.git'"
 
 else
   server_image="${project}_builder:$version"
@@ -91,7 +93,7 @@ else
     entrypoint: 'bash modules/server/ops/entry.sh'
     volumes:
       - '$root:/root'
-      - 'content:/blog-content'"
+      - '$BLOG_HOST_CONTENT_DIR:/blog-content.git'"
 
 fi
 bash "$root/ops/pull-images.sh" "$server_image"
@@ -161,6 +163,7 @@ volumes:
   certs:
   content:
   ipfs:
+  media:
 
 services:
   proxy:
@@ -185,7 +188,7 @@ services:
     $common
     volumes:
       - 'ipfs:/data/ipfs'
-      - '$BLOG_MEDIA_DIR:/media'
+      - '$BLOG_HOST_MEDIA_DIR:/media'
     ports:
       - '5001:5001'
 

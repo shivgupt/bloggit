@@ -10,16 +10,7 @@ const app = express();
 // First: Log everything
 app.use((req, res, next) => { console.log(`=> ${req.path}`); next(); });
 
-// Second: return config if requested
-app.use("/git/config", (req, res, _): void => {
-  res.json({
-    contentBranch: env.contentBranch,
-    contentDir: env.contentDir,
-    contentUrl: env.contentUrl,
-  });
-});
-
-// Third: return info from local git repo
+// Second: return info from local git repo
 app.use("/git", gitRouter);
 
 // Last: 404
