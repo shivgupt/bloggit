@@ -1,7 +1,3 @@
-export type ServerConfig = {
-  contentBranch: string;
-  contentDir: string;
-}
 
 export type PostData = {
   category: string;
