@@ -29,7 +29,7 @@ const server = http.createServer(function (req, res) {
       ps.stderr.on("data", (data) => console.log(`===== Child produced errors: ${data}`));
 
       ps.stdout.pipe(service.createStream()).pipe(ps.stdin);
-    }) as any,
+    }),
 
   ).pipe(res);
 });

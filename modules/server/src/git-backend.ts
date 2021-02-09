@@ -107,12 +107,10 @@ export const getService = (opts: ServiceOpts, backend: any): IService => {
   };
 };
 
-type IGitBackend = Duplex;
-
 export const getGitBackend = (
   uri: string,
   cb: (err: string, service: IService) => void,
-): IGitBackend | void => {
+): Duplex => {
   const self = new Duplex() as any;
   const error = (msg) => process.nextTick((): void => {
     self.emit("error", typeof msg === "string" ? new Error(msg) : msg);
@@ -124,9 +122,15 @@ export const getGitBackend = (
     self.on("error", cb);
   }
   try { uri = decodeURIComponent(uri); }
-  catch (err) { return error(err.message); }
+  catch (err) {
+    error(err.message);
+    return self;
+  }
   const u = url.parse(uri);
-  if (/\.\/|\.\./.test(u.pathname)) return error("invalid git path");
+  if (/\.\/|\.\./.test(u.pathname)) {
+    error("invalid git path");
+    return self;
+  }
   console.log(`Parsed uri to pathname=${u.pathname} and query=${u.query}`);
   self.parsed = false;
   const parts = u.pathname.split("/");
@@ -140,7 +144,8 @@ export const getGitBackend = (
   }
   console.log(`Set service to ${self.service} (info=${self.info})`);
   if (self.service !== "git-upload-pack" && self.service !== "git-receive-pack") {
-    return error("unsupported git service");
+    error("unsupported git service");
+    return self;
   }
   if (self.info) {
     const service = getService({ cmd: self.service, info: true }, self);
