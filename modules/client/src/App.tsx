@@ -96,19 +96,19 @@ const App: React.FC = () => {
     })();
 
     // Set sidebar node
-    if (currentSlug === ""){
-      setNode({
-        parent: "",
-        current: "categories",
-        child: "posts"
-      });
-    } else {
+    if (currentSlug !== "" && index.posts[currentSlug]){
+      console.log(currentSlug, index.posts[currentSlug]);
       setNode({
         parent: "posts",
         current: "toc",
         child: index.posts[currentSlug],
       });
-
+    } else {
+      setNode({
+        parent: "",
+        current: "categories",
+        child: "posts"
+      });
     }
 
   // eslint-disable-next-line
