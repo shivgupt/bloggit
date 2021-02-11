@@ -1,19 +1,11 @@
 import React from "react";
 
-export type adminKeyType = {
-  id: string,
-  value: string,
-}
-
 export const AdminContext = React.createContext({
-  key: {
-    id: "",
-    value: "",
-  },
+  authToken: "",
 
   adminMode: true,
 
   // eslint-disable-next-line
-  updateKey: (key: adminKeyType) => {},
+  updateAuthToken: (authToken: string) => {},
   viewAdminMode: (viewAdminMode: boolean) => {},
 });

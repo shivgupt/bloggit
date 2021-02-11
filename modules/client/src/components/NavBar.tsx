@@ -75,7 +75,7 @@ const DrawerContent = (props: any) => {
           </Box>
         </Typography>
       </ThemeProvider>
-      {adminContext.key.id ?
+      {adminContext.authToken ?
         <>
           <Box textAlign="center" m={1}> 
             <FormControlLabel

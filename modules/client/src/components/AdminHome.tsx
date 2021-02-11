@@ -25,37 +25,30 @@ export const AdminHome = () => {
   const classes = useStyles();
 
   const handleRegister = () => {
-    const id = (document.getElementById("key-id") as HTMLInputElement).value;
-    const value = (document.getElementById("key-value") as HTMLInputElement).value;
-    adminContext.updateKey({ id, value });
+    const authToken = (document.getElementById("auth-token") as HTMLInputElement).value;
+    adminContext.updateAuthToken(authToken);
   };
+
+  console.log(adminContext.authToken);
 
   return (
     <div>
-      <Typography variant="h4"> Admin Key</Typography>
-      {adminContext.key && adminContext.key.id
+      {adminContext.authToken
         ? (
           <div className={classes.section}>
             <TextField
               disabled
-              id="key-id-registered"
-              label="Key ID"
+              id="auth-token-registered"
+              label="Registered Auth Token"
               variant="outlined"
-              value={adminContext.key.id}
-            />
-            <TextField
-              disabled
-              id="key-value-registered"
-              label="Key Value"
-              variant="outlined"
-              value={adminContext.key.value}
+              value={adminContext.authToken}
             />
           </div>
         )
         : (
           <div className={classes.section}>
             <Typography variant="subtitle1">
-              You have no key registered on this device for Admin access
+              You have not registered this device for Admin access
             </Typography>
           </div>
         )
@@ -63,27 +56,15 @@ export const AdminHome = () => {
 
       <Divider variant="middle" />
       <div className={classes.section}>
-        <Typography variant="h6">Use auth token to register new key for this device</Typography>
+        <Typography variant="h6">Use auth token to register this device</Typography>
 
         <TextField
-          id="key-id"
-          label="Key ID"
-          placeholder="mobile-key"
-          defaultValue={""}
-        />
-
-        <TextField
-          id="key-value"
-          label="(NEW) Public Key"
-          placeholder="mobile-key-value"
-          defaultValue={""}
-        />
-
-        <TextField
-          id="authorized-key"
+          id="auth-token"
           label="Auth Token"
-          placeholder="authorized-token"
+          placeholder="AUTH-TOKEN"
+          defaultValue={""}
         />
+
         <Button onClick={handleRegister}> Register </Button>
       </div>
     </div>
