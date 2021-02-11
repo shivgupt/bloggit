@@ -3,9 +3,10 @@ import * as url from "url";
 import zlib from "zlib";
 
 import { getGitBackend } from "./git-backend";
-import { streamToString } from "./utils";
+import { streamToString, stringToStream } from "./utils";
 
-const server = http.createServer((req, res) => {
+const server = http.createServer(async (req, res) => {
+  console.log(`\n==========`);
   console.log(`git server received a ${req.method} req for: ${req.url}`);
   const reqStream = req.headers["content-encoding"] === "gzip"
     ? req.pipe(zlib.createGunzip())
@@ -24,11 +25,20 @@ const server = http.createServer((req, res) => {
   if (/\.\/|\.\./.test(path)) { err("invalid git path"); return; }
   console.log(`Parsed uri to path=${path} and query=${query}`);
 
-  const backendStream = getGitBackend(path, query, err, res);
+  // give input for info aka just the path & query
+  const backend = getGitBackend(path, query, err, res);
+  // give input for the actual service call aka pipe in post body
+  reqStream.pipe(backend);
 
-  streamToString(backendStream).then(s => console.log(`Backend stream returned: <<${s}>>`));
+  // If we wait for entire reqStream BEFORE piping to the backend, it hangs.. Why tho?
+  const reqString = await streamToString(reqStream);
+  console.log(`req stream is done producing ${reqString.length} chars of input`);
 
-  reqStream.pipe(backendStream).pipe(res);
+  // get output
+  const response = await streamToString(backend);
+  console.log(`backend stream returning: <<${response}>>`);
+  stringToStream(response).pipe(res);
+
 });
 console.log(`git server is listening on port 5000`);
 server.listen(5000);

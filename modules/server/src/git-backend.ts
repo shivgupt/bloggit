@@ -3,7 +3,7 @@ import { Duplex } from "stream";
 import qs from "querystring";
 
 import { env } from "./env";
-import { streamToString } from "./utils";
+import { streamToString, stringToStream } from "./utils";
 
 type BufferEncoding = string;
 type Bufferish = string | Buffer;
@@ -38,20 +38,17 @@ type IService = {
   args: string[];
   cmd: string;
   createStream: () => Duplex;
-  type: string;
 }
 
 export const getService = (opts: ServiceOpts, backend: IBackend): IService => {
   console.log(`Service(${JSON.stringify(opts)}, ${typeof backend})`);
-  const type = "application/x-" + opts.cmd + "-advertisement";
   const args = [ "--stateless-rpc" ];
   if (opts.info) args.push("--advertise-refs");
   const createStream = (): IStream => {
-    console.log(`Service.createStream()`);
     const stream = new Duplex() as IStream;
     stream._read = (): void => {
-      const next = backend._next;
-      const buf = backend._buffer;
+      const { _next: next, _buffer: buf } = backend;
+      console.log(`Service stream reading ${buf ? buf.toString("utf8").length : 0} chars`);
       backend._next = null;
       backend._buffer = null;
       if (buf) stream.push(buf);
@@ -63,6 +60,7 @@ export const getService = (opts: ServiceOpts, backend: IBackend): IService => {
       next: (err?: Error) => void,
     ): void => {
       // dont send terminate signal
+      console.log(`Service stream writing ${buf ? buf.toString("utf8").length : 0} chars`);
       if (buf.length !== 4 && buf.toString() !== "0000") backend.push(buf);
       else stream.needsPktFlush = true;
       if (backend._ready) next();
@@ -83,7 +81,7 @@ export const getService = (opts: ServiceOpts, backend: IBackend): IService => {
     }
     return stream;
   };
-  return { type, args, cmd: opts.cmd, createStream } as IService;
+  return { args, cmd: opts.cmd, createStream } as IService;
 };
 
 export const getGitBackend = (
@@ -96,33 +94,34 @@ export const getGitBackend = (
   const backend = new Duplex() as IBackend;
 
   backend.on("error", err);
-  backend.on("service", (service: IService): void => {
-    const contentType = "application/x-" + service.cmd + "-advertisement";
-    console.log(`setting content-type header to: ${contentType}`);
-    res.setHeader("content-type", contentType);
+  backend.on("service", async (service: IService): Promise<void> => {
+    res.setHeader("content-type", "application/x-" + service.cmd + "-advertisement");
     const args = service.args.concat(env.contentDir);
-    console.log(`Spawning ${service.cmd} ${args.toString().split(",").join(" ")}`);
     const ps = spawn(service.cmd, args);
-    ps.on("error", (e) => console.log(`===== Failed to spawn child ${e}`));
-    ps.on("close", (code) => console.log(`===== Child spawn exited with code ${code}`));
-    ps.stdout.on("data", (data) => console.log(`===== Child produced output: ${data}`));
-    ps.stderr.on("data", (data) => console.log(`===== Child produced errors: ${data}`));
+    console.log(`Spawned: ${service.cmd} ${args.toString().split(",").join(" ")}`);
+
+    ps.on("error", (e) => console.log(`${service.cmd} failed to launch: ${e}`));
+    ps.on("close", (code) => console.log(`${service.cmd} exited with code ${code}`));
+    ps.stdout.on("data", out => console.log(`${service.cmd} sent ${out.length} chars to stdout`));
+    ps.stderr.on("data", err => console.log(`${service.cmd} sent ${err.length} chars to stderr`));
+    ps.stdin.on("data", out => console.log(`${service.cmd} got ${out.length} chars in stdin`));
+
     const stream = service.createStream();
-    streamToString(stream).then(s => console.log(`----- Created an inner stream: ${s}`));
     ps.stdout.pipe(stream).pipe(ps.stdin);
+
   });
 
   ////////////////////////////////////////
 
   let info = false;
-  let service: string;
+  let cmd: string;
   if (/\/info\/refs$/.test(path)) {
     info = true;
-    service = qs.parse(query).service.toString();
+    cmd = qs.parse(query).service.toString();
   } else {
     const parts = path.split("/");
-    service = parts[parts.length-1];
-    if (service !== "git-upload-pack" && service !== "git-receive-pack") {
+    cmd = parts[parts.length-1];
+    if (cmd !== "git-upload-pack" && cmd !== "git-receive-pack") {
       err("unsupported git service");
       return backend;
     }
@@ -130,12 +129,12 @@ export const getGitBackend = (
 
   if (info) {
     process.nextTick((): void => {
-      backend.emit("service", getService({ cmd: service, info: true }, backend));
+      backend.emit("service", getService({ cmd, info: true }, backend));
     });
   }
 
   backend._read = (n?: number): void => {
-    console.log(`GitBackend._read`);
+    console.log(`Backend stream is reading ${n} chars of input`);
     if (backend._stream && backend._stream.next) {
       backend._ready = false;
       backend._stream.next();
@@ -145,7 +144,7 @@ export const getGitBackend = (
   };
 
   backend._write = (buf, enc, next): void => {
-    console.log(`GitBackend._write`);
+    console.log(`Backend stream is writing ${buf ? buf.toString("utf8").length : 0} chars`);
     if (backend._stream) {
       backend._next = next;
       backend._stream.push(buf);
@@ -163,7 +162,7 @@ export const getGitBackend = (
         "([0-9a-fA-F]+) ([0-9a-fA-F]+) (refs/[^ \x00]+)( |00|\x00)|^(0000)$",
       ),
       "git-upload-pack": /^\S+ ([0-9a-fA-F]+)/
-    }[service].exec(buf.slice(0,512).toString("utf8"));
+    }[cmd].exec(buf.slice(0,512).toString("utf8"));
     if (m) {
       backend._prev = null;
       backend._buffer = buf;
@@ -171,8 +170,8 @@ export const getGitBackend = (
       const keys = {
         "git-receive-pack": [ "last", "head", "refname" ],
         "git-upload-pack": [ "head" ]
-      }[service];
-      const row = { cmd: service };
+      }[cmd];
+      const row = { cmd };
       for (let i = 0; i < keys.length; i++) {
         row[keys[i]] = m[i+1];
       }
