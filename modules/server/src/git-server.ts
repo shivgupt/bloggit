@@ -8,9 +8,9 @@ import {
   bufferToStream,
   logger,
   streamToBuffer,
-  streamToString,
-  stringToStream,
-  wait,
+  //streamToString,
+  //stringToStream,
+  // wait,
 } from "./utils";
 
 const log = logger.child({ module: "GitServer" });
@@ -42,22 +42,16 @@ const server = http.createServer(async (req, res) => {
     res.setHeader("content-type", contentType);
   }
 
-  // give input for info aka just the path & query
-  const backend = getGitBackend(path, query, err);
-  await wait(1000);
-
-  // If we wait for entire reqStream BEFORE piping to the backend, it hangs.. Q: Why tho?
-  // A: the stream can only be read once, if we read it into a string then we can't read it later
+  // The stream can only be read once, if we read it into a var then we can't read it again later
   const reqBuffer = await streamToBuffer(reqStream);
-  log.info(`req stream is done producing ${reqBuffer.toString("utf8").length} chars of input`);
+  log.info(`req stream is done producing ${reqBuffer.length} bytes of input`);
 
-  // give input for the actual service call aka pipe in post body
-  bufferToStream(reqBuffer).pipe(backend);
+  // provide input to git backend & wait for output
+  const response = await getGitBackend(path, query, reqBuffer, err);
 
   // get output
-  const response = await streamToString(backend);
-  log.info(`backend stream returning: <<${response}>>`);
-  stringToStream(response).pipe(res);
+  log.info(`backend stream returning: <<${response.toString("utf8")}>>`);
+  bufferToStream(response).pipe(res);
 
 });
 log.info(`git server is listening on port 5000`);

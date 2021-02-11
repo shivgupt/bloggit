@@ -3,7 +3,7 @@ import { Duplex } from "stream";
 import qs from "querystring";
 
 import { env } from "./env";
-import { logger /*, streamToString, stringToStream*/ } from "./utils";
+import { logger, bufferToStream, streamToBuffer } from "./utils";
 
 const log = logger.child({ module: "GitBackend" });
 
@@ -89,8 +89,9 @@ export const getService = (opts: ServiceOpts, backend: IBackend): IService => {
 export const getGitBackend = (
   path: string,
   query: string,
+  payload: Buffer,
   err: (e?: string | Error) => void,
-): IBackend => {
+): Promise<Buffer> => {
   log.info(`GitBackend(${path}, ${query})`);
   const backend = new Duplex() as IBackend;
 
@@ -99,16 +100,13 @@ export const getGitBackend = (
     const args = service.args.concat(env.contentDir);
     const ps = spawn(service.cmd, args);
     log.info(`Spawned: ${service.cmd} ${args.toString().split(",").join(" ")}`);
-
     ps.on("error", (e) => log.info(`${service.cmd} failed to launch: ${e}`));
     ps.on("close", (code) => log.info(`${service.cmd} exited with code ${code}`));
     ps.stdout.on("data", out => log.info(`${service.cmd} sent ${out.length} chars to stdout`));
     ps.stderr.on("data", err => log.info(`${service.cmd} sent ${err.length} chars to stderr`));
     ps.stdin.on("data", out => log.info(`${service.cmd} got ${out.length} chars in stdin`));
-
     const stream = service.createStream();
     ps.stdout.pipe(stream).pipe(ps.stdin);
-
   });
 
   ////////////////////////////////////////
@@ -123,7 +121,7 @@ export const getGitBackend = (
     cmd = parts[parts.length-1];
     if (cmd !== "git-upload-pack" && cmd !== "git-receive-pack") {
       err("unsupported git service");
-      return backend;
+      return Promise.resolve(Buffer.from([]));
     }
   }
 
@@ -185,5 +183,9 @@ export const getGitBackend = (
     }
   };
 
-  return backend;
+  if (payload && payload.length > 0) {
+    bufferToStream(payload).pipe(backend);
+  }
+
+  return streamToBuffer(backend);
 };
