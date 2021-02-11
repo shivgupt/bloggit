@@ -30,6 +30,14 @@ gitRouter.get("/config", (req, res, _): void => {
   });
 });
 
+/*
+gitRouter.get("/info/refs", (req, res, _): void => {
+  res.json({
+    defaultBranch: env.defaultBranch,
+  });
+});
+*/
+
 gitRouter.get("/:ref/*", async (req, res, next): Promise<void> => {
   const { ref: givenRef } = req.params;
   const filepath = req.path.replace(`/${givenRef}/`, "");

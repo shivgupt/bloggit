@@ -1,9 +1,7 @@
 import { Duplex } from "stream";
-import * as url from "url";
 import qs from "querystring";
 
 type BufferEncoding = string;
-
 type Bufferish = string | Buffer;
 
 type ServiceOpts = {
@@ -45,10 +43,9 @@ export const getService = (opts: ServiceOpts, backend: IBackend): IService => {
   const args = [ "--stateless-rpc" ];
   if (opts.info) args.push("--advertise-refs");
   const createStream = (): IStream => {
-    console.log(`Service.createStream w backend._ready=${backend._ready}`);
+    console.log(`Service.createStream()`);
     const stream = new Duplex() as IStream;
     stream._read = (): void => {
-      console.log(`stream._read()`);
       const next = backend._next;
       const buf = backend._buffer;
       backend._next = null;
@@ -61,7 +58,6 @@ export const getService = (opts: ServiceOpts, backend: IBackend): IService => {
       enc: BufferEncoding,
       next: (err?: Error) => void,
     ): void => {
-      console.log(`stream._write() w backend._ready = ${backend._ready}`);
       // dont send terminate signal
       if (buf.length !== 4 && buf.toString() !== "0000") backend.push(buf);
       else stream.needsPktFlush = true;
@@ -70,7 +66,6 @@ export const getService = (opts: ServiceOpts, backend: IBackend): IService => {
     };
     backend._stream = stream;
     if (backend._ready) {
-      console.log(`GitBackend is ready, _reading stream`);
       stream._read();
     }
     stream.on("finish", (): void => {
@@ -88,32 +83,16 @@ export const getService = (opts: ServiceOpts, backend: IBackend): IService => {
 };
 
 export const getGitBackend = (
-  uri: string,
-  cb: (err: string, service: IService) => void,
+  path: string,
+  query: string,
+  err: (e?: string | Error) => void,
+  cb: any,
 ): IBackend => {
-  console.log(`GitBackend(${uri}, ${typeof cb})`);
+  console.log(`GitBackend(${path}, ${query})`);
   const backend = new Duplex() as IBackend;
-  const err = (msg): void => {
-    process.nextTick((): void => {
-      backend.emit("error", typeof msg === "string" ? new Error(msg) : msg);
-    });
-  };
-  if (!uri) { err(`WTF where's the uri bro?`); return backend; }
-  if (!cb) { err(`WTF where's the callback bro?`); return backend; }
 
-  backend.on("service", (s): void => { cb(null, s); });
-  backend.on("error", cb);
-
-  ////////////////////////////////////////
-  /// Parse URL
-
-  let parsedUrl;
-  try { parsedUrl = url.parse(decodeURIComponent(uri)); }
-  catch (err) { err(err.message); return backend; }
-  const path = parsedUrl.pathname;
-  const query = parsedUrl.query;
-  if (/\.\/|\.\./.test(path)) { err("invalid git path"); return backend; }
-  console.log(`Parsed uri to path=${path} and query=${query}`);
+  backend.on("service", cb);
+  backend.on("error", err);
 
   ////////////////////////////////////////
 
@@ -130,7 +109,6 @@ export const getGitBackend = (
       return backend;
     }
   }
-  console.log(`Set service to ${service} (info=${info})`);
 
   if (info) {
     process.nextTick((): void => {
@@ -139,7 +117,7 @@ export const getGitBackend = (
   }
 
   backend._read = (n?: number): void => {
-    console.log(`GitBackend.prototype._read`);
+    console.log(`GitBackend._read`);
     if (backend._stream && backend._stream.next) {
       backend._ready = false;
       backend._stream.next();
@@ -149,7 +127,7 @@ export const getGitBackend = (
   };
 
   backend._write = (buf, enc, next): void => {
-    console.log(`GitBackend.prototype._write`);
+    console.log(`GitBackend._write`);
     if (backend._stream) {
       backend._next = next;
       backend._stream.push(buf);
@@ -162,14 +140,12 @@ export const getGitBackend = (
     if (backend._prev) {
       buf = Buffer.concat([ backend._prev, buf ]);
     }
-    const regex = {
+    const m = {
       "git-receive-pack": RegExp(
         "([0-9a-fA-F]+) ([0-9a-fA-F]+) (refs/[^ \x00]+)( |00|\x00)|^(0000)$",
       ),
       "git-upload-pack": /^\S+ ([0-9a-fA-F]+)/
-    };
-    const m = regex[service].exec(buf.slice(0,512).toString("utf8"));
-    console.log(`Got regex match: ${JSON.stringify(m)}`);
+    }[service].exec(buf.slice(0,512).toString("utf8"));
     if (m) {
       backend._prev = null;
       backend._buffer = buf;
