@@ -87,6 +87,7 @@ const App: React.FC = () => {
 
   // Set post content if slug changes
   useEffect(() => {
+    window.scrollTo(0, 0);
     (async () => {
       // Do nothing if index isn't loaded yet or content is already loaded
       if (!index.posts[currentSlug] || index.posts[currentSlug].content) {
@@ -101,7 +102,6 @@ const App: React.FC = () => {
 
     // Set sidebar node
     if (currentSlug !== "" && index.posts[currentSlug]){
-      console.log(currentSlug, index.posts[currentSlug]);
       setNode({
         parent: "posts",
         current: "toc",
@@ -115,19 +115,16 @@ const App: React.FC = () => {
       });
     }
 
-  // eslint-disable-next-line
-  }, [currentSlug, index]);
-
-  // Update the title when the index or current post changes
-  useEffect(() => {
+    // Update the title when the index or current post changes
     const post = index.posts[currentSlug];
     setTitle({
       site: index ? index.title : "My personal website",
       page: post ? post.title : "",
     });
     document.title = title.page ? `${title.page} | ${title.site}` : title.site;
+
   // eslint-disable-next-line
-  }, [index, currentSlug]);
+  }, [currentSlug, index]);
 
   const toggleTheme = () => {
     if ( theme.palette.type === "dark") {
@@ -142,7 +139,7 @@ const App: React.FC = () => {
 
   return (
     <ThemeProvider theme={theme}>
-      <AdminContext.Provider value={{ key: adminKey, updateKey: updateKey, adminMode, viewAdminMode}}>
+      <AdminContext.Provider value={{ key: adminKey, updateKey, adminMode, viewAdminMode }}>
         <CssBaseline />
         <NavBar
           node={node}
