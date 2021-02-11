@@ -5,14 +5,14 @@ import zlib from "zlib";
 import { env } from "./env";
 import { getGitBackend } from "./git-backend";
 
-const server = http.createServer(function (req, res) {
+const server = http.createServer((req, res) => {
   console.log(`git server received a ${req.method} req for: ${req.url}`);
   const reqStream = req.headers["content-encoding"] === "gzip"
     ? req.pipe(zlib.createGunzip())
     : req;
   reqStream.pipe(
 
-    getGitBackend(req.url, function (err, service) {
+    getGitBackend(req.url, (err, service) => {
       if (err) {
         console.log(`Error, not launching service: ${err}`);
         return res.end(err + "\n");
