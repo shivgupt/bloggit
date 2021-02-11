@@ -1,5 +1,9 @@
+import { spawn } from "child_process";
 import { Duplex } from "stream";
 import qs from "querystring";
+
+import { env } from "./env";
+import { streamToString } from "./utils";
 
 type BufferEncoding = string;
 type Bufferish = string | Buffer;
@@ -69,7 +73,7 @@ export const getService = (opts: ServiceOpts, backend: IBackend): IService => {
       stream._read();
     }
     stream.on("finish", (): void => {
-      if (stream.needsPktFlush) backend.push(new Buffer("0000"));
+      if (stream.needsPktFlush) backend.push(Buffer.from("0000"));
       backend.push(null);
     });
     if (opts.info) {
@@ -86,13 +90,27 @@ export const getGitBackend = (
   path: string,
   query: string,
   err: (e?: string | Error) => void,
-  cb: any,
+  res: any,
 ): IBackend => {
   console.log(`GitBackend(${path}, ${query})`);
   const backend = new Duplex() as IBackend;
 
-  backend.on("service", cb);
   backend.on("error", err);
+  backend.on("service", (service: IService): void => {
+    const contentType = "application/x-" + service.cmd + "-advertisement";
+    console.log(`setting content-type header to: ${contentType}`);
+    res.setHeader("content-type", contentType);
+    const args = service.args.concat(env.contentDir);
+    console.log(`Spawning ${service.cmd} ${args.toString().split(",").join(" ")}`);
+    const ps = spawn(service.cmd, args);
+    ps.on("error", (e) => console.log(`===== Failed to spawn child ${e}`));
+    ps.on("close", (code) => console.log(`===== Child spawn exited with code ${code}`));
+    ps.stdout.on("data", (data) => console.log(`===== Child produced output: ${data}`));
+    ps.stderr.on("data", (data) => console.log(`===== Child produced errors: ${data}`));
+    const stream = service.createStream();
+    streamToString(stream).then(s => console.log(`----- Created an inner stream: ${s}`));
+    ps.stdout.pipe(stream).pipe(ps.stdin);
+  });
 
   ////////////////////////////////////////
 
