@@ -90,14 +90,12 @@ export const getGitBackend = (
   path: string,
   query: string,
   err: (e?: string | Error) => void,
-  res: any,
 ): IBackend => {
   log.info(`GitBackend(${path}, ${query})`);
   const backend = new Duplex() as IBackend;
 
   backend.on("error", err);
   backend.on("service", async (service: IService): Promise<void> => {
-    res.setHeader("content-type", "application/x-" + service.cmd + "-advertisement");
     const args = service.args.concat(env.contentDir);
     const ps = spawn(service.cmd, args);
     log.info(`Spawned: ${service.cmd} ${args.toString().split(",").join(" ")}`);

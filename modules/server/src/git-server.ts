@@ -1,14 +1,15 @@
 import http from "http";
 import * as url from "url";
 import zlib from "zlib";
+import qs from "querystring";
 
 import { getGitBackend } from "./git-backend";
-import { logger, streamToString, stringToStream } from "./utils";
+import { logger, streamToString, stringToStream, wait } from "./utils";
 
 const log = logger.child({ module: "GitServer" });
 
 const server = http.createServer(async (req, res) => {
-  log.info(`\n==========`);
+  log.info(`==========`);
   log.info(`git server received a ${req.method} req for: ${req.url}`);
   const reqStream = req.headers["content-encoding"] === "gzip"
     ? req.pipe(zlib.createGunzip())
@@ -27,8 +28,17 @@ const server = http.createServer(async (req, res) => {
   if (/\.\/|\.\./.test(path)) { err("invalid git path"); return; }
   log.info(`Parsed uri to path=${path} and query=${query}`);
 
+  if (query) {
+    const cmd = qs.parse(query).service.toString();
+    const contentType = "application/x-" + cmd + "-advertisement";
+    log.info(`setting content-type header to ${contentType}`);
+    res.setHeader("content-type", contentType);
+  }
+
   // give input for info aka just the path & query
-  const backend = getGitBackend(path, query, err, res);
+  const backend = getGitBackend(path, query, err);
+  // await wait(1000);
+
   // give input for the actual service call aka pipe in post body
   reqStream.pipe(backend);
 
