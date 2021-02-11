@@ -1,6 +1,10 @@
 import { Readable } from "stream";
 
-export const trimSlash = (pathPart: string) => pathPart.replace(/^\/+/, "").replace(/\/+$/, "");
+import pino from "pino";
+
+import { env } from "./env";
+
+export const logger = pino({ level: env.logLevel });
 
 export const stringToStream = (str: string): Readable => Readable.from([str]);
 

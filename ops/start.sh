@@ -22,6 +22,7 @@ BLOG_DOMAINNAME="${BLOG_DOMAINNAME:-}"
 BLOG_EMAIL="${BLOG_EMAIL:-noreply@gmail.com}" # for notifications when ssl certs expire
 BLOG_HOST_CONTENT_DIR="${BLOG_HOST_CONTENT_DIR:-content}"
 BLOG_HOST_MEDIA_DIR="${BLOG_HOST_MEDIA_DIR:-media}" # mounted into IPFS
+BLOG_LOG_LEVEL="${BLOG_LOG_LEVEL:-info}"
 BLOG_PROD="${BLOG_PROD:-false}"
 BLOG_SEMVER="${BLOG_SEMVER:-false}"
 
@@ -37,6 +38,7 @@ echo "- BLOG_HOST_CONTENT_DIR=$BLOG_HOST_CONTENT_DIR"
 echo "- BLOG_DOMAINNAME=$BLOG_DOMAINNAME"
 echo "- BLOG_EMAIL=$BLOG_EMAIL"
 echo "- BLOG_HOST_MEDIA_DIR=$BLOG_HOST_MEDIA_DIR"
+echo "- BLOG_LOG_LEVEL=$BLOG_LOG_LEVEL"
 echo "- BLOG_PROD=$BLOG_PROD"
 echo "- BLOG_SEMVER=$BLOG_SEMVER"
 
@@ -80,6 +82,7 @@ server_internal_port=8080
 server_env="environment:
       BLOG_CONTENT_MIRROR: '$BLOG_CONTENT_MIRROR'
       BLOG_DEFAULT_BRANCH: '$BLOG_DEFAULT_BRANCH'
+      BLOG_LOG_LEVEL: '$BLOG_LOG_LEVEL'
       BLOG_PROD: '$BLOG_PROD'
       BLOG_PORT: '$server_internal_port'"
 

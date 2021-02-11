@@ -5,8 +5,11 @@ import express from "express";
 import git from "isomorphic-git";
 
 import { env } from "./env";
+import { logger } from "./utils";
 
 export const gitRouter = express.Router();
+
+const log = logger.child({ module: "GitRouter" });
 
 const gitdir = path.normalize(env.contentDir);
 const gitOpts = { fs, dir: gitdir, gitdir };
@@ -22,7 +25,7 @@ const resolveRef = async (givenRef: string): Promise<string> => {
   return ref;
 };
 
-git.listBranches({ ...gitOpts }).then(lob => console.log(`list of branches: ${lob}`));
+git.listBranches({ ...gitOpts }).then(lob => log.info(`list of branches: ${lob}`));
 
 gitRouter.get("/config", (req, res, _): void => {
   res.json({
@@ -44,9 +47,9 @@ gitRouter.get("/:ref/*", async (req, res, next): Promise<void> => {
   let ref;
   try {
     ref = await resolveRef(givenRef);
-    console.log(`Expanded given ref "${givenRef}" to "${ref}"`);
+    log.info(`Expanded given ref "${givenRef}" to "${ref}"`);
   } catch (e) {
-    console.log(`Failed to resolve ref ${givenRef}`);
+    log.info(`Failed to resolve ref ${givenRef}`);
     return next();
   }
   try {
@@ -56,14 +59,14 @@ gitRouter.get("/:ref/*", async (req, res, next): Promise<void> => {
       oid: ref,
       filepath,
     })).blob).toString("utf8");
-    console.log(`Returning ${content.length} chars of content for ${filepath}`);
+    log.info(`Returning ${content.length} chars of content for ${filepath}`);
     res.status(200).json({
       author: commit.committer.name,
       timestamp: commit.committer.timestamp,
       content,
     });
   } catch (e) {
-    console.log(`Failed to read object w oid ${ref} and filepath ${filepath}: ${e.message}`);
+    log.info(`Failed to read object w oid ${ref} and filepath ${filepath}: ${e.message}`);
     return next();
   }
 });

@@ -3,7 +3,9 @@ import { Duplex } from "stream";
 import qs from "querystring";
 
 import { env } from "./env";
-import { streamToString, stringToStream } from "./utils";
+import { logger /*, streamToString, stringToStream*/ } from "./utils";
+
+const log = logger.child({ module: "GitBackend" });
 
 type BufferEncoding = string;
 type Bufferish = string | Buffer;
@@ -41,14 +43,14 @@ type IService = {
 }
 
 export const getService = (opts: ServiceOpts, backend: IBackend): IService => {
-  console.log(`Service(${JSON.stringify(opts)}, ${typeof backend})`);
+  log.info(`Service(${JSON.stringify(opts)}, ${typeof backend})`);
   const args = [ "--stateless-rpc" ];
   if (opts.info) args.push("--advertise-refs");
   const createStream = (): IStream => {
     const stream = new Duplex() as IStream;
     stream._read = (): void => {
       const { _next: next, _buffer: buf } = backend;
-      console.log(`Service stream reading ${buf ? buf.toString("utf8").length : 0} chars`);
+      log.info(`Service stream reading ${buf ? buf.toString("utf8").length : 0} chars`);
       backend._next = null;
       backend._buffer = null;
       if (buf) stream.push(buf);
@@ -60,7 +62,7 @@ export const getService = (opts: ServiceOpts, backend: IBackend): IService => {
       next: (err?: Error) => void,
     ): void => {
       // dont send terminate signal
-      console.log(`Service stream writing ${buf ? buf.toString("utf8").length : 0} chars`);
+      log.info(`Service stream writing ${buf ? buf.toString("utf8").length : 0} chars`);
       if (buf.length !== 4 && buf.toString() !== "0000") backend.push(buf);
       else stream.needsPktFlush = true;
       if (backend._ready) next();
@@ -90,7 +92,7 @@ export const getGitBackend = (
   err: (e?: string | Error) => void,
   res: any,
 ): IBackend => {
-  console.log(`GitBackend(${path}, ${query})`);
+  log.info(`GitBackend(${path}, ${query})`);
   const backend = new Duplex() as IBackend;
 
   backend.on("error", err);
@@ -98,13 +100,13 @@ export const getGitBackend = (
     res.setHeader("content-type", "application/x-" + service.cmd + "-advertisement");
     const args = service.args.concat(env.contentDir);
     const ps = spawn(service.cmd, args);
-    console.log(`Spawned: ${service.cmd} ${args.toString().split(",").join(" ")}`);
+    log.info(`Spawned: ${service.cmd} ${args.toString().split(",").join(" ")}`);
 
-    ps.on("error", (e) => console.log(`${service.cmd} failed to launch: ${e}`));
-    ps.on("close", (code) => console.log(`${service.cmd} exited with code ${code}`));
-    ps.stdout.on("data", out => console.log(`${service.cmd} sent ${out.length} chars to stdout`));
-    ps.stderr.on("data", err => console.log(`${service.cmd} sent ${err.length} chars to stderr`));
-    ps.stdin.on("data", out => console.log(`${service.cmd} got ${out.length} chars in stdin`));
+    ps.on("error", (e) => log.info(`${service.cmd} failed to launch: ${e}`));
+    ps.on("close", (code) => log.info(`${service.cmd} exited with code ${code}`));
+    ps.stdout.on("data", out => log.info(`${service.cmd} sent ${out.length} chars to stdout`));
+    ps.stderr.on("data", err => log.info(`${service.cmd} sent ${err.length} chars to stderr`));
+    ps.stdin.on("data", out => log.info(`${service.cmd} got ${out.length} chars in stdin`));
 
     const stream = service.createStream();
     ps.stdout.pipe(stream).pipe(ps.stdin);
@@ -134,7 +136,7 @@ export const getGitBackend = (
   }
 
   backend._read = (n?: number): void => {
-    console.log(`Backend stream is reading ${n} chars of input`);
+    log.info(`Backend stream is reading ${n} chars of input`);
     if (backend._stream && backend._stream.next) {
       backend._ready = false;
       backend._stream.next();
@@ -144,7 +146,7 @@ export const getGitBackend = (
   };
 
   backend._write = (buf, enc, next): void => {
-    console.log(`Backend stream is writing ${buf ? buf.toString("utf8").length : 0} chars`);
+    log.info(`Backend stream is writing ${buf ? buf.toString("utf8").length : 0} chars`);
     if (backend._stream) {
       backend._next = next;
       backend._stream.push(buf);
