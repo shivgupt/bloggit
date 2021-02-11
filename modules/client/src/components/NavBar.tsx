@@ -14,10 +14,11 @@ import {
   makeStyles,
 } from "@material-ui/core";
 import {
+  AccountCircle as AdminAccount,
+  Brightness4 as DarkIcon,
+  BrightnessHigh as LightIcon,
   Home as HomeIcon,
   Menu as MenuIcon,
-  BrightnessHigh as LightIcon,
-  Brightness4 as DarkIcon,
 } from "@material-ui/icons";
 import React, { useState, useContext } from "react";
 import { Link } from "react-router-dom";
@@ -75,19 +76,29 @@ const DrawerContent = (props: any) => {
         </Typography>
       </ThemeProvider>
       {adminContext.key.id ?
-        <Box textAlign="center" m={1}> 
-          <FormControlLabel
-            control={
-              <Switch
-                size="small"
-                checked={adminContext.adminMode}
-                onChange={() => adminContext.viewAdminMode(!adminContext.adminMode)}
-              />
-            }
-            label="Admin"
-            labelPlacement="start"
-          /> 
-        </Box>
+        <>
+          <Box textAlign="center" m={1}> 
+            <FormControlLabel
+              control={
+                <Switch
+                  size="small"
+                  checked={adminContext.adminMode}
+                  onChange={() => adminContext.viewAdminMode(!adminContext.adminMode)}
+                />
+              }
+              label="Admin"
+              labelPlacement="end"
+            /> 
+          </Box>
+          <IconButton
+            component={Link}
+            edge="start"
+            to={"/admin"}
+            color="inherit"
+          >
+            <AdminAccount />
+          </IconButton>
+        </>
         : null
       }
       <Toc posts={posts} node={node} setNode={setNode}/>

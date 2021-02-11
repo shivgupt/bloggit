@@ -49,7 +49,7 @@ const App: React.FC = () => {
   const [title, setTitle] = useState({ site: "", page: "" });
   const [about, setAbout] = useState("");
   const [adminKey, setAdminKey] = useState({} as adminKeyType);
-  const [adminMode, setAdminMode] = useState(true);
+  const [adminMode, setAdminMode] = useState(false);
 
   const updateKey = (key: adminKeyType) => {
     setAdminKey(key);
