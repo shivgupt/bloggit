@@ -4,7 +4,14 @@ import zlib from "zlib";
 import qs from "querystring";
 
 import { getGitBackend } from "./git-backend";
-import { logger, streamToString, stringToStream, wait } from "./utils";
+import {
+  bufferToStream,
+  logger,
+  streamToBuffer,
+  streamToString,
+  stringToStream,
+  wait,
+} from "./utils";
 
 const log = logger.child({ module: "GitServer" });
 
@@ -26,7 +33,7 @@ const server = http.createServer(async (req, res) => {
   const path = parsedUrl.pathname;
   const query = parsedUrl.query;
   if (/\.\/|\.\./.test(path)) { err("invalid git path"); return; }
-  log.info(`Parsed uri to path=${path} and query=${query}`);
+  log.debug(`Parsed uri to path=${path} and query=${query}`);
 
   if (query) {
     const cmd = qs.parse(query).service.toString();
@@ -37,14 +44,15 @@ const server = http.createServer(async (req, res) => {
 
   // give input for info aka just the path & query
   const backend = getGitBackend(path, query, err);
-  // await wait(1000);
+  await wait(1000);
+
+  // If we wait for entire reqStream BEFORE piping to the backend, it hangs.. Q: Why tho?
+  // A: the stream can only be read once, if we read it into a string then we can't read it later
+  const reqBuffer = await streamToBuffer(reqStream);
+  log.info(`req stream is done producing ${reqBuffer.toString("utf8").length} chars of input`);
 
   // give input for the actual service call aka pipe in post body
-  reqStream.pipe(backend);
-
-  // If we wait for entire reqStream BEFORE piping to the backend, it hangs.. Why tho?
-  const reqString = await streamToString(reqStream);
-  log.info(`req stream is done producing ${reqString.length} chars of input`);
+  bufferToStream(reqBuffer).pipe(backend);
 
   // get output
   const response = await streamToString(backend);

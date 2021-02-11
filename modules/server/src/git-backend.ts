@@ -50,7 +50,7 @@ export const getService = (opts: ServiceOpts, backend: IBackend): IService => {
     const stream = new Duplex() as IStream;
     stream._read = (): void => {
       const { _next: next, _buffer: buf } = backend;
-      log.info(`Service stream reading ${buf ? buf.toString("utf8").length : 0} chars`);
+      log.info(`reading ${buf ? buf.toString("utf8").length : 0} chars from service`);
       backend._next = null;
       backend._buffer = null;
       if (buf) stream.push(buf);
@@ -62,7 +62,7 @@ export const getService = (opts: ServiceOpts, backend: IBackend): IService => {
       next: (err?: Error) => void,
     ): void => {
       // dont send terminate signal
-      log.info(`Service stream writing ${buf ? buf.toString("utf8").length : 0} chars`);
+      log.info(`writing ${buf ? buf.toString("utf8").length : 0} chars to service`);
       if (buf.length !== 4 && buf.toString() !== "0000") backend.push(buf);
       else stream.needsPktFlush = true;
       if (backend._ready) next();
@@ -134,7 +134,7 @@ export const getGitBackend = (
   }
 
   backend._read = (n?: number): void => {
-    log.info(`Backend stream is reading ${n} chars of input`);
+    log.info(`reading ${n} chars from backend`);
     if (backend._stream && backend._stream.next) {
       backend._ready = false;
       backend._stream.next();
@@ -144,7 +144,7 @@ export const getGitBackend = (
   };
 
   backend._write = (buf, enc, next): void => {
-    log.info(`Backend stream is writing ${buf ? buf.toString("utf8").length : 0} chars`);
+    log.info(`writing ${buf ? buf.toString("utf8").length : 0} chars to backend`);
     if (backend._stream) {
       backend._next = next;
       backend._stream.push(buf);

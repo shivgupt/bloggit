@@ -18,3 +18,14 @@ export const streamToString = (stream: Readable): Promise<string> => {
     stream.on("end", () => resolve(Buffer.concat(chunks).toString("utf8")));
   });
 };
+
+export const bufferToStream = (buf: Buffer): Readable => Readable.from(buf);
+
+export const streamToBuffer = (stream: Readable): Promise<Buffer> => {
+  const chunks = [];
+  return new Promise((resolve, reject) => {
+    stream.on("data", chunk => chunks.push(chunk));
+    stream.on("error", reject);
+    stream.on("end", () => resolve(Buffer.concat(chunks)));
+  });
+};
