@@ -1,6 +1,5 @@
 import { spawn } from "child_process";
 import { Duplex } from "stream";
-import qs from "querystring";
 
 import { env } from "./env";
 import { logger, bufferToStream, streamToBuffer } from "./utils";
@@ -88,11 +87,11 @@ export const getService = (opts: ServiceOpts, backend: IBackend): IService => {
 
 export const getGitBackend = (
   path: string,
-  query: string,
+  service: string,
   payload: Buffer,
   err: (e?: string | Error) => void,
 ): Promise<Buffer> => {
-  log.info(`GitBackend(${path}, ${query})`);
+  log.info(`GitBackend(${path}, ${service})`);
   const backend = new Duplex() as IBackend;
 
   backend.on("error", err);
@@ -115,7 +114,7 @@ export const getGitBackend = (
   let cmd: string;
   if (/\/info\/refs$/.test(path)) {
     info = true;
-    cmd = qs.parse(query).service.toString();
+    cmd = service;
   } else {
     const parts = path.split("/");
     cmd = parts[parts.length-1];

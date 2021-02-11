@@ -35,8 +35,9 @@ const server = http.createServer(async (req, res) => {
   if (/\.\/|\.\./.test(path)) { err("invalid git path"); return; }
   log.debug(`Parsed uri to path=${path} and query=${query}`);
 
+  let cmd = "";
   if (query) {
-    const cmd = qs.parse(query).service.toString();
+    cmd = qs.parse(query).service.toString();
     const contentType = "application/x-" + cmd + "-advertisement";
     log.info(`setting content-type header to ${contentType}`);
     res.setHeader("content-type", contentType);
@@ -47,7 +48,7 @@ const server = http.createServer(async (req, res) => {
   log.info(`req stream is done producing ${reqBuffer.length} bytes of input`);
 
   // provide input to git backend & wait for output
-  const response = await getGitBackend(path, query, reqBuffer, err);
+  const response = await getGitBackend(path, cmd, reqBuffer, err);
 
   // get output
   log.info(`backend stream returning: <<${response.toString("utf8")}>>`);
