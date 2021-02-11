@@ -1,14 +1,19 @@
 import fs from "fs";
 import path from "path";
 
+import bodyParser from "body-parser";
 import express from "express";
 import git from "isomorphic-git";
 
 import { env } from "./env";
+import { getGitBackend } from "./git-backend";
+import { logger } from "./utils";
 
 export const gitRouter = express.Router();
 
-const gitdir = path.normalize("/blog-content.git");
+const log = logger.child({ module: "GitRouter" });
+
+const gitdir = path.normalize(env.contentDir);
 const gitOpts = { fs, dir: gitdir, gitdir };
 
 // Given a branch name or abreviated commit hash, return the full commit hash
@@ -22,9 +27,44 @@ const resolveRef = async (givenRef: string): Promise<string> => {
   return ref;
 };
 
-git.listBranches({ ...gitOpts }).then(lob => console.log(`list of branches: ${lob}`));
+gitRouter.use(bodyParser.raw({ type: [
+  "application/x-git-receive-pack-request",
+  "application/x-git-upload-pack-request",
+] }));
 
-// Second: return config if requested
+gitRouter.get("/info/refs", async (req, res, _): Promise<void> => {
+  const err = (e: string): void => {
+    log.warn(`Git backend failed to get ref info: ${e}`);
+    res.status(500).send(e);
+    return;
+  };
+  const cmd = req?.query?.service?.toString() || "";
+  const response = await getGitBackend(req.path, cmd, req.body, err);
+  log.info(`Successfully got ${response.length} bytes of ref info`);
+  if (cmd) {
+    const contentType = "application/x-" + cmd + "-advertisement";
+    log.info(`setting content-type header to ${contentType}`);
+    res.setHeader("content-type", contentType);
+  }
+  res.send(response);
+});
+
+gitRouter.post([
+  "/git-receive-pack",
+  "/git-upload-pack",
+], async (req, res, _): Promise<void> => {
+  const err = (e: string): void => {
+    log.warn(`Git backend failed to get ref info: ${e}`);
+    res.status(500).send(e);
+    return;
+  };
+  log.info(`Activating git backend for ${req.body?.length} bytes posted to ${req.path}`);
+  const cmd = req?.query?.service?.toString() || "";
+  const response = await getGitBackend(req.path, cmd, req.body, err);
+  log.info(`Successfully got ${response.length} bytes of pack response`);
+  res.send(response);
+});
+
 gitRouter.get("/config", (req, res, _): void => {
   res.json({
     defaultBranch: env.defaultBranch,
@@ -34,12 +74,13 @@ gitRouter.get("/config", (req, res, _): void => {
 gitRouter.get("/:ref/*", async (req, res, next): Promise<void> => {
   const { ref: givenRef } = req.params;
   const filepath = req.path.replace(`/${givenRef}/`, "");
+  log.info(`Returning content at ref ${givenRef} and path ${filepath}`);
   let ref;
   try {
     ref = await resolveRef(givenRef);
-    console.log(`Expanded given ref "${givenRef}" to "${ref}"`);
+    log.info(`Expanded given ref "${givenRef}" to "${ref}"`);
   } catch (e) {
-    console.log(`Failed to resolve ref ${givenRef}`);
+    log.info(`Failed to resolve ref ${givenRef}`);
     return next();
   }
   try {
@@ -49,14 +90,14 @@ gitRouter.get("/:ref/*", async (req, res, next): Promise<void> => {
       oid: ref,
       filepath,
     })).blob).toString("utf8");
-    console.log(`Returning ${content.length} chars of content for ${filepath}`);
+    log.info(`Returning ${content.length} chars of content for ${filepath}`);
     res.status(200).json({
       author: commit.committer.name,
       timestamp: commit.committer.timestamp,
       content,
     });
   } catch (e) {
-    console.log(`Failed to read object w oid ${ref} and filepath ${filepath}: ${e.message}`);
+    log.info(`Failed to read object w oid ${ref} and filepath ${filepath}: ${e.message}`);
     return next();
   }
 });

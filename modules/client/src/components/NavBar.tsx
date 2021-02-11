@@ -1,26 +1,32 @@
 import {
   AppBar,
-  Button,
   Box,
+  Button,
   Drawer,
+  FormControlLabel,
   Hidden,
   IconButton,
   SwipeableDrawer,
+  Switch,
   ThemeProvider,
   Toolbar,
   Typography,
   makeStyles,
 } from "@material-ui/core";
 import {
+  AccountCircle as AdminAccount,
+  Brightness4 as DarkIcon,
+  BrightnessHigh as LightIcon,
   Home as HomeIcon,
   Menu as MenuIcon,
-  BrightnessHigh as LightIcon,
-  Brightness4 as DarkIcon,
 } from "@material-ui/icons";
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Link } from "react-router-dom";
-import { Toc } from "./ToC";
+
 import { siteTitleFont } from "../style";
+import { AdminContext } from "../AdminContext";
+
+import { Toc } from "./ToC";
 
 const useStyles = makeStyles(theme => ({
   appBar: {
@@ -58,6 +64,8 @@ const useStyles = makeStyles(theme => ({
 const DrawerContent = (props: any) => {
   const { title, posts, node, setNode, toggleTheme, theme } = props;
 
+  const adminContext = useContext(AdminContext);
+
   return (
     <>
       <ThemeProvider theme={siteTitleFont}>
@@ -67,6 +75,32 @@ const DrawerContent = (props: any) => {
           </Box>
         </Typography>
       </ThemeProvider>
+      {adminContext.authToken ?
+        <>
+          <Box textAlign="center" m={1}> 
+            <FormControlLabel
+              control={
+                <Switch
+                  size="small"
+                  checked={adminContext.adminMode}
+                  onChange={() => adminContext.viewAdminMode(!adminContext.adminMode)}
+                />
+              }
+              label="Admin"
+              labelPlacement="end"
+            /> 
+          </Box>
+          <IconButton
+            component={Link}
+            edge="start"
+            to={"/admin"}
+            color="inherit"
+          >
+            <AdminAccount />
+          </IconButton>
+        </>
+        : null
+      }
       <Toc posts={posts} node={node} setNode={setNode}/>
       <IconButton
         onClick={toggleTheme}

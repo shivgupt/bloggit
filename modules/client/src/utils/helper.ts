@@ -1,9 +1,10 @@
 import { PostData, Ingredient, Dish, FitnessProfile } from "../types";
-import { emptyNutrients } from "./constants";
 import * as Dishes from "../utils/dishes";
 
+import { emptyNutrients } from "./constants";
+
 export const prettyDateString = (s: string) => {
-  let month = s.substr(2,2);
+  const month = s.substr(2,2);
   let m;
   
   switch (month) {
@@ -63,7 +64,7 @@ export const getTotalNutrientsMeal = (dishes: Dish[]) => {
   const total = { ...emptyNutrients };
 
   dishes.forEach((dish: Dish) => {
-    let dishTotal = getTotalNutrientsDish(dish);
+    const dishTotal = getTotalNutrientsDish(dish);
     Object.keys(total).forEach((nutrient: string) => {
       total[nutrient] += dishTotal[nutrient];
     });
@@ -88,9 +89,9 @@ export const smartConcatMeal = (meal: Dish[], newDishes: Dish[]) => {
 export const getProfileStateFromStoreObj = (profile: string) => {
   const newProfile = JSON.parse(profile);
 
-  for (let date in newProfile.foodLog) {
-    for (let time in newProfile.foodLog[date]) {
-      let newMeal = [] as Dish[];
+  for (const date in newProfile.foodLog) {
+    for (const time in newProfile.foodLog[date]) {
+      const newMeal = [] as Dish[];
       newProfile.foodLog[date][time].forEach((mealItem) => {
         try {
           const dishObj = deepCopy(Object.values(Dishes)
@@ -111,10 +112,10 @@ export const getProfileStateFromStoreObj = (profile: string) => {
 
 export const getProfileStoreObjFromState = (profile: FitnessProfile) => {
 
-  let newProfile = deepCopy(profile);
-  for (let date in newProfile.foodLog) {
-    for (let time in newProfile.foodLog[date]) {
-      let newMeal = [] as Array<{ dish: string, serving: number }>;
+  const newProfile = deepCopy(profile);
+  for (const date in newProfile.foodLog) {
+    for (const time in newProfile.foodLog[date]) {
+      const newMeal = [] as Array<{ dish: string, serving: number }>;
       newProfile.foodLog[date][time].forEach((dish: Dish) => {
         try {
           newMeal.push({ dish: dish.name, serving: dish.serving });
