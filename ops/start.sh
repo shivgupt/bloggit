@@ -22,6 +22,7 @@ BLOG_DOMAINNAME="${BLOG_DOMAINNAME:-}"
 BLOG_EMAIL="${BLOG_EMAIL:-noreply@gmail.com}" # for notifications when ssl certs expire
 BLOG_HOST_CONTENT_DIR="${BLOG_HOST_CONTENT_DIR:-content}"
 BLOG_HOST_MEDIA_DIR="${BLOG_HOST_MEDIA_DIR:-media}" # mounted into IPFS
+BLOG_LOG_LEVEL="${BLOG_LOG_LEVEL:-info}"
 BLOG_PROD="${BLOG_PROD:-false}"
 BLOG_SEMVER="${BLOG_SEMVER:-false}"
 
@@ -37,6 +38,7 @@ echo "- BLOG_HOST_CONTENT_DIR=$BLOG_HOST_CONTENT_DIR"
 echo "- BLOG_DOMAINNAME=$BLOG_DOMAINNAME"
 echo "- BLOG_EMAIL=$BLOG_EMAIL"
 echo "- BLOG_HOST_MEDIA_DIR=$BLOG_HOST_MEDIA_DIR"
+echo "- BLOG_LOG_LEVEL=$BLOG_LOG_LEVEL"
 echo "- BLOG_PROD=$BLOG_PROD"
 echo "- BLOG_SEMVER=$BLOG_SEMVER"
 
@@ -80,6 +82,7 @@ server_internal_port=8080
 server_env="environment:
       BLOG_CONTENT_MIRROR: '$BLOG_CONTENT_MIRROR'
       BLOG_DEFAULT_BRANCH: '$BLOG_DEFAULT_BRANCH'
+      BLOG_LOG_LEVEL: '$BLOG_LOG_LEVEL'
       BLOG_PROD: '$BLOG_PROD'
       BLOG_PORT: '$server_internal_port'"
 
@@ -100,6 +103,8 @@ else
     $common
     $server_env
     entrypoint: 'bash modules/server/ops/entry.sh'
+    ports:
+      - '5000:5000'
     volumes:
       - '$root:/root'
       - '$BLOG_HOST_CONTENT_DIR:/blog-content.git'"
@@ -142,7 +147,7 @@ bash "$root/ops/pull-images.sh" "$proxy_image"
 
 if [[ -n "$BLOG_DOMAINNAME" ]]
 then
-  public_url="https://$BLOG_DOMAINNAME/ping"
+  public_url="https://$BLOG_DOMAINNAME/git/config"
   proxy_ports="ports:
       - '80:80'
       - '443:443'"
@@ -150,7 +155,7 @@ then
 
 else
   public_port=${public_port:-3000}
-  public_url="http://127.0.0.1:$public_port/ping"
+  public_url="http://127.0.0.1:$public_port/git/config"
   proxy_ports="ports:
       - '$public_port:80'"
   echo "${project}_proxy will be exposed on *:$public_port"

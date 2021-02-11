@@ -1,6 +1,5 @@
 import React from "react";
 import Markdown from "react-markdown";
-import { getChildValue } from "../utils";
 import { Link } from "react-router-dom";
 import {
   makeStyles,
@@ -14,6 +13,8 @@ import {
   NavigateNext as NavigateNextIcon,
   ArrowBackIos as NavigateBackIcon,
 } from "@material-ui/icons";
+
+import { getChildValue } from "../utils";
 
 import { HashLink } from "./HashLink";
 
@@ -37,7 +38,8 @@ const TocGenerator = (props: any) => {
     console.warn("This heading has no child values..?");
     return null;
   }
-  let headingSlug = value.toLowerCase().replace(/[^a-z0-9 ]/g, "").replace(/\W+/g, "-");
+  const headingSlug = value.toLowerCase().replace(/[^a-z0-9 ]/g, "").replace(/\W+/g, "-");
+
   return (
     <>
       <ListItem
@@ -66,7 +68,10 @@ export const Toc = (props: any) => {
           {Object.keys(posts).map((c) => {
             return (
               <div key={c}>
-                <ListItem >
+                <ListItem
+                  button
+                  onClick={() => setNode({ parent: "categories", current: "posts", child: c })}
+                >
                   {c}
                   <IconButton
                     onClick={() => setNode({
