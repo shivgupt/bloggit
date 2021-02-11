@@ -16,7 +16,7 @@ import { PostPage } from "./components/Posts";
 import { emptyIndex, fetchFile, fetchContent, fetchIndex, getPostsByCategories } from "./utils";
 import { darkTheme, lightTheme } from "./style";
 import { store } from "./utils/cache";
-import { AdminContext, adminKeyType } from "./AdminContext";
+import { AdminContext } from "./AdminContext";
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
   appBarSpacer: theme.mixins.toolbar,
@@ -31,32 +31,43 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
   },
   main: {
     flexGrow: 1,
-    padding: theme.spacing(3),
+    marginTop: theme.spacing(2),
+    padding: theme.spacing(0.25),
   },
 }));
 
 const App: React.FC = () => {
   const classes = useStyles();
-  const [node, setNode] = useState({
-    parent: null,
-    current: "categories",
-    child: "posts",
+  const [node, setNode] = useState({} as {
+    parent: string | null,
+    current: string,
+    child: any,
   });
   const [theme, setTheme] = useState(lightTheme);
   const [index, setIndex] = useState(emptyIndex);
   const [currentSlug, setCurrentSlug] = useState("");
   const [title, setTitle] = useState({ site: "", page: "" });
   const [about, setAbout] = useState("");
-  const [adminKey, setAdminKey] = useState({} as adminKeyType);
+  const [authToken, setAuthToken] = useState("");
+  const [adminMode, setAdminMode] = useState(false);
 
-  const updateKey = (key: adminKeyType) => {
-    setAdminKey(key);
-    store.save("adminKey", key);
-  }
+  const updateAuthToken = (authToken: string) => {
+    setAuthToken(authToken);
+    store.save("authToken", authToken);
+  };
+
+  const viewAdminMode = (viewAdminMode: boolean) => setAdminMode(viewAdminMode);
 
   // Only once: get the content index
   useEffect(() => {
     (async () => setIndex(await fetchIndex()))();
+
+    // Set top level node
+    setNode({
+      parent: "",
+      current: "categories",
+      child: "posts"
+    });
 
     // Set theme to local preference
     const themeSelection = store.load("theme");
@@ -64,8 +75,8 @@ const App: React.FC = () => {
     else setTheme(darkTheme);
 
     // Check local storage for admin edit keys
-    const key = store.load("adminKey");
-    if (key && key.id) setAdminKey(key);
+    const key = store.load("authToken");
+    if (key) setAuthToken(key);
   }, []);
 
   useEffect(() => {
@@ -76,6 +87,7 @@ const App: React.FC = () => {
 
   // Set post content if slug changes
   useEffect(() => {
+    window.scrollTo(0, 0);
     (async () => {
       // Do nothing if index isn't loaded yet or content is already loaded
       if (!index.posts[currentSlug] || index.posts[currentSlug].content) {
@@ -87,19 +99,32 @@ const App: React.FC = () => {
       newIndex.posts[currentSlug].content = currentContent;
       setIndex(newIndex);
     })();
-  // eslint-disable-next-line
-  }, [currentSlug, index]);
 
-  // Update the title when the index or current post changes
-  useEffect(() => {
+    // Set sidebar node
+    if (currentSlug !== "" && index.posts[currentSlug]){
+      setNode({
+        parent: "posts",
+        current: "toc",
+        child: index.posts[currentSlug],
+      });
+    } else {
+      setNode({
+        parent: "",
+        current: "categories",
+        child: "posts"
+      });
+    }
+
+    // Update the title when the index or current post changes
     const post = index.posts[currentSlug];
     setTitle({
       site: index ? index.title : "My personal website",
       page: post ? post.title : "",
     });
     document.title = title.page ? `${title.page} | ${title.site}` : title.site;
+
   // eslint-disable-next-line
-  }, [index, currentSlug]);
+  }, [currentSlug, index]);
 
   const toggleTheme = () => {
     if ( theme.palette.type === "dark") {
@@ -114,7 +139,7 @@ const App: React.FC = () => {
 
   return (
     <ThemeProvider theme={theme}>
-      <AdminContext.Provider value={{ key: adminKey, updateKey: updateKey }}>
+      <AdminContext.Provider value={{ authToken, updateAuthToken, adminMode, viewAdminMode }}>
         <CssBaseline />
         <NavBar
           node={node}

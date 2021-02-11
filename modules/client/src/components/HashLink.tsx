@@ -49,6 +49,7 @@ function hashLinkScroll() {
 }
 
 const genericHashLink = (props: any, As) => {
+  const { scroll, smooth, ...filteredProps } = props;
   function handleClick(e) {
     reset();
     if (props.onClick) props.onClick(e);
@@ -65,15 +66,14 @@ const genericHashLink = (props: any, As) => {
     }
     if (hashFragment !== "") {
       scrollFunction =
-        props.scroll ||
+        scroll ||
         (el =>
-          props.smooth
+          smooth
             ? el.scrollIntoView({ behavior: "smooth" })
             : el.scrollIntoView());
       hashLinkScroll();
     }
   }
-  const { scroll, smooth, ...filteredProps } = props;
   return (
     <As {...filteredProps} onClick={handleClick}>
       {props.children}
