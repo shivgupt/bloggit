@@ -74,8 +74,8 @@ const DrawerContent = (props: any) => {
           </Box>
         </Typography>
       </ThemeProvider>
-      {adminContext.key.id
-       ? <Box textAlign="center" m={1}> 
+      {adminContext.key.id ?
+        <Box textAlign="center" m={1}> 
           <FormControlLabel
             control={
               <Switch
@@ -87,8 +87,8 @@ const DrawerContent = (props: any) => {
             label="Admin"
             labelPlacement="start"
           /> 
-         </Box>
-       : null
+        </Box>
+        : null
       }
       <Toc posts={posts} node={node} setNode={setNode}/>
       <IconButton
