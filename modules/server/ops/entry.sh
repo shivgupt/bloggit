@@ -1,13 +1,19 @@
 #!/bin/bash
 set -e
 
+# Ensure defaults are set for important env vars
 export BLOG_INTERNAL_CONTENT_DIR="${BLOG_INTERNAL_CONTENT_DIR:-/blog-content.git}"
 export BLOG_DEFAULT_BRANCH="${BLOG_DEFAULT_BRANCH:-main}"
 
+# Log all env vars
 echo "Starting server in env:"
-echo "- BLOG_INTERNAL_CONTENT_DIR=$BLOG_INTERNAL_CONTENT_DIR"
+echo "- BLOG_ADMIN_TOKEN=$BLOG_ADMIN_TOKEN"
 echo "- BLOG_CONTENT_MIRROR=$BLOG_CONTENT_MIRROR"
 echo "- BLOG_DEFAULT_BRANCH=$BLOG_DEFAULT_BRANCH"
+echo "- BLOG_INTERNAL_CONTENT_DIR=$BLOG_INTERNAL_CONTENT_DIR"
+echo "- BLOG_LOG_LEVEL=$BLOG_LOG_LEVEL"
+echo "- BLOG_PORT=$BLOG_PORT"
+echo "- BLOG_PROD=$BLOG_PROD"
 
 if [[ -d "modules/server" ]]
 then cd modules/server
@@ -37,8 +43,8 @@ then
     else git remote set-url mirror "$BLOG_CONTENT_MIRROR"
     fi
     git fetch mirror --prune --tags
-    if ! grep -qs "main" <<<"$(git branch -l)"
-    then git branch main mirror/main
+    if ! grep -qs "$BLOG_DEFAULT_BRANCH" <<<"$(git branch -l)"
+    then git branch "$BLOG_DEFAULT_BRANCH" "mirror/$BLOG_DEFAULT_BRANCH"
     fi
   )
 fi
