@@ -4,7 +4,6 @@ import {
 } from "./helper";
 
 const emptyStore: any = {
-  contentUrlIndex: 0,
   theme: "light"
 };
 

@@ -16,7 +16,8 @@ import { PostPage } from "./components/Posts";
 import { emptyIndex, fetchFile, fetchContent, fetchIndex, getPostsByCategories } from "./utils";
 import { darkTheme, lightTheme } from "./style";
 import { store } from "./utils/cache";
-import { AdminContext, adminKeyType } from "./AdminContext";
+import { AdminContext } from "./AdminContext";
+import { PostData } from "./types";
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
   appBarSpacer: theme.mixins.toolbar,
@@ -48,12 +49,15 @@ const App: React.FC = () => {
   const [currentSlug, setCurrentSlug] = useState("");
   const [title, setTitle] = useState({ site: "", page: "" });
   const [about, setAbout] = useState("");
-  const [adminKey, setAdminKey] = useState({} as adminKeyType);
+  const [authToken, setAuthToken] = useState("");
+  const [adminMode, setAdminMode] = useState(false);
 
-  const updateKey = (key: adminKeyType) => {
-    setAdminKey(key);
-    store.save("adminKey", key);
+  const updateAuthToken = (authToken: string) => {
+    setAuthToken(authToken);
+    store.save("authToken", authToken);
   };
+
+  const viewAdminMode = (viewAdminMode: boolean) => setAdminMode(viewAdminMode);
 
   // Only once: get the content index
   useEffect(() => {
@@ -72,8 +76,8 @@ const App: React.FC = () => {
     else setTheme(darkTheme);
 
     // Check local storage for admin edit keys
-    const key = store.load("adminKey");
-    if (key && key.id) setAdminKey(key);
+    const key = store.load("authToken");
+    if (key) setAuthToken(key);
   }, []);
 
   useEffect(() => {
@@ -84,6 +88,7 @@ const App: React.FC = () => {
 
   // Set post content if slug changes
   useEffect(() => {
+    window.scrollTo(0, 0);
     (async () => {
       // Do nothing if index isn't loaded yet or content is already loaded
       if (!index.posts[currentSlug] || index.posts[currentSlug].content) {
@@ -98,7 +103,6 @@ const App: React.FC = () => {
 
     // Set sidebar node
     if (currentSlug !== "" && index.posts[currentSlug]){
-      console.log(currentSlug, index.posts[currentSlug]);
       setNode({
         parent: "posts",
         current: "toc",
@@ -112,19 +116,16 @@ const App: React.FC = () => {
       });
     }
 
-  // eslint-disable-next-line
-  }, [currentSlug, index]);
-
-  // Update the title when the index or current post changes
-  useEffect(() => {
+    // Update the title when the index or current post changes
     const post = index.posts[currentSlug];
     setTitle({
       site: index ? index.title : "My personal website",
       page: post ? post.title : "",
     });
     document.title = title.page ? `${title.page} | ${title.site}` : title.site;
+
   // eslint-disable-next-line
-  }, [index, currentSlug]);
+  }, [currentSlug, index]);
 
   const toggleTheme = () => {
     if ( theme.palette.type === "dark") {
@@ -139,7 +140,7 @@ const App: React.FC = () => {
 
   return (
     <ThemeProvider theme={theme}>
-      <AdminContext.Provider value={{ key: adminKey, updateKey: updateKey }}>
+      <AdminContext.Provider value={{ authToken, updateAuthToken, adminMode, viewAdminMode }}>
         <CssBaseline />
         <NavBar
           node={node}
@@ -169,7 +170,7 @@ const App: React.FC = () => {
                 path="/about"
                 render={() => {
                   setCurrentSlug("");
-                  return (<PostPage content={index.about ?
+                  return (<PostPage post={index.about ?
                     about
                     : "Not added yet" }
                   />);
@@ -190,10 +191,10 @@ const App: React.FC = () => {
                   const slug = match.params.slug;
                   setCurrentSlug(slug);
                   return (<PostPage
-                    content={
+                    post={
                       index.posts[slug]
-                        ? (index.posts[slug].content || "Loading Page")
-                        : "Loading Index"
+                        ? index.posts[slug]
+                        : {} as PostData
                     }
                   />);
                 }}

@@ -4,9 +4,14 @@ import { PostIndex } from "../types";
 
 let indexCache: Promise<PostIndex> | undefined;
 const contentCache: { [key: string]: Promise<string>; } = {};
+let configCache: Promise<any> | undefined;
 
 const get = async (file: string): Promise<string | PostIndex> => {
-  const url = `/git/master/${file}`;
+  if (!configCache) {
+    configCache = axios("/git/config")
+  }
+  const config = (await configCache).data;
+  const url = `/git/${config.defaultBranch}/${file}`;
   try {
     const response = await axios(url);
     if (response && response.data && response.data.content) {

@@ -16,29 +16,50 @@ if [[ -f .env ]]
 then source .env
 fi
 
-BLOG_CONTENT_BRANCH="${BLOG_CONTENT_BRANCH:-main}"
-BLOG_CONTENT_DIR="${BLOG_CONTENT_DIR:-}"
-BLOG_CONTENT_REPO="${BLOG_CONTENT_REPO:-https://gitlab.com/bohendo/blog-content.git}"
-BLOG_CONTENT_URL="${BLOG_CONTENT_URL:-https://gitlab.com/bohendo/blog-content/raw}"
+BLOG_ADMIN_TOKEN="${BLOG_ADMIN_TOKEN:-abc123}"
+BLOG_CONTENT_MIRROR="${BLOG_CONTENT_MIRROR:-https://gitlab.com/bohendo/blog-content.git}"
+BLOG_DEFAULT_BRANCH="${BLOG_DEFAULT_BRANCH:-main}"
 BLOG_DOMAINNAME="${BLOG_DOMAINNAME:-}"
 BLOG_EMAIL="${BLOG_EMAIL:-noreply@gmail.com}" # for notifications when ssl certs expire
-BLOG_MEDIA_DIR="${BLOG_MEDIA_DIR:-$root/../blog-content/media}" # mounted into IPFS
+BLOG_HOST_CONTENT_DIR="${BLOG_HOST_CONTENT_DIR:-content}"
+BLOG_HOST_MEDIA_DIR="${BLOG_HOST_MEDIA_DIR:-media}" # mounted into IPFS
+BLOG_INTERNAL_CONTENT_DIR="${BLOG_INTERNAL_CONTENT_DIR:-/blog-content.git}"
+BLOG_LOG_LEVEL="${BLOG_LOG_LEVEL:-info}"
 BLOG_PROD="${BLOG_PROD:-false}"
+BLOG_SEMVER="${BLOG_SEMVER:-false}"
+
+# If semver flag is given, we should ensure the prod flag is also active
+if [[ "$BLOG_SEMVER" == "true" ]]
+then export BLOG_PROD=true
+fi
 
 echo "Launching $project in env:"
-echo "- BLOG_CONTENT_BRANCH=$BLOG_CONTENT_BRANCH"
-echo "- BLOG_CONTENT_DIR=$BLOG_CONTENT_DIR"
-echo "- BLOG_CONTENT_REPO=$BLOG_CONTENT_REPO"
-echo "- BLOG_CONTENT_URL=$BLOG_CONTENT_URL"
+echo "- BLOG_ADMIN_TOKEN=$BLOG_ADMIN_TOKEN"
+echo "- BLOG_CONTENT_MIRROR=$BLOG_CONTENT_MIRROR"
+echo "- BLOG_DEFAULT_BRANCH=$BLOG_DEFAULT_BRANCH"
 echo "- BLOG_DOMAINNAME=$BLOG_DOMAINNAME"
 echo "- BLOG_EMAIL=$BLOG_EMAIL"
-echo "- BLOG_MEDIA_DIR=$BLOG_MEDIA_DIR"
+echo "- BLOG_HOST_CONTENT_DIR=$BLOG_HOST_CONTENT_DIR"
+echo "- BLOG_HOST_MEDIA_DIR=$BLOG_HOST_MEDIA_DIR"
+echo "- BLOG_INTERNAL_CONTENT_DIR=$BLOG_INTERNAL_CONTENT_DIR"
+echo "- BLOG_LOG_LEVEL=$BLOG_LOG_LEVEL"
 echo "- BLOG_PROD=$BLOG_PROD"
+echo "- BLOG_SEMVER=$BLOG_SEMVER"
 
 ########################################
 # Misc Config
 
-if [[ "$BLOG_PROD" == "true" ]]
+if [[ "$BLOG_HOST_CONTENT_DIR" == "/"* ]]
+then mkdir -p "$BLOG_HOST_CONTENT_DIR"
+fi
+
+if [[ "$BLOG_HOST_MEDIA_DIR" == "/"* ]]
+then mkdir -p "$BLOG_HOST_MEDIA_DIR"
+fi
+
+if [[ "$BLOG_SEMVER" == "true" ]]
+then version=v$(grep -m 1 '"version":' "$root/package.json" | cut -d '"' -f 4)
+elif [[ "$BLOG_PROD" == "true" ]]
 then version=$(git rev-parse HEAD | head -c 8)
 else version="latest"
 fi
@@ -53,8 +74,6 @@ common="networks:
 ########################################
 # IPFS config
 
-mkdir -p "$BLOG_MEDIA_DIR"
-
 ipfs_internal_port=8080
 
 ipfs_image="ipfs/go-ipfs:v0.7.0"
@@ -65,12 +84,13 @@ bash "$root/ops/pull-images.sh" "$ipfs_image"
 
 server_internal_port=8080
 server_env="environment:
-      BLOG_CONTENT_BRANCH: '$BLOG_CONTENT_BRANCH'
-      BLOG_CONTENT_DIR: '$BLOG_CONTENT_DIR'
-      BLOG_CONTENT_REPO: '$BLOG_CONTENT_REPO'
-      BLOG_CONTENT_URL: '$BLOG_CONTENT_URL'
-      BLOG_PROD: '$BLOG_PROD'
-      PORT: '$server_internal_port'"
+      BLOG_ADMIN_TOKEN: '$BLOG_ADMIN_TOKEN'
+      BLOG_CONTENT_MIRROR: '$BLOG_CONTENT_MIRROR'
+      BLOG_DEFAULT_BRANCH: '$BLOG_DEFAULT_BRANCH'
+      BLOG_INTERNAL_CONTENT_DIR: '$BLOG_INTERNAL_CONTENT_DIR'
+      BLOG_LOG_LEVEL: '$BLOG_LOG_LEVEL'
+      BLOG_PORT: '$server_internal_port'
+      BLOG_PROD: '$BLOG_PROD'"
 
 if [[ "$BLOG_PROD" == "true" ]]
 then
@@ -80,7 +100,7 @@ then
     $common
     $server_env
     volumes:
-      - 'content:/blog-content'"
+      - '$BLOG_HOST_CONTENT_DIR:$BLOG_INTERNAL_CONTENT_DIR'"
 
 else
   server_image="${project}_builder:$version"
@@ -89,9 +109,11 @@ else
     $common
     $server_env
     entrypoint: 'bash modules/server/ops/entry.sh'
+    ports:
+      - '5000:5000'
     volumes:
       - '$root:/root'
-      - 'content:/blog-content'"
+      - '$BLOG_HOST_CONTENT_DIR:$BLOG_INTERNAL_CONTENT_DIR'"
 
 fi
 bash "$root/ops/pull-images.sh" "$server_image"
@@ -131,7 +153,7 @@ bash "$root/ops/pull-images.sh" "$proxy_image"
 
 if [[ -n "$BLOG_DOMAINNAME" ]]
 then
-  public_url="https://$BLOG_DOMAINNAME/ping"
+  public_url="https://$BLOG_DOMAINNAME/git/config"
   proxy_ports="ports:
       - '80:80'
       - '443:443'"
@@ -139,7 +161,7 @@ then
 
 else
   public_port=${public_port:-3000}
-  public_url="http://127.0.0.1:$public_port/ping"
+  public_url="http://127.0.0.1:$public_port/git/config"
   proxy_ports="ports:
       - '$public_port:80'"
   echo "${project}_proxy will be exposed on *:$public_port"
@@ -161,6 +183,7 @@ volumes:
   certs:
   content:
   ipfs:
+  media:
 
 services:
   proxy:
@@ -185,7 +208,7 @@ services:
     $common
     volumes:
       - 'ipfs:/data/ipfs'
-      - '$BLOG_MEDIA_DIR:/media'
+      - '$BLOG_HOST_MEDIA_DIR:/media'
     ports:
       - '5001:5001'
 

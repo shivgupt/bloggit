@@ -5,7 +5,7 @@ SHELL=/bin/bash
 dir=$(shell cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )
 project=$(shell cat $(dir)/package.json | jq .name | tr -d '"')
 find_options=-type f -not -path "*/node_modules/*" -not -name "*.swp" -not -path "*/.*" -not -name "*.log"
-version=$(shell cat package.json | grep '"version":' | awk -F '"' '{print $$4}')
+semver=v$(shell cat package.json | grep '"version":' | awk -F '"' '{print $$4}')
 commit=$(shell git rev-parse HEAD | head -c 8)
 user=$(shell if [[ -n "${CI_PROJECT_NAMESPACE}" ]]; then echo "${CI_PROJECT_NAMESPACE}"; else echo "`whoami`"; fi)
 registry=registry.gitlab.com/$(user)/$(project)
@@ -38,33 +38,32 @@ restart: stop
 stop:
 	bash ops/stop.sh
 
-reset: stop
-	docker container prune -f
-
 clean: stop
 	docker container prune -f
 	rm -rf .flags/*
 	rm -rf modules/**/build
 	rm -rf modules/**/dist
 
+reset: stop
+	docker container prune -f
+
 purge: clean reset
 
 push: push-commit
 push-commit:
 	bash ops/push-images.sh $(commit)
-
-push-release:
-	bash ops/push-images.sh $(release)
+push-semver:
+	bash ops/pull-images.sh $(commit)
+	bash ops/tag-images.sh $(semver)
+	bash ops/push-images.sh $(semver)
 
 pull: pull-latest
 pull-latest:
 	bash ops/pull-images.sh latest
-
 pull-commit:
 	bash ops/pull-images.sh $(commit)
-
-pull-release:
-	bash ops/pull-images.sh $(release)
+pull-semver:
+	bash ops/pull-images.sh $(semver)
 
 build-report:
 	bash ops/build-report.sh

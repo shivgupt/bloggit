@@ -15,7 +15,7 @@ export const CodeBlockRenderer = (props: any) => {
   }
 
   return (
-    <SyntaxHighlighter language={props.language} style={vs}>
+    <SyntaxHighlighter showLineNumbers language={props.language} style={vs}>
       {props.value}
     </SyntaxHighlighter>
   );
