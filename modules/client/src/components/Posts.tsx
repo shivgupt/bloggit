@@ -54,13 +54,12 @@ export const PostPage = (props: { post?: PostData | string }) => {
       setContent(post);
       setNewContent(post);
     } else if (post && post.content) {
-      console.log(post);
       setContent(post.content);
       setNewContent(post.content);
     }
   },[post]);
 
-  const commitAndPush = async () => {
+  const updateGit = async () => {
     if (content === newContent){
       console.log("no changes detected");
       return;
@@ -112,7 +111,7 @@ export const PostPage = (props: { post?: PostData | string }) => {
             <Edit />
           </IconButton>
           <IconButton
-            onClick={commitAndPush}
+            onClick={updateGit}
           >
             <Save />
           </IconButton>
