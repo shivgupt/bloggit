@@ -17,6 +17,7 @@ import ReactMde from "react-mde";
 import "react-mde/lib/styles/css/react-mde-all.css";
 
 import { AdminContext } from "../AdminContext";
+import { PostData } from "../types";
 
 import { CodeBlockRenderer } from "./CodeBlock";
 import { HeadingRenderer } from "./HeadingRenderer";
@@ -32,16 +33,26 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-export const PostPage = (props: any) => {
+export const PostPage = (props: { post?: PostData | string }) => {
 
-  const { content } = props;
+  const { post } = props;
   const classes = useStyles();
   const adminContext = useContext(AdminContext);
   const [editMode, setEditMode] = useState(false);
-  const [value, setValue] = useState(content);
+  const [newContent, setNewContent] = useState("Loading Page");
+  const [content, setContent] = useState("Loading Page");
   const [selectedTab, setSelectedTab] = React.useState<"write" | "preview">("write");
 
-  useEffect(() => setValue(content), [content]);
+  useEffect(() => {
+    if (typeof(post) === "string") {
+      setContent(post);
+      setNewContent(post);
+    } else if (post && post.content) {
+      console.log(post);
+      setContent(post.content);
+      setNewContent(post.content);
+    }
+  },[post]);
 
   const commitAndPush = () => {
     console.log("Lets push it to git");
@@ -84,8 +95,8 @@ export const PostPage = (props: any) => {
       }
       { editMode ? 
         <ReactMde
-          value={value}
-          onChange={setValue}
+          value={newContent}
+          onChange={setNewContent}
           selectedTab={selectedTab}
           onTabChange={setSelectedTab}
           minEditorHeight={400}
@@ -105,7 +116,7 @@ export const PostPage = (props: any) => {
           )}
         />
         : <Markdown
-            source={content}
+            source={content || "Loading Page"}
             className={classes.text}
             renderers={{
               heading: HeadingRenderer,
