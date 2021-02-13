@@ -66,10 +66,16 @@ gitRouter.post([
 });
 
 // based on https://stackoverflow.com/a/25556917
+// TODO: lock so simultaneous pushes proceed serially
 gitRouter.post("/push/*", async (req, res, _): Promise<void> => {
   const filepath = req.path.replace(`/push/`, "");
   log.info(`Processing git push for file ${filepath}`);
-  await git.resetIndex({ ...gitOpts });
+  const latestCommit = await resolveRef(env.defaultBranch);
+  log.info(`latestCommit: ${latestCommit}`);
+  // Reset this filepath
+  await git.resetIndex({ ...gitOpts, filepath });
+  const indexTree = await git.readTree({ ...gitOpts, oid: latestCommit });
+  log.info(indexTree, "indexTree:");
   res.json({
     defaultBranch: env.defaultBranch,
   });
