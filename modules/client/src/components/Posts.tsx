@@ -82,6 +82,7 @@ export const PostPage = (props: { post?: PostData | string }) => {
     });
     console.log(res.status);
     console.log(res);
+    setEditMode(false);
   }
 
   const emojiSupport = text =>
