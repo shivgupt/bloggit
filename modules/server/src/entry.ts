@@ -14,7 +14,13 @@ const app = express();
 ////////////////////////////////////////
 /// Begin Pipeline
 
-app.use((req, res, next) => { log.info(`=> ${req.path}`); next(); });
+app.use((req, res, next) => {
+  const query = req.query && Object.keys(req.query).length > 0
+    ? `?${Object.entries(req.query).map(([key, val]) => `${key}=${val}`).join("&")}`
+    : "";
+  log.info(req.headers, `=> ${req.method} ${req.path}${query}`);
+  next();
+});
 
 app.use(authRouter);
 
