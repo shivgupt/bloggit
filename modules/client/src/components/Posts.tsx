@@ -8,6 +8,7 @@ import {
 } from "@material-ui/core";
 import {
   Edit,
+  RestaurantRounded,
   Save,
 } from "@material-ui/icons";
 import React, { useContext, useEffect, useState } from "react";
@@ -15,8 +16,10 @@ import Markdown from "react-markdown";
 import emoji from "emoji-dictionary";
 import ReactMde from "react-mde";
 import "react-mde/lib/styles/css/react-mde-all.css";
+import axios from "axios";
 
 import { AdminContext } from "../AdminContext";
+import { PostData } from "../types";
 
 import { CodeBlockRenderer } from "./CodeBlock";
 import { HeadingRenderer } from "./HeadingRenderer";
@@ -32,19 +35,54 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-export const PostPage = (props: any) => {
+export const PostPage = (props: { post?: PostData | string }) => {
 
-  const { content } = props;
+  const { post } = props;
   const classes = useStyles();
   const adminContext = useContext(AdminContext);
   const [editMode, setEditMode] = useState(false);
-  const [value, setValue] = useState(content);
+  const [newContent, setNewContent] = useState("Loading Page");
+  const [content, setContent] = useState("Loading Page");
   const [selectedTab, setSelectedTab] = React.useState<"write" | "preview">("write");
+  
+  useEffect(() => {
+    axios.defaults.headers.common["admin-token"] = adminContext.authToken;
+  }, [adminContext]);
 
-  useEffect(() => setValue(content), [content]);
+  useEffect(() => {
+    if (typeof(post) === "string") {
+      setContent(post);
+      setNewContent(post);
+    } else if (post && post.content) {
+      setContent(post.content);
+      setNewContent(post.content);
+    }
+  },[post]);
 
-  const commitAndPush = () => {
+  const updateGit = async () => {
+    if (content === newContent){
+      console.log("no changes detected");
+      return;
+    }
     console.log("Lets push it to git");
+    let path: string;
+    if (typeof(post) === "string") {
+      path = post;
+    } else if (post && post.path) {
+      path = post.path;
+    } else {
+      console.log("error: no path found");
+      return;
+    }
+    let res = await axios({
+      method: "post",
+      url: `git/push/${path}`,
+      data: newContent,
+      headers: { "content-type": "text/plain" }
+    });
+    console.log(res.status);
+    console.log(res);
+    setEditMode(false);
   }
 
   const emojiSupport = text =>
@@ -64,7 +102,6 @@ export const PostPage = (props: any) => {
     return (<Link color="secondary" href={props.href}> {props.children[0].props.value} </Link>);
   };
 
-  console.log(editMode);
   return (
     <Paper variant="outlined">
       {adminContext.adminMode ?
@@ -75,7 +112,7 @@ export const PostPage = (props: any) => {
             <Edit />
           </IconButton>
           <IconButton
-            onClick={commitAndPush}
+            onClick={updateGit}
           >
             <Save />
           </IconButton>
@@ -84,8 +121,8 @@ export const PostPage = (props: any) => {
       }
       { editMode ? 
         <ReactMde
-          value={value}
-          onChange={setValue}
+          value={newContent}
+          onChange={setNewContent}
           selectedTab={selectedTab}
           onTabChange={setSelectedTab}
           minEditorHeight={400}
@@ -105,7 +142,7 @@ export const PostPage = (props: any) => {
           )}
         />
         : <Markdown
-            source={content}
+            source={content || "Loading Page"}
             className={classes.text}
             renderers={{
               heading: HeadingRenderer,
