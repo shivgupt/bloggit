@@ -43,7 +43,7 @@ export const push = async (req, res, _): Promise<void> => {
   } catch (e) {
     log.info(`Failed to read blob: ${e.message}`);
     blob = {
-      oid: await git.writeBlob({ ...gitOpts, blob: blobHash.object }),
+      oid: await git.writeBlob({ ...gitOpts, blob: strToArray(req.body) }),
       blob: blobHash.object,
     };
     log.info(`Wrote new blob: {"oid":"${blob.oid}","blob":"${arrToString(blob.blob)}"}`);
