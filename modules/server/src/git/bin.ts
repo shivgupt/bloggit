@@ -1,8 +1,8 @@
 import { spawn } from "child_process";
 import { Duplex } from "stream";
 
-import { env } from "./env";
-import { logger, bufferToStream, streamToBuffer } from "./utils";
+import { env } from "../env";
+import { logger, bufferToStream, streamToBuffer } from "../utils";
 
 const log = logger.child({ module: "GitBackend" });
 
@@ -41,12 +41,13 @@ type IService = {
   createStream: () => Duplex;
 }
 
-export const getService = (opts: ServiceOpts, backend: IBackend): IService => {
+const getService = (opts: ServiceOpts, backend: IBackend): IService => {
   log.info(`Service(${JSON.stringify(opts)}, ${typeof backend})`);
   const args = [ "--stateless-rpc" ];
   if (opts.info) args.push("--advertise-refs");
   const createStream = (): IStream => {
     const stream = new Duplex() as IStream;
+
     stream._read = (): void => {
       const { _next: next, _buffer: buf } = backend;
       log.info(`reading ${buf ? buf.toString("utf8").length : 0} chars from service`);
@@ -55,6 +56,7 @@ export const getService = (opts: ServiceOpts, backend: IBackend): IService => {
       if (buf) stream.push(buf);
       if (next) next();
     };
+
     stream._write = (
       buf: string | Buffer,
       enc: BufferEncoding,
@@ -67,6 +69,7 @@ export const getService = (opts: ServiceOpts, backend: IBackend): IService => {
       if (backend._ready) next();
       else stream._next = next;
     };
+
     backend._stream = stream;
     if (backend._ready) {
       stream._read();

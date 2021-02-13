@@ -17,6 +17,7 @@ import { emptyIndex, fetchFile, fetchContent, fetchIndex, getPostsByCategories }
 import { darkTheme, lightTheme } from "./style";
 import { store } from "./utils/cache";
 import { AdminContext } from "./AdminContext";
+import { PostData } from "./types";
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
   appBarSpacer: theme.mixins.toolbar,
@@ -169,7 +170,7 @@ const App: React.FC = () => {
                 path="/about"
                 render={() => {
                   setCurrentSlug("");
-                  return (<PostPage content={index.about ?
+                  return (<PostPage post={index.about ?
                     about
                     : "Not added yet" }
                   />);
@@ -190,10 +191,10 @@ const App: React.FC = () => {
                   const slug = match.params.slug;
                   setCurrentSlug(slug);
                   return (<PostPage
-                    content={
+                    post={
                       index.posts[slug]
-                        ? (index.posts[slug].content || "Loading Page")
-                        : "Loading Index"
+                        ? index.posts[slug]
+                        : {} as PostData
                     }
                   />);
                 }}
