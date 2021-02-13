@@ -43,8 +43,8 @@ then
     else git remote set-url mirror "$BLOG_CONTENT_MIRROR"
     fi
     git fetch mirror --prune --tags
-    if ! grep -qs "main" <<<"$(git branch -l)"
-    then git branch main mirror/main
+    if ! grep -qs "$BLOG_DEFAULT_BRANCH" <<<"$(git branch -l)"
+    then git branch "$BLOG_DEFAULT_BRANCH" "mirror/$BLOG_DEFAULT_BRANCH"
     fi
   )
 fi
