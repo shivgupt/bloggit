@@ -37,6 +37,9 @@ export const push = async (req, res, _): Promise<void> => {
   try {
     blob = await git.readBlob({ ...gitOpts, oid: parentCommit, filepath });
     log.info(`Read existing blob: ${JSON.stringify(blob)}`);
+    if (arrToString(blob.blob) !== req.body) {
+      throw new Error(`Blob contents differ`);
+    }
   } catch (e) {
     log.info(`Failed to read blob: ${e.message}`);
     blob = {
@@ -96,8 +99,12 @@ export const push = async (req, res, _): Promise<void> => {
   } else {
     const target = tree.findIndex(element => element.path === filename);
     if (target >= 0) {
+      log.info(`Root tree already contains target file, updating it..`);
+      log.info(`Old node: ${JSON.stringify(tree[target])}`);
       tree[target] = newBlob as any;
+      log.info(`New node: ${JSON.stringify(tree[target])}`);
     } else {
+      log.info(`Root tree does not contains target file, adding it..`);
       tree.push(newBlob as any);
     }
   }
