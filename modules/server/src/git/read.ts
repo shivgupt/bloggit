@@ -16,7 +16,7 @@ export const getConfig = (req, res, _): void => {
   });
 };
 
-export const getFile = (req, res, next): Promise<void> => {
+export const getFile = async (req, res, next): Promise<void> => {
   const { ref: givenRef } = req.params;
   const filepath = req.path.replace(`/${givenRef}/`, "");
   log.info(`Returning content at ref ${givenRef} and path ${filepath}`);
