@@ -65,6 +65,16 @@ gitRouter.post([
   res.send(response);
 });
 
+// based on https://stackoverflow.com/a/25556917
+gitRouter.post("/push/*", async (req, res, _): Promise<void> => {
+  const filepath = req.path.replace(`/push/`, "");
+  log.info(`Processing git push for file ${filepath}`);
+  await git.resetIndex({ ...gitOpts });
+  res.json({
+    defaultBranch: env.defaultBranch,
+  });
+});
+
 gitRouter.get("/config", (req, res, _): void => {
   res.json({
     defaultBranch: env.defaultBranch,
