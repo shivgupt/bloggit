@@ -94,8 +94,12 @@ export const push = async (req, res, _): Promise<void> => {
       return;
     }
   } else {
-    const target = subTree.findIndex(element => element.path === filename);
-    tree[target] = newBlob as any;
+    const target = tree.findIndex(element => element.path === filename);
+    if (target >= 0) {
+      tree[target] = newBlob as any;
+    } else {
+      tree.push(newBlob as any);
+    }
   }
 
   const rootTreeOid = await git.writeTree({ ...gitOpts, tree });
