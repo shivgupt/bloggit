@@ -34,7 +34,7 @@ gitRouter.use(bodyParser.raw({ type: [
 
 gitRouter.get("/info/refs", async (req, res, _): Promise<void> => {
   const err = (e: string): void => {
-    log.warn(`Git backend failed to get ref info: ${e}`);
+    log.warn(`Git backend failure: ${e}`);
     res.status(500).send(e);
     return;
   };
@@ -54,7 +54,7 @@ gitRouter.post([
   "/git-upload-pack",
 ], async (req, res, _): Promise<void> => {
   const err = (e: string): void => {
-    log.warn(`Git backend failed to get ref info: ${e}`);
+    log.warn(`Git backend failure: ${e}`);
     res.status(500).send(e);
     return;
   };
