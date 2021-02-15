@@ -4,138 +4,106 @@ import { Duplex } from "stream";
 import { env } from "../env";
 import { logger } from "../utils";
 
-import { bufferToStream, streamToBuffer } from "./utils";
-
 const log = logger.child({ module: "GitBackend" });
 
 // const keys = {"git-receive-pack": [ "last", "head", "refname" ], "git-upload-pack": [ "head" ]};
+const regex = {
+  "git-receive-pack": RegExp("([0-9a-fA-F]+) ([0-9a-fA-F]+) (refs/[^ \x00]+)( |00|\x00)|^(0000)$"),
+  "git-upload-pack": /^\S+ ([0-9a-fA-F]+)/,
+};
 
-type BufferEncoding = string;
-
-export const getGitBackend = (
-  path: string,
-  service: string,
+export const getGitBackend = async (
+  service: "git-upload-pack" | "git-receive-pack",
+  info: boolean,
   payload: Buffer,
-  err: (e?: string | Error) => void,
 ): Promise<Buffer> => {
-  log.info(`GitBackend(${path}, ${service})`);
-  const backend = new Duplex();
+  log.info(`GitBackend(${service}, ${info}, payload.length=${payload ? payload.length : 0})`);
 
-  backend.on("error", err);
+  return new Promise((resolve, reject) => {
 
-  let info = false;
-  let cmd: string;
-  const args = [ "--stateless-rpc" ];
-  if (/\/info\/refs$/.test(path)) {
-    info = true;
-    cmd = service;
-    args.push("--advertise-refs");
-  } else {
-    const parts = path.split("/");
-    cmd = parts[parts.length-1];
-    if (cmd !== "git-upload-pack" && cmd !== "git-receive-pack") {
-      err("unsupported git service");
-      return Promise.resolve(Buffer.from([]));
-    }
-  }
-  args.push(env.contentDir);
+    let output = Buffer.from([]);
 
-  ////////////////////////////////////////
-
-  let psBuffer: Buffer;
-  let psCallback: (err?: Error) => void;
-  let psStream: Duplex;
-  let inputReady: number;
-
-  const spawnChild = (): void => {
-    psStream = new Duplex();
-    let needsPktFlush: boolean;
-    psStream._read = (): void => {
-      log.info(`reading ${psBuffer ? psBuffer.toString("utf8").length : 0} chars from service`);
-      if (psBuffer) psStream.push(psBuffer);
-      if (psCallback) psCallback();
-      psCallback = null;
-      psBuffer = null;
-    };
-    psStream._write = (
-      buf: string | Buffer,
-      enc: BufferEncoding,
-      next: (err?: Error) => void,
-    ): void => {
-      log.info(`writing ${buf ? buf.toString("utf8").length : 0} chars to service`);
-      if (buf.length !== 4 && buf.toString() !== "0000") { // dont send terminate signal
-        backend.push(buf);
-      } else {
-        needsPktFlush = true;
-      }
-      if (inputReady) {
-        next();
-      }
-    };
-    if (inputReady) {
-      psStream._read(undefined as any);
-    }
-    psStream.on("finish", (): void => {
-      if (needsPktFlush) backend.push(Buffer.from("0000"));
-      backend.push(null);
-    });
+    const args = [ "--stateless-rpc" ];
     if (info) {
-      const flag = "# service=" + cmd + "\n";
-      const n = (4 + flag.length).toString(16);
-      backend.push(Array(4 - n.length + 1).join("0") + n + flag + "0000");
+      args.push("--advertise-refs");
     }
-    const ps = spawn(cmd, args);
-    log.info(`Spawned: ${cmd} ${args.toString().split(",").join(" ")}`);
-    ps.on("error", (e) => log.info(`${cmd} failed to launch: ${e}`));
-    ps.on("close", (code) => log.info(`${cmd} exited with code ${code}`));
-    ps.stdout.on("data", out => log.info(`${cmd} sent ${out.length} chars to stdout`));
-    ps.stderr.on("data", err => log.info(`${cmd} sent ${err.length} chars to stderr`));
-    ps.stdin.on("data", out => log.info(`${cmd} got ${out.length} chars in stdin`));
-    ps.stdout.pipe(psStream).pipe(ps.stdin);
-  };
+    args.push(env.contentDir);
 
-  if (info) {
-    spawnChild();
-  }
+    ////////////////////////////////////////
 
-  backend._read = (n?: number): void => {
-    log.info(`reading ${n} chars from backend`);
-    inputReady = n;
-  };
+    let childStream: Duplex;
+    let inputReady: number;
 
-  backend._write = (buf, enc, next): void => {
-    log.info(`writing ${buf ? buf.toString("utf8").length : 0} chars to backend`);
-    if (psStream) {
-      log.debug(`Pushing backend data to psStream`);
-      psCallback = next;
-      psStream.push(buf);
-      return;
-    } else if (info) {
-      log.debug(`Setting psBuffer to the given buf`);
-      psBuffer = buf;
-      psCallback = next;
-      return;
-    }
-    const m = {
-      "git-receive-pack": RegExp(
-        "([0-9a-fA-F]+) ([0-9a-fA-F]+) (refs/[^ \x00]+)( |00|\x00)|^(0000)$",
-      ),
-      "git-upload-pack": /^\S+ ([0-9a-fA-F]+)/
-    }[cmd].exec(buf.slice(0,512).toString("utf8"));
-    if (m) {
-      log.debug(`Got regex match on ${cmd}'s buffer, spawning child`);
-      psBuffer = buf;
-      psCallback = next;
+    const spawnChild = (inputBuf?: Buffer): void => {
+      log.info(`Creating child stream`);
+      let needsPktFlush: boolean;
+      let childBuffer = inputBuf;
+
+      childStream = new Duplex();
+      childStream._read = (n?: number): void => {
+        log.info(`reading ${n || 0} chars from child`);
+        if (childBuffer) {
+          log.debug(`pushing childBuffer to childStream`);
+          childStream.push(childBuffer);
+          childBuffer = null;
+        }
+      };
+      childStream._write = (
+        buf: string | Buffer,
+        enc: string,
+        next: (err?: Error) => void,
+      ): void => {
+        log.info(`writing ${buf ? buf.toString("utf8").length : 0} chars to child`);
+        if (buf.toString() === "0000") { // dont send terminate signal until childStream is finished
+          needsPktFlush = true;
+        } else {
+          log.debug(`Pushing ${buf ? buf.toString("utf8").length : 0} chars to output`);
+          output = Buffer.concat([output, Buffer.from(buf)]);
+        }
+        if (inputReady) {
+          log.debug(`Input is ready, activating child._write callback`);
+          next(null);
+        }
+      };
+      childStream.on("finish", (): void => {
+        log.debug(`childStream is finished, writing terminate signal to output`);
+        if (needsPktFlush) {
+          output = Buffer.concat([output, Buffer.from("0000")]);
+        }
+        log.debug(`Resolving promise directly`);
+        resolve(output);
+      });
+
+      if (info) {
+        const flag = "# service=" + service + "\n";
+        const n = (4 + flag.length).toString(16);
+        const toPush = Array(4 - n.length + 1).join("0") + n + flag + "0000";
+        log.debug(`Pushing ${toPush.length} chars of info data to output`);
+        output = Buffer.concat([output, Buffer.from(toPush)]);
+      }
+
+      log.info(`Spawning: ${service} ${args.toString().split(",").join(" ")}`);
+      const ps = spawn(service, args);
+      ps.on("error", (e) => log.error(`${service} failed to launch: ${e}`));
+      ps.on("close", (code) => log.debug(`${service} exited with code ${code}`));
+      ps.stdout.on("data", out => log.debug(`${service} sent ${out.length} chars to stdout`));
+      ps.stderr.on("data", err => log.error(`${service} sent ${err.length} chars to stderr`));
+      ps.stdin.on("data", out => log.debug(`${service} got ${out.length} chars in stdin`));
+      ps.stdout.pipe(childStream).pipe(ps.stdin);
+    };
+
+    if (info) {
+      inputReady = 16384;
       spawnChild();
-    } else {
-      backend.emit("error", new Error("unrecognized input"));
-      return;
+    } else if (payload && payload.length > 0) {
+      if (regex[service].exec(payload.slice(0,512).toString("utf8"))) {
+        log.debug(`Got regex match on ${service}'s input buffer, spawning child`);
+        inputReady = 16384;
+        spawnChild(payload);
+      } else {
+        reject(new Error("unrecognized input"));
+        return;
+      }
     }
-  };
-
-  if (payload && payload.length > 0) {
-    bufferToStream(payload).pipe(backend);
-  }
-
-  return streamToBuffer(backend);
+  });
 };
