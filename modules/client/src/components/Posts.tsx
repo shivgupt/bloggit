@@ -67,7 +67,7 @@ export const PostPage = (props: { post?: PostData | string }) => {
     console.log("Lets push it to git");
     let path: string;
     if (typeof(post) === "string") {
-      path = post;
+      path = adminContext.index.about;
     } else if (post && post.path) {
       path = post.path;
     } else {
@@ -82,13 +82,7 @@ export const PostPage = (props: { post?: PostData | string }) => {
     });
 
     if (typeof(post) === "string") {
-      adminContext.updateIndex(
-        JSON.parse(JSON.stringify(adminContext.index)),
-        "about",
-        "",
-        post,
-      )
-
+      adminContext.updateIndex(JSON.parse(JSON.stringify(adminContext.index)), "about");
     } else {
       adminContext.updateIndex(
         JSON.parse(JSON.stringify(adminContext.index)),

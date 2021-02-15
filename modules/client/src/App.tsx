@@ -59,7 +59,7 @@ const App: React.FC = () => {
     if (fetch) {
       switch(fetch) {
         case "content": 
-          const currentContent = await fetchContent(slug!);
+          const currentContent = await fetchContent(slug!, true);
           newIndex[key!][slug!].content = currentContent;
           break;
         case "index":
@@ -69,7 +69,7 @@ const App: React.FC = () => {
           }
           break;
         case "about":
-          setAbout(await fetchFile(slug!));
+          setAbout(await fetchFile(newIndex.about));
       }
     }
     setIndex(newIndex || {} as PostIndex);
