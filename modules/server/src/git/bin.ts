@@ -11,17 +11,6 @@ const log = logger.child({ module: "GitBackend" });
 // const keys = {"git-receive-pack": [ "last", "head", "refname" ], "git-upload-pack": [ "head" ]};
 
 type BufferEncoding = string;
-type Bufferish = string | Buffer;
-
-type IBackend = Duplex & {
-  _next: (err?: Error) => void;
-  _prev: null | Bufferish;
-  _ready: boolean | number;
-  _stream: Duplex;
-
-  _read: () => void;
-  _write: (buf: Bufferish, enc: BufferEncoding, next: (err?: Error) => void) => void;
-}
 
 export const getGitBackend = (
   path: string,
@@ -30,7 +19,7 @@ export const getGitBackend = (
   err: (e?: string | Error) => void,
 ): Promise<Buffer> => {
   log.info(`GitBackend(${path}, ${service})`);
-  const backend = new Duplex() as IBackend;
+  const backend = new Duplex();
 
   backend.on("error", err);
 
@@ -54,20 +43,21 @@ export const getGitBackend = (
   ////////////////////////////////////////
 
   let psBuffer: Buffer;
+  let psCallback: (err?: Error) => void;
+  let psStream: Duplex;
+  let inputReady: number;
 
   const spawnChild = (): void => {
-    const stream = new Duplex();
+    psStream = new Duplex();
     let needsPktFlush: boolean;
-    stream._read = (): void => {
-      const { _next: next } = backend;
-      const buf = psBuffer;
-      log.info(`reading ${buf ? buf.toString("utf8").length : 0} chars from service`);
-      backend._next = null;
+    psStream._read = (): void => {
+      log.info(`reading ${psBuffer ? psBuffer.toString("utf8").length : 0} chars from service`);
+      if (psBuffer) psStream.push(psBuffer);
+      if (psCallback) psCallback();
+      psCallback = null;
       psBuffer = null;
-      if (buf) stream.push(buf);
-      if (next) next();
     };
-    stream._write = (
+    psStream._write = (
       buf: string | Buffer,
       enc: BufferEncoding,
       next: (err?: Error) => void,
@@ -78,15 +68,14 @@ export const getGitBackend = (
       } else {
         needsPktFlush = true;
       }
-      if (backend._ready) {
+      if (inputReady) {
         next();
       }
     };
-    backend._stream = stream;
-    if (backend._ready) {
-      stream._read(undefined as any);
+    if (inputReady) {
+      psStream._read(undefined as any);
     }
-    stream.on("finish", (): void => {
+    psStream.on("finish", (): void => {
       if (needsPktFlush) backend.push(Buffer.from("0000"));
       backend.push(null);
     });
@@ -102,7 +91,7 @@ export const getGitBackend = (
     ps.stdout.on("data", out => log.info(`${cmd} sent ${out.length} chars to stdout`));
     ps.stderr.on("data", err => log.info(`${cmd} sent ${err.length} chars to stderr`));
     ps.stdin.on("data", out => log.info(`${cmd} got ${out.length} chars in stdin`));
-    ps.stdout.pipe(stream).pipe(ps.stdin);
+    ps.stdout.pipe(psStream).pipe(ps.stdin);
   };
 
   if (info) {
@@ -111,22 +100,21 @@ export const getGitBackend = (
 
   backend._read = (n?: number): void => {
     log.info(`reading ${n} chars from backend`);
-    backend._ready = n;
+    inputReady = n;
   };
 
   backend._write = (buf, enc, next): void => {
     log.info(`writing ${buf ? buf.toString("utf8").length : 0} chars to backend`);
-    if (backend._stream) {
-      backend._next = next;
-      backend._stream.push(buf);
+    if (psStream) {
+      log.debug(`Pushing backend data to psStream`);
+      psCallback = next;
+      psStream.push(buf);
       return;
     } else if (info) {
+      log.debug(`Setting psBuffer to the given buf`);
       psBuffer = buf;
-      backend._next = next;
+      psCallback = next;
       return;
-    }
-    if (backend._prev) {
-      buf = Buffer.concat([ backend._prev, buf ]);
     }
     const m = {
       "git-receive-pack": RegExp(
@@ -135,17 +123,13 @@ export const getGitBackend = (
       "git-upload-pack": /^\S+ ([0-9a-fA-F]+)/
     }[cmd].exec(buf.slice(0,512).toString("utf8"));
     if (m) {
-      backend._prev = null;
+      log.debug(`Got regex match on ${cmd}'s buffer, spawning child`);
       psBuffer = buf;
-      backend._next = next;
+      psCallback = next;
       spawnChild();
-    } else if (buf.length >= 512) {
+    } else {
       backend.emit("error", new Error("unrecognized input"));
       return;
-    } else {
-      log.warn(`Hit unexpected code path`);
-      backend._prev = buf;
-      next();
     }
   };
 
