@@ -18,6 +18,7 @@ import { darkTheme, lightTheme } from "./style";
 import { store } from "./utils/cache";
 import { AdminContext } from "./AdminContext";
 import { PostData, PostIndex, SidebarNode } from "./types";
+import { CreateNewPost } from "./components/CreateNewPost";
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
   appBarSpacer: theme.mixins.toolbar,
@@ -163,6 +164,12 @@ const App: React.FC = () => {
                     about
                     : "Not added yet" }
                   />);
+                }}
+              />
+              <Route exact
+                path="/create-new-post"
+                render={() => {
+                  return <CreateNewPost />;
                 }}
               />
               <Route exact

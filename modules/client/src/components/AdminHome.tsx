@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { 
   Button,
   Divider,
@@ -12,7 +12,7 @@ import { AdminContext } from "../AdminContext";
 
 const useStyles = makeStyles((theme: Theme) => ({
   section: {
-    margin: theme.spacing(3, 2),
+    margin: theme.spacing(1, 1),
     "& > *": {
       margin: theme.spacing(1),
     }
@@ -29,7 +29,44 @@ export const AdminHome = () => {
     adminContext.updateAuthToken(authToken);
   };
 
-  console.log(adminContext.authToken);
+  const JsonEditor = (props: any) => {
+    const { root } = props;
+
+    return (<>{
+      Object.entries(root).map(([key,value]) => { 
+      switch(typeof(value)) {
+        case 'string':
+          console.log('string');
+          return <TextField
+            id={"key" + key}
+            key={key}
+            label={key}
+            variant="outlined"
+            defaultValue={value}
+          />
+          
+        case 'object':
+          console.log(value);
+          if (value && (value as Array<any>).length ) {
+            const val = (value as Array<any>).reduce((v, o) =>  v + o + "\n", "");
+           return <TextField 
+                key={key}
+                label={key}
+                multiline
+                defaultValue={val}
+             />
+          } else {
+             return <Typography key={key}>Processing Key: {key}</Typography> //<JsonEditor root={value} />
+            //return <JsonEditor root={value} />
+          }
+          
+        default:
+          return <Typography key={key}> Unknown {key} {typeof(value)}</Typography>
+      }})
+    }</>);
+  };
+
+  console.log(adminContext.index);
 
   return (
     <div>
@@ -67,6 +104,14 @@ export const AdminHome = () => {
 
         <Button onClick={handleRegister}> Register </Button>
       </div>
+
+      <Divider variant="middle" />
+      { adminContext.authToken
+        ? (<div className={classes.section}>
+          <JsonEditor root={adminContext.index} />
+        </div>)
+        : <>SOmething wenT Wrong!</>
+      }
     </div>
   );
 };

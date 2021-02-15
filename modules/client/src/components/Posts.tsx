@@ -3,12 +3,9 @@ import {
   IconButton,
   makeStyles,
   Paper,
-  Hidden,
-  TextareaAutosize,
 } from "@material-ui/core";
 import {
   Edit,
-  RestaurantRounded,
   Save,
 } from "@material-ui/icons";
 import React, { useContext, useEffect, useState } from "react";
