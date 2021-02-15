@@ -12,13 +12,10 @@ docker network create --attachable --driver overlay "$project" 2> /dev/null || t
 # External Env Vars
 
 # shellcheck disable=SC1091
-if [[ -f .env ]]
-then source .env
-fi
+if [[ -f .env ]]; then source .env; fi
 
 BLOG_AUTH_PASSWORD="${BLOG_AUTH_PASSWORD:-abc123}"
 BLOG_AUTH_USERNAME="${BLOG_AUTH_USERNAME:-admin}"
-BLOG_CONTENT_MIRROR="${BLOG_CONTENT_MIRROR:-https://gitlab.com/bohendo/blog-content.git}"
 BLOG_DEFAULT_BRANCH="${BLOG_DEFAULT_BRANCH:-main}"
 BLOG_DOMAINNAME="${BLOG_DOMAINNAME:-}"
 BLOG_EMAIL="${BLOG_EMAIL:-noreply@gmail.com}" # for notifications when ssl certs expire
@@ -26,6 +23,8 @@ BLOG_HOST_CONTENT_DIR="${BLOG_HOST_CONTENT_DIR:-$root/.blog-content.git}"
 BLOG_HOST_MEDIA_DIR="${BLOG_HOST_MEDIA_DIR:-$root/.media}" # mounted into IPFS
 BLOG_INTERNAL_CONTENT_DIR="${BLOG_INTERNAL_CONTENT_DIR:-/blog-content.git}"
 BLOG_LOG_LEVEL="${BLOG_LOG_LEVEL:-info}"
+BLOG_MIRROR_KEY="${BLOG_MIRROR_KEY:-}"
+BLOG_MIRROR_URL="${BLOG_MIRROR_URL:-https://gitlab.com/bohendo/blog-content.git}"
 BLOG_PROD="${BLOG_PROD:-false}"
 BLOG_SEMVER="${BLOG_SEMVER:-false}"
 
@@ -37,7 +36,6 @@ fi
 echo "Launching $project in env:"
 echo "- BLOG_AUTH_PASSWORD=$BLOG_AUTH_PASSWORD"
 echo "- BLOG_AUTH_USERNAME=$BLOG_AUTH_USERNAME"
-echo "- BLOG_CONTENT_MIRROR=$BLOG_CONTENT_MIRROR"
 echo "- BLOG_DEFAULT_BRANCH=$BLOG_DEFAULT_BRANCH"
 echo "- BLOG_DOMAINNAME=$BLOG_DOMAINNAME"
 echo "- BLOG_EMAIL=$BLOG_EMAIL"
@@ -45,6 +43,8 @@ echo "- BLOG_HOST_CONTENT_DIR=$BLOG_HOST_CONTENT_DIR"
 echo "- BLOG_HOST_MEDIA_DIR=$BLOG_HOST_MEDIA_DIR"
 echo "- BLOG_INTERNAL_CONTENT_DIR=$BLOG_INTERNAL_CONTENT_DIR"
 echo "- BLOG_LOG_LEVEL=$BLOG_LOG_LEVEL"
+echo "- BLOG_MIRROR_KEY=$BLOG_MIRROR_KEY"
+echo "- BLOG_MIRROR_URL=$BLOG_MIRROR_URL"
 echo "- BLOG_PROD=$BLOG_PROD"
 echo "- BLOG_SEMVER=$BLOG_SEMVER"
 
@@ -88,10 +88,11 @@ server_internal_port=8080
 server_env="environment:
       BLOG_AUTH_PASSWORD: '$BLOG_AUTH_PASSWORD'
       BLOG_AUTH_USERNAME: '$BLOG_AUTH_USERNAME'
-      BLOG_CONTENT_MIRROR: '$BLOG_CONTENT_MIRROR'
       BLOG_DEFAULT_BRANCH: '$BLOG_DEFAULT_BRANCH'
       BLOG_INTERNAL_CONTENT_DIR: '$BLOG_INTERNAL_CONTENT_DIR'
       BLOG_LOG_LEVEL: '$BLOG_LOG_LEVEL'
+      BLOG_MIRROR_KEY: '$BLOG_MIRROR_KEY'
+      BLOG_MIRROR_URL: '$BLOG_MIRROR_URL'
       BLOG_PORT: '$server_internal_port'
       BLOG_PROD: '$BLOG_PROD'"
 
