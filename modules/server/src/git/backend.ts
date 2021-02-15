@@ -75,4 +75,5 @@ export const pack = async (req, res, _): Promise<void> => {
     log.info(`Sending ${response.length} bytes of pack response`);
     res.send(response);
   }
+  // TODO: push to mirror repo
 };
