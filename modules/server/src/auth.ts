@@ -7,15 +7,17 @@ const log = logger.child({ module: "AuthRouter" });
 
 export const authRouter = express.Router();
 
-const authHeader = "admin-token";
+const authHeader = "authorization";
+const authType = "Basic";
+const encodedToken = Buffer.from(`${env.authUsername}:${env.authPassword}`).toString("base64");
 const restrictedPaths = ["/git/push", "/git/git-receive-pack"];
 
 authRouter.use((req, res, next) => {
   if (restrictedPaths.some(path => req.path.startsWith(path))) {
-    if (!req.headers[authHeader] || req.headers[authHeader] !== env.adminToken) {
+    if (!req.headers[authHeader] || req.headers[authHeader] !== `${authType} ${encodedToken}`) {
       log.info(`Failed to authenticate request for ${req.path}`);
-      // res.status(403).send("Forbidden");
-      next(); // For now, still proceed so we can debug other stuff
+      res.setHeader("www-authenticate", authType);
+      res.status(401).send("Unauthorized");
     } else {
       log.info(`Successfully authenticated request for ${req.path}`);
       next();
