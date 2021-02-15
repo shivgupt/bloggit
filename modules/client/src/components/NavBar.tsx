@@ -6,7 +6,6 @@ import {
   FormControlLabel,
   Hidden,
   IconButton,
-  SwipeableDrawer,
   Switch,
   ThemeProvider,
   Toolbar,
@@ -124,15 +123,9 @@ const DrawerContent = (props: any) => {
 export const NavBar = (props: any) => {
   const { title } = props;
   const classes = useStyles();
-  const [drawer, setDrawer] = useState({ open: false });
+  const [drawer, setDrawer] = useState(false);
 
-  const toggleDrawer = (open) => event => {
-    // what's the goal of ignoring some of these events?
-    if (event && event.type === "keydown" && (event.key === "Tab" || event.key === "Shift")) {
-      return;
-    }
-    setDrawer({ open: open });
-  };
+  const toggleDrawer = () => setDrawer(!drawer);
 
   return (
     <>
@@ -161,7 +154,7 @@ export const NavBar = (props: any) => {
               edge="start"
               color="inherit"
               aria-label="open drawer"
-              onClick={toggleDrawer(true)}
+              onClick={toggleDrawer}
               className={classes.rightButton}
             >
               <MenuIcon />
@@ -171,15 +164,14 @@ export const NavBar = (props: any) => {
       </AppBar>
       <nav className={classes.drawer}>
         <Hidden mdUp>
-          <SwipeableDrawer
+          <Drawer
             anchor="right"
-            open={drawer.open}
-            onClose={toggleDrawer(false)}
-            onOpen={toggleDrawer(true)}
+            open={drawer}
+            onClose={toggleDrawer}
             classes={{ paper: classes.list }}
           >
             <DrawerContent {...props} />
-          </SwipeableDrawer>
+          </Drawer>
         </Hidden>
         <Hidden smDown>
           <Drawer
