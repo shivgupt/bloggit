@@ -1,7 +1,8 @@
 import path from "path";
 
 export type Env = {
-  adminToken: string;
+  authUsername: string;
+  authPassword: string;
   contentDir: string;
   defaultBranch: string;
   logLevel: string;
@@ -10,7 +11,8 @@ export type Env = {
 }
 
 export const env: Env = {
-  adminToken: process?.env?.BLOG_ADMIN_TOKEN || "abc123",
+  authUsername: process?.env?.BLOG_AUTH_USERNAME || "admin",
+  authPassword: process?.env?.BLOG_AUTH_PASSWORD || "abc123",
   contentDir: path.normalize(process?.env?.BLOG_INTERNAL_CONTENT_DIR || "/blog-content.git"),
   defaultBranch: process?.env?.BLOG_DEFAULT_BRANCH || "main",
   logLevel: process?.env?.BLOG_LOG_LEVEL || "info",
