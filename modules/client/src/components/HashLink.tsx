@@ -81,11 +81,9 @@ const genericHashLink = (props: any, As) => {
   );
 };
 
-export class HashLink extends React.Component {
-  render () {
-    return genericHashLink(this.props, Link);
-  }
-}
+export const HashLink = React.forwardRef((props, ref) => {
+  return genericHashLink(props, Link);
+});
 
 export function NavHashLink(props) {
   return genericHashLink(props, NavLink);
