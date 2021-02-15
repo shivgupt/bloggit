@@ -3,7 +3,7 @@ import git from "isomorphic-git";
 import { env } from "../env";
 import { logger } from "../utils";
 
-import { gitOpts, resolveRef, strToArray, arrToString } from "./utils";
+import { gitOpts, pushToMirror, resolveRef, strToArray, arrToString } from "./utils";
 
 const log = logger.child({ module: "GitRouter" });
 
@@ -127,17 +127,19 @@ export const push = async (req, res, _): Promise<void> => {
   } });
   log.info(`Wrote new commit w hash: ${commitHash}`);
 
+  const ref = `refs/heads/${env.defaultBranch}`;
+
   await git.writeRef({
     ...gitOpts,
     force: true,
-    ref: `refs/heads/${env.defaultBranch}`,
+    ref,
     value: commitHash,
   });
   log.info(`Wrote new ref, pointing ${env.defaultBranch} at ${commitHash}`);
 
-  // TODO: push to mirror repo
+  res.json({ status: "success" });
 
-  res.json({
-    status: "success",
-  });
+  if (env.mirrorUrl && env.mirrorKey) {
+    await pushToMirror();
+  }
 };
