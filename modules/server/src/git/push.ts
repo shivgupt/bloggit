@@ -7,9 +7,8 @@ import { gitOpts, resolveRef, strToArray, arrToString } from "./utils";
 
 const log = logger.child({ module: "GitRouter" });
 
-let lock = false;
-
 // based on https://stackoverflow.com/a/25556917
+// TODO: lock so simultaneous pushes proceed serially
 export const push = async (req, res, _): Promise<void> => {
   const err = (e: string): void => {
     log.warn(`Git push failure: ${e}`);
@@ -17,8 +16,6 @@ export const push = async (req, res, _): Promise<void> => {
     return;
   };
   if (!req.body) err("Body Required");
-  if (lock) err("Endpoint Locked");
-  lock = true;
 
   const filepath = req.path.replace(`/push/`, "");
   const parts = filepath.split("/");
@@ -143,5 +140,4 @@ export const push = async (req, res, _): Promise<void> => {
   res.json({
     status: "success",
   });
-  lock = false;
 };
