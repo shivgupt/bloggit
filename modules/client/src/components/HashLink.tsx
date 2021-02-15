@@ -48,7 +48,7 @@ function hashLinkScroll() {
   }, 0);
 }
 
-const genericHashLink = (props: any, As) => {
+const genericHashLink = (props: any, As, ref: any) => {
   const { scroll, smooth, ...filteredProps } = props;
   function handleClick(e) {
     reset();
@@ -75,19 +75,19 @@ const genericHashLink = (props: any, As) => {
     }
   }
   return (
-    <As {...filteredProps} onClick={handleClick}>
+    <As ref={ref} {...filteredProps} onClick={handleClick}>
       {props.children}
     </As>
   );
 };
 
 export const HashLink = React.forwardRef((props, ref) => {
-  return genericHashLink(props, Link);
+  return genericHashLink(props, Link, ref);
 });
 
-export function NavHashLink(props) {
-  return genericHashLink(props, NavLink);
-}
+export const NavHashLink = React.forwardRef((props, ref) => {
+  return genericHashLink(props, NavLink, ref);
+});
 
 const propTypes = {
   onClick: PropTypes.func,
@@ -97,4 +97,4 @@ const propTypes = {
 };
 
 //HashLink.propTypes = propTypes;
-NavHashLink.propTypes = propTypes;
+//NavHashLink.propTypes = propTypes;

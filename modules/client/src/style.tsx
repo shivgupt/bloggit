@@ -1,4 +1,5 @@
-import { createMuiTheme } from "@material-ui/core";
+//import { createMuiTheme } from "@material-ui/core";
+import { unstable_createMuiStrictModeTheme as createMuiTheme } from '@material-ui/core';
 import "@fontsource/monsieur-la-doulaise";
 
 export const siteTitleFont = createMuiTheme({
