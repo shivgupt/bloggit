@@ -9,7 +9,7 @@ export BLOG_DEFAULT_BRANCH="${BLOG_DEFAULT_BRANCH:-main}"
 echo "Starting server in env:"
 echo "- BLOG_AUTH_PASSWORD=$BLOG_AUTH_PASSWORD"
 echo "- BLOG_AUTH_USERNAME=$BLOG_AUTH_USERNAME"
-echo "- BLOG_CONTENT_MIRROR=$BLOG_CONTENT_MIRROR"
+echo "- BLOG_MIRROR_URL=$BLOG_MIRROR_URL"
 echo "- BLOG_DEFAULT_BRANCH=$BLOG_DEFAULT_BRANCH"
 echo "- BLOG_INTERNAL_CONTENT_DIR=$BLOG_INTERNAL_CONTENT_DIR"
 echo "- BLOG_LOG_LEVEL=$BLOG_LOG_LEVEL"
@@ -34,14 +34,14 @@ then
   )
 fi
 
-if [[ -n "$BLOG_CONTENT_MIRROR" ]]
+if [[ -n "$BLOG_MIRROR_URL" ]]
 then
   (
-    echo "Pulling updates from remote content mirror at $BLOG_CONTENT_MIRROR"
+    echo "Pulling updates from remote content mirror at $BLOG_MIRROR_URL"
     cd "$BLOG_INTERNAL_CONTENT_DIR"
     if ! grep -qs "mirror" <<<"$(git remote)"
-    then git remote add mirror "$BLOG_CONTENT_MIRROR"
-    else git remote set-url mirror "$BLOG_CONTENT_MIRROR"
+    then git remote add mirror "$BLOG_MIRROR_URL"
+    else git remote set-url mirror "$BLOG_MIRROR_URL"
     fi
     git fetch mirror --prune --tags || true
     if ! grep -qs "$BLOG_DEFAULT_BRANCH" <<<"$(git branch -l)"
