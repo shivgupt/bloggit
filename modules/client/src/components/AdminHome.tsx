@@ -49,15 +49,22 @@ export const AdminHome = () => {
           console.log(value);
           if (value && (value as Array<any>).length ) {
             const val = (value as Array<any>).reduce((v, o) =>  v + o + "\n", "");
-           return <TextField 
-                key={key}
-                label={key}
-                multiline
-                defaultValue={val}
-             />
-          } else {
-             return <Typography key={key}>Processing Key: {key}</Typography> //<JsonEditor root={value} />
-            //return <JsonEditor root={value} />
+            return <TextField 
+                  key={key}
+                  label={key}
+                  multiline
+                  defaultValue={val}
+              />
+            } else {
+             //return <Typography key={key}>Processing Key: {key}</Typography> //<JsonEditor root={value} />
+            return (
+              <>
+                <Typography variant="subtitle2">
+                  {key}
+                </Typography>
+                <JsonEditor root={value} />
+              </>
+            )
           }
           
         default:
