@@ -7,7 +7,7 @@ import {
   ThemeProvider,
 } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
-import { Route, Switch } from "react-router-dom";
+import { Route, Switch, useRouteMatch} from "react-router-dom";
 
 import { Home } from "./components/Home";
 import { AdminHome } from "./components/AdminHome";
@@ -42,11 +42,13 @@ const App: React.FC = () => {
   const [node, setNode] = useState({} as SidebarNode);
   const [theme, setTheme] = useState(lightTheme);
   const [index, setIndex] = useState(emptyIndex);
-  const [currentSlug, setCurrentSlug] = useState("");
   const [title, setTitle] = useState({ site: "", page: "" });
   const [about, setAbout] = useState("");
   const [authToken, setAuthToken] = useState("");
   const [adminMode, setAdminMode] = useState(true);
+
+  const match = useRouteMatch("/:slug");
+  const currentSlug = match ? match.params.slug : "";
 
   const updateAuthToken = (authToken: string) => {
     setAuthToken(authToken);
@@ -127,8 +129,6 @@ const App: React.FC = () => {
 
   }, [currentSlug, index]);
 
-  console.log(index);
-
   return (
     <ThemeProvider theme={theme}>
       <AdminContext.Provider value={{ authToken, index, updateIndex ,updateAuthToken, adminMode, viewAdminMode }}>
@@ -148,7 +148,6 @@ const App: React.FC = () => {
               <Route exact
                 path="/"
                 render={() => {
-                  setCurrentSlug("");
                   return (
                     <Home
                       posts={index.posts}
@@ -160,7 +159,6 @@ const App: React.FC = () => {
               <Route exact
                 path="/about"
                 render={() => {
-                  setCurrentSlug("");
                   return (<PostPage post={index.about ?
                     about
                     : "Not added yet" }
@@ -170,7 +168,6 @@ const App: React.FC = () => {
               <Route exact
                 path="/admin"
                 render={() => {
-                  setCurrentSlug("");
                   return (
                     <AdminHome />
                   );
@@ -180,7 +177,6 @@ const App: React.FC = () => {
                 path="/:slug"
                 render={({ match }) => {
                   const slug = match.params.slug;
-                  setCurrentSlug(slug);
                   return (<PostPage
                     post={
                       index.posts[slug]
