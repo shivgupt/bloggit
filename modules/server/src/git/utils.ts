@@ -45,16 +45,16 @@ export const arrToString = (arr: Uint8Array): string => {
 
 export const pushToMirror = async (): Promise<void> => {
   const log = logger.child({ module: "PushToMirror" });
-  const { defaultBranch, mirrorKey, mirrorRef, mirrorUrl } = env;
+  const { branch, mirrorKey, mirrorRef, mirrorUrl } = env;
   if (mirrorUrl && mirrorKey) {
 
     // Manually check whether there's anything we need to push
     // a la https://github.com/isomorphic-git/isomorphic-git/issues/398#issuecomment-742798499
-    const remote = `refs/remotes/${mirrorRef}/${defaultBranch}`;
+    const remote = `refs/remotes/${mirrorRef}/${branch}`;
     const remoteHash = await resolveRef(remote);
     log.info(`${remote} is on ${remoteHash}`);
 
-    const local = `refs/heads/${defaultBranch}`;
+    const local = `refs/heads/${branch}`;
     const localHash = await resolveRef(local);
     log.info(`${local} is on ${localHash}`);
 
