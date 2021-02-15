@@ -42,7 +42,7 @@ then
     then git remote add mirror "$BLOG_CONTENT_MIRROR"
     else git remote set-url mirror "$BLOG_CONTENT_MIRROR"
     fi
-    git fetch mirror --prune --tags
+    git fetch mirror --prune --tags || true
     if ! grep -qs "$BLOG_DEFAULT_BRANCH" <<<"$(git branch -l)"
     then git branch "$BLOG_DEFAULT_BRANCH" "mirror/$BLOG_DEFAULT_BRANCH"
     fi
@@ -57,7 +57,7 @@ then
   echo "Starting blog server in prod-mode"
   export NODE_ENV=production
   exec node --no-deprecation dist/entry.js \
-    | pino-pretty --colorize --translateTime --ignore pid,level,hostname,module
+    | pino-pretty --colorize --translateTime --ignore pid,hostname,module
 else
   echo "Starting blog server in dev-mode"
   export NODE_ENV=development
@@ -73,5 +73,5 @@ else
     --polling-interval 1000 \
     --watch src \
     --exec ts-node \
-    ./src/entry.ts | pino-pretty --colorize --translateTime --ignore pid,level,hostname,module
+    ./src/entry.ts | pino-pretty --colorize --translateTime --ignore pid,hostname,module
 fi

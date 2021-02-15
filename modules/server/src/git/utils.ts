@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { Readable } from "stream";
 
 import git from "isomorphic-git";
 
@@ -18,6 +19,16 @@ export const resolveRef = async (givenRef: string): Promise<string> => {
     ref = await git.expandOid({ ...gitOpts, oid: givenRef });
   }
   return ref;
+};
+
+export const bufferToStream = (buf: Buffer): Readable => Readable.from(buf);
+export const streamToBuffer = (stream: Readable): Promise<Buffer> => {
+  const chunks = [];
+  return new Promise((resolve, reject) => {
+    stream.on("data", chunk => chunks.push(chunk));
+    stream.on("error", reject);
+    stream.on("end", () => resolve(Buffer.concat(chunks)));
+  });
 };
 
 //https://stackoverflow.com/a/43934805
