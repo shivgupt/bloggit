@@ -80,8 +80,23 @@ export const PostPage = (props: { post?: PostData | string }) => {
       data: newContent,
       headers: { "content-type": "text/plain" }
     });
-    console.log(res.status);
-    console.log(res);
+
+    if (typeof(post) === "string") {
+      adminContext.updateIndex(
+        JSON.parse(JSON.stringify(adminContext.index)),
+        "about",
+        "",
+        post,
+      )
+
+    } else {
+      adminContext.updateIndex(
+        JSON.parse(JSON.stringify(adminContext.index)),
+        "content",
+        "posts",
+        post.slug
+      )
+    }
     setEditMode(false);
   }
 
