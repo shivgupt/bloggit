@@ -45,47 +45,45 @@ export const arrToString = (arr: Uint8Array): string => {
 
 export const pushToMirror = async (): Promise<void> => {
   const log = logger.child({ module: "PushToMirror" });
-  if (env.mirrorUrl && env.mirrorKey) {
+  const { branch, mirrorKey, mirrorRef, mirrorUrl } = env;
+  if (mirrorUrl && mirrorKey) {
 
     // Manually check whether there's anything we need to push
     // a la https://github.com/isomorphic-git/isomorphic-git/issues/398#issuecomment-742798499
-    const remoteRef = `refs/remotes/mirror/${env.defaultBranch}`;
-    const remoteCommits = await git.log({
-      ...gitOpts,
-      depth: 1,
-      ref: remoteRef,
-    });
-    const remoteOid = remoteCommits && remoteCommits.length ? remoteCommits[0].oid : null;
-    log.info(`Remote ${remoteRef} has most recent commit oid of ${remoteOid}`);
-    const localCommits = await git.log({ ...gitOpts, depth: 1 });
-    const localOid = localCommits && localCommits.length ? localCommits[0].oid : null;
-    if (localOid === remoteOid) {
-      log.info(`Remote & local repos are up to date with commit ${localOid}, nothing to push`);
+    const remote = `refs/remotes/${mirrorRef}/${branch}`;
+    const remoteHash = await resolveRef(remote);
+    log.info(`${remote} is on ${remoteHash}`);
+
+    const local = `refs/heads/${branch}`;
+    const localHash = await resolveRef(local);
+    log.info(`${local} is on ${localHash}`);
+
+    if (localHash === remoteHash) {
+      log.info(`Nothing to push`);
       return;
     }
 
-    const ref = `refs/heads/${env.defaultBranch}`;
-    log.info(`Pushing ref ${ref} to ${env.mirrorUrl}`);
+    log.info(`Pushing ${localHash} to ${remote} at ${mirrorUrl}`);
     await git.push({
       ...gitOpts,
       http,
-      remote: "mirror",
-      url: env.mirrorUrl,
+      remote: mirrorRef,
+      url: mirrorUrl,
       onAuth: (url?: string, other?: any) => {
-        log.info(`Auth triggered for mirror at ${url} & other=${JSON.stringify(other)}`);
-        return({ password: env.mirrorKey });
+        log.info(`Auth triggered for ${mirrorRef} at ${url} & other=${JSON.stringify(other)}`);
+        return({ password: mirrorKey });
       },
       onAuthFailure: (url?: string, other?: any) => {
-        log.warn(`Failed to authenticate w mirror at ${url} & creds ${JSON.stringify(other)}`);
+        log.warn(`Failed to auth w ${mirrorRef} at ${url} & creds ${JSON.stringify(other)}`);
       },
-      onAuthSuccess: (url?: string, other?: any) => {
-        log.info(`Successfully authenticated w mirror at ${url} & creds ${JSON.stringify(other)}`);
+      onAuthSuccess: (url?: string) => {
+        log.info(`Successfully authenticated w ${mirrorRef} at ${url}`);
       },
       onMessage: (msg: string) => {
-        log.info(`Pushing to remote message: ${msg}`);
+        log.info(`Received message from ${mirrorRef} at ${mirrorUrl}: ${msg}`);
       },
       onProgress: (progress: any) => {
-        log.info(`Pushing to remote progress: ${JSON.stringify(progress)}`);
+        log.info(`Progress pushing to ${mirrorUrl}: ${JSON.stringify(progress)}`);
       },
     }).catch(e => log.error(e.message));
   }

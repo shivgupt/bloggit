@@ -21,7 +21,7 @@ export const push = async (req, res, _): Promise<void> => {
   const parts = filepath.split("/");
   const dirname = parts.slice(0, parts.length - 1)[0];
   const filename = parts.slice(parts.length - 1)[0];
-  const parentCommit = await resolveRef(env.defaultBranch);
+  const parentCommit = await resolveRef(env.branch);
 
   if (parts.length > 2) {
     err("Too many nested dirs, updating files more than 1 dir deep has not been implemented yet");
@@ -127,7 +127,7 @@ export const push = async (req, res, _): Promise<void> => {
   } });
   log.info(`Wrote new commit w hash: ${commitHash}`);
 
-  const ref = `refs/heads/${env.defaultBranch}`;
+  const ref = `refs/heads/${env.branch}`;
 
   await git.writeRef({
     ...gitOpts,
@@ -135,7 +135,7 @@ export const push = async (req, res, _): Promise<void> => {
     ref,
     value: commitHash,
   });
-  log.info(`Wrote new ref, pointing ${env.defaultBranch} at ${commitHash}`);
+  log.info(`Wrote new ref, pointing ${env.branch} at ${commitHash}`);
 
   res.json({ status: "success" });
 

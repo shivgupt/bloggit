@@ -11,7 +11,7 @@ const get = async (file: string): Promise<string | PostIndex> => {
     configCache = axios("/git/config")
   }
   const config = (await configCache).data;
-  const url = `/git/${config.defaultBranch}/${file}`;
+  const url = `/git/${config.branch}/${file}`;
   try {
     const response = await axios(url);
     if (response && response.data && response.data.content) {
