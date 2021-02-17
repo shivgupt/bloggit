@@ -18,6 +18,7 @@ import axios from "axios";
 
 import { AdminContext } from "../AdminContext";
 import { PostData } from "../types";
+import { formatTagsArray } from "../utils";
 
 import { CodeBlockRenderer } from "./CodeBlock";
 import { HeadingRenderer } from "./HeadingRenderer";
@@ -112,11 +113,6 @@ export const PostPage = (props: { post?: PostData | string }) => {
   const LinkRenderer = (props: any) => {
     return (<Link color="secondary" href={props.href}> {props.children[0].props.value} </Link>);
   };
-
-  const formatTagsArray = (tags: string[] | undefined) => {
-    if (!tags) return "";
-    return tags.reduce((v,o) => v + o + ",\n", "");
-  }
 
   return (
     <Paper variant="outlined">
