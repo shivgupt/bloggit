@@ -44,7 +44,7 @@ export const edit = async (req, res, _): Promise<void> => {
 
   log.info(`Editing on top of root tree ${latestTree.oid} at commit ${latestCommit}`);
 
-  let rootTreeOid;
+  let rootTreeOid = latestTree.oid;
   for (const edit of req.body) {
     // const subTrees = [tree] as Array<GitTree | string>;
 
@@ -58,14 +58,14 @@ export const edit = async (req, res, _): Promise<void> => {
 
     const treePath = await git.walk({
       ...gitOpts,
-      trees: [git.TREE({ ref: latestCommit })],
+      trees: [git.TREE({ ref: rootTreeOid })],
       map: async (filepath: string) => {
         if (filepath === ".") {
-          const obj = await git.readTree({ ...gitOpts, oid: latestCommit });
+          const obj = await git.readTree({ ...gitOpts, oid: rootTreeOid });
           return { path: "root", oid: obj.oid, val: obj.tree };
         } else if (edit.path.startsWith(filepath)) {
           log.debug(`Found the ${filepath} in ${edit.path}!`);
-          const obj = await git.readObject({ ...gitOpts, oid: latestCommit, filepath });
+          const obj = await git.readObject({ ...gitOpts, oid: rootTreeOid, filepath });
           return { path: filepath, oid: obj.oid, val: obj.object };
         }
         return null;
