@@ -59,14 +59,19 @@ export const CreateNewPost = () => {
 
   const updateGit = async () => {
     console.log("Lets push it to git");
+    //console.log(document.getElementById("post_path"))
     let res = await axios({
       method: "post",
-      url: `git/push/${post.path}`,
+      url: `git/push/${(document.getElementById("post_path") as HTMLInputElement).value}`,
       data: newContent,
       headers: { "content-type": "text/plain" }
     });
     console.log(res);
   }
+
+  const handleChange = (event) => {
+    console.log(event)
+  };
 
   const emojiSupport = text =>
     text.value.replace(/:\w+:/gi, name =>
