@@ -57,6 +57,9 @@ export const edit = async (req, res, _): Promise<void> => {
     // Split the path into an array of subdirs (omitting the filename)
     const filename = edit.path.includes("/") ? edit.path.split("/").pop() : edit.path;
     const dirs = edit.path.split("/").reverse().slice(1).reverse();
+    if (filename === "" || dirs.some(dir => dir === "")) {
+      return err(`Filename or some dir is an empty string for path ${edit.path}`);
+    }
 
     // Read through the subTrees to determine which ones needs to be updated
     for (const dir of dirs) {
