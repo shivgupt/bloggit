@@ -16,6 +16,7 @@ import {
 const log = logger.child({ module: "GitRouter" });
 
 // Roughly based on https://stackoverflow.com/a/25556917
+// TODO: if content of an edit is "", then delete the file from the tree
 export const edit = async (req, res, _): Promise<void> => {
   const err = (e: string): void => {
     log.warn(`Git edit failure: ${e}`);
@@ -121,9 +122,12 @@ export const edit = async (req, res, _): Promise<void> => {
           if (index >= 0) {
             subTree[index] = newBlob;
             prevOid = await git.writeTree({ ...gitOpts, tree: subTree });
-            log.info(`Wrote subtree w new file ${JSON.stringify(subTree[index])} w oid ${prevOid}`);
+            log.info(`Wrote tree w edited file ${JSON.stringify(subTree[index])} w oid ${prevOid}`);
           } else {
-            return err(`I have no idea how to update ${filename} on ${JSON.stringify(subTree)}`);
+            subTree.push(newBlob);
+            subTree.sort((e1, e2) => e1.path < e2.path ? -1 : 1);
+            prevOid = await git.writeTree({ ...gitOpts, tree: subTree });
+            log.info(`Wrote tree w new file ${JSON.stringify(subTree[index])} w oid ${prevOid}`);
           }
         }
       }
@@ -146,7 +150,7 @@ export const edit = async (req, res, _): Promise<void> => {
     timezoneOffset: 0,
   };
   const commitHash = await git.writeCommit({ ...gitOpts, commit: {
-    message: `git/edit ${pendingEdits.map(e => e.path).join(", ")}`,
+    message: `edit ${pendingEdits.map(e => e.path).join(", ")}`,
     tree: rootTreeOid,
     parent: [latestCommit],
     author: committer,
