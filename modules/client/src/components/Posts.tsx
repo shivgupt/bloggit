@@ -73,7 +73,7 @@ export const PostPage = (props: { post?: PostData | string }) => {
     }
     let res = await axios({
       method: "post",
-      url: `git/push/${path}`,
+      url: `git/edit/${path}`,
       data: newContent,
       headers: { "content-type": "text/plain" }
     });

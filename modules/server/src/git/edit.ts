@@ -9,15 +9,15 @@ const log = logger.child({ module: "GitRouter" });
 
 // based on https://stackoverflow.com/a/25556917
 // TODO: lock so simultaneous pushes proceed serially
-export const push = async (req, res, _): Promise<void> => {
+export const edit = async (req, res, _): Promise<void> => {
   const err = (e: string): void => {
-    log.warn(`Git push failure: ${e}`);
+    log.warn(`Git edit failure: ${e}`);
     res.status(500).send(e);
     return;
   };
   if (!req.body) err("Body Required");
 
-  const filepath = req.path.replace(`/push/`, "");
+  const filepath = req.path.replace(`/edit/`, "");
   const parts = filepath.split("/");
   const dirname = parts.slice(0, parts.length - 1)[0];
   const filename = parts.slice(parts.length - 1)[0];
@@ -27,7 +27,7 @@ export const push = async (req, res, _): Promise<void> => {
     err("Too many nested dirs, updating files more than 1 dir deep has not been implemented yet");
   }
 
-  log.info(`Processing git push for file ${filepath} on top of commit ${parentCommit}`);
+  log.info(`Processing git edit for file ${filepath} on top of commit ${parentCommit}`);
   log.info(`req.body=${req.body}`);
 
   // TODO: why is there a "blob {len}" prefix added to the input?

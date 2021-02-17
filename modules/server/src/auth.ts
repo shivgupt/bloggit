@@ -10,7 +10,7 @@ export const authRouter = express.Router();
 const authHeader = "authorization";
 const authType = "Basic";
 const encodedToken = Buffer.from(`${env.authUsername}:${env.authPassword}`).toString("base64");
-const restrictedPaths = ["/git/push", "/git/git-receive-pack"];
+const restrictedPaths = ["/git/edit", "/git/git-receive-pack"];
 
 authRouter.use((req, res, next) => {
   if (restrictedPaths.some(path => req.path.startsWith(path))) {

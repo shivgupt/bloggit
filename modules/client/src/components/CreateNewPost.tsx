@@ -52,7 +52,7 @@ export const CreateNewPost = () => {
     let path = "new";
     let res = await axios({
       method: "post",
-      url: `git/push/${path}`,
+      url: `git/edit/${path}`,
       data: newContent,
       headers: { "content-type": "text/plain" }
     });
