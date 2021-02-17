@@ -42,20 +42,20 @@ export const edit = async (req, res, _): Promise<void> => {
   log.info(`Editing on top of root tree at commit ${latestCommit}`);
   await printTree(latestCommit);
 
-  // Read trees to determine the list of subTrees that need to be edited to insert our new file
   let rootTreeOid;
   for (const edit of req.body) {
     const subTrees = [tree] as Array<GitTree | string>;
 
     // Split the path into an array of subdirs (omitting the filename)
-    // TODO: strip leading slash from path?
     const filename = edit.path.includes("/") ? edit.path.split("/").pop() : edit.path;
     const dirs = edit.path.split("/").reverse().slice(1).reverse();
-    if (filename === "" || dirs.some(dir => dir === "")) {
+    if (filename === "" || dirs.includes("")) {
       return err(`Filename or some dir is an empty string for path ${edit.path}`);
     }
 
-    // TODO: if content of an edit is "", then delete the file from the tree
+    if (edit.content === "") {
+      return err(`File deletion is not implemented yet`);
+    }
     const newBlob = await writeBlob(edit.path, edit.content, latestCommit);
     log.info(`Wrote new blob: ${JSON.stringify(newBlob)}`);
 
