@@ -140,7 +140,7 @@ export const edit = async (req, res, _): Promise<void> => {
   }
 
   const committer = {
-    name: env.authUsername,
+    name: `${env.authUsername}@${env.domainname}`,
     email: env.email,
     timestamp: Math.round(Date.now()/1000),
     timezoneOffset: 0,

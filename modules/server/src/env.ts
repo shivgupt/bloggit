@@ -5,6 +5,7 @@ export type Env = {
   authUsername: string;
   branch: string;
   contentDir: string;
+  domainname: string;
   email: string;
   logLevel: string;
   mirrorKey: string;
@@ -19,6 +20,7 @@ export const env: Env = {
   authUsername: process?.env?.BLOG_AUTH_USERNAME || "admin",
   branch: process?.env?.BLOG_BRANCH || "main",
   contentDir: path.normalize(process?.env?.BLOG_INTERNAL_CONTENT_DIR || "/blog-content.git"),
+  domainname: process?.env?.BLOG_DOMAINNAME || "localhost",
   email: process?.env?.BLOG_EMAIL || "noreply@localhost",
   logLevel: process?.env?.BLOG_LOG_LEVEL || "info",
   mirrorKey: process?.env?.BLOG_MIRROR_KEY || "",

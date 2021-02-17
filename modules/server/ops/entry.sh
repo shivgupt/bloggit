@@ -8,18 +8,19 @@ export BLOG_MIRROR_KEY="${BLOG_MIRROR_KEY:-}"
 export BLOG_MIRROR_REF="${BLOG_MIRROR_REF:-mirror}"
 
 # Log all env vars
-echo "Starting server in env:"
 echo "- BLOG_AUTH_PASSWORD=$BLOG_AUTH_PASSWORD"
 echo "- BLOG_AUTH_USERNAME=$BLOG_AUTH_USERNAME"
 echo "- BLOG_BRANCH=$BLOG_BRANCH"
-echo "- BLOG_INTERNAL_CONTENT_DIR=$BLOG_INTERNAL_CONTENT_DIR"
+echo "- BLOG_DOMAINNAME=$BLOG_DOMAINNAME"
 echo "- BLOG_EMAIL=$BLOG_EMAIL"
+echo "- BLOG_INTERNAL_CONTENT_DIR=$BLOG_INTERNAL_CONTENT_DIR"
 echo "- BLOG_LOG_LEVEL=$BLOG_LOG_LEVEL"
 echo "- BLOG_MIRROR_KEY=$BLOG_MIRROR_KEY"
 echo "- BLOG_MIRROR_REF=$BLOG_MIRROR_REF"
 echo "- BLOG_MIRROR_URL=$BLOG_MIRROR_URL"
 echo "- BLOG_PORT=$BLOG_PORT"
 echo "- BLOG_PROD=$BLOG_PROD"
+echo "Starting server in env:"
 
 if [[ -d "modules/server" ]]
 then cd modules/server
