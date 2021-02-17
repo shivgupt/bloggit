@@ -93,17 +93,53 @@ export const edit = async (req, res, _): Promise<void> => {
       reduce: async (parent, children) => [].concat(parent, ...children),
     });
 
-    log.info(`treePath: ${treePath.map(entry => `${entry.path} ${entry.type} ${entry.oid}`)}`);
+    log.info(`treePath: ${treePath.map(entry => `${entry.path} ${entry.oid.substring(0, 8)}`)}`);
 
     if (edit.content === "") {
-      return err(`File deletion is not implemented yet`);
+      log.info(`Deleting references to ${filename}`);
+      let toRemove = filename;
+      let newEntry;
+      for (const dir of ["."].concat(dirs).reverse()) {
+        const tree = treePath.find(t => t.path.endsWith(dir))?.val || [];
+        if (tree.length === 0) {
+          log.warn(`No tree found for this path, moving on..`);
+          toRemove = dir;
+          continue;
+        }
+        const rmIndex = tree.findIndex(e => e.path === toRemove);
+        if (rmIndex >= 0) {
+          log.info(`Removing subTree[${rmIndex}] in ${dir}`);
+          tree.splice(rmIndex, 1);
+          toRemove = null;
+        }
+        if (tree.length > 0) {
+          const syncIndex = tree.findIndex(e => newEntry?.path && e.path === newEntry.path);
+          if (syncIndex >= 0) {
+            log.info(`Replacing subTree[${syncIndex}] with entry ${JSON.stringify(newEntry)}`);
+            tree[syncIndex] = newEntry;
+            toRemove = null;
+          }
+          newEntry = {
+            mode: "040000",
+            oid: await git.writeTree({ ...gitOpts, tree }),
+            type: "tree",
+            path: dir,
+          };
+          toRemove = null;
+        } else {
+          log.info(`Nothing left in this dir, flagging it for deletion`);
+          toRemove = dir;
+        }
+      }
+      rootTreeOid = newEntry.oid;
+
     } else {
       const newBlobOid = await git.writeBlob({ ...gitOpts, blob: strToArray(edit.content) });
       log.info(`Wrote new blob for ${filename}: ${newBlobOid}`);
       let newEntry = { mode: "100644", oid: newBlobOid, type: "blob", path: filename };
       for (const dir of ["."].concat(dirs).reverse()) {
         const tree = treePath.find(t => t.path.endsWith(dir))?.val || [];
-        log.debug(`${tree.length > 0 ? "Using existing" : "Creating new"} tree for ${dir}`);
+        log.info(`${tree.length > 0 ? "Using existing" : "Creating new"} tree for ${dir}`);
         const index = tree.findIndex(e => e.path === newEntry.path);
         if (index >= 0) {
           log.info(`Replacing subTree[${index}] with ${JSON.stringify(newEntry)}`);
