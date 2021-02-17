@@ -40,12 +40,15 @@ stop:
 
 clean: stop
 	docker container prune -f
-	rm -rf .flags/*
+	rm -rf .flags
 	rm -rf modules/**/build
 	rm -rf modules/**/dist
 
 reset: stop
 	docker container prune -f
+	rm -rf .docker-compose.yml
+	rm -rf .blog-content.git .media
+	rm -rf .bash_history .config
 
 purge: clean reset
 

@@ -19,6 +19,12 @@ export type PostIndex = {
   title: string;
 }
 
+export type SidebarNode = {
+  parent: string | null,
+  current: string,
+  child: any,
+}
+
 // Types for Food logger
 
 export type Nutrients = { /* nutrient percentage */

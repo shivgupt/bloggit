@@ -3,12 +3,14 @@ import path from "path";
 export type Env = {
   authPassword: string;
   authUsername: string;
-  contentDir: string;
   branch: string;
+  contentDir: string;
+  domainname: string;
+  email: string;
   logLevel: string;
   mirrorKey: string;
-  mirrorUrl: string;
   mirrorRef: string;
+  mirrorUrl: string;
   port: number;
   prodMode: boolean;
 }
@@ -16,8 +18,10 @@ export type Env = {
 export const env: Env = {
   authPassword: process?.env?.BLOG_AUTH_PASSWORD || "abc123",
   authUsername: process?.env?.BLOG_AUTH_USERNAME || "admin",
+  branch: process?.env?.BLOG_BRANCH || "main",
   contentDir: path.normalize(process?.env?.BLOG_INTERNAL_CONTENT_DIR || "/blog-content.git"),
-  branch: process?.env?.BLOG_DEFAULT_BRANCH || "main",
+  domainname: process?.env?.BLOG_DOMAINNAME || "localhost",
+  email: process?.env?.BLOG_EMAIL || "noreply@localhost",
   logLevel: process?.env?.BLOG_LOG_LEVEL || "info",
   mirrorKey: process?.env?.BLOG_MIRROR_KEY || "",
   mirrorRef: process?.env?.BLOG_MIRROR_REF || "mirror",

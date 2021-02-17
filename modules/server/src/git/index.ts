@@ -2,11 +2,12 @@ import bodyParser from "body-parser";
 import express from "express";
 
 import { getRefInfo, pack } from "./backend";
-import { push } from "./push";
+import { edit } from "./edit";
 import { getConfig, getFile } from "./read";
 
 export const gitRouter = express.Router();
 
+gitRouter.use(bodyParser.json({ type: ["application/json"] }));
 gitRouter.use(bodyParser.text({ type: ["text/plain"] }));
 gitRouter.use(bodyParser.raw({ type: [
   "application/x-git-receive-pack-request",
@@ -16,7 +17,7 @@ gitRouter.use(bodyParser.raw({ type: [
 gitRouter.get("/info/refs", getRefInfo);
 gitRouter.post(["/git-receive-pack", "/git-upload-pack"], pack);
 
-gitRouter.post("/push/*", push);
+gitRouter.post("/edit", edit);
 
 gitRouter.get("/config", getConfig);
 gitRouter.get("/:ref/*", getFile);

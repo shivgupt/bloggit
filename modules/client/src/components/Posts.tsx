@@ -3,12 +3,9 @@ import {
   IconButton,
   makeStyles,
   Paper,
-  Hidden,
-  TextareaAutosize,
 } from "@material-ui/core";
 import {
   Edit,
-  RestaurantRounded,
   Save,
 } from "@material-ui/icons";
 import React, { useContext, useEffect, useState } from "react";
@@ -67,7 +64,7 @@ export const PostPage = (props: { post?: PostData | string }) => {
     console.log("Lets push it to git");
     let path: string;
     if (typeof(post) === "string") {
-      path = post;
+      path = adminContext.index.about;
     } else if (post && post.path) {
       path = post.path;
     } else {
@@ -76,12 +73,24 @@ export const PostPage = (props: { post?: PostData | string }) => {
     }
     let res = await axios({
       method: "post",
-      url: `git/push/${path}`,
-      data: newContent,
-      headers: { "content-type": "text/plain" }
+      url: "git/edit",
+      data: [{
+        path,
+        content: newContent
+      }],
+      headers: { "content-type": "application/json" }
     });
-    console.log(res.status);
-    console.log(res);
+
+    if (typeof(post) === "string") {
+      adminContext.updateIndex(JSON.parse(JSON.stringify(adminContext.index)), "about");
+    } else {
+      adminContext.updateIndex(
+        JSON.parse(JSON.stringify(adminContext.index)),
+        "content",
+        "posts",
+        post.slug
+      )
+    }
     setEditMode(false);
   }
 

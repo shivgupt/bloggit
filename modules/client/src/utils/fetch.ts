@@ -24,8 +24,8 @@ const get = async (file: string): Promise<string | PostIndex> => {
   throw new Error(`Couldn't get ${file}`);
 };
 
-export const fetchIndex = async(): Promise<PostIndex> => {
-  if (!indexCache) {
+export const fetchIndex = async(force?: boolean): Promise<PostIndex> => {
+  if (!indexCache || force) {
     indexCache = get("index.json") as Promise<PostIndex>;
   }
   const index = JSON.parse((await indexCache) as any);
@@ -43,8 +43,8 @@ export const fetchIndex = async(): Promise<PostIndex> => {
 
 export const fetchFile = async (path: string): Promise<string> => get(path) as Promise<string>;
 
-export const fetchContent = async(slug: string): Promise<string> => {
-  if (!contentCache[slug]) {
+export const fetchContent = async(slug: string, force?: boolean): Promise<string> => {
+  if (!contentCache[slug] || force) {
     const post = (await fetchIndex()).posts[slug];
     // TODO: Handle 404s better
     if (!post) { return "Loading"; }
