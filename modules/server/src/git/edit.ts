@@ -12,32 +12,13 @@ import {
 
 const log = logger.child({ module: "GitRouter" });
 
-export type GitObjectType = "blob" | "tree" | "commit";
-export type GitBlobEntry = {
-  mode: string;
-  path: string;
-  oid: string;
-  type: "blob";
-};
 export type GitTreeEntry = {
   mode: string;
   path: string;
   oid: string;
-  type: GitObjectType;
+  type: "blob" | "tree" | "commit";
 };
 export type GitTree = GitTreeEntry[];
-
-export const printTree = async (oid: string, indent = 0): Promise<void> => {
-  const tree = await git.readTree({ ...gitOpts, oid });
-  for (const entry of tree.tree) {
-    if (entry.type === "blob") {
-      logger.debug(`${"  ".repeat(indent)}- ${entry.path} ${entry.oid}`);
-    } else if (entry.type === "tree") {
-      logger.info(` ${"  ".repeat(indent)}- ${entry.path} ${entry.oid}`);
-      await printTree(entry.oid, indent + 1);
-    }
-  }
-};
 
 // Roughly based on https://stackoverflow.com/a/25556917
 export const edit = async (req, res, _): Promise<void> => {
@@ -61,8 +42,7 @@ export const edit = async (req, res, _): Promise<void> => {
   const latestCommit = await resolveRef(env.branch);
   const latestTree = await git.readTree({ ...gitOpts, oid: latestCommit });
 
-  log.info(`Editing on top of root tree at commit ${latestCommit}`);
-  await printTree(latestCommit);
+  log.info(`Editing on top of root tree ${latestTree.oid} at commit ${latestCommit}`);
 
   let rootTreeOid;
   for (const edit of req.body) {
@@ -74,32 +54,30 @@ export const edit = async (req, res, _): Promise<void> => {
     if (filename === "" || dirs.includes("")) {
       return err(`Filename or some dir is an empty string for path ${edit.path}`);
     }
-    log.info(`filename: ${filename} | dirs: ${dirs}`);
+    log.debug(`filename: ${filename} | dirs: ${dirs}`);
 
     const treePath = await git.walk({
       ...gitOpts,
       trees: [git.TREE({ ref: latestCommit })],
-      map: async (filepath: string, [entry]) => {
+      map: async (filepath: string) => {
         if (filepath === ".") {
           const obj = await git.readTree({ ...gitOpts, oid: latestCommit });
-          return { path: filepath, oid: obj.oid, val: obj.tree, type: "tree" };
+          return { path: "root", oid: obj.oid, val: obj.tree };
         } else if (edit.path.startsWith(filepath)) {
-          log.info(`Found the ${filepath} in ${edit.path}!`);
+          log.debug(`Found the ${filepath} in ${edit.path}!`);
           const obj = await git.readObject({ ...gitOpts, oid: latestCommit, filepath });
-          return { path: filepath, oid: obj.oid, val: obj.object, type: await entry.type() };
+          return { path: filepath, oid: obj.oid, val: obj.object };
         }
         return null;
       },
-      reduce: async (parent, children) => [].concat(parent, ...children),
     });
-
-    log.info(`treePath: ${treePath.map(entry => `${entry.path} ${entry.oid.substring(0, 8)}`)}`);
+    log.info(`${treePath.map(entry => `${entry.path}:${entry.oid.substring(0, 8)}`).join(", ")}`);
 
     if (edit.content === "") {
-      log.info(`Deleting references to ${filename}`);
+      log.info(`Deleting references to ${edit.path}`);
       let toRemove = filename;
       let newEntry;
-      for (const dir of ["."].concat(dirs).reverse()) {
+      for (const dir of ["root"].concat(dirs).reverse()) {
         const tree = treePath.find(t => t.path.endsWith(dir))?.val || [];
         if (tree.length === 0) {
           log.warn(`No tree found for this path, moving on..`);
@@ -108,14 +86,14 @@ export const edit = async (req, res, _): Promise<void> => {
         }
         const rmIndex = tree.findIndex(e => e.path === toRemove);
         if (rmIndex >= 0) {
-          log.info(`Removing subTree[${rmIndex}] in ${dir}`);
+          log.info(`Removing ${dir}[${rmIndex}]`);
           tree.splice(rmIndex, 1);
           toRemove = null;
         }
         if (tree.length > 0) {
           const syncIndex = tree.findIndex(e => newEntry?.path && e.path === newEntry.path);
           if (syncIndex >= 0) {
-            log.info(`Replacing subTree[${syncIndex}] with entry ${JSON.stringify(newEntry)}`);
+            log.info(`Replacing ${dir}[${syncIndex}] with entry ${JSON.stringify(newEntry)}`);
             tree[syncIndex] = newEntry;
             toRemove = null;
           }
@@ -127,7 +105,7 @@ export const edit = async (req, res, _): Promise<void> => {
           };
           toRemove = null;
         } else {
-          log.info(`Nothing left in this dir, flagging it for deletion`);
+          log.info(`Nothing left in ${dir}, flagging it for deletion`);
           toRemove = dir;
         }
       }
@@ -137,15 +115,15 @@ export const edit = async (req, res, _): Promise<void> => {
       const newBlobOid = await git.writeBlob({ ...gitOpts, blob: strToArray(edit.content) });
       log.info(`Wrote new blob for ${filename}: ${newBlobOid}`);
       let newEntry = { mode: "100644", oid: newBlobOid, type: "blob", path: filename };
-      for (const dir of ["."].concat(dirs).reverse()) {
+      for (const dir of ["root"].concat(dirs).reverse()) {
         const tree = treePath.find(t => t.path.endsWith(dir))?.val || [];
         log.info(`${tree.length > 0 ? "Using existing" : "Creating new"} tree for ${dir}`);
         const index = tree.findIndex(e => e.path === newEntry.path);
         if (index >= 0) {
-          log.info(`Replacing subTree[${index}] with ${JSON.stringify(newEntry)}`);
+          log.info(`Replacing ${dir}[${index}] with ${JSON.stringify(newEntry)}`);
           tree[index] = newEntry;
         } else {
-          log.info(`Pushing new entry into tree: ${JSON.stringify(newEntry)}`);
+          log.info(`Pushing new entry into ${dir}: ${JSON.stringify(newEntry)}`);
           tree.push(newEntry);
         }
         newEntry = {
@@ -156,15 +134,17 @@ export const edit = async (req, res, _): Promise<void> => {
         };
       }
       rootTreeOid = newEntry.oid;
-      log.info(`New root tree oid: ${rootTreeOid}`);
     }
   }
 
-  log.info(`Final root tree w oid ${rootTreeOid}`);
-  await printTree(rootTreeOid);
-
   if (rootTreeOid === latestTree.oid) {
-    return res.json({ status: "no change", newCommit: rootTreeOid });
+    log.info(`No differences detected, doing nothing`);
+    return res.json({ status: "no change", commit: latestCommit });
+  }
+  log.info(`Final root tree has oid: ${rootTreeOid}`);
+
+  if (await resolveRef(env.branch) !== latestCommit) {
+    return err(`Latest commit on ${env.branch} was updated mid-edit`);
   }
 
   const committer = {
@@ -173,30 +153,21 @@ export const edit = async (req, res, _): Promise<void> => {
     timestamp: Math.round(Date.now()/1000),
     timezoneOffset: 0,
   };
-  const commitHash = await git.writeCommit({ ...gitOpts, commit: {
+  const newCommit = await git.writeCommit({ ...gitOpts, commit: {
     message: `edit ${req.body.map(e => e.path).join(", ")}`,
     tree: rootTreeOid,
     parent: [latestCommit],
     author: committer,
     committer,
   } });
-  log.info(`Wrote new commit w hash: ${commitHash}`);
-
-  const ref = `refs/heads/${env.branch}`;
-
-  if (await resolveRef(env.branch) !== latestCommit) {
-    return err(`Latest commit on ${env.branch} was updated mid-edit`);
-  }
-
   await git.writeRef({
     ...gitOpts,
     force: true,
-    ref,
-    value: commitHash,
+    ref: `refs/heads/${env.branch}`,
+    value: newCommit,
   });
-  log.info(`Wrote new ref, pointing ${env.branch} at ${commitHash}`);
-
-  res.json({ status: "success", newCommit: commitHash });
+  log.info(`Wrote new commit to ${env.branch} w hash: ${newCommit}`);
+  res.json({ status: "success", commit: newCommit });
 
   await pushToMirror();
   return;
