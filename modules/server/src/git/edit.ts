@@ -140,13 +140,13 @@ export const edit = async (req, res, _): Promise<void> => {
   }
 
   const committer = {
-    name: "server",
-    email: "server@localhost.com",
+    name: env.authUsername,
+    email: env.email,
     timestamp: Math.round(Date.now()/1000),
     timezoneOffset: 0,
   };
   const commitHash = await git.writeCommit({ ...gitOpts, commit: {
-    message: `update files via http`,
+    message: `git/edit ${pendingEdits.map(e => e.path).join(", ")}`,
     tree: rootTreeOid,
     parent: [latestCommit],
     author: committer,
