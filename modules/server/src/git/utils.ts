@@ -76,11 +76,13 @@ export const writeBlob = async (
   return { mode: "100644", oid: blob.oid, type: "blob", path: filename };
 };
 
-export const printTree = async (oid: string, indent = 1): Promise<void> => {
+export const printTree = async (oid: string, indent = 0): Promise<void> => {
   const tree = await git.readTree({ ...gitOpts, oid });
   for (const entry of tree.tree) {
-    logger.info(`${"  ".repeat(indent)}- ${entry.path} ${entry.oid}`);
-    if (entry.type === "tree") {
+    if (entry.type === "blob") {
+      logger.debug(`${"  ".repeat(indent)}- ${entry.path} ${entry.oid}`);
+    } else if (entry.type === "tree") {
+      logger.info(` ${"  ".repeat(indent)}- ${entry.path} ${entry.oid}`);
       await printTree(entry.oid, indent + 1);
     }
   }
