@@ -3,6 +3,7 @@ import {
   IconButton,
   makeStyles,
   Paper,
+  TextField,
 } from "@material-ui/core";
 import {
   Edit,
@@ -21,9 +22,13 @@ import { PostData } from "../types";
 import { CodeBlockRenderer } from "./CodeBlock";
 import { HeadingRenderer } from "./HeadingRenderer";
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
+    margin: theme.spacing(1, 1),
+    "& > *": {
+      margin: theme.spacing(1),
+    }
   },
   text: {
     padding: "20px",
@@ -108,6 +113,11 @@ export const PostPage = (props: { post?: PostData | string }) => {
     return (<Link color="secondary" href={props.href}> {props.children[0].props.value} </Link>);
   };
 
+  const formatTagsArray = (tags: string[] | undefined) => {
+    if (!tags) return "";
+    return tags.reduce((v,o) => v + o + ",\n", "");
+  }
+
   return (
     <Paper variant="outlined">
       {adminContext.adminMode ?
@@ -126,27 +136,45 @@ export const PostPage = (props: { post?: PostData | string }) => {
         : null
       }
       { editMode ? 
-        <ReactMde
-          value={newContent}
-          onChange={setNewContent}
-          selectedTab={selectedTab}
-          onTabChange={setSelectedTab}
-          minEditorHeight={400}
-          generateMarkdownPreview={(markdown) =>
-          Promise.resolve(
-            <Markdown
-              source={markdown}
-              className={classes.text}
-              renderers={{
-                heading: HeadingRenderer,
-                code: CodeBlockRenderer,
-                text: emojiSupport,
-                link: LinkRenderer,
-                image: Image,
-              }}
-            />
-          )}
-        />
+        <>
+          { typeof(post) === "string"
+            ? <div className={classes.root}>
+                <TextField id="post_path" label="path" defaultValue={adminContext.index.about} />
+              </div>
+            : (
+            <div className={classes.root}>
+              <TextField id="post_title" label="title" defaultValue={post?.title} fullWidth />
+              <TextField id="post_path" label="path" defaultValue={post?.path} fullWidth />
+              <TextField id="post_slug" label="slug" defaultValue={post?.slug} />
+              <TextField id="post_category" label="category" defaultValue={post?.category} />
+              <TextField id="post_tldr" label="tldr" defaultValue={post?.tldr} multiline fullWidth />
+              <TextField id="post_img" label="card-img-ipfs#" defaultValue={post?.img} />
+              <TextField id="post_tags" label="tags" defaultValue={formatTagsArray(post?.tags)} />
+            </div>)
+
+          }
+          <ReactMde
+            value={newContent}
+            onChange={setNewContent}
+            selectedTab={selectedTab}
+            onTabChange={setSelectedTab}
+            minEditorHeight={400}
+            generateMarkdownPreview={(markdown) =>
+            Promise.resolve(
+              <Markdown
+                source={markdown}
+                className={classes.text}
+                renderers={{
+                  heading: HeadingRenderer,
+                  code: CodeBlockRenderer,
+                  text: emojiSupport,
+                  link: LinkRenderer,
+                  image: Image,
+                }}
+              />
+            )}
+          />
+        </>
         : <Markdown
             source={content || "Loading Page"}
             className={classes.text}
