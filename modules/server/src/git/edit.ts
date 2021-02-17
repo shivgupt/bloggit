@@ -30,14 +30,14 @@ export const edit = async (req, res, _): Promise<void> => {
     return err("Body Required");
   }
   if (!req.body.length) {
-    return err("Body Malformed");
+    return err("Body not iterable");
   }
   for (const edit of req.body) {
     if (typeof edit.path !== "string" || typeof edit.content !== "string") {
-      return err("Body Malformed");
+      return err("Body contains non-string path or content values");
     }
   }
-  log.info(`Pending edits: ${JSON.stringify(req.body)}`);
+  log.debug(`Pending edits: ${JSON.stringify(req.body)}`);
 
   const latestCommit = await resolveRef(env.branch);
   const latestTree = await git.readTree({ ...gitOpts, oid: latestCommit });
