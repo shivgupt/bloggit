@@ -8,6 +8,7 @@ import {
   GitObjectType,
   GitTree,
   gitOpts,
+  printTree,
   resolveRef,
   writeBlob,
 } from "./utils";
@@ -42,7 +43,8 @@ export const edit = async (req, res, _): Promise<void> => {
   const tree = (await git.readTree({ ...gitOpts, oid: latestCommit })).tree;
   const treeType = "tree" as GitObjectType;
 
-  log.info(tree, `Editing on top of root tree at commit ${latestCommit}`);
+  log.info(`Editing on top of root tree at commit ${latestCommit}`);
+  await printTree(latestCommit);
 
   // Read trees to determine the list of subTrees that need to be edited to insert our new file
   let rootTreeOid;
