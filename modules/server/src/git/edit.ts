@@ -16,7 +16,6 @@ import {
 const log = logger.child({ module: "GitRouter" });
 
 // Roughly based on https://stackoverflow.com/a/25556917
-// TODO: if content of an edit is "", then delete the file from the tree
 export const edit = async (req, res, _): Promise<void> => {
   const err = (e: string): void => {
     log.warn(`Git edit failure: ${e}`);
@@ -25,20 +24,15 @@ export const edit = async (req, res, _): Promise<void> => {
   if (!req.body) {
     return err("Body Required");
   }
-
   if (!req.body.length) {
     return err("Body Malformed");
   }
-
-  type GitEdit = { path: string, content: string };
-  const pendingEdits = [] as GitEdit[];
   for (const edit of req.body) {
     if (typeof edit.path !== "string" || typeof edit.content !== "string") {
       return err("Body Malformed");
     }
-    pendingEdits.push({ path: edit.path, content: edit.content });
   }
-  log.info(`Pending edits: ${JSON.stringify(pendingEdits)}`);
+  log.info(`Pending edits: ${JSON.stringify(req.body)}`);
 
   const latestCommit = await resolveRef(env.branch);
   const latestTree = await git.readTree({ ...gitOpts, oid: latestCommit });
@@ -50,17 +44,18 @@ export const edit = async (req, res, _): Promise<void> => {
 
   // Read trees to determine the list of subTrees that need to be edited to insert our new file
   let rootTreeOid;
-  for (const edit of pendingEdits) {
+  for (const edit of req.body) {
     const subTrees = [tree] as Array<GitTree | string>;
 
     // Split the path into an array of subdirs (omitting the filename)
-    // TODO: strip leading slash?
+    // TODO: strip leading slash from path?
     const filename = edit.path.includes("/") ? edit.path.split("/").pop() : edit.path;
     const dirs = edit.path.split("/").reverse().slice(1).reverse();
     if (filename === "" || dirs.some(dir => dir === "")) {
       return err(`Filename or some dir is an empty string for path ${edit.path}`);
     }
 
+    // TODO: if content of an edit is "", then delete the file from the tree
     const newBlob = await writeBlob(edit.path, edit.content, latestCommit);
     log.info(`Wrote new blob: ${JSON.stringify(newBlob)}`);
 
@@ -152,7 +147,7 @@ export const edit = async (req, res, _): Promise<void> => {
     timezoneOffset: 0,
   };
   const commitHash = await git.writeCommit({ ...gitOpts, commit: {
-    message: `edit ${pendingEdits.map(e => e.path).join(", ")}`,
+    message: `edit ${req.body.map(e => e.path).join(", ")}`,
     tree: rootTreeOid,
     parent: [latestCommit],
     author: committer,
