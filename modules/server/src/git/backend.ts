@@ -3,7 +3,8 @@ import { spawn } from "child_process";
 import { env } from "../env";
 import { logger } from "../utils";
 
-import { bufferToStream, pushToMirror, streamToBuffer } from "./utils";
+import { pushToMirror } from "./push";
+import { bufferToStream, streamToBuffer } from "./utils";
 
 const log = logger.child({ module: "GitRouter" });
 
@@ -75,7 +76,7 @@ export const pack = async (req, res, _): Promise<void> => {
     log.info(`Sending ${response.length} bytes of pack response`);
     res.send(response);
   }
-  if (service === "git-receive-pack" && env.mirrorUrl && env.mirrorKey) {
+  if (service === "git-receive-pack") {
     await pushToMirror();
   }
 };
