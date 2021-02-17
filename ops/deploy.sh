@@ -82,10 +82,6 @@ git add .
 git commit --amend --no-edit
 git push origin prod --no-verify
 
-# Push a new semver tag
-git tag "$tag"
-git push origin "$tag" --no-verify
-
 # Bring main up-to-date w prod for a cleaner git history
 git checkout main
 git merge prod

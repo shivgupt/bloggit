@@ -2,16 +2,21 @@
 set -e
 
 # Ensure defaults are set for important env vars
-export BLOG_INTERNAL_CONTENT_DIR="${BLOG_INTERNAL_CONTENT_DIR:-/blog-content.git}"
 export BLOG_DEFAULT_BRANCH="${BLOG_DEFAULT_BRANCH:-main}"
+export BLOG_INTERNAL_CONTENT_DIR="${BLOG_INTERNAL_CONTENT_DIR:-/blog-content.git}"
+export BLOG_MIRROR_KEY="${BLOG_MIRROR_KEY:-}"
+export BLOG_MIRROR_REF="${BLOG_MIRROR_REF:-mirror}"
 
 # Log all env vars
 echo "Starting server in env:"
-echo "- BLOG_ADMIN_TOKEN=$BLOG_ADMIN_TOKEN"
-echo "- BLOG_CONTENT_MIRROR=$BLOG_CONTENT_MIRROR"
+echo "- BLOG_AUTH_PASSWORD=$BLOG_AUTH_PASSWORD"
+echo "- BLOG_AUTH_USERNAME=$BLOG_AUTH_USERNAME"
 echo "- BLOG_DEFAULT_BRANCH=$BLOG_DEFAULT_BRANCH"
 echo "- BLOG_INTERNAL_CONTENT_DIR=$BLOG_INTERNAL_CONTENT_DIR"
 echo "- BLOG_LOG_LEVEL=$BLOG_LOG_LEVEL"
+echo "- BLOG_MIRROR_KEY=$BLOG_MIRROR_KEY"
+echo "- BLOG_MIRROR_REF=$BLOG_MIRROR_REF"
+echo "- BLOG_MIRROR_URL=$BLOG_MIRROR_URL"
 echo "- BLOG_PORT=$BLOG_PORT"
 echo "- BLOG_PROD=$BLOG_PROD"
 
@@ -33,18 +38,18 @@ then
   )
 fi
 
-if [[ -n "$BLOG_CONTENT_MIRROR" ]]
+if [[ -n "$BLOG_MIRROR_URL" ]]
 then
   (
-    echo "Pulling updates from remote content mirror at $BLOG_CONTENT_MIRROR"
+    echo "Pulling updates from remote content $BLOG_MIRROR_REF at $BLOG_MIRROR_URL"
     cd "$BLOG_INTERNAL_CONTENT_DIR"
-    if ! grep -qs "mirror" <<<"$(git remote)"
-    then git remote add mirror "$BLOG_CONTENT_MIRROR"
-    else git remote set-url mirror "$BLOG_CONTENT_MIRROR"
+    if ! grep -qs "$BLOG_MIRROR_REF" <<<"$(git remote)"
+    then git remote add "$BLOG_MIRROR_REF" "$BLOG_MIRROR_URL"
+    else git remote set-url "$BLOG_MIRROR_REF" "$BLOG_MIRROR_URL"
     fi
-    git fetch mirror --prune --tags
+    git fetch "$BLOG_MIRROR_REF" --prune --tags || true
     if ! grep -qs "$BLOG_DEFAULT_BRANCH" <<<"$(git branch -l)"
-    then git branch "$BLOG_DEFAULT_BRANCH" "mirror/$BLOG_DEFAULT_BRANCH"
+    then git branch "$BLOG_DEFAULT_BRANCH" "$BLOG_MIRROR_REF/$BLOG_DEFAULT_BRANCH"
     fi
   )
 fi
@@ -57,7 +62,7 @@ then
   echo "Starting blog server in prod-mode"
   export NODE_ENV=production
   exec node --no-deprecation dist/entry.js \
-    | pino-pretty --colorize --translateTime --ignore pid,level,hostname,module
+    | pino-pretty --colorize --translateTime --ignore pid,hostname,module
 else
   echo "Starting blog server in dev-mode"
   export NODE_ENV=development
@@ -73,5 +78,5 @@ else
     --polling-interval 1000 \
     --watch src \
     --exec ts-node \
-    ./src/entry.ts | pino-pretty --colorize --translateTime --ignore pid,level,hostname,module
+    ./src/entry.ts | pino-pretty --colorize --translateTime --ignore pid,hostname,module
 fi

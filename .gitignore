@@ -6,6 +6,10 @@
 **/.npm
 modules/*/package-lock.json
 
+# Local storage
+.media
+.blog-content.git
+
 # Compiled output
 .flags
 build/
