@@ -13,9 +13,10 @@ export type PostData = {
 };
 
 export type PostIndex = {
+  about: string;
+  drafts?: { [slug: string]: PostData };
   posts: { [slug: string]: PostData };
   style?: any;
-  about: string;
   title: string;
 }
 

@@ -8,6 +8,7 @@ import {
   Typography,
 } from "@material-ui/core";
 
+import { IndexEditor } from "./IndexEditor";
 import { AdminContext } from "../AdminContext";
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -27,50 +28,6 @@ export const AdminHome = () => {
   const handleRegister = () => {
     const authToken = (document.getElementById("auth-token") as HTMLInputElement).value;
     adminContext.updateAuthToken(authToken);
-  };
-
-  const JsonEditor = (props: any) => {
-    const { root } = props;
-
-    return (<>{
-      Object.entries(root).map(([key,value]) => { 
-      switch(typeof(value)) {
-        case 'string':
-          console.log('string');
-          return <TextField
-            id={"key" + key}
-            key={key}
-            label={key}
-            variant="outlined"
-            defaultValue={value}
-          />
-          
-        case 'object':
-          console.log(value);
-          if (value && (value as Array<any>).length ) {
-            const val = (value as Array<any>).reduce((v, o) =>  v + o + "\n", "");
-            return <TextField 
-                  key={key}
-                  label={key}
-                  multiline
-                  defaultValue={val}
-              />
-            } else {
-             //return <Typography key={key}>Processing Key: {key}</Typography> //<JsonEditor root={value} />
-            return (
-              <>
-                <Typography variant="subtitle2">
-                  {key}
-                </Typography>
-                <JsonEditor root={value} />
-              </>
-            )
-          }
-          
-        default:
-          return <Typography key={key}> Unknown {key} {typeof(value)}</Typography>
-      }})
-    }</>);
   };
 
   console.log(adminContext.index);
@@ -115,7 +72,7 @@ export const AdminHome = () => {
       <Divider variant="middle" />
       { adminContext.authToken
         ? (<div className={classes.section}>
-          <JsonEditor root={adminContext.index} />
+          <IndexEditor />
         </div>)
         : <>SOmething wenT Wrong!</>
       }
