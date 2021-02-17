@@ -5,20 +5,44 @@ import { logger } from "../utils";
 
 import { pushToMirror } from "./push";
 import {
-  GitObjectType,
-  GitTree,
+  strToArray,
   gitOpts,
-  printTree,
   resolveRef,
-  writeBlob,
 } from "./utils";
 
 const log = logger.child({ module: "GitRouter" });
 
+export type GitObjectType = "blob" | "tree" | "commit";
+export type GitBlobEntry = {
+  mode: string;
+  path: string;
+  oid: string;
+  type: "blob";
+};
+export type GitTreeEntry = {
+  mode: string;
+  path: string;
+  oid: string;
+  type: GitObjectType;
+};
+export type GitTree = GitTreeEntry[];
+
+export const printTree = async (oid: string, indent = 0): Promise<void> => {
+  const tree = await git.readTree({ ...gitOpts, oid });
+  for (const entry of tree.tree) {
+    if (entry.type === "blob") {
+      logger.debug(`${"  ".repeat(indent)}- ${entry.path} ${entry.oid}`);
+    } else if (entry.type === "tree") {
+      logger.info(` ${"  ".repeat(indent)}- ${entry.path} ${entry.oid}`);
+      await printTree(entry.oid, indent + 1);
+    }
+  }
+};
+
 // Roughly based on https://stackoverflow.com/a/25556917
 export const edit = async (req, res, _): Promise<void> => {
   const err = (e: string): void => {
-    log.warn(`Git edit failure: ${e}`);
+    log.error(`Git edit failed: ${e}`);
     res.status(500).send(e);
   };
   if (!req.body) {
@@ -36,101 +60,68 @@ export const edit = async (req, res, _): Promise<void> => {
 
   const latestCommit = await resolveRef(env.branch);
   const latestTree = await git.readTree({ ...gitOpts, oid: latestCommit });
-  const tree = latestTree.tree;
-  const treeType = "tree" as GitObjectType;
 
   log.info(`Editing on top of root tree at commit ${latestCommit}`);
   await printTree(latestCommit);
 
   let rootTreeOid;
   for (const edit of req.body) {
-    const subTrees = [tree] as Array<GitTree | string>;
+    // const subTrees = [tree] as Array<GitTree | string>;
 
-    // Split the path into an array of subdirs (omitting the filename)
     const filename = edit.path.includes("/") ? edit.path.split("/").pop() : edit.path;
+    // Split the path into an array of subdirs (omitting the filename)
     const dirs = edit.path.split("/").reverse().slice(1).reverse();
     if (filename === "" || dirs.includes("")) {
       return err(`Filename or some dir is an empty string for path ${edit.path}`);
     }
+    log.info(`filename: ${filename} | dirs: ${dirs}`);
+
+    const treePath = await git.walk({
+      ...gitOpts,
+      trees: [git.TREE({ ref: latestCommit })],
+      map: async (filepath: string, [entry]) => {
+        if (filepath === ".") {
+          const obj = await git.readTree({ ...gitOpts, oid: latestCommit });
+          return { path: filepath, oid: obj.oid, val: obj.tree, type: "tree" };
+        } else if (edit.path.startsWith(filepath)) {
+          log.info(`Found the ${filepath} in ${edit.path}!`);
+          const obj = await git.readObject({ ...gitOpts, oid: latestCommit, filepath });
+          return { path: filepath, oid: obj.oid, val: obj.object, type: await entry.type() };
+        }
+        return null;
+      },
+      reduce: async (parent, children) => [].concat(parent, ...children),
+    });
+
+    log.info(`treePath: ${treePath.map(entry => `${entry.path} ${entry.type} ${entry.oid}`)}`);
 
     if (edit.content === "") {
       return err(`File deletion is not implemented yet`);
-    }
-    const newBlob = await writeBlob(edit.path, edit.content, latestCommit);
-    log.info(`Wrote new blob: ${JSON.stringify(newBlob)}`);
-
-    // Read through the subTrees to determine which ones needs to be updated
-    for (const dir of dirs) {
-      const absoluteDir = dirs.slice(0, dirs.indexOf(dir)).concat([dir]).join("/");
-      log.info(`Processing dir "${dir}" (at absolute path "${absoluteDir}")`);
-      const subTree = subTrees[subTrees.length - 1] as GitTree;
-      if (typeof subTree === "string") {
-        log.info(`Dir ${dir} represents a brand new subTree`);
-        subTrees.push(dir);
-        continue;
-      }
-      const nodeIndex = subTree.findIndex(entry => entry.type === treeType && entry.path === dir);
-      if (nodeIndex >= 0) {
-        log.info(`Dir ${dir} already exists on subTree, setting it's oid to "tbd"`);
-        subTree[nodeIndex].oid = "tbd";
-        subTrees.push((await git.readTree({
-          ...gitOpts,
-          oid: latestCommit,
-          filepath: absoluteDir,
-        })).tree);
-      } else {
-        log.info(`Dir ${dir} does NOT exist on subTree, pushing new entry with "tbd" oid`);
-        subTree.push({
-          mode: "040000",
-          path: dir,
-          oid: "tbd",
-          type: treeType,
-        });
-        subTree.sort((e1, e2) => e1.path < e2.path ? -1 : 1);
-        subTrees.push(dir);
-      }
-    }
-
-    // Given the list of subTrees that need to change, write updates to each of them
-    let prevOid = newBlob.oid;
-    let prevDir = dirs[dirs.length - 1];
-    for (const maybeSubTree of subTrees.reverse()) {
-      if (typeof maybeSubTree === "string") {
-        const dirName = maybeSubTree as string;
-        if (prevOid === newBlob.oid) {
-          const newTree = [newBlob];
-          prevOid = await git.writeTree({ ...gitOpts, tree: newTree });
-          log.info(`Wrote new subTree for new file: ${JSON.stringify(newTree)} w oid ${prevOid}`);
-          continue;
-        }
-        const newTree = [{ mode: "040000", path: prevDir, oid: prevOid, type: treeType }];
-        prevOid = await git.writeTree({ ...gitOpts, tree: newTree });
-        prevDir = dirName;
-        log.info(`Wrote new subTree for ${dirName}: ${JSON.stringify(newTree)} w oid ${prevOid}`);
-      } else {
-        const subTree = maybeSubTree as GitTree;
-        const index = subTree.findIndex(entry => entry.type === treeType && entry.oid === "tbd");
+    } else {
+      const newBlobOid = await git.writeBlob({ ...gitOpts, blob: strToArray(edit.content) });
+      log.info(`Wrote new blob for ${filename}: ${newBlobOid}`);
+      let newEntry = { mode: "100644", oid: newBlobOid, type: "blob", path: filename };
+      for (const dir of ["."].concat(dirs).reverse()) {
+        const tree = treePath.find(t => t.path.endsWith(dir))?.val || [];
+        log.debug(`${tree.length > 0 ? "Using existing" : "Creating new"} tree for ${dir}`);
+        const index = tree.findIndex(e => e.path === newEntry.path);
         if (index >= 0) {
-          subTree[index].oid = prevOid;
-          prevOid = await git.writeTree({ ...gitOpts, tree: subTree });
-          log.info(`Wrote subtree w new dir ${JSON.stringify(subTree[index])} w oid ${prevOid}`);
+          log.info(`Replacing subTree[${index}] with ${JSON.stringify(newEntry)}`);
+          tree[index] = newEntry;
         } else {
-          const index = subTree.findIndex(entry => entry.path === filename);
-          if (index >= 0) {
-            subTree[index] = newBlob;
-            prevOid = await git.writeTree({ ...gitOpts, tree: subTree });
-            log.info(`Wrote tree w edited file ${JSON.stringify(subTree[index])} w oid ${prevOid}`);
-          } else {
-            subTree.push(newBlob);
-            subTree.sort((e1, e2) => e1.path < e2.path ? -1 : 1);
-            prevOid = await git.writeTree({ ...gitOpts, tree: subTree });
-            log.info(`Wrote tree w new file ${JSON.stringify(subTree[index])} w oid ${prevOid}`);
-          }
+          log.info(`Pushing new entry into tree: ${JSON.stringify(newEntry)}`);
+          tree.push(newEntry);
         }
+        newEntry = {
+          mode: "040000",
+          oid: await git.writeTree({ ...gitOpts, tree }),
+          type: "tree",
+          path: dir,
+        };
       }
+      rootTreeOid = newEntry.oid;
+      log.info(`New root tree oid: ${rootTreeOid}`);
     }
-    rootTreeOid = prevOid;
-    log.info(`New root tree oid: ${rootTreeOid}`);
   }
 
   log.info(`Final root tree w oid ${rootTreeOid}`);
