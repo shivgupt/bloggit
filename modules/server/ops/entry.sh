@@ -2,7 +2,7 @@
 set -e
 
 # Ensure defaults are set for important env vars
-export BLOG_DEFAULT_BRANCH="${BLOG_DEFAULT_BRANCH:-main}"
+export BLOG_BRANCH="${BLOG_BRANCH:-main}"
 export BLOG_INTERNAL_CONTENT_DIR="${BLOG_INTERNAL_CONTENT_DIR:-/blog-content.git}"
 export BLOG_MIRROR_KEY="${BLOG_MIRROR_KEY:-}"
 export BLOG_MIRROR_REF="${BLOG_MIRROR_REF:-mirror}"
@@ -11,7 +11,7 @@ export BLOG_MIRROR_REF="${BLOG_MIRROR_REF:-mirror}"
 echo "Starting server in env:"
 echo "- BLOG_AUTH_PASSWORD=$BLOG_AUTH_PASSWORD"
 echo "- BLOG_AUTH_USERNAME=$BLOG_AUTH_USERNAME"
-echo "- BLOG_DEFAULT_BRANCH=$BLOG_DEFAULT_BRANCH"
+echo "- BLOG_BRANCH=$BLOG_BRANCH"
 echo "- BLOG_INTERNAL_CONTENT_DIR=$BLOG_INTERNAL_CONTENT_DIR"
 echo "- BLOG_LOG_LEVEL=$BLOG_LOG_LEVEL"
 echo "- BLOG_MIRROR_KEY=$BLOG_MIRROR_KEY"
@@ -29,12 +29,12 @@ fi
 
 if [[ ! -d "$BLOG_INTERNAL_CONTENT_DIR" || ! -d "$BLOG_INTERNAL_CONTENT_DIR/refs" ]]
 then
-  echo "Initializing a bare git repo and setting the HEAD branch to $BLOG_DEFAULT_BRANCH"
+  echo "Initializing a bare git repo and setting the HEAD branch to $BLOG_BRANCH"
   git init --bare "$BLOG_INTERNAL_CONTENT_DIR"
   (
     cd "$BLOG_INTERNAL_CONTENT_DIR"
     rm -rf HEAD
-    echo "ref: refs/heads/$BLOG_DEFAULT_BRANCH" > HEAD
+    echo "ref: refs/heads/$BLOG_BRANCH" > HEAD
   )
 fi
 
@@ -48,8 +48,8 @@ then
     else git remote set-url "$BLOG_MIRROR_REF" "$BLOG_MIRROR_URL"
     fi
     git fetch "$BLOG_MIRROR_REF" --prune --tags || true
-    if ! grep -qs "$BLOG_DEFAULT_BRANCH" <<<"$(git branch -l)"
-    then git branch "$BLOG_DEFAULT_BRANCH" "$BLOG_MIRROR_REF/$BLOG_DEFAULT_BRANCH"
+    if ! grep -qs "$BLOG_BRANCH" <<<"$(git branch -l)"
+    then git branch "$BLOG_BRANCH" "$BLOG_MIRROR_REF/$BLOG_BRANCH"
     fi
   )
 fi
