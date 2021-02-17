@@ -40,7 +40,8 @@ export const edit = async (req, res, _): Promise<void> => {
   log.info(`Pending edits: ${JSON.stringify(pendingEdits)}`);
 
   const latestCommit = await resolveRef(env.branch);
-  const tree = (await git.readTree({ ...gitOpts, oid: latestCommit })).tree;
+  const latestTree = await git.readTree({ ...gitOpts, oid: latestCommit });
+  const tree = latestTree.tree;
   const treeType = "tree" as GitObjectType;
 
   log.info(`Editing on top of root tree at commit ${latestCommit}`);
@@ -69,7 +70,8 @@ export const edit = async (req, res, _): Promise<void> => {
       }
       const nodeIndex = subTree.findIndex(entry => entry.type === treeType && entry.path === dir);
       if (nodeIndex >= 0) {
-        log.info(`Dir ${dir} already exists on subTree`);
+        log.info(`Dir ${dir} already exists on subTree, setting it's oid to "tbd"`);
+        subTree[nodeIndex].oid = "tbd";
         subTrees.push((await git.readTree({
           ...gitOpts,
           oid: latestCommit,
@@ -112,13 +114,14 @@ export const edit = async (req, res, _): Promise<void> => {
           prevOid = await git.writeTree({ ...gitOpts, tree: subTree });
           log.info(`Wrote subtree w new dir ${JSON.stringify(subTree[index])} w oid ${prevOid}`);
         } else {
-          const index = subTree.findIndex(e => e.path === filename);
-          if (index < 0) {
-            return err(`Well THAT'S not supposed to happen...`);
+          const index = subTree.findIndex(entry => entry.path === filename);
+          if (index >= 0) {
+            subTree[index] = newBlob;
+            prevOid = await git.writeTree({ ...gitOpts, tree: subTree });
+            log.info(`Wrote subtree w new file ${JSON.stringify(subTree[index])} w oid ${prevOid}`);
+          } else {
+            return err(`I have no idea how to update ${filename} on ${JSON.stringify(subTree)}`);
           }
-          subTree[index] = newBlob;
-          prevOid = await git.writeTree({ ...gitOpts, tree: subTree });
-          log.info(`Wrote subtree w new file ${JSON.stringify(subTree[index])} w oid ${prevOid}`);
         }
       }
     }
@@ -126,7 +129,12 @@ export const edit = async (req, res, _): Promise<void> => {
     log.info(`New root tree oid: ${rootTreeOid}`);
   }
 
-  log.info(tree, `Final root tree w oid ${rootTreeOid}`);
+  log.info(`Final root tree w oid ${rootTreeOid}`);
+  await printTree(rootTreeOid);
+
+  if (rootTreeOid === latestTree.oid) {
+    return res.json({ status: "no change", newCommit: rootTreeOid });
+  }
 
   const committer = {
     name: "server",
@@ -158,6 +166,7 @@ export const edit = async (req, res, _): Promise<void> => {
   log.info(`Wrote new ref, pointing ${env.branch} at ${commitHash}`);
 
   res.json({ status: "success", newCommit: commitHash });
+
   await pushToMirror();
   return;
 };
