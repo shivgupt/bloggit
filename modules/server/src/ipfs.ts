@@ -22,27 +22,36 @@ ipfsRouter.use(bodyParser.json({ type: ["application/json"] }));
 ipfsRouter.use(bodyParser.text({ type: ["text/plain"] }));
 
 ipfsRouter.get("/*", async (req, res, _next): Promise<any> => {
-  const path = `${req.path.replace(/^\//, "")}`;
-  let id;
+  const path = `/ipfs/${req.path.replace(/^\//, "")}`;
+  log.info(`Getting path ${path} via ${req.method} to IPFS daemon`);
+  let output = "";
+  const list = [];
   try {
-    id = await ipfs.id();
+    for await (const chunk of ipfs.ls(path)) {
+      list.push(chunk.name);
+    }
+    for await (const chunk of ipfs.cat(path)) {
+      output += arrToString(chunk);
+    }
   } catch (e) {
+    if (e.message === "this dag node is a directory") {
+      log.info(`Got list of ${list.length} file from ${path}`);
+      return res.status(200).json(list);
+    }
     log.warn(e.message);
-    return res.send("NOT OK");
+    return res.status(500).send(e.message);
   }
-  log.info(id, `Getting path ${path} via ${req.method} to IPFS daemon w id:`);
-  try {
-    const result = await ipfs.cat(path);
-    log.info(`Got contents for file at ${path}: "${arrToString(result)}"`);
-  } catch (e) {
-    log.warn(e.message);
-  }
-  return res.send("OK");
+  log.info(`Got ${output.length} chars of contents from ${path}`);
+  return res.status(200).send(output);
 });
 
 ipfsRouter.post("/", async (req, res, _next): Promise<any> => {
   log.info(`POSTing path ${req.path} w data "${req.body}"`);
-  const result = await ipfs.add(req.body, { pin: true });
-  log.info(result, "Added file to ipfs, result:");
-  return res.send("OK");
+  try {
+    const result = await ipfs.add(req.body, { pin: true });
+    log.info(result, "Added file to ipfs, result:");
+    return res.send(`/ipfs/${result.path}`);
+  } catch (e) {
+    return res.status(500).send(e.message);
+  }
 });
