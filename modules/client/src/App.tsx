@@ -64,7 +64,7 @@ const App: React.FC = () => {
           newIndex![key!][slug!].content = currentContent;
           break;
         case "index":
-          newIndex = await fetchIndex();
+          newIndex = await fetchIndex(true);
           if (newIndex.about) {
             setAbout(await fetchFile(newIndex.about));
           }
