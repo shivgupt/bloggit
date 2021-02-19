@@ -40,20 +40,25 @@ ipfsRouter.get("/*", async (req, res, _next): Promise<any> => {
     log.error(e);
     return res.status(500).send(e.message);
   }
-  const contentType = getContentType(content);
+  let contentType = getContentType(content);
   if (contentType !== "unknown") {
     res.setHeader("content-type", contentType);
     log.info(`Returning ${content.length} bytes of ${contentType} content`);
     return res.status(200).send(content);
+  } else {
+    log.info(`${contentType} content type from ${content.slice(0, 16).toString("hex")}`);
   }
+  const text = content.toString("utf8");
   try {
-    const text = content.toString("utf8");
-    log.info(`Returning ${text.length} chars of text content`);
-    return res.status(200).send(text);
+    const json = JSON.parse(text);
+    contentType = "application/json";
+    log.info(`Returning ${text.length} chars of ${contentType} content`);
+    res.setHeader("content-type", contentType);
+    return res.status(200).send(json);
   } catch (e) {
     log.warn(e.message);
-    log.info(`Returning ${content.length} bytes of unknown content`);
-    return res.status(200).send(content);
+    log.info(`Returning ${text.length} chars of text content`);
+    return res.status(200).send(text);
   }
 });
 

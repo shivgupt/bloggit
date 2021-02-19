@@ -32,7 +32,7 @@ export const getContentType = (content: Buffer): string => {
       fmtSig("FF D8 FF DB "),
       fmtSig("FF D8 FF E0 00 10 4A 46 49 46 00 01"),
       fmtSig("FF D8 FF EE"),
-      fmtSig("FF D8 FF E1 00 00 45 78 69 66 00 00"),
+      fmtSig("FF D8 FF E1 00 00 45 78 69 66 00 00"), // bytes 5,6 = ?? ??
     ],
     "image/mpg": [
       fmtSig("00 00 01 BA"),
@@ -46,6 +46,8 @@ export const getContentType = (content: Buffer): string => {
       fmtSig("4D 4D 00 2A"),
     ],
     "video/mp4": [
+      fmtSig("00 00 00 14 66 74 79 70 6d 70 34 31"),
+      fmtSig("00 00 00 18 66 74 79 70 6d 70 34 32"),
       fmtSig("00 00 00 20 66 74 79 70 69 73 6F 6D"),
     ]
   })) {
