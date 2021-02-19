@@ -20,7 +20,7 @@ import axios from "axios";
 import { AdminContext } from "../AdminContext";
 
 import { CodeBlockRenderer } from "./CodeBlock";
-import { HeadingRenderer } from "./HeadingRenderer";
+import { EmojiRenderer, HeadingRenderer, ImageRenderer, LinkRenderer } from "./Renderers";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -51,7 +51,7 @@ export const CreateNewPost = () => {
   const [selectedTab, setSelectedTab] = React.useState<"write" | "preview">("write");
   
   useEffect(() => {
-    axios.defaults.headers.common["admin-token"] = adminContext.authToken;
+    axios.defaults.headers.common["authorization"] = adminContext.authToken;
   }, [adminContext]);
 
   const save = async (as: string) => {
@@ -113,23 +113,6 @@ export const CreateNewPost = () => {
     }
   };
 
-  const emojiSupport = text =>
-    text.value.replace(/:\w+:/gi, name =>
-      emoji.getUnicode(name) || name);
-
-  const Image = (props: any) => {
-    return <img
-      { ...props }
-      src={props.src}
-      alt={props.alt}
-      style={{ maxWidth: "100%", height: "200px", width: "200px" }}
-    />;
-  };
-
-  const LinkRenderer = (props: any) => {
-    return (<Link color="secondary" href={props.href}> {props.children[0].props.value} </Link>);
-  };
-
   if (!(adminContext.adminMode && adminContext.authToken)) return <div>Invalid Page</div>
   return (
     <Paper variant="outlined" className={classes.paper}>
@@ -156,9 +139,9 @@ export const CreateNewPost = () => {
             renderers={{
               heading: HeadingRenderer,
               code: CodeBlockRenderer,
-              text: emojiSupport,
+              text: EmojiRenderer,
               link: LinkRenderer,
-              image: Image,
+              image: ImageRenderer,
             }}
           />
         )}

@@ -1,5 +1,4 @@
 import {
-  Link,
   IconButton,
   makeStyles,
   Paper,
@@ -11,7 +10,6 @@ import {
 } from "@material-ui/icons";
 import React, { useContext, useEffect, useState } from "react";
 import Markdown from "react-markdown";
-import emoji from "emoji-dictionary";
 import ReactMde from "react-mde";
 import "react-mde/lib/styles/css/react-mde-all.css";
 import axios from "axios";
@@ -19,7 +17,7 @@ import axios from "axios";
 import { AdminContext } from "../AdminContext";
 
 import { CodeBlockRenderer } from "./CodeBlock";
-import { HeadingRenderer } from "./HeadingRenderer";
+import { EmojiRenderer, HeadingRenderer, ImageRenderer, LinkRenderer } from "./Renderers";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -48,12 +46,10 @@ export const PostPage = (props: { content: string, slug?: string }) => {
   const post = slug ? adminContext.index.posts[slug] : "about";
 
   useEffect(() => {
-    axios.defaults.headers.common["admin-token"] = adminContext.authToken;
+    axios.defaults.headers.common["authorization"] = adminContext.authToken;
   }, [adminContext]);
 
-  useEffect(() => {
-    setNewContent(content);
-  },[content]);
+  useEffect(() => setNewContent(content),[content]);
 
   const save = async () => {
     const newIndex = JSON.parse(JSON.stringify(adminContext.index))
@@ -111,29 +107,11 @@ export const PostPage = (props: { content: string, slug?: string }) => {
       adminContext.updateIndex(
         JSON.parse(JSON.stringify(adminContext.index)),
         "content",
-        "posts",
         post.slug
       )
     }
     setEditMode(false);
   }
-
-  const emojiSupport = text =>
-    text.value.replace(/:\w+:/gi, name =>
-      emoji.getUnicode(name) || name);
-
-  const Image = (props: any) => {
-    return <img
-      { ...props }
-      src={props.src}
-      alt={props.alt}
-      style={{ maxWidth: "100%", height: "200px", width: "200px" }}
-    />;
-  };
-
-  const LinkRenderer = (props: any) => {
-    return (<Link color="secondary" href={props.href}> {props.children[0].props.value} </Link>);
-  };
 
   return (
     <Paper variant="outlined">
@@ -184,9 +162,9 @@ export const PostPage = (props: { content: string, slug?: string }) => {
                 renderers={{
                   heading: HeadingRenderer,
                   code: CodeBlockRenderer,
-                  text: emojiSupport,
+                  text: EmojiRenderer,
                   link: LinkRenderer,
-                  image: Image,
+                  image: ImageRenderer,
                 }}
               />
             )}
@@ -198,9 +176,9 @@ export const PostPage = (props: { content: string, slug?: string }) => {
             renderers={{
               heading: HeadingRenderer,
               code: CodeBlockRenderer,
-              text: emojiSupport,
+              text: EmojiRenderer,
               link: LinkRenderer,
-              image: Image,
+              image: ImageRenderer,
             }}
           />
       }

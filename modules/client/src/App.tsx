@@ -57,7 +57,7 @@ const App: React.FC = () => {
     store.save("authToken", authToken);
   };
 
-  const updateIndex = async (newIndex?: PostIndex, fetch?: "content" | "index" | "about", key?: string, slug?: string) => {
+  const updateIndex = async (newIndex?: PostIndex, fetch?: "content" | "index" | "about", slug?: string) => {
     if (fetch) {
       switch(fetch) {
         case "content": 
@@ -112,11 +112,11 @@ const App: React.FC = () => {
     window.scrollTo(0, 0);
     (async () => {
       // Do nothing if index isn't loaded yet or content is already loaded
-      if (!index.posts[currentSlug] || postsContent[currentSlug]) {
+      if (!(index.posts[currentSlug] || index.drafts[currentSlug]) || postsContent[currentSlug]) {
         return;
       }
       // Need to setIndex to a new object to be sure we trigger a re-render
-      await updateIndex(JSON.parse(JSON.stringify(index)), "content", "posts", currentSlug);
+      await updateIndex(JSON.parse(JSON.stringify(index)), "content", currentSlug);
     })();
 
     // Set sidebar node
@@ -190,12 +190,14 @@ const App: React.FC = () => {
                 path="/:slug"
                 render={({ match }) => {
                   const slug = match.params.slug;
+                  let content = "Loading..."
+                  if (postsContent[slug]) {
+                    content = postsContent[slug];
+                  } else if (!(index.posts[slug] || index.drafts[slug])) {
+                    content = "Post Does Not Exist"
+                  }
                   return (<PostPage
-                    content={
-                      index.posts[slug]
-                        ? postsContent[slug] ? postsContent[slug] : "Loading Post"
-                        : "Post Does Not Exist"
-                    }
+                    content={content}
                     slug={slug}
                   />);
                 }}

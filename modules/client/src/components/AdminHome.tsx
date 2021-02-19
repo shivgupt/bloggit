@@ -30,8 +30,6 @@ export const AdminHome = () => {
     adminContext.updateAuthToken(authToken);
   };
 
-  console.log(adminContext.index);
-
   return (
     <div>
       {adminContext.authToken

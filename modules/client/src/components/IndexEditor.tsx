@@ -12,10 +12,11 @@ import {
   Theme,
   Typography,
 } from "@material-ui/core";
+import { Link } from "react-router-dom";
 
 import { AdminContext } from "../AdminContext";
-import { PostData } from "../types";
 import { Drafts, ExpandLess, ExpandMore, Public } from "@material-ui/icons";
+import axios from "axios";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -45,7 +46,53 @@ const classes = useStyles();
 const togglePosts = () => setOpenPosts(!openPosts);
 const toggleDrafts = () => setOpenDrafts(!openDrafts);
 
+useEffect(() => {
+  axios.defaults.headers.common["authorization"] = adminContext.authToken;
+}, [adminContext]);
+
 useEffect(() => setIndex(adminContext.index), [adminContext.index]);
+
+const handleArchive = async (slug: string) => {
+  const newIndex = JSON.parse(JSON.stringify(index));
+
+  newIndex.drafts[slug] = index.posts[slug];
+  delete newIndex.posts[slug];
+
+  let res = await axios({
+    method: "post",
+    url: "git/edit",
+    data: [
+    {
+      path: "index.json",
+      content: JSON.stringify(newIndex, null, 2),
+    }
+  ],
+    headers: { "content-type": "application/json" }
+  });
+
+  adminContext.updateIndex(undefined, "index");
+};
+
+const handlePublish = async (slug: string) => {
+  const newIndex = JSON.parse(JSON.stringify(index));
+
+  newIndex.posts[slug] = index.drafts![slug];
+  delete newIndex.drafts[slug];
+
+  let res = await axios({
+    method: "post",
+    url: "git/edit",
+    data: [
+    {
+      path: "index.json",
+      content: JSON.stringify(newIndex, null, 2),
+    }
+  ],
+    headers: { "content-type": "application/json" }
+  });
+
+  adminContext.updateIndex(undefined, "index");
+};
 
 return (
   <List className={classes.root}>
@@ -60,10 +107,16 @@ return (
       <List>
       {Object.values(index.posts).map((post) => {
         return (
-          <ListItem key={post.slug} alignItems="flex-start">
+          <ListItem component={Link} to={`/${post.slug}`} key={post.slug} alignItems="flex-start">
             <ListItemText primary={post.title} className={classes.listText} />
             <ListItemSecondaryAction>
-              <Button size="small" color="primary" variant="contained" startIcon={<Drafts />}>
+              <Button
+                onClick={() => handleArchive(post.slug)}
+                size="small"
+                color="primary"
+                variant="contained"
+                startIcon={<Drafts />}
+              >
                 Archive
               </Button>
             </ListItemSecondaryAction>
@@ -81,10 +134,15 @@ return (
       {index.drafts
        ? Object.values(index.drafts).map((draft) => {
           return (
-            <ListItem key={draft.slug} alignItems="flex-start">
+            <ListItem component={Link} to={`/${draft.slug}`} key={draft.slug} alignItems="flex-start">
               <ListItemText primary={draft.title} className={classes.listText} />
               <ListItemSecondaryAction>
-                <Button size="small" color="primary" variant="contained" startIcon={<Public />}>
+                <Button size="small"
+                  onClick={() => handlePublish(draft.slug)}
+                  color="primary"
+                  variant="contained"
+                  startIcon={<Public />}
+                >
                   Publish
                 </Button>
               </ListItemSecondaryAction>
@@ -98,43 +156,3 @@ return (
   </List>
   );
 }
-  //   return (<>{
-  //     Object.entries(adminContext.index).map(([key,value]) => { 
-  //     switch(typeof(value)) {
-  //       case 'string':
-  //         console.log('string');
-  //         return <TextField
-  //           id={"key" + key}
-  //           key={key}
-  //           label={key}
-  //           variant="outlined"
-  //           defaultValue={value}
-  //         />
-          
-  //       case 'object':
-  //         console.log(value);
-  //         if (value && (value as Array<any>).length ) {
-  //           const val = (value as Array<any>).reduce((v, o) =>  v + o + "\n", "");
-  //           return <TextField 
-  //                 key={key}
-  //                 label={key}
-  //                 multiline
-  //                 defaultValue={val}
-  //             />
-  //           } else {
-  //            //return <Typography key={key}>Processing Key: {key}</Typography> //<JsonEditor root={value} />
-  //           return (
-  //             <>
-  //               <Typography variant="subtitle2">
-  //                 {key}
-  //               </Typography>
-  //               <JsonEditor root={value} />
-  //             </>
-  //           )
-  //         }
-          
-  //       default:
-  //         return <Typography key={key}> Unknown {key} {typeof(value)}</Typography>
-  //     }})
-  //   }</>);
-  // };
