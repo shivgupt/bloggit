@@ -6,7 +6,6 @@ import {
   FormControlLabel,
   Hidden,
   IconButton,
-  SwipeableDrawer,
   Switch,
   ThemeProvider,
   Toolbar,
@@ -19,6 +18,7 @@ import {
   BrightnessHigh as LightIcon,
   Home as HomeIcon,
   Menu as MenuIcon,
+  AddCircle as AddIcon,
 } from "@material-ui/icons";
 import React, { useState, useContext } from "react";
 import { Link } from "react-router-dom";
@@ -45,7 +45,7 @@ const useStyles = makeStyles(theme => ({
     borderBottom: `5px solid ${theme.palette.divider}`,
   },
   homeButton: {
-    marginRight: theme.spacing(2),
+    marginRight: theme.spacing(1),
   },
   permanentDrawer: {
     width: "20%",
@@ -54,7 +54,7 @@ const useStyles = makeStyles(theme => ({
     width: "40%",
   },
   rightButton: {
-    marginLeft: theme.spacing(2),
+    marginLeft: theme.spacing(1),
   },
   title: {
     flex: 1,
@@ -62,7 +62,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const DrawerContent = (props: any) => {
-  const { title, posts, node, setNode, toggleTheme, theme } = props;
+  const { title, posts, postsContent, node, setNode, toggleTheme, theme } = props;
 
   const adminContext = useContext(AdminContext);
 
@@ -101,7 +101,7 @@ const DrawerContent = (props: any) => {
         </>
         : null
       }
-      <Toc posts={posts} node={node} setNode={setNode}/>
+      <Toc posts={posts} postsContent={postsContent} node={node} setNode={setNode}/>
       <IconButton
         onClick={toggleTheme}
         size="small"
@@ -124,15 +124,11 @@ const DrawerContent = (props: any) => {
 export const NavBar = (props: any) => {
   const { title } = props;
   const classes = useStyles();
-  const [drawer, setDrawer] = useState({ open: false });
+  const [drawer, setDrawer] = useState(false);
 
-  const toggleDrawer = (open) => event => {
-    // what's the goal of ignoring some of these events?
-    if (event && event.type === "keydown" && (event.key === "Tab" || event.key === "Shift")) {
-      return;
-    }
-    setDrawer({ open: open });
-  };
+  const toggleDrawer = () => setDrawer(!drawer);
+
+  const adminContext = useContext(AdminContext);
 
   return (
     <>
@@ -156,12 +152,24 @@ export const NavBar = (props: any) => {
           >
             {title.page ? title.page : "Home"}
           </Typography>
+          {
+            adminContext.authToken && adminContext.adminMode
+            ? <IconButton
+              component={Link}
+              edge="end"
+              to={"/create-new-post"}
+              color="inherit"
+            >
+              <AddIcon />
+            </IconButton>
+            : null
+          }
           <Hidden mdUp>
             <IconButton
               edge="start"
               color="inherit"
               aria-label="open drawer"
-              onClick={toggleDrawer(true)}
+              onClick={toggleDrawer}
               className={classes.rightButton}
             >
               <MenuIcon />
@@ -171,15 +179,14 @@ export const NavBar = (props: any) => {
       </AppBar>
       <nav className={classes.drawer}>
         <Hidden mdUp>
-          <SwipeableDrawer
+          <Drawer
             anchor="right"
-            open={drawer.open}
-            onClose={toggleDrawer(false)}
-            onOpen={toggleDrawer(true)}
+            open={drawer}
+            onClose={toggleDrawer}
             classes={{ paper: classes.list }}
           >
             <DrawerContent {...props} />
-          </SwipeableDrawer>
+          </Drawer>
         </Hidden>
         <Hidden smDown>
           <Drawer

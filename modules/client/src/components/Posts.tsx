@@ -3,12 +3,10 @@ import {
   IconButton,
   makeStyles,
   Paper,
-  Hidden,
-  TextareaAutosize,
+  TextField,
 } from "@material-ui/core";
 import {
   Edit,
-  RestaurantRounded,
   Save,
 } from "@material-ui/icons";
 import React, { useContext, useEffect, useState } from "react";
@@ -19,14 +17,17 @@ import "react-mde/lib/styles/css/react-mde-all.css";
 import axios from "axios";
 
 import { AdminContext } from "../AdminContext";
-import { PostData } from "../types";
 
 import { CodeBlockRenderer } from "./CodeBlock";
 import { HeadingRenderer } from "./HeadingRenderer";
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
+    margin: theme.spacing(1, 1),
+    "& > *": {
+      margin: theme.spacing(1),
+    }
   },
   text: {
     padding: "20px",
@@ -35,53 +36,85 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-export const PostPage = (props: { post?: PostData | string }) => {
+export const PostPage = (props: { content: string, slug?: string }) => {
 
-  const { post } = props;
+  const { content, slug } = props;
   const classes = useStyles();
-  const adminContext = useContext(AdminContext);
   const [editMode, setEditMode] = useState(false);
   const [newContent, setNewContent] = useState("Loading Page");
-  const [content, setContent] = useState("Loading Page");
   const [selectedTab, setSelectedTab] = React.useState<"write" | "preview">("write");
   
+  const adminContext = useContext(AdminContext);
+  const post = slug ? adminContext.index.posts[slug] : "about";
+
   useEffect(() => {
     axios.defaults.headers.common["admin-token"] = adminContext.authToken;
   }, [adminContext]);
 
   useEffect(() => {
-    if (typeof(post) === "string") {
-      setContent(post);
-      setNewContent(post);
-    } else if (post && post.content) {
-      setContent(post.content);
-      setNewContent(post.content);
-    }
-  },[post]);
+    setNewContent(content);
+  },[content]);
 
-  const updateGit = async () => {
-    if (content === newContent){
-      console.log("no changes detected");
-      return;
-    }
-    console.log("Lets push it to git");
-    let path: string;
+  const save = async () => {
+    const newIndex = JSON.parse(JSON.stringify(adminContext.index))
+    const path = (document.getElementById("post_path") as HTMLInputElement).value;
     if (typeof(post) === "string") {
-      path = post;
-    } else if (post && post.path) {
-      path = post.path;
+      newIndex.about = path;
+    } else if (path) {
+
+      const slug = (document.getElementById("post_slug") as HTMLInputElement).value;
+      const category = (document.getElementById("post_category") as HTMLInputElement).value;
+      const title = (document.getElementById("post_title") as HTMLInputElement).value;
+      const tldr = (document.getElementById("post_tldr") as HTMLInputElement).value;
+      const tags = (document.getElementById("post_tags") as HTMLInputElement).value.split(",");
+
+      newIndex.posts[slug] = {
+        category,
+        lastEdit: (new Date()).toLocaleDateString("en-in"),
+        path,
+        tldr,
+        title,
+        slug,
+        tags,
+      };
+
     } else {
       console.log("error: no path found");
       return;
     }
+
+    if (content === newContent && JSON.stringify(newIndex) === JSON.stringify(adminContext.index) ){
+      console.log("no changes detected");
+      return;
+    }
+    console.log("Lets push it to git");
+
     let res = await axios({
       method: "post",
-      url: `git/push/${path}`,
-      data: newContent,
-      headers: { "content-type": "text/plain" }
+      url: "git/edit",
+      data: [
+      {
+        path: path,
+        content: newContent,
+      },
+      {
+        path: "index.json",
+        content: JSON.stringify(newIndex, null, 2),
+      }
+    ],
+      headers: { "content-type": "application/json" }
     });
-    console.log(res.status);
-    console.log(res);
+
+    if (typeof(post) === "string") {
+      adminContext.updateIndex(JSON.parse(JSON.stringify(adminContext.index)), "about");
+    } else {
+      adminContext.updateIndex(
+        JSON.parse(JSON.stringify(adminContext.index)),
+        "content",
+        "posts",
+        post.slug
+      )
+    }
     setEditMode(false);
   }
 
@@ -112,7 +145,7 @@ export const PostPage = (props: { post?: PostData | string }) => {
             <Edit />
           </IconButton>
           <IconButton
-            onClick={updateGit}
+            onClick={save}
           >
             <Save />
           </IconButton>
@@ -120,27 +153,45 @@ export const PostPage = (props: { post?: PostData | string }) => {
         : null
       }
       { editMode ? 
-        <ReactMde
-          value={newContent}
-          onChange={setNewContent}
-          selectedTab={selectedTab}
-          onTabChange={setSelectedTab}
-          minEditorHeight={400}
-          generateMarkdownPreview={(markdown) =>
-          Promise.resolve(
-            <Markdown
-              source={markdown}
-              className={classes.text}
-              renderers={{
-                heading: HeadingRenderer,
-                code: CodeBlockRenderer,
-                text: emojiSupport,
-                link: LinkRenderer,
-                image: Image,
-              }}
-            />
-          )}
-        />
+        <>
+          { typeof(post) === "string"
+            ? <div className={classes.root}>
+                <TextField id="post_path" label="path" defaultValue={adminContext.index.about} />
+              </div>
+            : (
+            <div className={classes.root}>
+              <TextField id="post_title" label="title" defaultValue={post?.title} fullWidth />
+              <TextField id="post_path" label="path" defaultValue={post?.path} fullWidth />
+              <TextField id="post_slug" label="slug" defaultValue={post?.slug} />
+              <TextField id="post_category" label="category" defaultValue={post?.category} />
+              <TextField id="post_tldr" label="tldr" defaultValue={post?.tldr} multiline fullWidth />
+              <TextField id="post_img" label="card-img-ipfs#" defaultValue={post?.img} />
+              <TextField id="post_tags" label="tags" defaultValue={post?.tags} />
+            </div>)
+
+          }
+          <ReactMde
+            value={newContent}
+            onChange={setNewContent}
+            selectedTab={selectedTab}
+            onTabChange={setSelectedTab}
+            minEditorHeight={400}
+            generateMarkdownPreview={(markdown) =>
+            Promise.resolve(
+              <Markdown
+                source={markdown}
+                className={classes.text}
+                renderers={{
+                  heading: HeadingRenderer,
+                  code: CodeBlockRenderer,
+                  text: emojiSupport,
+                  link: LinkRenderer,
+                  image: Image,
+                }}
+              />
+            )}
+          />
+        </>
         : <Markdown
             source={content || "Loading Page"}
             className={classes.text}

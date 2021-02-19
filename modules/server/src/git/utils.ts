@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { Readable } from "stream";
 
 import git from "isomorphic-git";
 
@@ -20,7 +21,18 @@ export const resolveRef = async (givenRef: string): Promise<string> => {
   return ref;
 };
 
-//https://stackoverflow.com/a/43934805
+export const bufferToStream = (buf: Buffer): Readable => Readable.from(buf);
+export const streamToBuffer = (stream: Readable): Promise<Buffer> => {
+  const chunks = [];
+  return new Promise((resolve, reject) => {
+    stream.on("data", chunk => chunks.push(chunk));
+    stream.on("error", reject);
+    stream.on("end", () => resolve(Buffer.concat(chunks)));
+  });
+};
+
+// Convert between utf8-encoded strings and Uint8Arrays
+// A la https://stackoverflow.com/a/43934805
 export const strToArray = (str: string): Uint8Array => {
   const utf8Encoded = unescape(encodeURIComponent(str));
   return new Uint8Array(utf8Encoded.split("").map(c => c.charCodeAt(0)));

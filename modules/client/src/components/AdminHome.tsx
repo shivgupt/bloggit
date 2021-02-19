@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { 
   Button,
   Divider,
@@ -8,11 +8,12 @@ import {
   Typography,
 } from "@material-ui/core";
 
+import { IndexEditor } from "./IndexEditor";
 import { AdminContext } from "../AdminContext";
 
 const useStyles = makeStyles((theme: Theme) => ({
   section: {
-    margin: theme.spacing(3, 2),
+    margin: theme.spacing(1, 1),
     "& > *": {
       margin: theme.spacing(1),
     }
@@ -29,7 +30,7 @@ export const AdminHome = () => {
     adminContext.updateAuthToken(authToken);
   };
 
-  console.log(adminContext.authToken);
+  console.log(adminContext.index);
 
   return (
     <div>
@@ -67,6 +68,14 @@ export const AdminHome = () => {
 
         <Button onClick={handleRegister}> Register </Button>
       </div>
+
+      <Divider variant="middle" />
+      { adminContext.authToken
+        ? (<div className={classes.section}>
+          <IndexEditor />
+        </div>)
+        : <>SOmething wenT Wrong!</>
+      }
     </div>
   );
 };

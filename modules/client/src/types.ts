@@ -1,7 +1,6 @@
 
 export type PostData = {
   category: string;
-  content?: string;
   featured?: string;
   lastEdit: string;
   img?: string;
@@ -13,10 +12,17 @@ export type PostData = {
 };
 
 export type PostIndex = {
+  about: string;
+  drafts?: { [slug: string]: PostData };
   posts: { [slug: string]: PostData };
   style?: any;
-  about: string;
   title: string;
+}
+
+export type SidebarNode = {
+  parent: string | null,
+  current: string,
+  child: any,
 }
 
 // Types for Food logger

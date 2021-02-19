@@ -12,7 +12,7 @@ const log = logger.child({ module: "GitRead" });
 
 export const getConfig = (req, res, _): void => {
   res.json({
-    defaultBranch: env.defaultBranch,
+    branch: env.branch,
   });
 };
 
