@@ -6,7 +6,7 @@ import {
   makeStyles,
   ThemeProvider,
 } from "@material-ui/core";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Route, Switch, useRouteMatch} from "react-router-dom";
 import axios from "axios";
 
@@ -18,7 +18,7 @@ import { emptyIndex, fetchFile, fetchContent, fetchIndex, getPostsByCategories }
 import { darkTheme, lightTheme } from "./style";
 import { store } from "./utils/cache";
 import { AdminContext } from "./AdminContext";
-import { PostData, PostIndex, SidebarNode } from "./types";
+import { PostIndex, SidebarNode } from "./types";
 import { CreateNewPost } from "./components/CreateNewPost";
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
