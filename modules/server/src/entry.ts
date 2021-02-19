@@ -3,6 +3,7 @@ import express from "express";
 import { authRouter } from "./auth";
 import { env } from "./env";
 import { gitRouter } from "./git";
+import { ipfsRouter } from "./ipfs";
 import { logger } from "./utils";
 
 const log = logger.child({ module: "Entry" });
@@ -25,6 +26,7 @@ app.use((req, res, next) => {
 app.use(authRouter);
 
 app.use("/git", gitRouter);
+app.use("/ipfs", ipfsRouter);
 
 app.use((req, res) => {
   log.info("404: Not Found");
