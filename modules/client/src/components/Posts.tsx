@@ -17,8 +17,6 @@ import "react-mde/lib/styles/css/react-mde-all.css";
 import axios from "axios";
 
 import { AdminContext } from "../AdminContext";
-import { PostData } from "../types";
-import { formatTagsArray } from "../utils";
 
 import { CodeBlockRenderer } from "./CodeBlock";
 import { HeadingRenderer } from "./HeadingRenderer";
@@ -168,7 +166,7 @@ export const PostPage = (props: { content: string, slug?: string }) => {
               <TextField id="post_category" label="category" defaultValue={post?.category} />
               <TextField id="post_tldr" label="tldr" defaultValue={post?.tldr} multiline fullWidth />
               <TextField id="post_img" label="card-img-ipfs#" defaultValue={post?.img} />
-              <TextField id="post_tags" label="tags" defaultValue={formatTagsArray(post?.tags)} />
+              <TextField id="post_tags" label="tags" defaultValue={post?.tags} />
             </div>)
 
           }

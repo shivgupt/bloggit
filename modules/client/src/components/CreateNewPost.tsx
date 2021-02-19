@@ -18,8 +18,6 @@ import "react-mde/lib/styles/css/react-mde-all.css";
 import axios from "axios";
 
 import { AdminContext } from "../AdminContext";
-import { PostData } from "../types";
-import { formatTagsArray } from "../utils";
 
 import { CodeBlockRenderer } from "./CodeBlock";
 import { HeadingRenderer } from "./HeadingRenderer";
@@ -51,7 +49,6 @@ export const CreateNewPost = () => {
   const adminContext = useContext(AdminContext);
   const [newContent, setNewContent] = useState("");
   const [selectedTab, setSelectedTab] = React.useState<"write" | "preview">("write");
-  const [post, setPost] = React.useState({} as PostData);
   
   useEffect(() => {
     axios.defaults.headers.common["admin-token"] = adminContext.authToken;

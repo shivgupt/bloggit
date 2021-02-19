@@ -138,8 +138,3 @@ export const getProfileStoreObjFromState = (profile: FitnessProfile) => {
   }
   return newProfile;
 };
-
-export const formatTagsArray = (tags: string[] | undefined) => {
-  if (!tags) return "";
-  return tags.reduce((v,o) => v + o + ",\n", "");
-}
