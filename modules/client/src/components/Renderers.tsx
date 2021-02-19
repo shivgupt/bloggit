@@ -1,10 +1,27 @@
-import { IconButton } from "@material-ui/core";
+import { IconButton, Link } from "@material-ui/core";
 import { Link as LinkIcon } from "@material-ui/icons";
 import React from "react";
+import emoji from "emoji-dictionary";
 
 import { getChildValue } from "../utils";
 
 import { HashLink } from "./HashLink";
+
+export const EmojiRenderer = text => text.value.replace(/:\w+:/gi, name =>
+      emoji.getUnicode(name) || name);
+
+export  const LinkRenderer = (props: any) => {
+    return (<Link color="secondary" href={props.href}> {props.children[0].props.value} </Link>);
+  };
+
+export  const ImageRenderer = (props: any) => {
+    return <img
+      { ...props }
+      src={props.src}
+      alt={props.alt}
+      style={{ maxWidth: "100%", height: "200px", width: "200px" }}
+    />;
+  };
 
 export const HeadingRenderer = (props: any) => {
   if (props.children.length > 1) {
