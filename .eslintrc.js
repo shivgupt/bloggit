@@ -41,6 +41,7 @@ module.exports = {
     "indent": ["error", 2],
     "max-len": ["error", 100],
     "no-control-regex": ["off"],
+    "no-loop-func": ["off"],
     "no-undef": ["error"],
     "no-var": ["error"],
     "object-curly-spacing": ["error", "always"],

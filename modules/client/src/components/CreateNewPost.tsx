@@ -62,7 +62,7 @@ export const CreateNewPost = () => {
     //console.log(document.getElementById("post_path"))
     let res = await axios({
       method: "post",
-      url: `git/push/${(document.getElementById("post_path") as HTMLInputElement).value}`,
+      url: `git/edit/${(document.getElementById("post_path") as HTMLInputElement).value}`,
       data: newContent,
       headers: { "content-type": "text/plain" }
     });
