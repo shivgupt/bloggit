@@ -1,14 +1,10 @@
 import git from "isomorphic-git";
 
 import { env } from "../env";
-import { logger } from "../utils";
+import { logger, strToArray } from "../utils";
 
 import { pushToMirror } from "./push";
-import {
-  strToArray,
-  gitOpts,
-  resolveRef,
-} from "./utils";
+import { gitOpts, resolveRef } from "./utils";
 
 const log = logger.child({ module: "GitRouter" });
 
