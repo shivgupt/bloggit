@@ -1,7 +1,6 @@
 
 export type PostData = {
   category: string;
-  content?: string;
   featured?: string;
   lastEdit: string;
   img?: string;
@@ -13,9 +12,10 @@ export type PostData = {
 };
 
 export type PostIndex = {
+  about: string;
+  drafts: { [slug: string]: PostData };
   posts: { [slug: string]: PostData };
   style?: any;
-  about: string;
   title: string;
 }
 

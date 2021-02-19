@@ -3,6 +3,7 @@ import {
   Button,
   makeStyles,
   Paper,
+  TextField,
 } from "@material-ui/core";
 import {
   Save,
@@ -17,13 +18,19 @@ import "react-mde/lib/styles/css/react-mde-all.css";
 import axios from "axios";
 
 import { AdminContext } from "../AdminContext";
-import { PostData } from "../types";
 
 import { CodeBlockRenderer } from "./CodeBlock";
-import { HeadingRenderer } from "./HeadingRenderer";
+import { EmojiRenderer, HeadingRenderer, ImageRenderer, LinkRenderer } from "./Renderers";
 
 const useStyles = makeStyles((theme) => ({
   root: {
+    flexGrow: 1,
+    margin: theme.spacing(1, 1),
+    "& > *": {
+      margin: theme.spacing(1),
+    }
+  },
+  paper: {
     flexGrow: 1,
   },
   button: {
@@ -43,41 +50,77 @@ export const CreateNewPost = () => {
   const [newContent, setNewContent] = useState("");
   const [selectedTab, setSelectedTab] = React.useState<"write" | "preview">("write");
   
-  useEffect(() => {
-    axios.defaults.headers.common["admin-token"] = adminContext.authToken;
-  }, [adminContext]);
+  const save = async (as: string) => {
+    // create new index.json entry
+    const newIndex = JSON.parse(JSON.stringify(adminContext.index))
 
-  const updateGit = async () => {
-    console.log("Lets push it to git");
-    let path = "new";
+    const slug = (document.getElementById("post_slug") as HTMLInputElement).value;
+    const path = (document.getElementById("post_path") as HTMLInputElement).value;
+    const category = (document.getElementById("post_category") as HTMLInputElement).value;
+    const title = (document.getElementById("post_title") as HTMLInputElement).value;
+    const tldr = (document.getElementById("post_tldr") as HTMLInputElement).value;
+    const tags = (document.getElementById("post_tags") as HTMLInputElement).value.split(",");
+
+    if (as === "draft") {
+      if (!newIndex.drafts) newIndex.drafts = {};
+      newIndex.drafts[slug] = {
+        category,
+        lastEdit: (new Date()).toLocaleDateString("en-in"),
+        path,
+        tldr,
+        title,
+        slug,
+        tags,
+      };
+    } else {
+      if (!newIndex.posts) newIndex.posts = {};
+      newIndex.posts[slug] = {
+        category,
+        lastEdit: (new Date()).toLocaleDateString("en-in"),
+        path,
+        tldr,
+        title,
+        slug,
+        tags,
+      };
+    }
+
+    // Send request to update index.json and create new file
     let res = await axios({
       method: "post",
-      url: `git/edit/${path}`,
-      data: newContent,
-      headers: { "content-type": "text/plain" }
+      url: "git/edit",
+      data: [
+      {
+        path: path,
+        content: newContent,
+      },
+      {
+        path: "index.json",
+        content: JSON.stringify(newIndex, null, 2),
+      }
+    ],
+      headers: { "content-type": "application/json" }
     });
-  }
-
-  const emojiSupport = text =>
-    text.value.replace(/:\w+:/gi, name =>
-      emoji.getUnicode(name) || name);
-
-  const Image = (props: any) => {
-    return <img
-      { ...props }
-      src={props.src}
-      alt={props.alt}
-      style={{ maxWidth: "100%", height: "200px", width: "200px" }}
-    />;
-  };
-
-  const LinkRenderer = (props: any) => {
-    return (<Link color="secondary" href={props.href}> {props.children[0].props.value} </Link>);
+    
+    if (res.status === 200) {
+      adminContext.updateIndex(undefined, "index");
+    } else { 
+      console.log("Something went wrong")
+    }
   };
 
   if (!(adminContext.adminMode && adminContext.authToken)) return <div>Invalid Page</div>
   return (
-    <Paper variant="outlined" className={classes.root}>
+    <Paper variant="outlined" className={classes.paper}>
+      <div className={classes.root}>
+        <TextField id="post_title" label="title" defaultValue={"post-title"} fullWidth />
+        <TextField id="post_path" label="path" defaultValue={"post-path"} fullWidth />
+        <TextField id="post_slug" label="slug" defaultValue={"post-slug"} />
+        <TextField id="post_category" label="category" defaultValue={"post-category"} />
+        <TextField id="post_tldr" label="tldr" defaultValue={"post-tldr"} multiline fullWidth />
+        <TextField id="post_img" label="card-img-ipfs#" defaultValue={"post-img"} />
+        <TextField id="post_tags" label="tags" defaultValue={"post-tags"} />
+      </div>
       <ReactMde
         value={newContent}
         onChange={setNewContent}
@@ -92,15 +135,15 @@ export const CreateNewPost = () => {
             renderers={{
               heading: HeadingRenderer,
               code: CodeBlockRenderer,
-              text: emojiSupport,
+              text: EmojiRenderer,
               link: LinkRenderer,
-              image: Image,
+              image: ImageRenderer,
             }}
           />
         )}
       />
       <Button
-        onClick={updateGit}
+        onClick={() => save("draft")}
         startIcon={<DraftIcon />}
         variant="contained"
         color="secondary"
@@ -110,7 +153,7 @@ export const CreateNewPost = () => {
         Save Draft
       </Button>
       <Button
-        onClick={updateGit}
+        onClick={() => save("post")}
         startIcon={<PublishIcon />}
         variant="contained"
         color="secondary"
