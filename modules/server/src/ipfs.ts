@@ -1,4 +1,3 @@
-import bodyParser from "body-parser";
 import express from "express";
 import ipfsClient from "ipfs-client";
 
@@ -17,9 +16,6 @@ const ipfs = ipfsClient({
   http: ipfsUrl,
 });
 
-
-ipfsRouter.use(bodyParser.json({ type: ["application/json"] }));
-ipfsRouter.use(bodyParser.text({ type: ["text/plain"] }));
 
 ipfsRouter.get("/*", async (req, res, _next): Promise<any> => {
   const path = `/ipfs/${req.path.replace(/^\//, "")}`;

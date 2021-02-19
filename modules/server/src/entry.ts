@@ -1,3 +1,4 @@
+import bodyParser from "body-parser";
 import express from "express";
 
 import { authRouter } from "./auth";
@@ -24,6 +25,17 @@ app.use((req, res, next) => {
 });
 
 app.use(authRouter);
+
+app.use(bodyParser.json({ type: ["application/json"] }));
+app.use(bodyParser.raw({ limit: "100mb", type: [
+  "application/octet-stream",
+  "application/x-git-receive-pack-request",
+  "application/x-git-upload-pack-request",
+  "image/*",
+  "multipart/*",
+  "video/*",
+] }));
+app.use(bodyParser.text({ type: ["text/*"] }));
 
 app.use("/git", gitRouter);
 app.use("/ipfs", ipfsRouter);
