@@ -51,6 +51,7 @@ const App: React.FC = () => {
 
   const match = useRouteMatch("/:slug");
   const currentSlug = match ? match.params.slug : "";
+  console.log(currentSlug)
 
   const updateAuthToken = (authToken: string) => {
     setAuthToken(authToken);
@@ -112,9 +113,10 @@ const App: React.FC = () => {
     window.scrollTo(0, 0);
     (async () => {
       // Do nothing if index isn't loaded yet or content is already loaded
-      if (!index.posts[currentSlug] || postsContent[currentSlug]) {
+      if (!(index.posts[currentSlug] || index.drafts[currentSlug]) || postsContent[currentSlug]) {
         return;
       }
+      console.log("updating index");
       // Need to setIndex to a new object to be sure we trigger a re-render
       await updateIndex(JSON.parse(JSON.stringify(index)), "content", "posts", currentSlug);
     })();
@@ -190,12 +192,14 @@ const App: React.FC = () => {
                 path="/:slug"
                 render={({ match }) => {
                   const slug = match.params.slug;
+                  let content = "Loading..."
+                  if (postsContent[slug]) {
+                    content = postsContent[slug];
+                  } else if (!(index.posts[slug] || index.drafts[slug])) {
+                    content = "Post Does Not Exist"
+                  }
                   return (<PostPage
-                    content={
-                      index.posts[slug]
-                        ? postsContent[slug] ? postsContent[slug] : "Loading Post"
-                        : "Post Does Not Exist"
-                    }
+                    content={content}
                     slug={slug}
                   />);
                 }}

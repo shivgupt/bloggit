@@ -12,9 +12,9 @@ import {
   Theme,
   Typography,
 } from "@material-ui/core";
+import { Link } from "react-router-dom";
 
 import { AdminContext } from "../AdminContext";
-import { PostData } from "../types";
 import { Drafts, ExpandLess, ExpandMore, Public } from "@material-ui/icons";
 import axios from "axios";
 
@@ -107,7 +107,7 @@ return (
       <List>
       {Object.values(index.posts).map((post) => {
         return (
-          <ListItem key={post.slug} alignItems="flex-start">
+          <ListItem component={Link} to={`/${post.slug}`} key={post.slug} alignItems="flex-start">
             <ListItemText primary={post.title} className={classes.listText} />
             <ListItemSecondaryAction>
               <Button
@@ -134,7 +134,7 @@ return (
       {index.drafts
        ? Object.values(index.drafts).map((draft) => {
           return (
-            <ListItem key={draft.slug} alignItems="flex-start">
+            <ListItem component={Link} to={`/${draft.slug}`} key={draft.slug} alignItems="flex-start">
               <ListItemText primary={draft.title} className={classes.listText} />
               <ListItemSecondaryAction>
                 <Button size="small"
