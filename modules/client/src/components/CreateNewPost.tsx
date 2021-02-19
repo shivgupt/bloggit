@@ -51,7 +51,7 @@ export const CreateNewPost = () => {
   const [selectedTab, setSelectedTab] = React.useState<"write" | "preview">("write");
   
   useEffect(() => {
-    axios.defaults.headers.common["admin-token"] = adminContext.authToken;
+    axios.defaults.headers.common["authorization"] = adminContext.authToken;
   }, [adminContext]);
 
   const save = async (as: string) => {

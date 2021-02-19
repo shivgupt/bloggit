@@ -46,7 +46,7 @@ export const PostPage = (props: { content: string, slug?: string }) => {
   const post = slug ? adminContext.index.posts[slug] : "about";
 
   useEffect(() => {
-    axios.defaults.headers.common["admin-token"] = adminContext.authToken;
+    axios.defaults.headers.common["authorization"] = adminContext.authToken;
   }, [adminContext]);
 
   useEffect(() => setNewContent(content),[content]);
