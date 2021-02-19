@@ -1,7 +1,6 @@
 
 export type PostData = {
   category: string;
-  content?: string;
   featured?: string;
   lastEdit: string;
   img?: string;

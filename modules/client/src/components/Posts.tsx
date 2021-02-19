@@ -38,29 +38,24 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export const PostPage = (props: { post?: PostData | string }) => {
+export const PostPage = (props: { content: string, slug?: string }) => {
 
-  const { post } = props;
+  const { content, slug } = props;
   const classes = useStyles();
-  const adminContext = useContext(AdminContext);
   const [editMode, setEditMode] = useState(false);
   const [newContent, setNewContent] = useState("Loading Page");
-  const [content, setContent] = useState("Loading Page");
   const [selectedTab, setSelectedTab] = React.useState<"write" | "preview">("write");
   
+  const adminContext = useContext(AdminContext);
+  const post = slug ? adminContext.index.posts[slug] : adminContext.index.about;
+
   useEffect(() => {
     axios.defaults.headers.common["admin-token"] = adminContext.authToken;
   }, [adminContext]);
 
   useEffect(() => {
-    if (typeof(post) === "string") {
-      setContent(post);
-      setNewContent(post);
-    } else if (post && post.content) {
-      setContent(post.content);
-      setNewContent(post.content);
-    }
-  },[post]);
+    setNewContent(content);
+  },[content]);
 
   const updateGit = async () => {
     if (content === newContent){

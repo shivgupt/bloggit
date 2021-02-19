@@ -47,6 +47,7 @@ const App: React.FC = () => {
   const [about, setAbout] = useState("");
   const [authToken, setAuthToken] = useState("");
   const [adminMode, setAdminMode] = useState(true);
+  const [postsContent, setPostsContent] = useState({});
 
   const match = useRouteMatch("/:slug");
   const currentSlug = match ? match.params.slug : "";
@@ -60,8 +61,11 @@ const App: React.FC = () => {
     if (fetch) {
       switch(fetch) {
         case "content": 
-          const currentContent = await fetchContent(slug!, true);
-          newIndex![key!][slug!].content = currentContent;
+          const content = await fetchContent(slug!, true);
+          const newPostsContent = JSON.parse(JSON.stringify(postsContent));
+          //newIndex![key!][slug!].content = currentContent;
+          newPostsContent[slug!] = content;
+          setPostsContent(newPostsContent);
           break;
         case "index":
           newIndex = await fetchIndex(true);
@@ -107,7 +111,7 @@ const App: React.FC = () => {
     window.scrollTo(0, 0);
     (async () => {
       // Do nothing if index isn't loaded yet or content is already loaded
-      if (!index.posts[currentSlug] || index.posts[currentSlug].content) {
+      if (!index.posts[currentSlug] || postsContent[currentSlug]) {
         return;
       }
       // Need to setIndex to a new object to be sure we trigger a re-render
@@ -138,6 +142,7 @@ const App: React.FC = () => {
           node={node}
           setNode={setNode}
           posts={getPostsByCategories(index.posts)}
+          postsContent={postsContent}
           title={title}
           theme={theme}
           toggleTheme={toggleTheme}
@@ -160,7 +165,7 @@ const App: React.FC = () => {
               <Route exact
                 path="/about"
                 render={() => {
-                  return (<PostPage post={index.about ?
+                  return (<PostPage content={index.about ?
                     about
                     : "Not added yet" }
                   />);
@@ -185,11 +190,12 @@ const App: React.FC = () => {
                 render={({ match }) => {
                   const slug = match.params.slug;
                   return (<PostPage
-                    post={
+                    content={
                       index.posts[slug]
-                        ? index.posts[slug]
-                        : {} as PostData
+                        ? postsContent[slug] ? postsContent[slug] : "Loading Post"
+                        : "Post Does Not Exist"
                     }
+                    slug={slug}
                   />);
                 }}
               />

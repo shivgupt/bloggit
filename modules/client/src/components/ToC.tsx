@@ -57,7 +57,7 @@ const TocGenerator = (props: any) => {
 };
 
 export const Toc = (props: any) => {
-  const { node, posts, setNode } = props;
+  const { node, posts, postsContent, setNode } = props;
   const classes = useStyles();
 
   switch(node.current) {
@@ -109,7 +109,7 @@ export const Toc = (props: any) => {
               <div key={p.slug}>
                 <ListItem button={true} key={p.title} component={Link} to={`/${p.slug}`}>
                   {p.title}
-                  {p.content ? 
+                  {postsContent[p.slug] ? 
                     <IconButton
                       onClick={() => {
                         setNode({
@@ -149,7 +149,7 @@ export const Toc = (props: any) => {
         <List component="nav" className={classes.list}>
           <Markdown
             allowedTypes={["text", "heading"]}
-            source={node.child.content}
+            source={postsContent[node.child.slug]}
             renderers={{ heading: TocGenerator }}
             className={classes.list}
           />

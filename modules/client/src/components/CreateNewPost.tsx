@@ -140,13 +140,13 @@ export const CreateNewPost = () => {
   return (
     <Paper variant="outlined" className={classes.paper}>
       <div className={classes.root}>
-        <TextField id="post_title" label="title" defaultValue={post?.title} fullWidth />
-        <TextField id="post_path" label="path" defaultValue={post?.path} fullWidth />
-        <TextField id="post_slug" label="slug" defaultValue={post?.slug} />
-        <TextField id="post_category" label="category" defaultValue={post?.category} />
-        <TextField id="post_tldr" label="tldr" defaultValue={post?.tldr} multiline fullWidth />
-        <TextField id="post_img" label="card-img-ipfs#" defaultValue={post?.img} />
-        <TextField id="post_tags" label="tags" defaultValue={formatTagsArray(post?.tags)} />
+        <TextField id="post_title" label="title" defaultValue={"post-title"} fullWidth />
+        <TextField id="post_path" label="path" defaultValue={"post-path"} fullWidth />
+        <TextField id="post_slug" label="slug" defaultValue={"post-slug"} />
+        <TextField id="post_category" label="category" defaultValue={"post-category"} />
+        <TextField id="post_tldr" label="tldr" defaultValue={"post-tldr"} multiline fullWidth />
+        <TextField id="post_img" label="card-img-ipfs#" defaultValue={"post-img"} />
+        <TextField id="post_tags" label="tags" defaultValue={"post-tags"} />
       </div>
       <ReactMde
         value={newContent}
