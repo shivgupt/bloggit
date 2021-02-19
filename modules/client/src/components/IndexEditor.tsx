@@ -46,10 +46,6 @@ const classes = useStyles();
 const togglePosts = () => setOpenPosts(!openPosts);
 const toggleDrafts = () => setOpenDrafts(!openDrafts);
 
-useEffect(() => {
-  axios.defaults.headers.common["authorization"] = adminContext.authToken;
-}, [adminContext]);
-
 useEffect(() => setIndex(adminContext.index), [adminContext.index]);
 
 const handleArchive = async (slug: string) => {

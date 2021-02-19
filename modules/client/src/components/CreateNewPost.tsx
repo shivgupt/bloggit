@@ -50,10 +50,6 @@ export const CreateNewPost = () => {
   const [newContent, setNewContent] = useState("");
   const [selectedTab, setSelectedTab] = React.useState<"write" | "preview">("write");
   
-  useEffect(() => {
-    axios.defaults.headers.common["authorization"] = adminContext.authToken;
-  }, [adminContext]);
-
   const save = async (as: string) => {
     // create new index.json entry
     const newIndex = JSON.parse(JSON.stringify(adminContext.index))
