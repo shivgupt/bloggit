@@ -47,7 +47,7 @@ export const PostPage = (props: { content: string, slug?: string }) => {
   const [selectedTab, setSelectedTab] = React.useState<"write" | "preview">("write");
   
   const adminContext = useContext(AdminContext);
-  const post = slug ? adminContext.index.posts[slug] : adminContext.index.about;
+  const post = slug ? adminContext.index.posts[slug] : "about";
 
   useEffect(() => {
     axios.defaults.headers.common["admin-token"] = adminContext.authToken;
@@ -57,28 +57,53 @@ export const PostPage = (props: { content: string, slug?: string }) => {
     setNewContent(content);
   },[content]);
 
-  const updateGit = async () => {
-    if (content === newContent){
-      console.log("no changes detected");
-      return;
-    }
-    console.log("Lets push it to git");
-    let path: string;
+  const save = async () => {
+    const newIndex = JSON.parse(JSON.stringify(adminContext.index))
+    const path = (document.getElementById("post_path") as HTMLInputElement).value;
     if (typeof(post) === "string") {
-      path = adminContext.index.about;
-    } else if (post && post.path) {
-      path = post.path;
+      newIndex.about = path;
+    } else if (path) {
+
+      const slug = (document.getElementById("post_slug") as HTMLInputElement).value;
+      const category = (document.getElementById("post_category") as HTMLInputElement).value;
+      const title = (document.getElementById("post_title") as HTMLInputElement).value;
+      const tldr = (document.getElementById("post_tldr") as HTMLInputElement).value;
+      const tags = (document.getElementById("post_tags") as HTMLInputElement).value.split(",");
+
+      newIndex.posts[slug] = {
+        category,
+        lastEdit: (new Date()).toLocaleDateString("en-in"),
+        path,
+        tldr,
+        title,
+        slug,
+        tags,
+      };
+
     } else {
       console.log("error: no path found");
       return;
     }
+
+    if (content === newContent && JSON.stringify(newIndex) === JSON.stringify(adminContext.index) ){
+      console.log("no changes detected");
+      return;
+    }
+    console.log("Lets push it to git");
+
     let res = await axios({
       method: "post",
       url: "git/edit",
-      data: [{
-        path,
-        content: newContent
-      }],
+      data: [
+      {
+        path: path,
+        content: newContent,
+      },
+      {
+        path: "index.json",
+        content: JSON.stringify(newIndex, null, 2),
+      }
+    ],
       headers: { "content-type": "application/json" }
     });
 
@@ -122,7 +147,7 @@ export const PostPage = (props: { content: string, slug?: string }) => {
             <Edit />
           </IconButton>
           <IconButton
-            onClick={updateGit}
+            onClick={save}
           >
             <Save />
           </IconButton>

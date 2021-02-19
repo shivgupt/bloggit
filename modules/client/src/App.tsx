@@ -61,6 +61,7 @@ const App: React.FC = () => {
     if (fetch) {
       switch(fetch) {
         case "content": 
+          newIndex = await fetchIndex(true);
           const content = await fetchContent(slug!, true);
           const newPostsContent = JSON.parse(JSON.stringify(postsContent));
           //newIndex![key!][slug!].content = currentContent;

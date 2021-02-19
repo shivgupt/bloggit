@@ -60,7 +60,6 @@ export const CreateNewPost = () => {
   const save = async (as: string) => {
     // create new index.json entry
     const newIndex = JSON.parse(JSON.stringify(adminContext.index))
-    console.log(adminContext.index);
 
     const slug = (document.getElementById("post_slug") as HTMLInputElement).value;
     const path = (document.getElementById("post_path") as HTMLInputElement).value;
@@ -92,8 +91,6 @@ export const CreateNewPost = () => {
         tags,
       };
     }
-
-    console.log(newIndex);
 
     // Send request to update index.json and create new file
     let res = await axios({
