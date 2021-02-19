@@ -4,25 +4,35 @@ import * as Dishes from "../utils/dishes";
 import { emptyNutrients } from "./constants";
 
 export const prettyDateString = (s: string) => {
-  const month = s.substr(2,2);
-  let m;
+  let m: string, d: string, y: string;
+  let month:number;
+  if (s.includes('/')) {
+    month = Number(s.substring(s.indexOf('/')+1,s.lastIndexOf('/')));
+    d = s.substring(0, s.indexOf('/'));
+    y = s.substring(s.lastIndexOf('/')+1);
+  } else {
+    month = Number(s.substr(2,2));
+    d = s.substr(0,2);
+    y = s.substr(4,4);
+  }
   
   switch (month) {
-  case "01": m = "Jan"; break;
-  case "02": m = "Feb"; break;
-  case "03": m = "Mar"; break;
-  case "04": m = "Apr"; break;
-  case "05": m = "May"; break;
-  case "06": m = "Jun"; break;
-  case "07": m = "Jul"; break;
-  case "08": m = "Aug"; break;
-  case "09": m = "Sep"; break;
-  case "10": m = "Oct"; break;
-  case "11": m = "Nov"; break;
-  case "12": m = "Dec"; break;
+  case 1: m = "Jan"; break;
+  case 2: m = "Feb"; break;
+  case 3: m = "Mar"; break;
+  case 4: m = "Apr"; break;
+  case 5: m = "May"; break;
+  case 6: m = "Jun"; break;
+  case 7: m = "Jul"; break;
+  case 8: m = "Aug"; break;
+  case 9: m = "Sep"; break;
+  case 10: m = "Oct"; break;
+  case 11: m = "Nov"; break;
+  case 12: m = "Dec"; break;
+  default: m = "Unknown";
   }
 
-  return `${s.substr(0,2)} ${m}, ${s.substr(4,4)}`;
+  return `${d} ${m}, ${y}`;
 };
 
 export const compareObj = (o1: any, o2: any) => {
