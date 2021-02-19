@@ -16,3 +16,42 @@ export const arrToString = (arr: Uint8Array): string => {
   const utf8String = Array.from(arr).map(item => String.fromCharCode(item)).join("");
   return decodeURIComponent(escape(utf8String));
 };
+
+// Sigs copied from https://en.wikipedia.org/wiki/List_of_file_signatures
+export const getContentType = (content: Buffer): string => {
+  const fmtSig = str => Buffer.from(str.replace(/ /g, ""), "hex");
+  for (const [key, val] of Object.entries({
+    "application/pdf": [
+      fmtSig("25 50 44 46 2d"),
+    ],
+    "image/gif": [
+      fmtSig("47 49 46 38 37 61"),
+      fmtSig("47 49 46 38 39 61"),
+    ],
+    "image/jpg": [
+      fmtSig("FF D8 FF DB "),
+      fmtSig("FF D8 FF E0 00 10 4A 46 49 46 00 01"),
+      fmtSig("FF D8 FF EE"),
+      fmtSig("FF D8 FF E1 00 00 45 78 69 66 00 00"),
+    ],
+    "image/mpg": [
+      fmtSig("00 00 01 BA"),
+      fmtSig("00 00 01 B3"),
+    ],
+    "image/png": [
+      fmtSig("89 50 4E 47 0D 0A 1A 0A"),
+    ],
+    "image/tif": [
+      fmtSig("49 49 2A 00"),
+      fmtSig("4D 4D 00 2A"),
+    ],
+    "video/mp4": [
+      fmtSig("00 00 00 20 66 74 79 70 69 73 6F 6D"),
+    ]
+  })) {
+    if (val.some(sig => content.compare(sig, 0, sig.length, 0, sig.length) === 0)) {
+      return key;
+    }
+  }
+  return "unknown";
+};
