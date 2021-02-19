@@ -45,10 +45,14 @@ export const fetchFile = async (path: string): Promise<string> => get(path) as P
 
 export const fetchContent = async(slug: string, force?: boolean): Promise<string> => {
   if (!contentCache[slug] || force) {
-    const post = (await fetchIndex()).posts[slug];
-    // TODO: Handle 404s better
-    if (!post) { return "Loading"; }
-    contentCache[slug] = get(post.path) as Promise<string>;
+    const index = await fetchIndex();
+    if (index.posts[slug]) {
+      contentCache[slug] = get(index.posts[slug].path) as Promise<string>;
+    } else if (index.drafts[slug]) {
+      contentCache[slug] = get(index.drafts[slug].path) as Promise<string>;
+    } else {
+      return "Page does not exist"
+    }
   }
   return contentCache[slug];
 };

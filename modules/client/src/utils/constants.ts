@@ -8,6 +8,7 @@ import {
 
 export const emptyIndex: PostIndex = {
   posts: {},
+  drafts: {},
   about: "",
   title: "My Personal Website",
 };

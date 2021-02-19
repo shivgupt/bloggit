@@ -8,6 +8,7 @@ import {
 } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
 import { Route, Switch, useRouteMatch} from "react-router-dom";
+import axios from "axios";
 
 import { Home } from "./components/Home";
 import { AdminHome } from "./components/AdminHome";
@@ -47,6 +48,8 @@ const App: React.FC = () => {
   const [about, setAbout] = useState("");
   const [authToken, setAuthToken] = useState("");
   const [adminMode, setAdminMode] = useState(true);
+  const [postsContent, setPostsContent] = useState({});
+  const adminContext = useContext(AdminContext);
 
   const match = useRouteMatch("/:slug");
   const currentSlug = match ? match.params.slug : "";
@@ -56,21 +59,25 @@ const App: React.FC = () => {
     store.save("authToken", authToken);
   };
 
-  const updateIndex = async (newIndex: PostIndex, fetch?: "content" | "index" | "about", key?: string, slug?: string) => {
+  const updateIndex = async (newIndex?: PostIndex, fetch?: "content" | "index" | "about", slug?: string) => {
     if (fetch) {
       switch(fetch) {
         case "content": 
-          const currentContent = await fetchContent(slug!, true);
-          newIndex[key!][slug!].content = currentContent;
+          newIndex = await fetchIndex(true);
+          const content = await fetchContent(slug!, true);
+          const newPostsContent = JSON.parse(JSON.stringify(postsContent));
+          //newIndex![key!][slug!].content = currentContent;
+          newPostsContent[slug!] = content;
+          setPostsContent(newPostsContent);
           break;
         case "index":
-          newIndex = await fetchIndex();
+          newIndex = await fetchIndex(true);
           if (newIndex.about) {
             setAbout(await fetchFile(newIndex.about));
           }
           break;
         case "about":
-          setAbout(await fetchFile(newIndex.about));
+          setAbout(await fetchFile(newIndex!.about));
       }
     }
     setIndex(newIndex || {} as PostIndex);
@@ -90,6 +97,10 @@ const App: React.FC = () => {
   };
 
   useEffect(() => {
+    axios.defaults.headers.common["authorization"] = `Basic ${btoa(`admin:${adminContext.authToken}`)}`;
+  }, [adminContext]);
+
+  useEffect(() => {
     (async () => updateIndex({} as PostIndex, "index"))();
 
     // Set theme to local preference
@@ -107,11 +118,11 @@ const App: React.FC = () => {
     window.scrollTo(0, 0);
     (async () => {
       // Do nothing if index isn't loaded yet or content is already loaded
-      if (!index.posts[currentSlug] || index.posts[currentSlug].content) {
+      if (!(index.posts[currentSlug] || index.drafts[currentSlug]) || postsContent[currentSlug]) {
         return;
       }
       // Need to setIndex to a new object to be sure we trigger a re-render
-      await updateIndex(JSON.parse(JSON.stringify(index)), "content", "posts", currentSlug);
+      await updateIndex(JSON.parse(JSON.stringify(index)), "content", currentSlug);
     })();
 
     // Set sidebar node
@@ -138,6 +149,7 @@ const App: React.FC = () => {
           node={node}
           setNode={setNode}
           posts={getPostsByCategories(index.posts)}
+          postsContent={postsContent}
           title={title}
           theme={theme}
           toggleTheme={toggleTheme}
@@ -160,7 +172,7 @@ const App: React.FC = () => {
               <Route exact
                 path="/about"
                 render={() => {
-                  return (<PostPage post={index.about ?
+                  return (<PostPage content={index.about ?
                     about
                     : "Not added yet" }
                   />);
@@ -184,12 +196,15 @@ const App: React.FC = () => {
                 path="/:slug"
                 render={({ match }) => {
                   const slug = match.params.slug;
+                  let content = "Loading..."
+                  if (postsContent[slug]) {
+                    content = postsContent[slug];
+                  } else if (!(index.posts[slug] || index.drafts[slug])) {
+                    content = "Post Does Not Exist"
+                  }
                   return (<PostPage
-                    post={
-                      index.posts[slug]
-                        ? index.posts[slug]
-                        : {} as PostData
-                    }
+                    content={content}
+                    slug={slug}
                   />);
                 }}
               />
