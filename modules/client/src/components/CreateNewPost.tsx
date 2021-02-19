@@ -57,7 +57,7 @@ export const CreateNewPost = () => {
     axios.defaults.headers.common["admin-token"] = adminContext.authToken;
   }, [adminContext]);
 
-  const saveAsDraft = async () => {
+  const save = async (as: string) => {
     // create new index.json entry
     const newIndex = JSON.parse(JSON.stringify(adminContext.index))
     console.log(adminContext.index);
@@ -69,17 +69,29 @@ export const CreateNewPost = () => {
     const tldr = (document.getElementById("post_tldr") as HTMLInputElement).value;
     const tags = (document.getElementById("post_tags") as HTMLInputElement).value.split(",");
 
-    if (!newIndex.drafts) newIndex.drafts = {};
-
-    newIndex.drafts[slug] = {
-      category,
-      lastEdit: (new Date()).toLocaleDateString(),
-      path,
-      tldr,
-      title,
-      slug,
-      tags,
-    };
+    if (as === "draft") {
+      if (!newIndex.drafts) newIndex.drafts = {};
+      newIndex.drafts[slug] = {
+        category,
+        lastEdit: (new Date()).toLocaleDateString("en-in"),
+        path,
+        tldr,
+        title,
+        slug,
+        tags,
+      };
+    } else {
+      if (!newIndex.posts) newIndex.posts = {};
+      newIndex.posts[slug] = {
+        category,
+        lastEdit: (new Date()).toLocaleDateString("en-in"),
+        path,
+        tldr,
+        title,
+        slug,
+        tags,
+      };
+    }
 
     console.log(newIndex);
 
@@ -102,26 +114,9 @@ export const CreateNewPost = () => {
     
     if (res.status === 200) {
       adminContext.updateIndex(undefined, "index");
+    } else { 
+      console.log("Something went wrong")
     }
-  };
-
-  const updateGit = async () => {
-    console.log("Lets push it to git");
-    //console.log(document.getElementById("post_path"))
-    let res = await axios({
-      method: "post",
-      url: "git/edit",
-      data: [{
-        path: (document.getElementById("post_path") as HTMLInputElement).value,
-        content: newContent,
-      }],
-      headers: { "content-type": "application/json" }
-    });
-    console.log(res);
-  }
-
-  const handleChange = (event) => {
-    console.log(event)
   };
 
   const emojiSupport = text =>
@@ -175,7 +170,7 @@ export const CreateNewPost = () => {
         )}
       />
       <Button
-        onClick={saveAsDraft}
+        onClick={() => save("draft")}
         startIcon={<DraftIcon />}
         variant="contained"
         color="secondary"
@@ -185,7 +180,7 @@ export const CreateNewPost = () => {
         Save Draft
       </Button>
       <Button
-        onClick={updateGit}
+        onClick={() => save("post")}
         startIcon={<PublishIcon />}
         variant="contained"
         color="secondary"

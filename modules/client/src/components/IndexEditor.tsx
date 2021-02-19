@@ -45,7 +45,7 @@ const classes = useStyles();
 const togglePosts = () => setOpenPosts(!openPosts);
 const toggleDrafts = () => setOpenDrafts(!openDrafts);
 
-useEffect(() => setIndex(adminContext.index), [adminContext]);
+useEffect(() => setIndex(adminContext.index), [adminContext.index]);
 
 return (
   <List className={classes.root}>
