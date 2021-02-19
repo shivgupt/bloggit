@@ -12,7 +12,6 @@ export const AdminContext = React.createContext({
   updateIndex: async (
     newIndex?: PostIndex,
     fetch?: "content" | "index" | "about",
-    key?: string,
     slug?: string
   ) => {},
 });

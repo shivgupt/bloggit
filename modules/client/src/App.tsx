@@ -51,14 +51,13 @@ const App: React.FC = () => {
 
   const match = useRouteMatch("/:slug");
   const currentSlug = match ? match.params.slug : "";
-  console.log(currentSlug)
 
   const updateAuthToken = (authToken: string) => {
     setAuthToken(authToken);
     store.save("authToken", authToken);
   };
 
-  const updateIndex = async (newIndex?: PostIndex, fetch?: "content" | "index" | "about", key?: string, slug?: string) => {
+  const updateIndex = async (newIndex?: PostIndex, fetch?: "content" | "index" | "about", slug?: string) => {
     if (fetch) {
       switch(fetch) {
         case "content": 
@@ -116,9 +115,8 @@ const App: React.FC = () => {
       if (!(index.posts[currentSlug] || index.drafts[currentSlug]) || postsContent[currentSlug]) {
         return;
       }
-      console.log("updating index");
       // Need to setIndex to a new object to be sure we trigger a re-render
-      await updateIndex(JSON.parse(JSON.stringify(index)), "content", "posts", currentSlug);
+      await updateIndex(JSON.parse(JSON.stringify(index)), "content", currentSlug);
     })();
 
     // Set sidebar node

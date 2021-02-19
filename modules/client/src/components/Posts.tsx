@@ -107,7 +107,6 @@ export const PostPage = (props: { content: string, slug?: string }) => {
       adminContext.updateIndex(
         JSON.parse(JSON.stringify(adminContext.index)),
         "content",
-        "posts",
         post.slug
       )
     }
