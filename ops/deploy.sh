@@ -77,6 +77,12 @@ mv package-lock.json .package-lock.json
 sed 's/^\(  \|	\)"version": ".*"/  "version": "'"$version"'"/' < .package-lock.json > package-lock.json
 rm .package-lock.json
 
+pkgVersion=v$(grep -m 1 '"version":' "$root/package.json" | cut -d '"' -f 4)
+if [[ "$pkgVersion" == "$version" ]]
+then echo "Successfully set version to $pkgVersion in package.json"
+else echo "Failure, set version to $pkgVersion in package.json. Manual cleanup required" && exit 1
+fi
+
 # Push a new commit to prod
 git add .
 git commit --amend --no-edit
