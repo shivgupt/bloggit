@@ -10,7 +10,7 @@ export const AdminContext = React.createContext({
   updateAuthToken: (authToken: string) => {},
   viewAdminMode: (viewAdminMode: boolean) => {},
   updateIndex: async (
-    newIndex: PostIndex,
+    newIndex?: PostIndex,
     fetch?: "content" | "index" | "about",
     key?: string,
     slug?: string

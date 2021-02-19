@@ -56,12 +56,12 @@ const App: React.FC = () => {
     store.save("authToken", authToken);
   };
 
-  const updateIndex = async (newIndex: PostIndex, fetch?: "content" | "index" | "about", key?: string, slug?: string) => {
+  const updateIndex = async (newIndex?: PostIndex, fetch?: "content" | "index" | "about", key?: string, slug?: string) => {
     if (fetch) {
       switch(fetch) {
         case "content": 
           const currentContent = await fetchContent(slug!, true);
-          newIndex[key!][slug!].content = currentContent;
+          newIndex![key!][slug!].content = currentContent;
           break;
         case "index":
           newIndex = await fetchIndex();
@@ -70,7 +70,7 @@ const App: React.FC = () => {
           }
           break;
         case "about":
-          setAbout(await fetchFile(newIndex.about));
+          setAbout(await fetchFile(newIndex!.about));
       }
     }
     setIndex(newIndex || {} as PostIndex);

@@ -57,14 +57,65 @@ export const CreateNewPost = () => {
     axios.defaults.headers.common["admin-token"] = adminContext.authToken;
   }, [adminContext]);
 
+  const saveAsDraft = async () => {
+    // create new index.json entry
+    const newIndex = JSON.parse(JSON.stringify(adminContext.index))
+    console.log(adminContext.index);
+
+    const slug = (document.getElementById("post_slug") as HTMLInputElement).value;
+    const path = (document.getElementById("post_path") as HTMLInputElement).value;
+    const category = (document.getElementById("post_category") as HTMLInputElement).value;
+    const title = (document.getElementById("post_title") as HTMLInputElement).value;
+    const tldr = (document.getElementById("post_tldr") as HTMLInputElement).value;
+    const tags = (document.getElementById("post_tags") as HTMLInputElement).value.split(",");
+
+    if (!newIndex.drafts) newIndex.drafts = {};
+
+    newIndex.drafts[slug] = {
+      category,
+      lastEdit: (new Date()).toLocaleDateString(),
+      path,
+      tldr,
+      title,
+      slug,
+      tags,
+    };
+
+    console.log(newIndex);
+
+    // Send request to update index.json and create new file
+    let res = await axios({
+      method: "post",
+      url: "git/edit",
+      data: [
+      {
+        path: path,
+        content: newContent,
+      },
+      {
+        path: "index.json",
+        content: JSON.stringify(newIndex, null, 2),
+      }
+    ],
+      headers: { "content-type": "application/json" }
+    });
+    
+    if (res.status === 200) {
+      adminContext.updateIndex(undefined, "index");
+    }
+  };
+
   const updateGit = async () => {
     console.log("Lets push it to git");
     //console.log(document.getElementById("post_path"))
     let res = await axios({
       method: "post",
-      url: `git/edit/${(document.getElementById("post_path") as HTMLInputElement).value}`,
-      data: newContent,
-      headers: { "content-type": "text/plain" }
+      url: "git/edit",
+      data: [{
+        path: (document.getElementById("post_path") as HTMLInputElement).value,
+        content: newContent,
+      }],
+      headers: { "content-type": "application/json" }
     });
     console.log(res);
   }
@@ -124,7 +175,7 @@ export const CreateNewPost = () => {
         )}
       />
       <Button
-        onClick={updateGit}
+        onClick={saveAsDraft}
         startIcon={<DraftIcon />}
         variant="contained"
         color="secondary"

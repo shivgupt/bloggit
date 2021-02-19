@@ -48,7 +48,7 @@ export const Home = (props: any) => {
                 <CardContent>
                   <Typography variant="h5" gutterBottom>{posts[slug].title}</Typography>
                   <Typography variant="caption" gutterBottom display="block">
-                    {posts[slug].lastEdit ? prettyDateString(posts[slug].lastEdit) : ""}
+                    {posts[slug].lastEdit ? posts[slug].lastEdit : ""}
                     &nbsp;
                     &nbsp;
                     Tags: {posts[slug].tags.map(tag => <Chip key={tag} label={tag} />)}
