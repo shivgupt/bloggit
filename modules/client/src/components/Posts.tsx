@@ -43,7 +43,11 @@ export const PostPage = (props: { content: string, slug?: string }) => {
   const [selectedTab, setSelectedTab] = React.useState<"write" | "preview">("write");
   
   const adminContext = useContext(AdminContext);
-  const post = slug ? adminContext.index.posts[slug] : "about";
+
+  const post = slug ? adminContext.index.posts[slug]
+                      ? adminContext.index.posts[slug]
+                      : adminContext.index.drafts[slug]
+                    : "about";
 
   useEffect(() => setNewContent(content),[content]);
 
