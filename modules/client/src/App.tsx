@@ -49,7 +49,6 @@ const App: React.FC = () => {
   const [authToken, setAuthToken] = useState("");
   const [adminMode, setAdminMode] = useState(true);
   const [postsContent, setPostsContent] = useState({});
-  const adminContext = useContext(AdminContext);
 
   const match = useRouteMatch("/:slug");
   const currentSlug = match ? match.params.slug : "";
@@ -97,8 +96,8 @@ const App: React.FC = () => {
   };
 
   useEffect(() => {
-    axios.defaults.headers.common["authorization"] = `Basic ${btoa(`admin:${adminContext.authToken}`)}`;
-  }, [adminContext]);
+    axios.defaults.headers.common["authorization"] = `Basic ${btoa(`admin:${authToken}`)}`;
+  }, [authToken]);
 
   useEffect(() => {
     (async () => updateIndex({} as PostIndex, "index"))();
