@@ -193,6 +193,7 @@ volumes:
   media:
 
 services:
+
   proxy:
     image: '$proxy_image'
     $common
@@ -212,8 +213,6 @@ services:
   ipfs:
     image: '$ipfs_image'
     $common
-    ports:
-      - '5001:5001'
     volumes:
       - 'ipfs:/data/ipfs'
       - '$BLOG_HOST_MEDIA_DIR:/media'
