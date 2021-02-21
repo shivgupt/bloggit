@@ -47,9 +47,16 @@ export const fetchContent = async(slug: string, force?: boolean): Promise<string
   if (!contentCache[slug] || force) {
     const index = await fetchIndex();
     if (index.posts[slug]) {
-      contentCache[slug] = get(index.posts[slug].path) as Promise<string>;
+      if (index.posts[slug].path)
+        contentCache[slug] = get(index.posts[slug].path) as Promise<string>;
+      else
+        contentCache[slug] = get(`${index.posts[slug].category}/${slug}.md`) as Promise<string>;
+
     } else if (index.drafts[slug]) {
-      contentCache[slug] = get(index.drafts[slug].path) as Promise<string>;
+      if (index.drafts[slug].path)
+        contentCache[slug] = get(index.drafts[slug].path) as Promise<string>;
+      else
+        contentCache[slug] = get(`${index.drafts[slug].category}/${slug}.md`) as Promise<string>;
     } else {
       return "Page does not exist"
     }
