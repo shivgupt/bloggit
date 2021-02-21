@@ -35,19 +35,15 @@ export const AdminHome = () => {
       {adminContext.authToken
         ? (
           <div className={classes.section}>
-            <TextField
-              disabled
-              id="auth-token-registered"
-              label="Registered Auth Token"
-              variant="outlined"
-              value={adminContext.authToken}
-            />
+            <Typography variant="subtitle1">
+              This device is registered for Admin access
+            </Typography>
           </div>
         )
         : (
           <div className={classes.section}>
             <Typography variant="subtitle1">
-              You have not registered this device for Admin access
+              This device is NOT registered for Admin access
             </Typography>
           </div>
         )
@@ -55,13 +51,13 @@ export const AdminHome = () => {
 
       <Divider variant="middle" />
       <div className={classes.section}>
-        <Typography variant="h6">Use auth token to register this device</Typography>
-
         <TextField
           id="auth-token"
           label="Auth Token"
           placeholder="AUTH-TOKEN"
+          helperText="Register device with New AUTH TOKEN"
           defaultValue={""}
+          variant="outlined"
         />
 
         <Button onClick={handleRegister}> Register </Button>
