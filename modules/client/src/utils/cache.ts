@@ -1,8 +1,3 @@
-import {
-  getProfileStoreObjFromState,
-  getProfileStateFromStoreObj,
-} from "./helper";
-
 const emptyStore: any = {
   theme: "light"
 };
@@ -13,7 +8,7 @@ const load = (key: string): any => {
     if (data) {
       // console.log(`Loaded ${(data)} for key ${key}`);
       if (key === "FitnessProfile") {
-        return getProfileStateFromStoreObj(data);
+        return JSON.parse(data);
       }
       return JSON.parse(data);
     }
@@ -24,11 +19,6 @@ const load = (key: string): any => {
 };
 
 const save = (key: string, value?: any): void => {
-  if (value) {
-    if (key === "FitnessProfile") {
-      value = getProfileStoreObjFromState(value);
-    }
-  }
   localStorage.setItem(key, JSON.stringify(value || emptyStore[key]));
 };
 

@@ -6,7 +6,7 @@ import {
   makeStyles,
   ThemeProvider,
 } from "@material-ui/core";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Route, Switch, useRouteMatch} from "react-router-dom";
 import axios from "axios";
 
@@ -14,11 +14,18 @@ import { Home } from "./components/Home";
 import { AdminHome } from "./components/AdminHome";
 import { NavBar } from "./components/NavBar";
 import { PostPage } from "./components/Posts";
-import { emptyIndex, fetchFile, fetchContent, fetchIndex, getPostsByCategories } from "./utils";
+import {
+  emptyIndex,
+  fetchBranch,
+  fetchContent,
+  fetchFile,
+  fetchIndex,
+  getPostsByCategories,
+} from "./utils";
 import { darkTheme, lightTheme } from "./style";
 import { store } from "./utils/cache";
 import { AdminContext } from "./AdminContext";
-import { PostIndex, SidebarNode } from "./types";
+import { SidebarNode } from "./types";
 import { CreateNewPost } from "./components/CreateNewPost";
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
@@ -41,6 +48,18 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
 
 const App: React.FC = () => {
   const classes = useStyles();
+
+  const slugMatch = useRouteMatch("/:slug");
+  const refMatch = useRouteMatch("/:ref/:slug");
+  const refParam = refMatch ? refMatch.params.ref : "";
+  const slugParam = refMatch ? refMatch.params.slug
+    : slugMatch ? slugMatch.params.slug
+    : "";
+
+  const [ref, setRef] = useState(refParam);
+  const [slug, setSlug] = useState(slugParam);
+  const [content, setContent] = useState("Loading...");
+
   const [node, setNode] = useState({} as SidebarNode);
   const [theme, setTheme] = useState(lightTheme);
   const [index, setIndex] = useState(emptyIndex);
@@ -48,39 +67,13 @@ const App: React.FC = () => {
   const [about, setAbout] = useState("");
   const [authToken, setAuthToken] = useState("");
   const [adminMode, setAdminMode] = useState(true);
-  const [postsContent, setPostsContent] = useState({});
+  const [allContent, setAllContent] = useState({});
 
-  const match = useRouteMatch("/:slug");
-  const currentSlug = match ? match.params.slug : "";
-
+  // console.log(`Rendering App with ref=${ref} (${refParam}) and slug=${slug} (${slugParam})`);
   const updateAuthToken = (authToken: string) => {
     setAuthToken(authToken);
     store.save("authToken", authToken);
   };
-
-  const updateIndex = async (newIndex?: PostIndex, fetch?: "content" | "index" | "about", slug?: string) => {
-    if (fetch) {
-      switch(fetch) {
-        case "content": 
-          newIndex = await fetchIndex(true);
-          const content = await fetchContent(slug!, true);
-          const newPostsContent = JSON.parse(JSON.stringify(postsContent));
-          //newIndex![key!][slug!].content = currentContent;
-          newPostsContent[slug!] = content;
-          setPostsContent(newPostsContent);
-          break;
-        case "index":
-          newIndex = await fetchIndex(true);
-          if (newIndex.about) {
-            setAbout(await fetchFile(newIndex.about));
-          }
-          break;
-        case "about":
-          setAbout(await fetchFile(newIndex!.about));
-      }
-    }
-    setIndex(newIndex || {} as PostIndex);
-  }
 
   const viewAdminMode = (viewAdminMode: boolean) => setAdminMode(viewAdminMode);
 
@@ -95,62 +88,90 @@ const App: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    axios.defaults.headers.common["authorization"] = `Basic ${btoa(`admin:${authToken}`)}`;
-  }, [authToken]);
+  const syncRef = async (
+    _ref?: string | null,
+    slug?: string | null,
+    force?: boolean,
+  ) => {
+    const branch = await fetchBranch()
+    const newRef = _ref || branch;
+    setRef(newRef);
+    // console.log(`Syncing ref ${newRef}${slug ? ` and slug ${slug}` : ""}`);
+    // if ref is not the branch, then it's immutable & never needs to be refreshed
+    const forceForReal = force && newRef === branch;
+    const newIndex = await fetchIndex(newRef, forceForReal);
+    if (slug) {
+      if (!allContent[newRef]) {
+        allContent[newRef] = {};
+      }
+      allContent[newRef][slug] = await fetchContent(slug!, newRef, forceForReal);
+      setContent(allContent[newRef][slug]);
+      setAllContent(allContent);
+    }
+    if (newIndex.about) {
+      setAbout(await fetchFile(newIndex.about, newRef, forceForReal));
+    }
+    setIndex(JSON.parse(JSON.stringify(newIndex))); // new object forces a re-render
+  }
 
+  // Run this effect exactly once when the page initially loads
   useEffect(() => {
-    (async () => updateIndex({} as PostIndex, "index"))();
-
+    window.scrollTo(0, 0);
     // Set theme to local preference
+    // console.log("Setting theme & loading authToken");
     const themeSelection = store.load("theme");
     if (themeSelection === "light") setTheme(lightTheme);
     else setTheme(darkTheme);
-
     // Check local storage for admin edit keys
     const key = store.load("authToken");
     if (key) setAuthToken(key);
   }, []);
 
-  // Set post content if slug changes
+  // Fetch index & post content any time the url changes
   useEffect(() => {
-    window.scrollTo(0, 0);
+    setContent("Loading..");
+    setSlug(slugParam);
     (async () => {
-      // Do nothing if index isn't loaded yet or content is already loaded
-      if (!(index.posts[currentSlug] || index.drafts[currentSlug]) || postsContent[currentSlug]) {
-        return;
-      }
-      // Need to setIndex to a new object to be sure we trigger a re-render
-      await updateIndex(JSON.parse(JSON.stringify(index)), "content", currentSlug);
-    })();
+      await syncRef(refParam, slugParam);
+    })()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [refParam, slugParam]);
 
-    // Set sidebar node
-    if (currentSlug !== "" && index.posts[currentSlug]){
-      setNode({ parent: "posts", current: "toc", child: index.posts[currentSlug] });
+  // Update auth headers any time the authToken changes
+  useEffect(() => {
+    axios.defaults.headers.common["authorization"] = `Basic ${btoa(`admin:${authToken}`)}`;
+  }, [authToken]);
+
+  // Update the title & sidebar node when the index or slug changes
+  useEffect(() => {
+    // Update title
+    // console.log("Setting title & sidebar node");
+    const siteTitle = index ? index.title : "My personal website";
+    const pageTitle = index.posts[slug] ? index.posts[slug].title : "";
+    document.title = pageTitle ? `${pageTitle} | ${siteTitle}` : siteTitle;
+    setTitle({ site: siteTitle, page: pageTitle });
+    // Update sidebar node
+    if (slug !== "" && index.posts[slug]){
+      setNode({ parent: "posts", current: "toc", child: index.posts[slug] });
     } else {
       setNode({ parent: "", current: "categories", child: "posts" });
     }
-
-    // Update the title when the index or current post changes
-    setTitle({
-      site: index ? index.title : "My personal website",
-      page: index.posts[currentSlug] ? index.posts[currentSlug].title : "",
-    });
-    document.title = title.page ? `${title.page} | ${title.site}` : title.site;
-
-  }, [currentSlug, index]);
+  }, [slug, index]);
 
   return (
     <ThemeProvider theme={theme}>
-      <AdminContext.Provider value={{ authToken, index, updateIndex ,updateAuthToken, adminMode, viewAdminMode }}>
+      <AdminContext.Provider
+        value={{ syncRef, authToken, index, updateAuthToken, adminMode, viewAdminMode }}
+      >
         <CssBaseline />
         <NavBar
           node={node}
-          setNode={setNode}
+          allContent={allContent}
           posts={getPostsByCategories(index.posts)}
-          postsContent={postsContent}
-          title={title}
+          gitRef={ref}
+          setNode={setNode}
           theme={theme}
+          title={title}
           toggleTheme={toggleTheme}
         />
         <main className={classes.main}>
@@ -178,12 +199,6 @@ const App: React.FC = () => {
                 }}
               />
               <Route exact
-                path="/create-new-post"
-                render={() => {
-                  return <CreateNewPost />;
-                }}
-              />
-              <Route exact
                 path="/admin"
                 render={() => {
                   return (
@@ -191,21 +206,19 @@ const App: React.FC = () => {
                   );
                 }}
               />
+              <Route exact
+                path="/create-new-post"
+                render={() => {
+                  return <CreateNewPost />;
+                }}
+              />
+              <Route
+                path="/:ref/:slug"
+                render={() => <PostPage content={content} slug={slug} />}
+              />
               <Route
                 path="/:slug"
-                render={({ match }) => {
-                  const slug = match.params.slug;
-                  let content = "Loading..."
-                  if (postsContent[slug]) {
-                    content = postsContent[slug];
-                  } else if (!(index.posts[slug] || index.drafts[slug])) {
-                    content = "Post Does Not Exist"
-                  }
-                  return (<PostPage
-                    content={content}
-                    slug={slug}
-                  />);
-                }}
+                render={() => <PostPage content={content} slug={slug} />}
               />
             </Switch>
           </Container>

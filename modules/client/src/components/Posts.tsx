@@ -1,5 +1,6 @@
 import {
   IconButton,
+  Input,
   makeStyles,
   Paper,
   TextField,
@@ -18,6 +19,7 @@ import { AdminContext } from "../AdminContext";
 
 import { CodeBlockRenderer } from "./CodeBlock";
 import { EmojiRenderer, HeadingRenderer, ImageRenderer, LinkRenderer } from "./Renderers";
+import { ImageUploader } from "./ImageUploader";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -39,77 +41,80 @@ export const PostPage = (props: { content: string, slug?: string }) => {
   const { content, slug } = props;
   const classes = useStyles();
   const [editMode, setEditMode] = useState(false);
+  const [cardBgImg, setCardBgImg] = useState("");
   const [newContent, setNewContent] = useState("Loading Page");
   const [selectedTab, setSelectedTab] = React.useState<"write" | "preview">("write");
   
   const adminContext = useContext(AdminContext);
 
-  const post = slug ? adminContext.index.posts[slug]
-                      ? adminContext.index.posts[slug]
-                      : adminContext.index.drafts[slug]
-                    : "about";
+  const post = (!slug || slug === "about") ? "about"
+    : (adminContext.index.posts[slug] || adminContext.index.drafts[slug]);
 
-  useEffect(() => setNewContent(content),[content]);
+  useEffect(
+    () => setNewContent(content),
+    [content],
+  );
+
+  useEffect(() => {
+    if (typeof(post) === "object" && post.img) {
+      setCardBgImg(post.img);
+    }
+  },[post]);
 
   const save = async () => {
+    if (!newContent || !(document.getElementById("post_slug") as HTMLInputElement)) {
+      console.warn(`Nothing to update`);
+      return;
+    }
     const newIndex = JSON.parse(JSON.stringify(adminContext.index))
-    const path = (document.getElementById("post_path") as HTMLInputElement).value;
-    if (typeof(post) === "string") {
-      newIndex.about = path;
-    } else if (path) {
+    const data = [] as Array<{path: string, content: string}>;
 
+    if (typeof(post) === "string") {
+      const path = (document.getElementById("post_path") as HTMLInputElement).value;
+      newIndex.about = path;
+      data.push({ path, content: newContent });
+
+    } else {
+      // update to new format path = category/slug
       const slug = (document.getElementById("post_slug") as HTMLInputElement).value;
-      const category = (document.getElementById("post_category") as HTMLInputElement).value;
+      const category = (document.getElementById("post_category") as HTMLInputElement).value.toLocaleLowerCase();
       const title = (document.getElementById("post_title") as HTMLInputElement).value;
       const tldr = (document.getElementById("post_tldr") as HTMLInputElement).value;
+      const img = (document.getElementById("post_img") as HTMLInputElement).value;
       const tags = (document.getElementById("post_tags") as HTMLInputElement).value.split(",");
-
       newIndex.posts[slug] = {
         category,
         lastEdit: (new Date()).toLocaleDateString("en-in"),
-        path,
+        img,
         tldr,
         title,
         slug,
         tags,
       };
-
-    } else {
-      console.log("error: no path found");
-      return;
+      if (post.path) {
+        data.push({path: post.path, content: ""});
+      } else if (post.slug !== slug || post.category !== category) {
+        console.log("Path or category changed, deleting old file");
+        data.push({ path: `${post.category}/${post.slug}.md`, content: ""});
+      }
+      data.push({ path: `${category}/${slug}.md`, content: newContent});
     }
 
     if (content === newContent && JSON.stringify(newIndex) === JSON.stringify(adminContext.index) ){
       console.log("no changes detected");
       return;
     }
-    console.log("Lets push it to git");
 
-    let res = await axios({
+    data.push({ path: "index.json", content: JSON.stringify(newIndex, null, 2)});
+    console.log("Lets push it to git");
+    await axios({
+      data,
+      headers: { "content-type": "application/json" },
       method: "post",
       url: "git/edit",
-      data: [
-      {
-        path: path,
-        content: newContent,
-      },
-      {
-        path: "index.json",
-        content: JSON.stringify(newIndex, null, 2),
-      }
-    ],
-      headers: { "content-type": "application/json" }
     });
 
-    if (typeof(post) === "string") {
-      adminContext.updateIndex(JSON.parse(JSON.stringify(adminContext.index)), "about");
-    } else {
-      adminContext.updateIndex(
-        JSON.parse(JSON.stringify(adminContext.index)),
-        "content",
-        post.slug
-      )
-    }
+    await adminContext.syncRef(undefined, slug);
     setEditMode(false);
   }
 
@@ -139,14 +144,16 @@ export const PostPage = (props: { content: string, slug?: string }) => {
             : (
             <div className={classes.root}>
               <TextField id="post_title" label="title" defaultValue={post?.title} fullWidth />
-              <TextField id="post_path" label="path" defaultValue={post?.path} fullWidth />
-              <TextField id="post_slug" label="slug" defaultValue={post?.slug} />
               <TextField id="post_category" label="category" defaultValue={post?.category} />
+              <TextField id="post_slug" label="slug" defaultValue={post?.slug} />
               <TextField id="post_tldr" label="tldr" defaultValue={post?.tldr} multiline fullWidth />
-              <TextField id="post_img" label="card-img-ipfs#" defaultValue={post?.img} />
               <TextField id="post_tags" label="tags" defaultValue={post?.tags} />
+              <Input
+                id="post_img"
+                value={cardBgImg}
+                endAdornment={ <ImageUploader setImageHash={setCardBgImg} /> }
+              />
             </div>)
-
           }
           <ReactMde
             value={newContent}

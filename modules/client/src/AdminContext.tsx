@@ -9,9 +9,5 @@ export const AdminContext = React.createContext({
   // eslint-disable-next-line
   updateAuthToken: (authToken: string) => {},
   viewAdminMode: (viewAdminMode: boolean) => {},
-  updateIndex: async (
-    newIndex?: PostIndex,
-    fetch?: "content" | "index" | "about",
-    slug?: string
-  ) => {},
+  syncRef: async (ref?: string, slug?: string) => {},
 });

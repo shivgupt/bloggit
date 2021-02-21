@@ -29,10 +29,10 @@ export const getContentType = (content: Buffer): string => {
       fmtSig("47 49 46 38 39 61"),
     ],
     "image/jpg": [
-      fmtSig("FF D8 FF DB "),
-      fmtSig("FF D8 FF E0 00 10 4A 46 49 46 00 01"),
+      fmtSig("FF D8 FF DB"),
+      fmtSig("FF D8 FF E0"),
       fmtSig("FF D8 FF EE"),
-      fmtSig("FF D8 FF E1 00 00 45 78 69 66 00 00"), // bytes 5,6 = ?? ??
+      fmtSig("FF D8 FF E1"),
     ],
     "image/mpg": [
       fmtSig("00 00 01 BA"),

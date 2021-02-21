@@ -55,10 +55,10 @@ export const CreateNewPost = () => {
     const newIndex = JSON.parse(JSON.stringify(adminContext.index))
 
     const slug = (document.getElementById("post_slug") as HTMLInputElement).value;
-    const path = (document.getElementById("post_path") as HTMLInputElement).value;
-    const category = (document.getElementById("post_category") as HTMLInputElement).value;
+    const category = (document.getElementById("post_category") as HTMLInputElement).value.toLocaleLowerCase();
     const title = (document.getElementById("post_title") as HTMLInputElement).value;
     const tldr = (document.getElementById("post_tldr") as HTMLInputElement).value;
+    const img = (document.getElementById("post_img") as HTMLInputElement).value;
     const tags = (document.getElementById("post_tags") as HTMLInputElement).value.split(",");
 
     if (as === "draft") {
@@ -66,9 +66,9 @@ export const CreateNewPost = () => {
       newIndex.drafts[slug] = {
         category,
         lastEdit: (new Date()).toLocaleDateString("en-in"),
-        path,
         tldr,
         title,
+        img,
         slug,
         tags,
       };
@@ -77,9 +77,9 @@ export const CreateNewPost = () => {
       newIndex.posts[slug] = {
         category,
         lastEdit: (new Date()).toLocaleDateString("en-in"),
-        path,
         tldr,
         title,
+        img,
         slug,
         tags,
       };
@@ -91,8 +91,8 @@ export const CreateNewPost = () => {
       url: "git/edit",
       data: [
       {
-        path: path,
-        content: newContent,
+        path: `${category}/${slug}.md`,
+        content: newContent || "Coming Soon",
       },
       {
         path: "index.json",
@@ -103,7 +103,7 @@ export const CreateNewPost = () => {
     });
     
     if (res.status === 200) {
-      adminContext.updateIndex(undefined, "index");
+      adminContext.syncRef();
     } else { 
       console.log("Something went wrong")
     }
@@ -114,9 +114,8 @@ export const CreateNewPost = () => {
     <Paper variant="outlined" className={classes.paper}>
       <div className={classes.root}>
         <TextField id="post_title" label="title" defaultValue={"post-title"} fullWidth />
-        <TextField id="post_path" label="path" defaultValue={"post-path"} fullWidth />
-        <TextField id="post_slug" label="slug" defaultValue={"post-slug"} />
         <TextField id="post_category" label="category" defaultValue={"post-category"} />
+        <TextField id="post_slug" label="slug" defaultValue={"post-slug"} />
         <TextField id="post_tldr" label="tldr" defaultValue={"post-tldr"} multiline fullWidth />
         <TextField id="post_img" label="card-img-ipfs#" defaultValue={"post-img"} />
         <TextField id="post_tags" label="tags" defaultValue={"post-tags"} />
