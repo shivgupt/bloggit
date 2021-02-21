@@ -75,16 +75,14 @@ export const history = async (req, res, _): Promise<any> => {
             log.info(`Rename from ${path} to ${newFilepath} detected!`);
             newFilepath = path;
             newFilepathFlag = true;
-            output.push({
-              commit: prevCommit,
-              timestamp: toISO(prevTimestamp),
-            });
+            output.push({ commit: prevCommit, timestamp: toISO(prevTimestamp) });
           }
           return blob.oid;
         },
       });
       if (!newFilepathFlag) {
-        log.info(`File at ${newFilepath} doesn't appear to have been renamed. Done searching`);
+        log.info(`File at ${newFilepath} wasn't renamed, it was probably created here.`);
+        output.push({ commit: prevCommit, timestamp: toISO(prevTimestamp) });
         break;
       }
     }
