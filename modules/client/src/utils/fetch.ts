@@ -35,7 +35,6 @@ export const fetchIndex = async(force?: boolean): Promise<PostIndex> => {
   // Set some default values
   Object.keys(index!.posts).forEach(slug => {
     const post = index.posts[slug];
-    index.posts[slug].content = post.content || "";
     index.posts[slug].slug = slug;
   });
   return index;
@@ -48,13 +47,13 @@ export const fetchContent = async(slug: string, force?: boolean): Promise<string
     const index = await fetchIndex();
     if (index.posts[slug]) {
       if (index.posts[slug].path)
-        contentCache[slug] = get(index.posts[slug].path) as Promise<string>;
+        contentCache[slug] = get(index.posts[slug].path!) as Promise<string>;
       else
         contentCache[slug] = get(`${index.posts[slug].category}/${slug}.md`) as Promise<string>;
 
     } else if (index.drafts[slug]) {
       if (index.drafts[slug].path)
-        contentCache[slug] = get(index.drafts[slug].path) as Promise<string>;
+        contentCache[slug] = get(index.drafts[slug].path!) as Promise<string>;
       else
         contentCache[slug] = get(`${index.drafts[slug].category}/${slug}.md`) as Promise<string>;
     } else {

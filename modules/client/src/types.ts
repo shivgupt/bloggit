@@ -2,9 +2,9 @@
 export type PostData = {
   category: string;
   featured?: string;
-  lastEdit: string;
   img?: string;
-  path: string;
+  lastEdit: string;
+  path?: string;
   slug: string;
   tags: string[];
   title: string;
