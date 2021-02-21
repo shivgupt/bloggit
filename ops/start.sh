@@ -76,9 +76,9 @@ common="networks:
 ########################################
 # IPFS config
 
-ipfs_internal_port=8080
+ipfs_internal_port=5001
 
-ipfs_image="ipfs/go-ipfs:v0.7.0"
+ipfs_image="ipfs/go-ipfs:v0.8.0"
 bash "$root/ops/pull-images.sh" "$ipfs_image"
 
 ########################################
@@ -96,7 +96,8 @@ server_env="environment:
       BLOG_MIRROR_KEY: '$BLOG_MIRROR_KEY'
       BLOG_MIRROR_URL: '$BLOG_MIRROR_URL'
       BLOG_PORT: '$server_internal_port'
-      BLOG_PROD: '$BLOG_PROD'"
+      BLOG_PROD: '$BLOG_PROD'
+      IPFS_URL: 'ipfs:$ipfs_internal_port'"
 
 if [[ "$BLOG_PROD" == "true" ]]
 then
@@ -192,6 +193,7 @@ volumes:
   media:
 
 services:
+
   proxy:
     image: '$proxy_image'
     $common
@@ -199,7 +201,6 @@ services:
     environment:
       DOMAINNAME: '$BLOG_DOMAINNAME'
       EMAIL: '$BLOG_EMAIL'
-      IPFS_URL: 'ipfs:$ipfs_internal_port'
       SERVER_URL: 'server:$server_internal_port'
       WEBSERVER_URL: 'webserver:$webserver_internal_port'
     volumes:
@@ -215,8 +216,6 @@ services:
     volumes:
       - 'ipfs:/data/ipfs'
       - '$BLOG_HOST_MEDIA_DIR:/media'
-    ports:
-      - '5001:5001'
 
 EOF
 

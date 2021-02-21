@@ -10,7 +10,6 @@ echo "DOMAINNAME=$DOMAINNAME"
 echo "EMAIL=$EMAIL"
 echo "WEBSERVER_URL=$WEBSERVER_URL"
 echo "SERVER_URL=$SERVER_URL"
-echo "IPFS_URL=$IPFS_URL"
 
 # Provide a message indicating that we're still waiting for everything to wake up
 function loading_msg {
@@ -24,21 +23,15 @@ loading_pid="$!"
 ########################################
 # Wait for downstream services to wake up
 
-echo "waiting for $WEBSERVER_URL..."
-wait-for -q -t 60 "$WEBSERVER_URL" 2>&1 | sed '/nc: bad address/d'
-while ! curl -s "$WEBSERVER_URL" > /dev/null
-do sleep 2
-done
-
 echo "waiting for $SERVER_URL..."
 wait-for -q -t 60 "$SERVER_URL" 2>&1 | sed '/nc: bad address/d'
 while ! curl -s "$SERVER_URL" > /dev/null
 do sleep 2
 done
 
-echo "waiting for $IPFS_URL..."
-wait-for -q -t 60 "$IPFS_URL" 2>&1 | sed '/nc: bad address/d'
-while ! curl -s "$IPFS_URL" > /dev/null
+echo "waiting for $WEBSERVER_URL..."
+wait-for -q -t 60 "$WEBSERVER_URL" 2>&1 | sed '/nc: bad address/d'
+while ! curl -s "$WEBSERVER_URL" > /dev/null
 do sleep 2
 done
 

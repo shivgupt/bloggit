@@ -46,7 +46,7 @@ set -e
 ########################################
 ## Gather info needed for deployment
 
-current_version="$(git show origin/prod:package.json | grep '"version":' | awk -F '"' '{print $4}')"
+current_version=$(grep -m 1 '"version":' "$root/package.json" | cut -d '"' -f 4)
 echo "What version are we deploying? Current version: $current_version"
 read -p "> " -r
 echo
@@ -76,6 +76,12 @@ rm .package.json
 mv package-lock.json .package-lock.json
 sed 's/^\(  \|	\)"version": ".*"/  "version": "'"$version"'"/' < .package-lock.json > package-lock.json
 rm .package-lock.json
+
+pkgVersion=$(grep -m 1 '"version":' "$root/package.json" | cut -d '"' -f 4)
+if [[ "$pkgVersion" == "$version" ]]
+then echo "Successfully set version to $pkgVersion in package.json"
+else echo "Failure, set version to $pkgVersion in package.json. Manual cleanup required" && exit 1
+fi
 
 # Push a new commit to prod
 git add .

@@ -7,6 +7,7 @@ export type Env = {
   contentDir: string;
   domainname: string;
   email: string;
+  ipfsUrl: string;
   logLevel: string;
   mirrorKey: string;
   mirrorRef: string;
@@ -22,6 +23,7 @@ export const env: Env = {
   contentDir: path.normalize(process?.env?.BLOG_INTERNAL_CONTENT_DIR || "/blog-content.git"),
   domainname: process?.env?.BLOG_DOMAINNAME || "localhost",
   email: process?.env?.BLOG_EMAIL || "noreply@localhost",
+  ipfsUrl: process?.env?.IPFS_URL || "http://ipfs:5001",
   logLevel: process?.env?.BLOG_LOG_LEVEL || "info",
   mirrorKey: process?.env?.BLOG_MIRROR_KEY || "",
   mirrorRef: process?.env?.BLOG_MIRROR_REF || "mirror",

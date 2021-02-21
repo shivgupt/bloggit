@@ -18,7 +18,7 @@ import { emptyIndex, fetchFile, fetchContent, fetchIndex, getPostsByCategories }
 import { darkTheme, lightTheme } from "./style";
 import { store } from "./utils/cache";
 import { AdminContext } from "./AdminContext";
-import { PostData, PostIndex, SidebarNode } from "./types";
+import { PostIndex, SidebarNode } from "./types";
 import { CreateNewPost } from "./components/CreateNewPost";
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
@@ -65,7 +65,6 @@ const App: React.FC = () => {
           newIndex = await fetchIndex(true);
           const content = await fetchContent(slug!, true);
           const newPostsContent = JSON.parse(JSON.stringify(postsContent));
-          //newIndex![key!][slug!].content = currentContent;
           newPostsContent[slug!] = content;
           setPostsContent(newPostsContent);
           break;
@@ -117,7 +116,7 @@ const App: React.FC = () => {
     window.scrollTo(0, 0);
     (async () => {
       // Do nothing if index isn't loaded yet or content is already loaded
-      if (!(index.posts[currentSlug] || index.drafts[currentSlug]) || postsContent[currentSlug]) {
+      if (!(index.posts[currentSlug] || (index.drafts && index.drafts[currentSlug])) || postsContent[currentSlug]) {
         return;
       }
       // Need to setIndex to a new object to be sure we trigger a re-render
@@ -198,7 +197,7 @@ const App: React.FC = () => {
                   let content = "Loading..."
                   if (postsContent[slug]) {
                     content = postsContent[slug];
-                  } else if (!(index.posts[slug] || index.drafts[slug])) {
+                  } else if (!(index.posts[slug] || (index.drafts && index.drafts[slug]))) {
                     content = "Post Does Not Exist"
                   }
                   return (<PostPage

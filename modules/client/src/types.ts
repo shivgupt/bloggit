@@ -2,9 +2,9 @@
 export type PostData = {
   category: string;
   featured?: string;
-  lastEdit: string;
   img?: string;
-  path: string;
+  lastEdit: string;
+  path?: string;
   slug: string;
   tags: string[];
   title: string;
@@ -23,39 +23,4 @@ export type SidebarNode = {
   parent: string | null,
   current: string,
   child: any,
-}
-
-// Types for Food logger
-
-export type Nutrients = { /* nutrient percentage */
-  carbohydrates: number;
-  protein: number;
-  fat: number;
-  calories: number;
-};
-
-// Basic constituents of the Dish like cheese, mushroom, potato
-export type Ingredient = {
-  name: string;
-  quantity: string; /* quantity in grams */
-  nutrients: Nutrients;
-};
-
-export type Dish = {
-  name: string;
-  serving: number; /* serving size in grams */
-  ingredients: Ingredient[];
-}
-
-export type FoodLog = {
-  [date: string]: {
-    [time: string]: Dish[];
-  };
-}
-
-export type FitnessProfile = {
-  name: string;
-  age: number;
-  height: string;
-  foodLog: FoodLog;
 }
