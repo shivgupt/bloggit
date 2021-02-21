@@ -14,7 +14,14 @@ import { Home } from "./components/Home";
 import { AdminHome } from "./components/AdminHome";
 import { NavBar } from "./components/NavBar";
 import { PostPage } from "./components/Posts";
-import { emptyIndex, fetchFile, fetchContent, fetchIndex, getPostsByCategories } from "./utils";
+import {
+  emptyIndex,
+  fetchBranch,
+  fetchContent,
+  fetchFile,
+  fetchIndex,
+  getPostsByCategories,
+} from "./utils";
 import { darkTheme, lightTheme } from "./style";
 import { store } from "./utils/cache";
 import { AdminContext } from "./AdminContext";
@@ -50,32 +57,53 @@ const App: React.FC = () => {
   const [adminMode, setAdminMode] = useState(true);
   const [postsContent, setPostsContent] = useState({});
 
-  const match = useRouteMatch("/:slug");
-  const currentSlug = match ? match.params.slug : "";
+  const slugMatch = useRouteMatch("/:slug");
+  const refMatch = useRouteMatch("/:ref/:slug");
+  const currentRef = refMatch ? refMatch.params.ref : "";
+  const currentSlug = refMatch ? refMatch.params.slug : slugMatch ? slugMatch.params.slug : "";
+  console.log(`Rendering home page with ref=${currentRef} and slug=${currentSlug}`);
 
   const updateAuthToken = (authToken: string) => {
     setAuthToken(authToken);
     store.save("authToken", authToken);
   };
 
-  const updateIndex = async (newIndex?: PostIndex, fetch?: "content" | "index" | "about", slug?: string) => {
+  const updateIndex = async (
+    newIndex: PostIndex,
+    fetch?: string,
+    slug?: string,
+    _ref?: string,
+  ) => {
+
+    const ref = _ref || await fetchBranch();
+    newIndex = await fetchIndex(ref, true);
+
     if (fetch) {
       switch(fetch) {
         case "content": 
-          newIndex = await fetchIndex(true);
-          const content = await fetchContent(slug!, true);
-          const newPostsContent = JSON.parse(JSON.stringify(postsContent));
-          newPostsContent[slug!] = content;
-          setPostsContent(newPostsContent);
-          break;
-        case "index":
-          newIndex = await fetchIndex(true);
-          if (newIndex.about) {
-            setAbout(await fetchFile(newIndex.about));
+          if (slug === "about") {
+            return; // Use fetch = "about" to update the about page
+          }
+          console.log(`Updating content for ${slug} (ref=${ref})`);
+          newIndex = await fetchIndex(ref, true);
+          if (slug) {
+            const content = await fetchContent(slug!, ref);
+            const newPostsContent = JSON.parse(JSON.stringify(postsContent));
+            if (!newPostsContent[ref]) {
+              newPostsContent[ref] = {};
+            }
+            if (slug) {
+              newPostsContent[ref][slug] = content;
+            }
+            setPostsContent(newPostsContent);
           }
           break;
+        case "index":
+          break;
         case "about":
-          setAbout(await fetchFile(newIndex!.about));
+          if (newIndex && newIndex.about) {
+            setAbout(await fetchFile(newIndex.about, ref, true));
+          }
       }
     }
     setIndex(newIndex || {} as PostIndex);
@@ -94,54 +122,53 @@ const App: React.FC = () => {
     }
   };
 
+  // Run this effect exactly once when the page initially loads
   useEffect(() => {
-    axios.defaults.headers.common["authorization"] = `Basic ${btoa(`admin:${authToken}`)}`;
-  }, [authToken]);
-
-  useEffect(() => {
-    (async () => updateIndex({} as PostIndex, "index"))();
-
+    window.scrollTo(0, 0);
+    updateIndex({} as PostIndex, "index", undefined, currentRef);
     // Set theme to local preference
     const themeSelection = store.load("theme");
     if (themeSelection === "light") setTheme(lightTheme);
     else setTheme(darkTheme);
-
     // Check local storage for admin edit keys
     const key = store.load("authToken");
     if (key) setAuthToken(key);
   }, []);
 
-  // Set post content if slug changes
+  // Update auth headers any time the authToken changes
   useEffect(() => {
-    window.scrollTo(0, 0);
-    (async () => {
-      // Do nothing if index isn't loaded yet or content is already loaded
-      if (!(index.posts[currentSlug] || (index.drafts && index.drafts[currentSlug])) || postsContent[currentSlug]) {
-        return;
-      }
-      // Need to setIndex to a new object to be sure we trigger a re-render
-      await updateIndex(JSON.parse(JSON.stringify(index)), "content", currentSlug);
-    })();
+    axios.defaults.headers.common["authorization"] = `Basic ${btoa(`admin:${authToken}`)}`;
+  }, [authToken]);
 
-    // Set sidebar node
+  // Update the title & sidebar node when the index or slug changes
+  useEffect(() => {
+    // Update title
+    const siteTitle = index ? index.title : "My personal website";
+    const pageTitle = index.posts[currentSlug] ? index.posts[currentSlug].title : "";
+    document.title = pageTitle ? `${pageTitle} | ${siteTitle}` : siteTitle;
+    setTitle({ site: siteTitle, page: pageTitle });
+    // Update sidebar node
     if (currentSlug !== "" && index.posts[currentSlug]){
       setNode({ parent: "posts", current: "toc", child: index.posts[currentSlug] });
     } else {
       setNode({ parent: "", current: "categories", child: "posts" });
     }
-
-    // Update the title when the index or current post changes
-    setTitle({
-      site: index ? index.title : "My personal website",
-      page: index.posts[currentSlug] ? index.posts[currentSlug].title : "",
-    });
-    document.title = title.page ? `${title.page} | ${title.site}` : title.site;
-
   }, [currentSlug, index]);
+
+  // Fetch index & post content any time the slug or ref changes
+  useEffect(() => {
+    (async () => {
+      // Need to setIndex to a new object to be sure we trigger a re-render
+      await updateIndex(JSON.parse(JSON.stringify(index)), "content", currentSlug, currentRef);
+    })();
+    // Set sidebar node
+  }, [currentRef, currentSlug]);
 
   return (
     <ThemeProvider theme={theme}>
-      <AdminContext.Provider value={{ authToken, index, updateIndex ,updateAuthToken, adminMode, viewAdminMode }}>
+      <AdminContext.Provider
+        value={{ authToken, index, updateIndex ,updateAuthToken, adminMode, viewAdminMode }}
+      >
         <CssBaseline />
         <NavBar
           node={node}
@@ -177,12 +204,6 @@ const App: React.FC = () => {
                 }}
               />
               <Route exact
-                path="/create-new-post"
-                render={() => {
-                  return <CreateNewPost />;
-                }}
-              />
-              <Route exact
                 path="/admin"
                 render={() => {
                   return (
@@ -190,15 +211,40 @@ const App: React.FC = () => {
                   );
                 }}
               />
+              <Route exact
+                path="/create-new-post"
+                render={() => {
+                  return <CreateNewPost />;
+                }}
+              />
+              <Route
+                path="/:ref/:slug"
+                render={({ match }) => {
+                  const ref = match.params.ref;
+                  const slug = match.params.slug;
+                  let content = "Loading..."
+                  console.log(`Rendering historical data for ref ${ref} and slug ${slug}`);
+                  if (postsContent[ref] && postsContent[ref][slug]) {
+                    content = postsContent[ref][slug];
+                  } else if (!(index.posts[slug] || (index.drafts && index.drafts[slug]))) {
+                    content = "Does Not Exist";
+                  }
+                  return (<PostPage
+                    content={content}
+                    slug={slug}
+                  />);
+                }}
+              />
               <Route
                 path="/:slug"
                 render={({ match }) => {
                   const slug = match.params.slug;
                   let content = "Loading..."
+                  console.log(`Rendering current data for slug ${slug}`);
                   if (postsContent[slug]) {
                     content = postsContent[slug];
                   } else if (!(index.posts[slug] || (index.drafts && index.drafts[slug]))) {
-                    content = "Post Does Not Exist"
+                    content = "Does Not Exist"
                   }
                   return (<PostPage
                     content={content}

@@ -5,7 +5,6 @@ import {
   TextField,
 } from "@material-ui/core";
 import {
-  Category,
   Edit,
   Save,
 } from "@material-ui/icons";
@@ -45,12 +44,14 @@ export const PostPage = (props: { content: string, slug?: string }) => {
   
   const adminContext = useContext(AdminContext);
 
-  const post = slug ? adminContext.index.posts[slug]
-                      ? adminContext.index.posts[slug]
-                      : adminContext.index.drafts[slug]
-                    : "about";
+  const post = slug
+    ? (adminContext.index.posts[slug] || adminContext.index.drafts[slug])
+    : "about";
 
-  useEffect(() => setNewContent(content),[content]);
+  useEffect(
+    () => setNewContent(content),
+    [content],
+  );
 
   const save = async () => {
     if (!newContent || !(document.getElementById("post_slug") as HTMLInputElement)) {
@@ -64,8 +65,8 @@ export const PostPage = (props: { content: string, slug?: string }) => {
       const path = (document.getElementById("post_path") as HTMLInputElement).value;
       newIndex.about = path;
       data.push({ path, content: newContent });
-    } else {
 
+    } else {
       // update to new format path = category/slug
       const slug = (document.getElementById("post_slug") as HTMLInputElement).value;
       const category = (document.getElementById("post_category") as HTMLInputElement).value.toLocaleLowerCase();
@@ -73,7 +74,6 @@ export const PostPage = (props: { content: string, slug?: string }) => {
       const tldr = (document.getElementById("post_tldr") as HTMLInputElement).value;
       const img = (document.getElementById("post_img") as HTMLInputElement).value;
       const tags = (document.getElementById("post_tags") as HTMLInputElement).value.split(",");
-
       newIndex.posts[slug] = {
         category,
         lastEdit: (new Date()).toLocaleDateString("en-in"),
@@ -83,15 +83,12 @@ export const PostPage = (props: { content: string, slug?: string }) => {
         slug,
         tags,
       };
-
       if (post.path) {
         data.push({path: post.path, content: ""});
       } else if (post.slug !== slug || post.category !== category) {
         console.log("Path or category changed, deleting old file");
         data.push({ path: `${post.category}/${post.slug}.md`, content: ""});
       }
-
-
       data.push({ path: `${category}/${slug}.md`, content: newContent});
     }
 
@@ -101,24 +98,18 @@ export const PostPage = (props: { content: string, slug?: string }) => {
     }
 
     data.push({ path: "index.json", content: JSON.stringify(newIndex, null, 2)});
-
     console.log("Lets push it to git");
-
-    let res = await axios({
+    await axios({
+      data,
+      headers: { "content-type": "application/json" },
       method: "post",
       url: "git/edit",
-      data,
-      headers: { "content-type": "application/json" }
     });
 
     if (typeof(post) === "string") {
       adminContext.updateIndex(JSON.parse(JSON.stringify(adminContext.index)), "about");
     } else {
-      adminContext.updateIndex(
-        JSON.parse(JSON.stringify(adminContext.index)),
-        "content",
-        post.slug
-      )
+      adminContext.updateIndex(JSON.parse(JSON.stringify(adminContext.index)), "content", post.slug)
     }
     setEditMode(false);
   }
@@ -155,7 +146,6 @@ export const PostPage = (props: { content: string, slug?: string }) => {
               <TextField id="post_img" label="card-img-ipfs#" defaultValue={post?.img} />
               <TextField id="post_tags" label="tags" defaultValue={post?.tags} />
             </div>)
-
           }
           <ReactMde
             value={newContent}
