@@ -1,6 +1,6 @@
 import axios from "axios";
 
-import { PostIndex } from "../types";
+import { PostData, PostIndex } from "../types";
 
 let branchCache: string;
 export const fetchBranch = async (force?: boolean): Promise<string> => {
@@ -64,14 +64,18 @@ export const fetchContent = async(
 ): Promise<string> => {
   const ref = _ref || await fetchBranch();
   const index = await fetchIndex(ref, force);
-  const entry = index.posts[slug] || (index.drafts ? index.drafts[slug] : undefined);
-  if (!entry) {
-    throw new Error(`There is no entry in the index for ${slug} on ${ref}`);
+  const entry = (index.posts && index.posts[slug]) ? index.posts[slug]
+    : (index.drafts && index.drafts[slug]) ? index.drafts[slug]
+    : {} as PostData;
+  if (!entry.path && slug === "about") {
+    entry.path = entry.path || index.about;
   }
-  try {
-    return await fetchFile(`${entry.category}/${slug}.md`, ref, force);
-  } catch (e) {
-    console.error(e.message)
-    return `${ref}/${entry.category}/${slug}.md does not exist`
+  if (entry.path) {
+    try {
+      return await fetchFile(entry.path, ref, force);
+    } catch (e) {
+      console.error(`${entry.path} does not exist: ${e.message}`)
+    }
   }
+  return await fetchFile(`${entry.category}/${slug}.md`, ref, force);
 };

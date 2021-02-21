@@ -48,6 +48,18 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
 
 const App: React.FC = () => {
   const classes = useStyles();
+
+  const slugMatch = useRouteMatch("/:slug");
+  const refMatch = useRouteMatch("/:ref/:slug");
+  const refParam = refMatch ? refMatch.params.ref : "";
+  const slugParam = refMatch ? refMatch.params.slug
+    : slugMatch ? slugMatch.params.slug
+    : "";
+
+  const [ref, setRef] = useState(refParam);
+  const [slug, setSlug] = useState(slugParam);
+  const [content, setContent] = useState("Loading...");
+
   const [node, setNode] = useState({} as SidebarNode);
   const [theme, setTheme] = useState(lightTheme);
   const [index, setIndex] = useState(emptyIndex);
@@ -55,41 +67,13 @@ const App: React.FC = () => {
   const [about, setAbout] = useState("");
   const [authToken, setAuthToken] = useState("");
   const [adminMode, setAdminMode] = useState(true);
-  const [postContent, setPostContent] = useState({});
+  const [allContent, setAllContent] = useState({});
 
-  const slugMatch = useRouteMatch("/:slug");
-  const refMatch = useRouteMatch("/:ref/:slug");
-  const currentRef = refMatch ? refMatch.params.ref : "";
-  const currentSlug = refMatch ? refMatch.params.slug : slugMatch ? slugMatch.params.slug : "";
-  console.log(`Rendering home page with ref=${currentRef} and slug=${currentSlug}`);
-
+  // console.log(`Rendering App with ref=${ref} (${refParam}) and slug=${slug} (${slugParam})`);
   const updateAuthToken = (authToken: string) => {
     setAuthToken(authToken);
     store.save("authToken", authToken);
   };
-
-  const syncRef = async (
-    _ref?: string,
-    slug?: string,
-  ) => {
-    const branch = await fetchBranch()
-    const ref = _ref || branch;
-    const force = ref === branch; // if not branch, then immutable & never need to force refresh
-    const newIndex = await fetchIndex(ref, force);
-    setIndex(newIndex);
-    if (slug) {
-      const newContent = await fetchContent(slug!, ref, force);
-      const newPostContent = JSON.parse(JSON.stringify(postContent));
-      if (!newPostContent[ref]) {
-        newPostContent[ref] = {};
-      }
-      newPostContent[ref][slug] = newContent;
-      setPostContent(newPostContent);
-    }
-    if (newIndex.about) {
-      setAbout(await fetchFile(newIndex.about, ref, force));
-    }
-  }
 
   const viewAdminMode = (viewAdminMode: boolean) => setAdminMode(viewAdminMode);
 
@@ -104,20 +88,54 @@ const App: React.FC = () => {
     }
   };
 
+  const syncRef = async (
+    _ref?: string | null,
+    slug?: string | null,
+    force?: boolean,
+  ) => {
+    const branch = await fetchBranch()
+    const newRef = _ref || branch;
+    setRef(newRef);
+    // console.log(`Syncing ref ${newRef}${slug ? ` and slug ${slug}` : ""}`);
+    // if ref is not the branch, then it's immutable & never needs to be refreshed
+    const forceForReal = force && newRef === branch;
+    const newIndex = await fetchIndex(newRef, forceForReal);
+    if (slug) {
+      if (!allContent[newRef]) {
+        allContent[newRef] = {};
+      }
+      allContent[newRef][slug] = await fetchContent(slug!, newRef, forceForReal);
+      setContent(allContent[newRef][slug]);
+      setAllContent(allContent);
+    }
+    if (newIndex.about) {
+      setAbout(await fetchFile(newIndex.about, newRef, forceForReal));
+    }
+    setIndex(JSON.parse(JSON.stringify(newIndex))); // new object forces a re-render
+  }
+
   // Run this effect exactly once when the page initially loads
   useEffect(() => {
     window.scrollTo(0, 0);
-    syncRef();
     // Set theme to local preference
+    // console.log("Setting theme & loading authToken");
     const themeSelection = store.load("theme");
     if (themeSelection === "light") setTheme(lightTheme);
     else setTheme(darkTheme);
     // Check local storage for admin edit keys
     const key = store.load("authToken");
     if (key) setAuthToken(key);
-  // syncRef doesn't have any 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Fetch index & post content any time the url changes
+  useEffect(() => {
+    setContent("Loading..");
+    setSlug(slugParam);
+    (async () => {
+      await syncRef(refParam, slugParam);
+    })()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [refParam, slugParam]);
 
   // Update auth headers any time the authToken changes
   useEffect(() => {
@@ -127,25 +145,18 @@ const App: React.FC = () => {
   // Update the title & sidebar node when the index or slug changes
   useEffect(() => {
     // Update title
+    // console.log("Setting title & sidebar node");
     const siteTitle = index ? index.title : "My personal website";
-    const pageTitle = index.posts[currentSlug] ? index.posts[currentSlug].title : "";
+    const pageTitle = index.posts[slug] ? index.posts[slug].title : "";
     document.title = pageTitle ? `${pageTitle} | ${siteTitle}` : siteTitle;
     setTitle({ site: siteTitle, page: pageTitle });
     // Update sidebar node
-    if (currentSlug !== "" && index.posts[currentSlug]){
-      setNode({ parent: "posts", current: "toc", child: index.posts[currentSlug] });
+    if (slug !== "" && index.posts[slug]){
+      setNode({ parent: "posts", current: "toc", child: index.posts[slug] });
     } else {
       setNode({ parent: "", current: "categories", child: "posts" });
     }
-  }, [currentSlug, index]);
-
-  // Fetch index & post content any time the slug or ref changes
-  useEffect(() => {
-    (async () => {
-      await syncRef(currentRef, currentSlug)
-    })();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentRef, currentSlug]);
+  }, [slug, index]);
 
   return (
     <ThemeProvider theme={theme}>
@@ -155,11 +166,12 @@ const App: React.FC = () => {
         <CssBaseline />
         <NavBar
           node={node}
-          setNode={setNode}
+          allContent={allContent}
           posts={getPostsByCategories(index.posts)}
-          postContent={postContent}
-          title={title}
+          gitRef={ref}
+          setNode={setNode}
           theme={theme}
+          title={title}
           toggleTheme={toggleTheme}
         />
         <main className={classes.main}>
@@ -202,38 +214,11 @@ const App: React.FC = () => {
               />
               <Route
                 path="/:ref/:slug"
-                render={({ match }) => {
-                  const ref = match.params.ref;
-                  const slug = match.params.slug;
-                  let content = "Loading..."
-                  console.log(`Rendering historical data for ref ${ref} and slug ${slug}`);
-                  if (postContent[ref] && postContent[ref][slug]) {
-                    content = postContent[ref][slug];
-                  } else if (!(index.posts[slug] || (index.drafts && index.drafts[slug]))) {
-                    content = "Does Not Exist";
-                  }
-                  return (<PostPage
-                    content={content}
-                    slug={slug}
-                  />);
-                }}
+                render={() => <PostPage content={content} slug={slug} />}
               />
               <Route
                 path="/:slug"
-                render={({ match }) => {
-                  const slug = match.params.slug;
-                  let content = "Loading..."
-                  console.log(`Rendering current data for slug ${slug}`);
-                  if (postContent[slug]) {
-                    content = postContent[slug];
-                  } else if (!(index.posts[slug] || (index.drafts && index.drafts[slug]))) {
-                    content = "Does Not Exist"
-                  }
-                  return (<PostPage
-                    content={content}
-                    slug={slug}
-                  />);
-                }}
+                render={() => <PostPage content={content} slug={slug} />}
               />
             </Switch>
           </Container>

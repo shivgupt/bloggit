@@ -47,9 +47,8 @@ export const PostPage = (props: { content: string, slug?: string }) => {
   
   const adminContext = useContext(AdminContext);
 
-  const post = slug
-    ? (adminContext.index.posts[slug] || adminContext.index.drafts[slug])
-    : "about";
+  const post = (!slug || slug === "about") ? "about"
+    : (adminContext.index.posts[slug] || adminContext.index.drafts[slug]);
 
   useEffect(
     () => setNewContent(content),
@@ -115,7 +114,7 @@ export const PostPage = (props: { content: string, slug?: string }) => {
       url: "git/edit",
     });
 
-    await adminContext.syncRef();
+    await adminContext.syncRef(undefined, slug);
     setEditMode(false);
   }
 
