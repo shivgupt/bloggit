@@ -18,7 +18,11 @@ authRouter.use((req, res, next) => {
   if (restrictedPaths.includes(req.path) || restrictedMethods.includes(req.method)) {
     if (!req.headers[authHeader] || req.headers[authHeader] !== `${authType} ${encodedToken}`) {
       log.info(`Failed to authenticate request for ${req.path}`);
-      res.setHeader("www-authenticate", authType);
+      if (req.path === "/git") {
+        res.removeHeader("www-authenticate"); // prevents browser from popping up a login window.
+      } else {
+        res.setHeader("www-authenticate", authType);
+      }
       res.status(401).send("Unauthorized");
     } else {
       log.info(`Successfully authenticated ${req.method} to ${req.path}`);

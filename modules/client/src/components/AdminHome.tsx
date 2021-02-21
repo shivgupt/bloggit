@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 import { 
   Button,
   Divider,
@@ -7,6 +7,7 @@ import {
   Theme,
   Typography,
 } from "@material-ui/core";
+import axios from "axios";
 
 import { IndexEditor } from "./IndexEditor";
 import { AdminContext } from "../AdminContext";
@@ -25,9 +26,23 @@ export const AdminHome = () => {
   const adminContext = useContext(AdminContext);
   const classes = useStyles();
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
     const authToken = (document.getElementById("auth-token") as HTMLInputElement).value;
-    adminContext.updateAuthToken(authToken);
+    try {
+      await axios({
+        headers: {
+          "authorization": `Basic ${btoa(`admin:${authToken}`)}`,
+        },
+        method: "post",
+        url: "git",
+        validateStatus: (code) => code === 404,
+      });
+      console.log(`Auth token is valid!`);
+      adminContext.updateAuthToken(authToken);
+    } catch (e) {
+      console.error(`Auth token is not valid: ${e.message}`);
+      adminContext.updateAuthToken("");
+    }
   };
 
   return (
@@ -68,7 +83,7 @@ export const AdminHome = () => {
         ? (<div className={classes.section}>
           <IndexEditor />
         </div>)
-        : <>SOmething wenT Wrong!</>
+        : <>Supply a valid auth token to activate admin mode</>
       }
     </div>
   );
