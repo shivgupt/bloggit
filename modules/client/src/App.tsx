@@ -25,7 +25,7 @@ import {
 import { darkTheme, lightTheme } from "./style";
 import { store } from "./utils/cache";
 import { AdminContext } from "./AdminContext";
-import { PostIndex, SidebarNode } from "./types";
+import { SidebarNode } from "./types";
 import { CreateNewPost } from "./components/CreateNewPost";
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
@@ -55,7 +55,7 @@ const App: React.FC = () => {
   const [about, setAbout] = useState("");
   const [authToken, setAuthToken] = useState("");
   const [adminMode, setAdminMode] = useState(true);
-  const [postsContent, setPostsContent] = useState({});
+  const [postContent, setPostContent] = useState({});
 
   const slugMatch = useRouteMatch("/:slug");
   const refMatch = useRouteMatch("/:ref/:slug");
@@ -68,45 +68,27 @@ const App: React.FC = () => {
     store.save("authToken", authToken);
   };
 
-  const updateIndex = async (
-    newIndex: PostIndex,
-    fetch?: string,
-    slug?: string,
+  const syncRef = async (
     _ref?: string,
+    slug?: string,
   ) => {
-
-    const ref = _ref || await fetchBranch();
-    newIndex = await fetchIndex(ref, true);
-
-    if (fetch) {
-      switch(fetch) {
-        case "content": 
-          if (slug === "about") {
-            return; // Use fetch = "about" to update the about page
-          }
-          console.log(`Updating content for ${slug} (ref=${ref})`);
-          newIndex = await fetchIndex(ref, true);
-          if (slug) {
-            const content = await fetchContent(slug!, ref);
-            const newPostsContent = JSON.parse(JSON.stringify(postsContent));
-            if (!newPostsContent[ref]) {
-              newPostsContent[ref] = {};
-            }
-            if (slug) {
-              newPostsContent[ref][slug] = content;
-            }
-            setPostsContent(newPostsContent);
-          }
-          break;
-        case "index":
-          break;
-        case "about":
-          if (newIndex && newIndex.about) {
-            setAbout(await fetchFile(newIndex.about, ref, true));
-          }
+    const branch = await fetchBranch()
+    const ref = _ref || branch;
+    const force = ref === branch; // if not branch, then immutable & never need to force refresh
+    const newIndex = await fetchIndex(ref, force);
+    setIndex(newIndex);
+    if (slug) {
+      const newContent = await fetchContent(slug!, ref, force);
+      const newPostContent = JSON.parse(JSON.stringify(postContent));
+      if (!newPostContent[ref]) {
+        newPostContent[ref] = {};
       }
+      newPostContent[ref][slug] = newContent;
+      setPostContent(newPostContent);
     }
-    setIndex(newIndex || {} as PostIndex);
+    if (newIndex.about) {
+      setAbout(await fetchFile(newIndex.about, ref, force));
+    }
   }
 
   const viewAdminMode = (viewAdminMode: boolean) => setAdminMode(viewAdminMode);
@@ -125,7 +107,7 @@ const App: React.FC = () => {
   // Run this effect exactly once when the page initially loads
   useEffect(() => {
     window.scrollTo(0, 0);
-    updateIndex({} as PostIndex, "index", undefined, currentRef);
+    syncRef();
     // Set theme to local preference
     const themeSelection = store.load("theme");
     if (themeSelection === "light") setTheme(lightTheme);
@@ -133,6 +115,8 @@ const App: React.FC = () => {
     // Check local storage for admin edit keys
     const key = store.load("authToken");
     if (key) setAuthToken(key);
+  // syncRef doesn't have any 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Update auth headers any time the authToken changes
@@ -158,23 +142,22 @@ const App: React.FC = () => {
   // Fetch index & post content any time the slug or ref changes
   useEffect(() => {
     (async () => {
-      // Need to setIndex to a new object to be sure we trigger a re-render
-      await updateIndex(JSON.parse(JSON.stringify(index)), "content", currentSlug, currentRef);
+      await syncRef(currentRef, currentSlug)
     })();
-    // Set sidebar node
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentRef, currentSlug]);
 
   return (
     <ThemeProvider theme={theme}>
       <AdminContext.Provider
-        value={{ authToken, index, updateIndex ,updateAuthToken, adminMode, viewAdminMode }}
+        value={{ syncRef, authToken, index, updateAuthToken, adminMode, viewAdminMode }}
       >
         <CssBaseline />
         <NavBar
           node={node}
           setNode={setNode}
           posts={getPostsByCategories(index.posts)}
-          postsContent={postsContent}
+          postContent={postContent}
           title={title}
           theme={theme}
           toggleTheme={toggleTheme}
@@ -224,8 +207,8 @@ const App: React.FC = () => {
                   const slug = match.params.slug;
                   let content = "Loading..."
                   console.log(`Rendering historical data for ref ${ref} and slug ${slug}`);
-                  if (postsContent[ref] && postsContent[ref][slug]) {
-                    content = postsContent[ref][slug];
+                  if (postContent[ref] && postContent[ref][slug]) {
+                    content = postContent[ref][slug];
                   } else if (!(index.posts[slug] || (index.drafts && index.drafts[slug]))) {
                     content = "Does Not Exist";
                   }
@@ -241,8 +224,8 @@ const App: React.FC = () => {
                   const slug = match.params.slug;
                   let content = "Loading..."
                   console.log(`Rendering current data for slug ${slug}`);
-                  if (postsContent[slug]) {
-                    content = postsContent[slug];
+                  if (postContent[slug]) {
+                    content = postContent[slug];
                   } else if (!(index.posts[slug] || (index.drafts && index.drafts[slug]))) {
                     content = "Does Not Exist"
                   }

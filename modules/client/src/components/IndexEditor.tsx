@@ -66,7 +66,7 @@ const handleArchive = async (slug: string) => {
     headers: { "content-type": "application/json" }
   });
 
-  adminContext.updateIndex(undefined, "index");
+  adminContext.syncRef();
 };
 
 const handlePublish = async (slug: string) => {
@@ -87,7 +87,7 @@ const handlePublish = async (slug: string) => {
     headers: { "content-type": "application/json" }
   });
 
-  adminContext.updateIndex(undefined, "index");
+  adminContext.syncRef();
 };
 
 return (

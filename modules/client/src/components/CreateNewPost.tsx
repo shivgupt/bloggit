@@ -103,7 +103,7 @@ export const CreateNewPost = () => {
     });
     
     if (res.status === 200) {
-      adminContext.updateIndex(undefined, "index");
+      adminContext.syncRef();
     } else { 
       console.log("Something went wrong")
     }

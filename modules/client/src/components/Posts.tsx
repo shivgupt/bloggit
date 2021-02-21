@@ -115,11 +115,7 @@ export const PostPage = (props: { content: string, slug?: string }) => {
       url: "git/edit",
     });
 
-    if (typeof(post) === "string") {
-      adminContext.updateIndex(JSON.parse(JSON.stringify(adminContext.index)), "about");
-    } else {
-      adminContext.updateIndex(JSON.parse(JSON.stringify(adminContext.index)), "content", post.slug)
-    }
+    await adminContext.syncRef();
     setEditMode(false);
   }
 
