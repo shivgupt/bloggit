@@ -46,7 +46,7 @@ set -e
 ########################################
 ## Gather info needed for deployment
 
-current_version="$(git show origin/prod:package.json | grep '"version":' | awk -F '"' '{print $4}')"
+current_version=$(grep -m 1 '"version":' "$root/package.json" | cut -d '"' -f 4)
 echo "What version are we deploying? Current version: $current_version"
 read -p "> " -r
 echo

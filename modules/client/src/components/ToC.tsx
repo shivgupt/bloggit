@@ -57,7 +57,7 @@ const TocGenerator = (props: any) => {
 };
 
 export const Toc = (props: any) => {
-  const { node, posts, postsContent, setNode } = props;
+  const { node, allContent, posts, gitRef: ref, setNode } = props;
   const classes = useStyles();
 
   switch(node.current) {
@@ -107,21 +107,21 @@ export const Toc = (props: any) => {
           {posts[node.child].map((p) => {
             return (
               <div key={p.slug}>
-                <ListItem button={true} key={p.title} component={Link} to={`/${p.slug}`}>
+                <ListItem button key={p.title} component={Link} to={`/${p.slug}`}>
                   {p.title}
-                  {postsContent[p.slug] ? 
-                    <IconButton
-                      onClick={() => {
-                        setNode({
-                          parent: "posts",
-                          current: "toc",
-                          child: p,
-                        });
-                      }}
-                      className={classes.tocButton}
-                    >
-                      <TocIcon/>
-                    </IconButton>
+                  {allContent && allContent[ref] && allContent[ref][p.slug]
+                    ?  <IconButton
+                        onClick={() => {
+                          setNode({
+                            parent: "posts",
+                            current: "toc",
+                            child: p,
+                          });
+                        }}
+                        className={classes.tocButton}
+                      >
+                        <TocIcon/>
+                      </IconButton>
                     : null
                   }
                 </ListItem>
@@ -149,7 +149,7 @@ export const Toc = (props: any) => {
         <List component="nav" className={classes.list}>
           <Markdown
             allowedTypes={["text", "heading"]}
-            source={postsContent[node.child.slug]}
+            source={allContent[ref] ? allContent[ref][node.child.slug] : ""}
             renderers={{ heading: TocGenerator }}
             className={classes.list}
           />

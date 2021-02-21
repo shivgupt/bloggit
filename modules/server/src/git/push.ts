@@ -7,7 +7,7 @@ import { logger } from "../utils";
 import { gitOpts, resolveRef } from "./utils";
 
 export const pushToMirror = async (): Promise<void> => {
-  const log = logger.child({ module: "PushToMirror" });
+  const log = logger.child({ module: "GitPush" });
   const { branch, mirrorKey, mirrorRef, mirrorUrl } = env;
   if (mirrorUrl && mirrorKey) {
 

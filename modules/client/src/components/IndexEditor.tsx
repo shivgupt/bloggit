@@ -66,7 +66,7 @@ const handleArchive = async (slug: string) => {
     headers: { "content-type": "application/json" }
   });
 
-  adminContext.updateIndex(undefined, "index");
+  adminContext.syncRef();
 };
 
 const handlePublish = async (slug: string) => {
@@ -87,7 +87,7 @@ const handlePublish = async (slug: string) => {
     headers: { "content-type": "application/json" }
   });
 
-  adminContext.updateIndex(undefined, "index");
+  adminContext.syncRef();
 };
 
 return (
@@ -103,7 +103,7 @@ return (
       <List>
       {Object.values(index.posts).map((post) => {
         return (
-          <ListItem component={Link} to={`/${post.slug}`} key={post.slug} alignItems="flex-start">
+          <ListItem button component={Link} to={`/${post.slug}`} key={post.slug} alignItems="flex-start">
             <ListItemText primary={post.title} className={classes.listText} />
             <ListItemSecondaryAction>
               <Button
@@ -130,7 +130,7 @@ return (
       {index.drafts
        ? Object.values(index.drafts).map((draft) => {
           return (
-            <ListItem component={Link} to={`/${draft.slug}`} key={draft.slug} alignItems="flex-start">
+            <ListItem button component={Link} to={`/${draft.slug}`} key={draft.slug} alignItems="flex-start">
               <ListItemText primary={draft.title} className={classes.listText} />
               <ListItemSecondaryAction>
                 <Button size="small"
