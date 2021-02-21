@@ -1,5 +1,6 @@
 import {
   IconButton,
+  Input,
   makeStyles,
   Paper,
   TextField,
@@ -18,6 +19,7 @@ import { AdminContext } from "../AdminContext";
 
 import { CodeBlockRenderer } from "./CodeBlock";
 import { EmojiRenderer, HeadingRenderer, ImageRenderer, LinkRenderer } from "./Renderers";
+import { ImageUploader } from "./ImageUploader";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -39,6 +41,7 @@ export const PostPage = (props: { content: string, slug?: string }) => {
   const { content, slug } = props;
   const classes = useStyles();
   const [editMode, setEditMode] = useState(false);
+  const [cardBgImg, setCardBgImg] = useState("");
   const [newContent, setNewContent] = useState("Loading Page");
   const [selectedTab, setSelectedTab] = React.useState<"write" | "preview">("write");
   
@@ -52,6 +55,12 @@ export const PostPage = (props: { content: string, slug?: string }) => {
     () => setNewContent(content),
     [content],
   );
+
+  useEffect(() => {
+    if (typeof(post) === "object" && post.img) {
+      setCardBgImg(post.img);
+    }
+  },[post]);
 
   const save = async () => {
     if (!newContent || !(document.getElementById("post_slug") as HTMLInputElement)) {
@@ -143,8 +152,12 @@ export const PostPage = (props: { content: string, slug?: string }) => {
               <TextField id="post_category" label="category" defaultValue={post?.category} />
               <TextField id="post_slug" label="slug" defaultValue={post?.slug} />
               <TextField id="post_tldr" label="tldr" defaultValue={post?.tldr} multiline fullWidth />
-              <TextField id="post_img" label="card-img-ipfs#" defaultValue={post?.img} />
               <TextField id="post_tags" label="tags" defaultValue={post?.tags} />
+              <Input
+                id="post_img"
+                value={cardBgImg}
+                endAdornment={ <ImageUploader setImageHash={setCardBgImg} /> }
+              />
             </div>)
           }
           <ReactMde
