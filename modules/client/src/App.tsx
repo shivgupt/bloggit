@@ -6,7 +6,7 @@ import {
   makeStyles,
   ThemeProvider,
 } from "@material-ui/core";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Route, Switch, useRouteMatch} from "react-router-dom";
 import axios from "axios";
 
@@ -117,7 +117,7 @@ const App: React.FC = () => {
     window.scrollTo(0, 0);
     (async () => {
       // Do nothing if index isn't loaded yet or content is already loaded
-      if (!(index.posts[currentSlug] || index.drafts[currentSlug]) || postsContent[currentSlug]) {
+      if (!(index.posts[currentSlug] || (index.drafts && index.drafts[currentSlug])) || postsContent[currentSlug]) {
         return;
       }
       // Need to setIndex to a new object to be sure we trigger a re-render
@@ -198,7 +198,7 @@ const App: React.FC = () => {
                   let content = "Loading..."
                   if (postsContent[slug]) {
                     content = postsContent[slug];
-                  } else if (!(index.posts[slug] || index.drafts[slug])) {
+                  } else if (!(index.posts[slug] || (index.drafts && index.drafts[slug]))) {
                     content = "Post Does Not Exist"
                   }
                   return (<PostPage
