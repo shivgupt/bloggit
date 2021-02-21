@@ -80,7 +80,11 @@ export const PostPage = (props: { content: string, slug?: string }) => {
 
       if (post.path) {
         data.push({path: post.path, content: ""});
+      } else if (post.slug !== slug || post.category !== category) {
+        console.log("Path or category changed, deleting old file");
+        data.push({ path: `${post.category}/${post.slug}.md`, content: ""});
       }
+
 
       data.push({ path: `${category}/${slug}.md`, content: newContent});
     }
@@ -139,8 +143,8 @@ export const PostPage = (props: { content: string, slug?: string }) => {
             : (
             <div className={classes.root}>
               <TextField id="post_title" label="title" defaultValue={post?.title} fullWidth />
-              <TextField id="post_slug" label="slug" defaultValue={post?.slug} />
               <TextField id="post_category" label="category" defaultValue={post?.category} />
+              <TextField id="post_slug" label="slug" defaultValue={post?.slug} />
               <TextField id="post_tldr" label="tldr" defaultValue={post?.tldr} multiline fullWidth />
               <TextField id="post_img" label="card-img-ipfs#" defaultValue={post?.img} />
               <TextField id="post_tags" label="tags" defaultValue={post?.tags} />
