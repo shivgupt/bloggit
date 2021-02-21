@@ -53,6 +53,10 @@ export const PostPage = (props: { content: string, slug?: string }) => {
   useEffect(() => setNewContent(content),[content]);
 
   const save = async () => {
+    if (!newContent || !(document.getElementById("post_slug") as HTMLInputElement)) {
+      console.warn(`Nothing to update`);
+      return;
+    }
     const newIndex = JSON.parse(JSON.stringify(adminContext.index))
     const data = [] as Array<{path: string, content: string}>;
 
