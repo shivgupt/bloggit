@@ -58,6 +58,7 @@ export const CreateNewPost = () => {
     const category = (document.getElementById("post_category") as HTMLInputElement).value.toLocaleLowerCase();
     const title = (document.getElementById("post_title") as HTMLInputElement).value;
     const tldr = (document.getElementById("post_tldr") as HTMLInputElement).value;
+    const img = (document.getElementById("post_img") as HTMLInputElement).value;
     const tags = (document.getElementById("post_tags") as HTMLInputElement).value.split(",");
 
     if (as === "draft") {
@@ -67,6 +68,7 @@ export const CreateNewPost = () => {
         lastEdit: (new Date()).toLocaleDateString("en-in"),
         tldr,
         title,
+        img,
         slug,
         tags,
       };
@@ -77,6 +79,7 @@ export const CreateNewPost = () => {
         lastEdit: (new Date()).toLocaleDateString("en-in"),
         tldr,
         title,
+        img,
         slug,
         tags,
       };
