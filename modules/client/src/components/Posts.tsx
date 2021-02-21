@@ -5,6 +5,7 @@ import {
   TextField,
 } from "@material-ui/core";
 import {
+  Category,
   Edit,
   Save,
 } from "@material-ui/icons";
@@ -53,13 +54,17 @@ export const PostPage = (props: { content: string, slug?: string }) => {
 
   const save = async () => {
     const newIndex = JSON.parse(JSON.stringify(adminContext.index))
-    const path = (document.getElementById("post_path") as HTMLInputElement).value;
-    if (typeof(post) === "string") {
-      newIndex.about = path;
-    } else if (path) {
+    const data = [] as Array<{path: string, content: string}>;
 
+    if (typeof(post) === "string") {
+      const path = (document.getElementById("post_path") as HTMLInputElement).value;
+      newIndex.about = path;
+      data.push({ path, content: newContent });
+    } else {
+
+      // update to new format path = category/slug
       const slug = (document.getElementById("post_slug") as HTMLInputElement).value;
-      const category = (document.getElementById("post_category") as HTMLInputElement).value;
+      const category = (document.getElementById("post_category") as HTMLInputElement).value.toLocaleLowerCase();
       const title = (document.getElementById("post_title") as HTMLInputElement).value;
       const tldr = (document.getElementById("post_tldr") as HTMLInputElement).value;
       const tags = (document.getElementById("post_tags") as HTMLInputElement).value.split(",");
@@ -67,37 +72,32 @@ export const PostPage = (props: { content: string, slug?: string }) => {
       newIndex.posts[slug] = {
         category,
         lastEdit: (new Date()).toLocaleDateString("en-in"),
-        path,
         tldr,
         title,
         slug,
         tags,
       };
 
-    } else {
-      console.log("error: no path found");
-      return;
+      if (post.path) {
+        data.push({path: post.path, content: ""});
+      }
+
+      data.push({ path: `${category}/${slug}.md`, content: newContent});
     }
 
     if (content === newContent && JSON.stringify(newIndex) === JSON.stringify(adminContext.index) ){
       console.log("no changes detected");
       return;
     }
+
+    data.push({ path: "index.json", content: JSON.stringify(newIndex, null, 2)});
+
     console.log("Lets push it to git");
 
     let res = await axios({
       method: "post",
       url: "git/edit",
-      data: [
-      {
-        path: path,
-        content: newContent,
-      },
-      {
-        path: "index.json",
-        content: JSON.stringify(newIndex, null, 2),
-      }
-    ],
+      data,
       headers: { "content-type": "application/json" }
     });
 
@@ -139,7 +139,6 @@ export const PostPage = (props: { content: string, slug?: string }) => {
             : (
             <div className={classes.root}>
               <TextField id="post_title" label="title" defaultValue={post?.title} fullWidth />
-              <TextField id="post_path" label="path" defaultValue={post?.path} fullWidth />
               <TextField id="post_slug" label="slug" defaultValue={post?.slug} />
               <TextField id="post_category" label="category" defaultValue={post?.category} />
               <TextField id="post_tldr" label="tldr" defaultValue={post?.tldr} multiline fullWidth />

@@ -65,7 +65,6 @@ const App: React.FC = () => {
           newIndex = await fetchIndex(true);
           const content = await fetchContent(slug!, true);
           const newPostsContent = JSON.parse(JSON.stringify(postsContent));
-          //newIndex![key!][slug!].content = currentContent;
           newPostsContent[slug!] = content;
           setPostsContent(newPostsContent);
           break;
