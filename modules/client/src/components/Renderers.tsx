@@ -19,7 +19,12 @@ export  const ImageRenderer = (props: any) => {
       { ...props }
       src={props.src}
       alt={props.alt}
-      style={{ maxWidth: "90%", display: "block", marginLeft: "auto", marginRight: "auto" }}
+      style={{
+        maxWidth: "90%",
+          display: "block",
+          marginLeft: "auto",
+          marginRight: "auto",
+      }}
     />;
   };
 
