@@ -110,8 +110,8 @@ export const fetchHistory = async (slug: string, _ref?: string): Promise<PostHis
   if (!slug) return [];
   const ref = _ref || (await fetchConfig()).commit.substring(0, 8);
   const path = await slugToPath(slug, ref);
-  const url = `/git/history/${path}?startRef=${ref}`;
-  console.log(`Fetching file history from ${url}`);
+  const url = `/git/history/${slug}`;
+  console.log(`Fetching slug history from ${url}`);
   const response = await axios(url);
   if (!response || !response.data) {
     throw new Error(`Failed to retrieve data from ${url}`);

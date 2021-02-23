@@ -12,7 +12,7 @@ gitRouter.post(["/git-receive-pack", "/git-upload-pack"], pack);
 
 gitRouter.post("/edit", edit);
 
-gitRouter.get("/history/*", history);
+gitRouter.get("/history/:slug", history);
 
 gitRouter.get("/config", getConfig);
 gitRouter.get("/:ref/*", getFile);
