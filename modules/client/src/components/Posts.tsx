@@ -23,7 +23,7 @@ import { AdminContext } from "../AdminContext";
 import { fetchConfig } from "../utils";
 
 import { Copyable } from "./Copyable";
-import { EditHistory } from "./EditHistory";
+import { SelectHistorical } from "./SelectHistorical";
 import { CodeBlockRenderer } from "./CodeBlock";
 import { EmojiRenderer, HeadingRenderer, ImageRenderer, LinkRenderer } from "./Renderers";
 import { ImageUploader } from "./ImageUploader";
@@ -170,7 +170,7 @@ export const PostPage = (props: { content: string, slug: string, gitRef: string 
         tooltip={"Snapshot of this page that will never change or disappear"}
         value={`${window.location.origin}/${ref}/${slug}`}
       />
-      <EditHistory
+      <SelectHistorical
         className={classes.button}
         slug={slug}
         gitRef={ref}

@@ -30,9 +30,9 @@ const StyledMenu = withStyles({
   />
 ));
 
-export const EditHistory = (props: { className: any; gitRef: string; slug: string; }) => {
+export const SelectHistorical = (props: { className: any; gitRef: string; slug: string; }) => {
   const [anchorEl, setAnchorEl] = React.useState(null);
-  const [history, setHistory] = React.useState([] as PostHistory);
+  const [editHistory, setEditHistory] = React.useState([] as PostHistory);
 
   const { gitRef: ref, slug } = props;
 
@@ -44,21 +44,17 @@ export const EditHistory = (props: { className: any; gitRef: string; slug: strin
     setAnchorEl(null);
   };
 
-  const getHandleClick = (commit: string) => (event) => {
-    console.log(`CLICK ON ${commit}!!`);
-    handleClose();
-  };
-
   React.useEffect(() => {
+    console.log(`Triggering SelectHistorical effect bc ${slug} changed`);
     (async () => {
       try {
-        setHistory(await fetchHistory(slug, ref));
+        setEditHistory(await fetchHistory(slug));
       } catch (e) {
         console.warn(e.message);
-        setHistory([]);
+        setEditHistory([]);
       }
     })();
-  }, [ref, slug]);
+  }, [slug]);
 
   return (
     <div>
@@ -81,13 +77,15 @@ export const EditHistory = (props: { className: any; gitRef: string; slug: strin
         onClose={handleClose}
       >
         {
-          history.filter(entry => entry.commit.substring(0,8) !== ref).map(entry => {
+          editHistory.map(entry => {
+            const commit = entry.commit.substring(0,8);
             return (
               <MenuItem
-                key={entry.commit}
                 component={Link}
-                to={`/${entry.commit.substring(0, 8)}/${slug}`}
-                onClick={getHandleClick(entry.commit)}
+                key={commit}
+                onClick={handleClose}
+                selected={commit === ref}
+                to={`/${commit}/${slug}`}
               >
                 <ListItemText primary={(new Date(entry.timestamp)).toLocaleString()} />
               </MenuItem>

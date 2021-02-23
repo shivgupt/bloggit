@@ -106,18 +106,17 @@ export const fetchContent = async(
   return await fetchFile(path, ref, force)
 };
 
-export const fetchHistory = async (slug: string, _ref?: string): Promise<PostHistory> => {
+export const fetchHistory = async (slug: string): Promise<PostHistory> => {
   if (!slug) return [];
-  const ref = _ref || (await fetchConfig()).commit.substring(0, 8);
-  const path = await slugToPath(slug, ref);
   const url = `/git/history/${slug}`;
-  console.log(`Fetching slug history from ${url}`);
   const response = await axios(url);
   if (!response || !response.data) {
-    throw new Error(`Failed to retrieve data from ${url}`);
+    console.warn(`Failed to retrieve data from ${url}`);
+    return [];
   }
   if (!response.data.length) {
-    throw new Error(`Failed to retrieve any history entries for ${path}`);
+    console.warn(`Failed to retrieve valid history entries for ${slug}`);
+    return [];
   }
   return response.data as PostHistory;
 };
