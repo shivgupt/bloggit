@@ -54,12 +54,12 @@ export const CreateNewPost = () => {
     // create new index.json entry
     const newIndex = JSON.parse(JSON.stringify(adminContext.index))
 
-    const slug = (document.getElementById("slug") as HTMLInputElement).value;
-    const category = (document.getElementById("category") as HTMLInputElement).value.toLocaleLowerCase();
-    const title = (document.getElementById("title") as HTMLInputElement).value;
-    const tldr = (document.getElementById("tldr") as HTMLInputElement).value;
-    const img = (document.getElementById("img") as HTMLInputElement).value;
-    const tags = (document.getElementById("tags") as HTMLInputElement).value.split(",");
+    const slug = (document.getElementById("post_slug") as HTMLInputElement).value;
+    const category = (document.getElementById("post_category") as HTMLInputElement).value.toLocaleLowerCase();
+    const title = (document.getElementById("post_title") as HTMLInputElement).value;
+    const tldr = (document.getElementById("post_tldr") as HTMLInputElement).value;
+    const img = (document.getElementById("post_img") as HTMLInputElement).value;
+    const tags = (document.getElementById("post_tags") as HTMLInputElement).value.split(",");
 
     if (as === "draft") {
       if (!newIndex.drafts) newIndex.drafts = {};
@@ -113,12 +113,12 @@ export const CreateNewPost = () => {
   return (
     <Paper variant="outlined" className={classes.paper}>
       <div className={classes.root}>
-        <TextField id="post_title" label="title" defaultValue={"post-title"} fullWidth />
-        <TextField id="post_category" label="category" defaultValue={"post-category"} />
-        <TextField id="post_slug" label="slug" defaultValue={"post-slug"} />
-        <TextField id="post_tldr" label="tldr" defaultValue={"post-tldr"} multiline fullWidth />
-        <TextField id="post_img" label="card-img-ipfs#" defaultValue={"post-img"} />
-        <TextField id="post_tags" label="tags" defaultValue={"post-tags"} />
+        <TextField id="post_title" label="title" defaultValue={"title"} fullWidth />
+        <TextField id="post_category" label="category" defaultValue={"category"} />
+        <TextField id="post_slug" label="slug" defaultValue={"slug"} />
+        <TextField id="post_tldr" label="tldr" defaultValue={"tldr"} multiline fullWidth />
+        <TextField id="post_img" label="card-img-ipfs#" defaultValue={"img"} />
+        <TextField id="post_tags" label="tags" defaultValue={"tags"} />
       </div>
       <ReactMde
         value={newContent}
