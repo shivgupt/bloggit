@@ -18,6 +18,7 @@ import "react-mde/lib/styles/css/react-mde-all.css";
 
 import { AdminContext } from "../AdminContext";
 
+import { AppSpeedDial } from "./AppSpeedDial";
 import { CodeBlockRenderer } from "./CodeBlock";
 import { EmojiRenderer, HeadingRenderer, ImageRenderer, LinkRenderer } from "./Renderers";
 
@@ -46,7 +47,7 @@ export const CreateNewPost = () => {
 
   const classes = useStyles();
   const adminContext = useContext(AdminContext);
-  const { newContent, updateNewContent } = adminContext;
+  const { newContent, updateNewContent, adminMode, authToken } = adminContext;
   const [selectedTab, setSelectedTab] = React.useState<"write" | "preview">("write");
   
   if (!(adminContext.adminMode && adminContext.authToken)) return <div>Invalid Page</div>
@@ -81,6 +82,7 @@ export const CreateNewPost = () => {
           />
         )}
       />
+      { adminMode && authToken ? <AppSpeedDial /> : null }
     </Paper>
   );
 };

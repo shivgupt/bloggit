@@ -5,9 +5,10 @@ import {
   createStyles,
   makeStyles,
   ThemeProvider,
+  Fab,
 } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
-import { Route, Switch, useRouteMatch} from "react-router-dom";
+import { Route, Switch, useHistory, useRouteMatch} from "react-router-dom";
 import axios from "axios";
 
 import { Home } from "./components/Home";
@@ -27,6 +28,7 @@ import { AdminContext } from "./AdminContext";
 import { SidebarNode } from "./types";
 import { CreateNewPost } from "./components/CreateNewPost";
 import { AppSpeedDial } from "./components/AppSpeedDial";
+import { Add } from "@material-ui/icons";
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
   appBarSpacer: theme.mixins.toolbar,
@@ -43,6 +45,11 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
     flexGrow: 1,
     marginTop: theme.spacing(2),
     padding: theme.spacing(0.25),
+  },
+  speedDial: {
+    position: "fixed",
+    bottom: theme.spacing(2),
+    right: theme.spacing(2),
   },
 }));
 
@@ -69,6 +76,7 @@ const App: React.FC = () => {
   const [newContent, setNewContent] = useState("");
   const [allContent, setAllContent] = useState({});
 
+  const history = useHistory();
   // console.log(`Rendering App with ref=${ref} (${refParam}) and slug=${slug} (${slugParam})`);
   const updateAuthToken = (authToken: string) => {
     setAuthToken(authToken);
@@ -115,6 +123,8 @@ const App: React.FC = () => {
     }
     setIndex(JSON.parse(JSON.stringify(newIndex))); // new object forces a re-render
   }
+
+  const handleRedirect = (to: string) => history.push(to)
 
   // Run this effect exactly once when the page initially loads
   useEffect(() => {
@@ -222,7 +232,12 @@ const App: React.FC = () => {
                 render={() => <PostPage content={content} slug={slug} gitRef={ref} />}
               />
             </Switch>
-            { adminMode && authToken ? <AppSpeedDial /> : null }
+            { adminMode && authToken ?
+             <Fab 
+              className={classes.speedDial}
+              color="primary"
+              onClick={() => handleRedirect("/create-new-post")}
+             > <Add /> </Fab> : null }
           </Container>
         </main>
       </AdminContext.Provider>
