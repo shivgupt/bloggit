@@ -98,7 +98,7 @@ const App: React.FC = () => {
     slug?: string | null,
     force?: boolean,
   ) => {
-    const commit = (await fetchConfig()).commit.substring(0, 8);
+    const commit = (await fetchConfig(force)).commit.substring(0, 8);
     const newRef = _ref || commit;
     setRef(newRef);
     // console.log(`Syncing ref ${newRef}${slug ? ` and slug ${slug}` : ""}`);

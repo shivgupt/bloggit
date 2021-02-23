@@ -8,6 +8,7 @@ import {
   AddCircle,
   Drafts,
   Edit,
+  Public,
 } from "@material-ui/icons";
 import { useHistory } from "react-router-dom";
 import axios from "axios";
@@ -86,7 +87,7 @@ export const AppSpeedDial = () => {
     });
     
     if (res.status === 200) {
-      adminContext.syncRef();
+      adminContext.syncRef(undefined, undefined, true);
     } else { 
       console.log("Something went wrong")
     }
@@ -113,6 +114,11 @@ export const AppSpeedDial = () => {
         icon={<Drafts />}
         tooltipTitle="Save Drafts"
         onClick={() => save("draft")}
+      />
+      <SpeedDialAction
+        icon={<Public />}
+        tooltipTitle="Publish"
+        onClick={() => save("post")}
       />
     </SpeedDial>
   )

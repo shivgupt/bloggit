@@ -11,5 +11,5 @@ export const AdminContext = React.createContext({
   updateAuthToken: (authToken: string) => {},
   updateNewContent: (newContent: string) => {},
   viewAdminMode: (viewAdminMode: boolean) => {},
-  syncRef: async (ref?: string, slug?: string) => {},
+  syncRef: async (ref?: string, slug?: string, force?: boolean) => {},
 });
