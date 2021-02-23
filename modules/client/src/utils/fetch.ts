@@ -12,7 +12,7 @@ export const fetchBranch = async (force?: boolean): Promise<string> => {
       throw new Error(`Failed to retrieve data from ${configPath}`);
     }
     if (!response.data.branch) {
-      throw new Error(`Failed to retrive branch from data: ${JSON.stringify(response.data)}`);
+      throw new Error(`Failed to retrieve branch from data: ${JSON.stringify(response.data)}`);
     }
     branchCache = response.data.branch;
   }

@@ -48,9 +48,21 @@ export const getChildValue = (child) => {
 
 export const getPostsByCategories = (posts: { [slug: string]: PostData }) => {
   return (
-    Object.values(posts).reduce((categories, post) => ({
-      ...categories,
-      [post.category.toLocaleLowerCase()]: [ ...(categories[post.category.toLocaleLowerCase()]||[]), post ]
-    }), {})
+    Object.values(posts).reduce((categories, post) => {
+      if (post.category) {
+        return ({
+          ...categories,
+          [post.category.toLocaleLowerCase()]: [
+            ...(categories[post.category.toLocaleLowerCase()]||[]),
+            post
+          ]
+        })
+      } else {
+        return ({
+          ...categories,
+          ["top-level"]: [ ...(categories["top-level"] || []), post ]
+        })
+      }
+    }, {})
   );
 };

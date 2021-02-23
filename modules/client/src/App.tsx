@@ -64,7 +64,6 @@ const App: React.FC = () => {
   const [theme, setTheme] = useState(lightTheme);
   const [index, setIndex] = useState(emptyIndex);
   const [title, setTitle] = useState({ site: "", page: "" });
-  const [about, setAbout] = useState("");
   const [authToken, setAuthToken] = useState("");
   const [adminMode, setAdminMode] = useState(true);
   const [allContent, setAllContent] = useState({});
@@ -107,9 +106,6 @@ const App: React.FC = () => {
       allContent[newRef][slug] = await fetchContent(slug!, newRef, forceForReal);
       setContent(allContent[newRef][slug]);
       setAllContent(allContent);
-    }
-    if (newIndex.about) {
-      setAbout(await fetchFile(newIndex.about, newRef, forceForReal));
     }
     setIndex(JSON.parse(JSON.stringify(newIndex))); // new object forces a re-render
   }
@@ -187,15 +183,6 @@ const App: React.FC = () => {
                       title={title}
                     />
                   );
-                }}
-              />
-              <Route exact
-                path="/about"
-                render={() => {
-                  return (<PostPage content={index.about ?
-                    about
-                    : "Not added yet" }
-                  />);
                 }}
               />
               <Route exact
