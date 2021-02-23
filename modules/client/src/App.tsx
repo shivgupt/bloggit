@@ -67,6 +67,7 @@ const App: React.FC = () => {
   const [authToken, setAuthToken] = useState("");
   const [adminMode, setAdminMode] = useState(true);
   const [newContent, setNewContent] = useState("");
+  const [editMode, setEditMode] = useState(false);
   const [allContent, setAllContent] = useState({});
 
   // console.log(`Rendering App with ref=${ref} (${refParam}) and slug=${slug} (${slugParam})`);
@@ -171,7 +172,7 @@ const App: React.FC = () => {
   return (
     <ThemeProvider theme={theme}>
       <AdminContext.Provider
-        value={{ syncRef, authToken, newContent, updateNewContent, index, updateAuthToken, adminMode, viewAdminMode }}
+        value={{ syncRef, authToken, editMode, setEditMode, newContent, updateNewContent, index, updateAuthToken, adminMode, viewAdminMode }}
       >
         <CssBaseline />
         <NavBar
@@ -192,10 +193,7 @@ const App: React.FC = () => {
                 path="/"
                 render={() => {
                   return (
-                    <Home
-                      posts={index.posts}
-                      title={title}
-                    />
+                    <Home posts={index.posts} title={title} />
                   );
                 }}
               />

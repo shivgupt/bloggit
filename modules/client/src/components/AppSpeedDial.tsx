@@ -1,16 +1,17 @@
 import React, { useContext, useState } from "react";
-import { makeStyles, Theme } from "@material-ui/core"
+import { makeStyles, Fab, Theme } from "@material-ui/core"
 import {
   SpeedDial,
   SpeedDialAction
 } from "@material-ui/lab";
 import {
+  Add,
   AddCircle,
   Drafts,
   Edit,
   Public,
 } from "@material-ui/icons";
-import { useHistory } from "react-router-dom";
+import { useHistory, useRouteMatch } from "react-router-dom";
 import axios from "axios";
 
 import { AdminContext } from "../AdminContext";
@@ -28,11 +29,18 @@ export const AppSpeedDial = () => {
   const [open, setOpen] = useState(false);
   const classes = useStyles();
   const adminContext = useContext(AdminContext);
-  const { newContent, updateNewContent } = adminContext;
+  const { newContent, updateNewContent, editMode, setEditMode } = adminContext;
+
+  const slugMatch = useRouteMatch("/:slug");
+  const slugParam = slugMatch ? slugMatch.params.slug : "";
+
+  //console.log(slugMatch, refMatch, refParam, slugParam);
 
   let dialButtonRef;
 
   const handleRedirect = (to: string) => history.push(to)
+  const handleOpen = () => {
+  }
 
   const save = async (as: string) => {
     // create new index.json entry
@@ -95,31 +103,67 @@ export const AppSpeedDial = () => {
   };
 
 
-  return (
-    <SpeedDial
-      ariaLabel="fab"
-      onClose={() => setOpen(false)}
-      onOpen={() => setOpen(true)}
-      open={open}
+  if (!slugMatch || slugParam === "admin") {
+    return (
+      <Fab 
       className={classes.speedDial}
-      icon={ <Edit />}
-      FabProps={{ref: (ref) => { dialButtonRef = ref }}}
-    >
-      <SpeedDialAction
-        icon={<AddCircle />}
-        tooltipTitle="New Post"
-        onClick={() => handleRedirect("/create-new-post")}
-      />
-      <SpeedDialAction
-        icon={<Drafts />}
-        tooltipTitle="Save Drafts"
-        onClick={() => save("draft")}
-      />
-      <SpeedDialAction
-        icon={<Public />}
-        tooltipTitle="Publish"
-        onClick={() => save("post")}
-      />
-    </SpeedDial>
-  )
+      color="primary"
+      onClick={() => handleRedirect("/create-new-post")}
+      > <Add /> </Fab>
+    );
+  } else if (slugParam === "create-new-post") {
+    return (
+      <SpeedDial
+        ariaLabel="fab"
+        onClose={() => setOpen(false)}
+        onOpen={() => setOpen(true)}
+        open={open}
+        className={classes.speedDial}
+        icon={ <Add />}
+        FabProps={{ref: (ref) => { dialButtonRef = ref }}}
+      >
+        <SpeedDialAction
+          icon={<Drafts />}
+          tooltipTitle="Save Drafts"
+          onClick={() => save("draft")}
+        />
+        <SpeedDialAction
+          icon={<Public />}
+          tooltipTitle="Publish"
+          onClick={() => save("post")}
+        />
+      </SpeedDial>
+    )
+  } else if (!editMode) {
+    return (
+      <Fab 
+      className={classes.speedDial}
+      color="primary"
+      onClick={() => setEditMode(true)}
+      > <Edit /> </Fab>
+    );
+  } else {
+    return (
+      <SpeedDial
+        ariaLabel="fab"
+        onClose={() => setOpen(false)}
+        onOpen={() => setOpen(true)}
+        open={open}
+        className={classes.speedDial}
+        icon={ <Edit />}
+        FabProps={{ref: (ref) => { dialButtonRef = ref }}}
+      >
+        <SpeedDialAction
+          icon={<Drafts />}
+          tooltipTitle="Save Drafts"
+          onClick={() => save("draft")}
+        />
+        <SpeedDialAction
+          icon={<Public />}
+          tooltipTitle="Publish"
+          onClick={() => save("post")}
+        />
+      </SpeedDial>
+    )
+  }
 }

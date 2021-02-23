@@ -64,12 +64,11 @@ export const PostPage = (props: { content: string, slug: string, gitRef: string 
   const { content, gitRef: ref, slug } = props;
   const classes = useStyles();
   const [isHistorical, setIsHistorical] = useState(false);
-  const [editMode, setEditMode] = useState(false);
   const [cardBgImg, setCardBgImg] = useState("");
-  const [newContent, setNewContent] = useState("Loading Page");
   const [selectedTab, setSelectedTab] = React.useState<"write" | "preview">("write");
   
   const adminContext = useContext(AdminContext);
+  const { newContent, updateNewContent, editMode, setEditMode } = adminContext;
 
   const post = (adminContext.index.posts[slug] || adminContext.index.drafts[slug]);
 
@@ -87,7 +86,7 @@ export const PostPage = (props: { content: string, slug: string, gitRef: string 
   }, [ref, slug]);
 
   useEffect(
-    () => setNewContent(content),
+    () => updateNewContent(content),
     [content],
   );
 
@@ -229,7 +228,7 @@ export const PostPage = (props: { content: string, slug: string, gitRef: string 
           }
           <ReactMde
             value={newContent}
-            onChange={setNewContent}
+            onChange={updateNewContent}
             selectedTab={selectedTab}
             onTabChange={setSelectedTab}
             minEditorHeight={400}
