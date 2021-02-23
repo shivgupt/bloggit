@@ -172,7 +172,7 @@ const App: React.FC = () => {
         />
         <main className={classes.main}>
           <div className={classes.appBarSpacer} />
-          <Container maxWidth="lg" className={classes.container}>
+          <Container maxWidth="xl" className={classes.container}>
             <Switch>
               <Route exact
                 path="/"

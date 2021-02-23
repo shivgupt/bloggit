@@ -112,9 +112,8 @@ const DrawerContent = (props: any) => {
       {posts["top-level"]
         ? posts["top-level"].map((p) => {
           return (
-            <Box textAlign="center" m={1}>
+            <Box key={p.slug} textAlign="center" m={1}>
               <Button
-                key={p.slug}
                 size="small"
                 disableFocusRipple={false}
                 component={Link}
