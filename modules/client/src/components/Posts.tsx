@@ -8,13 +8,14 @@ import {
 } from "@material-ui/core";
 import React, { useContext, useEffect, useState } from "react";
 import Markdown from "react-markdown";
-import ReactMde from "react-mde";
+import ReactMde, { SaveImageHandler } from "react-mde";
 import "react-mde/lib/styles/css/react-mde-all.css";
 import { Link } from "react-router-dom";
 import FastForwardIcon from '@material-ui/icons/FastForward';
 
 import { AdminContext } from "../AdminContext";
 import { fetchConfig } from "../utils";
+import axios from "axios";
 
 import { Copyable } from "./Copyable";
 import { EditHistory } from "./EditHistory";
@@ -60,6 +61,26 @@ export const PostPage = (props: { content: string, slug: string, gitRef: string 
   const [isHistorical, setIsHistorical] = useState(false);
   const [cardBgImg, setCardBgImg] = useState("");
   const [selectedTab, setSelectedTab] = React.useState<"write" | "preview">("write");
+
+  // MDE command lis
+  const save: SaveImageHandler = async function*(data: ArrayBuffer) {
+
+    let res = await axios({
+      method: "POST",
+      url: "ipfs",
+      data: data,
+      headers: { "content-type": "multipart/form-data"}
+    });
+    if (res.status === 200) {
+      console.log(res);
+      yield res.data;
+    } else {
+      console.log(res);
+    }
+
+    return true;
+  };
+
   
   const adminContext = useContext(AdminContext);
   const { newContent, updateNewContent, editMode, setEditMode } = adminContext;
@@ -165,6 +186,9 @@ export const PostPage = (props: { content: string, slug: string, gitRef: string 
                 }}
               />
             )}
+            paste={{
+              saveImage: save
+            }}
           />
         </>
         : <Markdown
