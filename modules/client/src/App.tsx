@@ -124,7 +124,7 @@ const App: React.FC = () => {
 
   // Fetch index & post content any time the url changes
   useEffect(() => {
-    if (slugParam === "admin") return;
+    if (slugParam === "admin" || slugParam === "create-new-post") return;
     setContent("Loading..");
     setSlug(slugParam);
     (async () => {
