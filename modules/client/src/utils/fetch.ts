@@ -2,37 +2,30 @@ import axios from "axios";
 
 import { PostData, PostIndex, PostHistory } from "../types";
 
-type GitConfig = { branch: string; commit: string; };
-
-let configCache: GitConfig;
-export const fetchConfig = async (force?: boolean): Promise<GitConfig> => {
-  if (!configCache || force) {
-    const configPath = "/git/config";
-    console.log(`F${force ? "orcefully f" : ""}etching branch from ${configPath}`);
-    const response = await axios(configPath);
-    if (!response || !response.data) {
-      throw new Error(`Failed to retrieve data from ${configPath}`);
-    }
-    if (!response.data.branch || !response.data.commit) {
-      throw new Error(`Failed to retrieve branch from data: ${JSON.stringify(response.data)}`);
-    }
-    configCache = response.data;
+export const fetchRef = async (): Promise<string> => {
+  const configUrl = "/git/config";
+  console.log(`Fetching latest ref from ${configUrl}`);
+  const response = await axios(configUrl);
+  if (!response || !response.data) {
+    throw new Error(`Failed to retrieve data from ${configUrl}`);
   }
-  return configCache;
+  if (!response.data.commit) {
+    throw new Error(`Failed to retrieve branch from data: ${JSON.stringify(response.data)}`);
+  }
+  return response.data.commit.substring(0, 8);
 }
 
-// TODO: never force, always resovle branch refs to a commit hash
 // TODO: instead of throwing, save null to cache so we never re-fetch invalid paths
 let fileCache: { [ref: string]: { [path: string]: string; } } = {};
-export const fetchFile = async (path: string, _ref?: string, force?: boolean): Promise<string> => {
-  const ref = _ref || (await fetchConfig(force)).commit.substring(0, 8);
+export const fetchFile = async (path: string, _ref?: string): Promise<string> => {
+  const ref = _ref || await fetchRef();
   if (!fileCache[ref]) {
     fileCache[ref] = {};
   }
-  if (!fileCache[ref][path] || force) {
+  if (!fileCache[ref][path]) {
     const url = `/git/${ref}/${path}`;
     try {
-      console.log(`F${force ? "orcefully f" : ""}etching file from ${url}`);
+      console.log(`Fetching file from ${url}`);
       const response = await axios(url);
       if (response && response.data && response.data.content) {
         fileCache[ref][path] = response.data.content;
@@ -47,9 +40,9 @@ export const fetchFile = async (path: string, _ref?: string, force?: boolean): P
   return fileCache[ref][path];
 };
 
-export const fetchIndex = async (_ref?: string, force?: boolean): Promise<PostIndex> => {
-  const ref = _ref || (await fetchConfig(force)).commit.substring(0, 8);
-  const indexContent = await fetchFile("index.json", ref, force);
+export const fetchIndex = async (_ref?: string): Promise<PostIndex> => {
+  const ref = _ref || await fetchRef();
+  const indexContent = await fetchFile("index.json", ref);
   const index = JSON.parse(indexContent);
   if (!index || !index.posts) {
     throw new Error(`Got invalid site index: ${JSON.stringify(index)}`);
@@ -99,11 +92,10 @@ const slugToPath = async (slug: string, ref: string): Promise<string> => {
 export const fetchContent = async(
   slug: string,
   _ref?: string,
-  force?: boolean,
 ): Promise<string> => {
-  const ref = _ref || (await fetchConfig()).commit.substring(0, 8);
+  const ref = _ref || await fetchRef();
   const path = await slugToPath(slug, ref);
-  return await fetchFile(path, ref, force)
+  return await fetchFile(path, ref)
 };
 
 export const fetchHistory = async (slug: string): Promise<PostHistory> => {

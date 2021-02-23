@@ -16,7 +16,7 @@ import { NavBar } from "./components/NavBar";
 import { PostPage } from "./components/Posts";
 import {
   emptyIndex,
-  fetchConfig,
+  fetchRef,
   fetchContent,
   fetchIndex,
   getPostsByCategories,
@@ -90,24 +90,21 @@ const App: React.FC = () => {
   const syncRef = async (
     _ref?: string | null,
     slug?: string | null,
-    force?: boolean,
   ) => {
-    const commit = (await fetchConfig()).commit.substring(0, 8);
-    const newRef = _ref || commit;
-    setRef(newRef);
-    // console.log(`Syncing ref ${newRef}${slug ? ` and slug ${slug}` : ""}`);
+    const newRef = _ref || await fetchRef();
+    console.log(`Syncing ref ${newRef}${slug ? ` and slug ${slug}` : ""}`);
     // if ref is not the commit, then it's immutable & never needs to be refreshed
-    const forceForReal = force && newRef === commit;
-    const newIndex = await fetchIndex(newRef, forceForReal);
+    const newIndex = await fetchIndex(newRef);
     if (slug) {
       if (!allContent[newRef]) {
         allContent[newRef] = {};
       }
-      allContent[newRef][slug] = await fetchContent(slug!, newRef, forceForReal);
+      allContent[newRef][slug] = await fetchContent(slug!, newRef);
       setContent(allContent[newRef][slug]);
       setAllContent(allContent);
     }
     setIndex(JSON.parse(JSON.stringify(newIndex))); // new object forces a re-render
+    setRef(newRef);
   }
 
   // Run this effect exactly once when the page initially loads

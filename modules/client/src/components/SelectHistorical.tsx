@@ -45,7 +45,7 @@ export const SelectHistorical = (props: { className: any; gitRef: string; slug: 
   };
 
   React.useEffect(() => {
-    console.log(`Triggering SelectHistorical effect bc ${slug} changed`);
+    // console.log(`Triggering SelectHistorical effect bc ${slug} changed`);
     (async () => {
       try {
         setEditHistory(await fetchHistory(slug));

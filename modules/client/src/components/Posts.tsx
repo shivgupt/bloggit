@@ -20,7 +20,7 @@ import { Link } from "react-router-dom";
 import FastForwardIcon from '@material-ui/icons/FastForward';
 
 import { AdminContext } from "../AdminContext";
-import { fetchConfig } from "../utils";
+import { fetchRef } from "../utils";
 
 import { Copyable } from "./Copyable";
 import { SelectHistorical } from "./SelectHistorical";
@@ -71,16 +71,14 @@ export const PostPage = (props: { content: string, slug: string, gitRef: string 
   
   const adminContext = useContext(AdminContext);
 
-  const post = (adminContext.index.posts[slug] || adminContext.index.drafts[slug]);
+  const post = (adminContext?.index?.posts?.[slug] || adminContext?.index?.drafts?.[slug]);
 
   useEffect(() => {
     (async () => {
-      const latestRef = (await fetchConfig(true)).commit.substring(0, 8);
+      const latestRef = await fetchRef();
       if (latestRef !== ref) {
-        console.log(`latestRef ${latestRef} !== current ref ${ref}`);
         setIsHistorical(true);
       } else {
-        console.log(`We're on the latest version`);
         setIsHistorical(false);
       }
     })();
