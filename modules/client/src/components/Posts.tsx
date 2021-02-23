@@ -8,13 +8,13 @@ import {
 } from "@material-ui/core";
 import React, { useContext, useEffect, useState } from "react";
 import Markdown from "react-markdown";
-import ReactMde from "react-mde";
+import ReactMde, { SaveImageHandler } from "react-mde";
 import "react-mde/lib/styles/css/react-mde-all.css";
 import { Link } from "react-router-dom";
 import FastForwardIcon from '@material-ui/icons/FastForward';
+import axios from "axios";
 
 import { AdminContext } from "../AdminContext";
-import { fetchRef } from "../utils";
 
 import { Copyable } from "./Copyable";
 import { SelectHistorical } from "./SelectHistorical";
@@ -65,9 +65,27 @@ export const PostPage = (props: {
   const [isHistorical, setIsHistorical] = useState(false);
   const [cardBgImg, setCardBgImg] = useState("");
   const [selectedTab, setSelectedTab] = React.useState<"write" | "preview">("write");
-  
+
+  // MDE command lis
+  const save: SaveImageHandler = async function*(data: ArrayBuffer) {
+
+    let res = await axios({
+      method: "POST",
+      url: "ipfs",
+      data: data,
+      headers: { "content-type": "multipart/form-data"}
+    });
+    if (res.status === 200) {
+      console.log(res);
+      yield res.data;
+    } else {
+      console.log(res);
+    }
+    return true;
+  };
+
   const adminContext = useContext(AdminContext);
-  const { newContent, updateNewContent, editMode, setEditMode } = adminContext;
+  const { newContent, updateNewContent, editMode } = adminContext;
 
   const post = (adminContext?.index?.posts?.[slug] || adminContext?.index?.drafts?.[slug]);
 
@@ -80,11 +98,9 @@ export const PostPage = (props: {
       }
     })();
   }, [latestRef, ref]);
-
-  useEffect(
-    () => updateNewContent(content),
-    [content],
-  );
+ 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => updateNewContent(content), [content]);
 
   useEffect(() => {
     if (typeof(post) === "object" && post.img) {
@@ -165,6 +181,9 @@ export const PostPage = (props: {
                 }}
               />
             )}
+            paste={{
+              saveImage: save
+            }}
           />
         </>
         : <Markdown
