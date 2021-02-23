@@ -1,18 +1,11 @@
 import {
-  Link,
-  Button,
+  Input,
   makeStyles,
   Paper,
   TextField,
 } from "@material-ui/core";
-import {
-  Save,
-  Drafts as DraftIcon,
-  Public as PublishIcon,
-} from "@material-ui/icons";
 import React, { useContext, useEffect, useState } from "react";
 import Markdown from "react-markdown";
-import emoji from "emoji-dictionary";
 import ReactMde from "react-mde";
 import "react-mde/lib/styles/css/react-mde-all.css";
 
@@ -20,6 +13,7 @@ import { AdminContext } from "../AdminContext";
 
 import { CodeBlockRenderer } from "./CodeBlock";
 import { EmojiRenderer, HeadingRenderer, ImageRenderer, LinkRenderer } from "./Renderers";
+import { ImageUploader } from "./ImageUploader";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -48,6 +42,7 @@ export const CreateNewPost = () => {
   const adminContext = useContext(AdminContext);
   const { newContent, updateNewContent } = adminContext;
   const [selectedTab, setSelectedTab] = React.useState<"write" | "preview">("write");
+  const [cardBgImg, setCardBgImg] = useState("");
   
   if (!(adminContext.adminMode && adminContext.authToken)) return <div>Invalid Page</div>
   return (
@@ -57,8 +52,12 @@ export const CreateNewPost = () => {
         <TextField id="post_category" label="category" defaultValue={"category"} />
         <TextField id="post_slug" label="slug" defaultValue={"slug"} />
         <TextField id="post_tldr" label="tldr" defaultValue={"tldr"} multiline fullWidth />
-        <TextField id="post_img" label="card-img-ipfs#" defaultValue={"img"} />
         <TextField id="post_tags" label="tags" defaultValue={"tags"} />
+        <Input
+          id="post_img"
+          value={cardBgImg}
+          endAdornment={ <ImageUploader setImageHash={setCardBgImg} /> }
+        />
       </div>
       <ReactMde
         value={newContent}

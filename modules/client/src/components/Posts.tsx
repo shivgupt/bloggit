@@ -1,21 +1,15 @@
 import {
   Button,
   CardMedia,
-  IconButton,
   Input,
   makeStyles,
   Paper,
   TextField,
 } from "@material-ui/core";
-import {
-  Edit,
-  Save,
-} from "@material-ui/icons";
 import React, { useContext, useEffect, useState } from "react";
 import Markdown from "react-markdown";
 import ReactMde from "react-mde";
 import "react-mde/lib/styles/css/react-mde-all.css";
-import axios from "axios";
 import { Link } from "react-router-dom";
 import FastForwardIcon from '@material-ui/icons/FastForward';
 

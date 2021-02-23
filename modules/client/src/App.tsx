@@ -78,7 +78,6 @@ const App: React.FC = () => {
 
   const updateNewContent = (newContent: string) => {
     setNewContent(newContent);
-    console.log("Updating");
   };
 
   const viewAdminMode = (viewAdminMode: boolean) => setAdminMode(viewAdminMode);

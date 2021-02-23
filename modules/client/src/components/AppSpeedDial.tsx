@@ -31,7 +31,7 @@ export const AppSpeedDial = (props: any) => {
   const [open, setOpen] = useState(false);
   const classes = useStyles();
   const adminContext = useContext(AdminContext);
-  const { newContent, updateNewContent, editMode, setEditMode } = adminContext;
+  const { newContent, editMode, setEditMode } = adminContext;
 
   const slugMatch = useRouteMatch("/:slug");
   const slugParam = slugMatch ? slugMatch.params.slug : "";
@@ -221,6 +221,11 @@ export const AppSpeedDial = (props: any) => {
           icon={<Delete />}
           tooltipTitle="Discard changes"
           onClick={() => setEditMode(false)}
+        />
+        <SpeedDialAction
+          icon={<Drafts />}
+          tooltipTitle="Save Drafts"
+          onClick={() => save("draft")}
         />
         <SpeedDialAction
           icon={<Public />}
