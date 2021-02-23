@@ -15,7 +15,6 @@ import Markdown from "react-markdown";
 import emoji from "emoji-dictionary";
 import ReactMde from "react-mde";
 import "react-mde/lib/styles/css/react-mde-all.css";
-import axios from "axios";
 
 import { AdminContext } from "../AdminContext";
 
@@ -47,68 +46,9 @@ export const CreateNewPost = () => {
 
   const classes = useStyles();
   const adminContext = useContext(AdminContext);
-  const [newContent, setNewContent] = useState("");
+  const { newContent, updateNewContent } = adminContext;
   const [selectedTab, setSelectedTab] = React.useState<"write" | "preview">("write");
   
-  const save = async (as: string) => {
-    // create new index.json entry
-    const newIndex = JSON.parse(JSON.stringify(adminContext.index))
-
-    const slug = (document.getElementById("post_slug") as HTMLInputElement).value;
-    const category = (document.getElementById("post_category") as HTMLInputElement).value.toLocaleLowerCase();
-    const title = (document.getElementById("post_title") as HTMLInputElement).value;
-    const tldr = (document.getElementById("post_tldr") as HTMLInputElement).value;
-    const img = (document.getElementById("post_img") as HTMLInputElement).value;
-    const tags = (document.getElementById("post_tags") as HTMLInputElement).value.split(",");
-
-    if (as === "draft") {
-      if (!newIndex.drafts) newIndex.drafts = {};
-      newIndex.drafts[slug] = {
-        category,
-        lastEdit: (new Date()).toLocaleDateString("en-in"),
-        tldr,
-        title,
-        img,
-        slug,
-        tags,
-      };
-    } else {
-      if (!newIndex.posts) newIndex.posts = {};
-      newIndex.posts[slug] = {
-        category,
-        lastEdit: (new Date()).toLocaleDateString("en-in"),
-        tldr,
-        title,
-        img,
-        slug,
-        tags,
-      };
-    }
-
-    // Send request to update index.json and create new file
-    let res = await axios({
-      method: "post",
-      url: "git/edit",
-      data: [
-      {
-        path: `${category}/${slug}.md`,
-        content: newContent || "Coming Soon",
-      },
-      {
-        path: "index.json",
-        content: JSON.stringify(newIndex, null, 2),
-      }
-    ],
-      headers: { "content-type": "application/json" }
-    });
-    
-    if (res.status === 200) {
-      adminContext.syncRef();
-    } else { 
-      console.log("Something went wrong")
-    }
-  };
-
   if (!(adminContext.adminMode && adminContext.authToken)) return <div>Invalid Page</div>
   return (
     <Paper variant="outlined" className={classes.paper}>
@@ -122,7 +62,7 @@ export const CreateNewPost = () => {
       </div>
       <ReactMde
         value={newContent}
-        onChange={setNewContent}
+        onChange={updateNewContent}
         selectedTab={selectedTab}
         onTabChange={setSelectedTab}
         minEditorHeight={400}
@@ -141,26 +81,6 @@ export const CreateNewPost = () => {
           />
         )}
       />
-      <Button
-        onClick={() => save("draft")}
-        startIcon={<DraftIcon />}
-        variant="contained"
-        color="secondary"
-        className={classes.button}
-        size="small"
-      >
-        Save Draft
-      </Button>
-      <Button
-        onClick={() => save("post")}
-        startIcon={<PublishIcon />}
-        variant="contained"
-        color="secondary"
-        className={classes.button}
-        size="small"
-      >
-        Publish
-      </Button>
     </Paper>
   );
 };
