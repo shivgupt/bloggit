@@ -16,6 +16,11 @@ fi
 
 docker run \
   "${interactive[@]}" \
+  "--env=REACT_APP_DARK_PRIMARY=$REACT_APP_DARK_PRIMARY"
+  "--env=REACT_APP_DARK_SECONDARY=$REACT_APP_DARK_SECONDARY"
+  "--env=REACT_APP_FONT_FAMILY=$REACT_APP_FONT_FAMILY"
+  "--env=REACT_APP_LIGHT_PRIMARY=$REACT_APP_LIGHT_PRIMARY"
+  "--env=REACT_APP_LIGHT_SECONDARY=$REACT_APP_LIGHT_SECONDARY"
   "--name=${project}_builder" \
   "--volume=$root:/root" \
   --rm \
