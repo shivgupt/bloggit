@@ -17,7 +17,7 @@ import axios from "axios";
 
 import { AdminContext } from "../AdminContext";
 import { Copyable } from "./Copyable";
-
+import { EditHistory } from "./EditHistory";
 
 import { CodeBlockRenderer } from "./CodeBlock";
 import { EmojiRenderer, HeadingRenderer, ImageRenderer, LinkRenderer } from "./Renderers";
@@ -35,6 +35,9 @@ const useStyles = makeStyles((theme) => ({
     padding: "20px",
     textAlign: "justify",
     fontVariant: "discretionary-ligatures",
+  },
+  buttonBar: {
+    display: "flex",
   },
   button: {
     marginBottom: theme.spacing(1),
@@ -129,13 +132,19 @@ export const PostPage = (props: { content: string, slug: string, gitRef: string 
 
   return (
   <>
-    <Copyable
-      className={classes.button}
-      color={"primary"}
-      text={"Permalink"}
-      tooltip={"Snapshot of this page that will never change or disappear"}
-      value={`${window.location.origin}/${ref}/${slug}`}
-    />
+
+    <div className={classes.buttonBar}>
+      <Copyable
+        className={classes.button}
+        color={"primary"}
+        text={"Permalink"}
+        tooltip={"Snapshot of this page that will never change or disappear"}
+        value={`${window.location.origin}/${ref}/${slug}`}
+      />
+      <EditHistory
+        className={classes.button}
+      />
+    </div>
 
     <Paper variant="outlined">
       {adminContext.adminMode && adminContext.authToken ?
