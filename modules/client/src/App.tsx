@@ -128,7 +128,14 @@ const App: React.FC = () => {
     setContent("Loading..");
     setSlug(slugParam);
     (async () => {
-      await syncRef(refParam, slugParam);
+      try {
+        await syncRef(refParam, slugParam);
+      } catch (e) {
+        console.warn(e.message);
+        allContent[refParam][slugParam] = "Post does not exist";
+        setContent(allContent[refParam][slugParam]);
+        setAllContent(allContent);
+      }
     })()
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refParam, slugParam]);

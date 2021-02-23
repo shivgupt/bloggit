@@ -51,7 +51,12 @@ export const EditHistory = (props: { className: any; gitRef: string; slug: strin
 
   React.useEffect(() => {
     (async () => {
-      setHistory(await fetchHistory(slug, ref));
+      try {
+        setHistory(await fetchHistory(slug, ref));
+      } catch (e) {
+        console.warn(e.message);
+        setHistory([]);
+      }
     })();
   }, [ref, slug]);
 

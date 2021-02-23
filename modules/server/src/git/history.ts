@@ -13,7 +13,7 @@ type DateString = string; // in ISO format
 const toISO = (secs: number): DateString => (new Date(secs * 1000)).toISOString();
 const cache = {} as any;
 
-// Timestamp MUST increase at every commit. If it doesn't, use the prev's timestamp instead
+// Timestamp MUST increase at every commit. If it doesn't, use the prev timestamp - 1 second
 const earliest = (current: number, _prev?: number): number => {
   const now = Math.round(Date.now() / 1000); // all math is done w units of seconds instead of ms
   const prev = _prev || now;
@@ -27,7 +27,6 @@ const earliest = (current: number, _prev?: number): number => {
   }
   return current;
 };
-
 
 // Return an array of all commits w/in which the given filepath was modified
 export const history = async (req, res, _): Promise<any> => {
