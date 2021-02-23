@@ -2,26 +2,28 @@ import axios from "axios";
 
 import { PostData, PostIndex } from "../types";
 
-let branchCache: string;
-export const fetchBranch = async (force?: boolean): Promise<string> => {
-  if (!branchCache || force) {
+type GitConfig = { branch: string; commit: string; };
+
+let configCache: GitConfig;
+export const fetchConfig = async (force?: boolean): Promise<GitConfig> => {
+  if (!configCache || force) {
     const configPath = "/git/config";
     console.log(`F${force ? "orcefully f" : ""}etching branch from ${configPath}`);
     const response = await axios(configPath);
     if (!response || !response.data) {
       throw new Error(`Failed to retrieve data from ${configPath}`);
     }
-    if (!response.data.branch) {
+    if (!response.data.branch || !response.data.commit) {
       throw new Error(`Failed to retrieve branch from data: ${JSON.stringify(response.data)}`);
     }
-    branchCache = response.data.branch;
+    configCache = response.data;
   }
-  return branchCache;
+  return configCache;
 }
 
 let fileCache: { [ref: string]: { [path: string]: string; } } = {};
 export const fetchFile = async (path: string, _ref?: string, force?: boolean): Promise<string> => {
-  const ref = _ref || await fetchBranch();
+  const ref = _ref || (await fetchConfig()).commit.substring(0, 8);
   if (!fileCache[ref]) {
     fileCache[ref] = {};
   }
@@ -44,7 +46,7 @@ export const fetchFile = async (path: string, _ref?: string, force?: boolean): P
 };
 
 export const fetchIndex = async(_ref?: string, force?: boolean): Promise<PostIndex> => {
-  const ref = _ref || await fetchBranch();
+  const ref = _ref || (await fetchConfig()).commit.substring(0, 8);
   const indexContent = await fetchFile("index.json", ref, force);
   const index = JSON.parse(indexContent);
   if (!index || !index.posts) {
@@ -62,7 +64,7 @@ export const fetchContent = async(
   _ref?: string,
   force?: boolean,
 ): Promise<string> => {
-  const ref = _ref || await fetchBranch();
+  const ref = _ref || (await fetchConfig()).commit.substring(0, 8);
   const index = await fetchIndex(ref, force);
   const entry = (index.posts && index.posts[slug]) ? index.posts[slug]
     : (index.drafts && index.drafts[slug]) ? index.drafts[slug]

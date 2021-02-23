@@ -16,9 +16,8 @@ import { NavBar } from "./components/NavBar";
 import { PostPage } from "./components/Posts";
 import {
   emptyIndex,
-  fetchBranch,
+  fetchConfig,
   fetchContent,
-  fetchFile,
   fetchIndex,
   getPostsByCategories,
 } from "./utils";
@@ -92,12 +91,12 @@ const App: React.FC = () => {
     slug?: string | null,
     force?: boolean,
   ) => {
-    const branch = await fetchBranch()
-    const newRef = _ref || branch;
+    const commit = (await fetchConfig()).commit.substring(0, 8);
+    const newRef = _ref || commit;
     setRef(newRef);
     // console.log(`Syncing ref ${newRef}${slug ? ` and slug ${slug}` : ""}`);
-    // if ref is not the branch, then it's immutable & never needs to be refreshed
-    const forceForReal = force && newRef === branch;
+    // if ref is not the commit, then it's immutable & never needs to be refreshed
+    const forceForReal = force && newRef === commit;
     const newIndex = await fetchIndex(newRef, forceForReal);
     if (slug) {
       if (!allContent[newRef]) {
