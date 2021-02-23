@@ -66,12 +66,18 @@ const App: React.FC = () => {
   const [title, setTitle] = useState({ site: "", page: "" });
   const [authToken, setAuthToken] = useState("");
   const [adminMode, setAdminMode] = useState(true);
+  const [newContent, setNewContent] = useState("");
   const [allContent, setAllContent] = useState({});
 
   // console.log(`Rendering App with ref=${ref} (${refParam}) and slug=${slug} (${slugParam})`);
   const updateAuthToken = (authToken: string) => {
     setAuthToken(authToken);
     store.save("authToken", authToken);
+  };
+
+  const updateNewContent = (newContent: string) => {
+    setNewContent(newContent);
+    console.log("Updating");
   };
 
   const viewAdminMode = (viewAdminMode: boolean) => setAdminMode(viewAdminMode);
@@ -165,7 +171,7 @@ const App: React.FC = () => {
   return (
     <ThemeProvider theme={theme}>
       <AdminContext.Provider
-        value={{ syncRef, authToken, index, updateAuthToken, adminMode, viewAdminMode }}
+        value={{ syncRef, authToken, newContent, updateNewContent, index, updateAuthToken, adminMode, viewAdminMode }}
       >
         <CssBaseline />
         <NavBar
