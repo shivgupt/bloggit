@@ -66,12 +66,18 @@ const App: React.FC = () => {
   const [title, setTitle] = useState({ site: "", page: "" });
   const [authToken, setAuthToken] = useState("");
   const [adminMode, setAdminMode] = useState(true);
+  const [newContent, setNewContent] = useState("");
+  const [editMode, setEditMode] = useState(false);
   const [allContent, setAllContent] = useState({});
 
   // console.log(`Rendering App with ref=${ref} (${refParam}) and slug=${slug} (${slugParam})`);
   const updateAuthToken = (authToken: string) => {
     setAuthToken(authToken);
     store.save("authToken", authToken);
+  };
+
+  const updateNewContent = (newContent: string) => {
+    setNewContent(newContent);
   };
 
   const viewAdminMode = (viewAdminMode: boolean) => setAdminMode(viewAdminMode);
@@ -92,8 +98,8 @@ const App: React.FC = () => {
     slug?: string | null,
   ) => {
     const newRef = _ref || await fetchRef();
-    console.log(`Syncing ref ${newRef}${slug ? ` and slug ${slug}` : ""}`);
-    // if ref is not the commit, then it's immutable & never needs to be refreshed
+    setRef(newRef);
+    // console.log(`Syncing ref ${newRef}${slug ? ` and slug ${slug}` : ""}`);
     const newIndex = await fetchIndex(newRef);
     if (slug) {
       if (!allContent[newRef]) {
@@ -124,6 +130,11 @@ const App: React.FC = () => {
   useEffect(() => {
     if (slugParam === "admin" || slugParam === "create-new-post") return;
     setContent("Loading..");
+
+    // cleanup state
+    setNewContent("");
+    setEditMode(false);
+
     setSlug(slugParam);
     (async () => {
       try {
@@ -162,7 +173,7 @@ const App: React.FC = () => {
   return (
     <ThemeProvider theme={theme}>
       <AdminContext.Provider
-        value={{ syncRef, authToken, index, updateAuthToken, adminMode, viewAdminMode }}
+        value={{ syncRef, authToken, editMode, setEditMode, newContent, updateNewContent, index, updateAuthToken, adminMode, viewAdminMode }}
       >
         <CssBaseline />
         <NavBar
@@ -183,10 +194,7 @@ const App: React.FC = () => {
                 path="/"
                 render={() => {
                   return (
-                    <Home
-                      posts={index.posts}
-                      title={title}
-                    />
+                    <Home posts={index.posts} title={title} />
                   );
                 }}
               />
@@ -213,7 +221,7 @@ const App: React.FC = () => {
                 render={() => <PostPage content={content} slug={slug} gitRef={ref} />}
               />
             </Switch>
-            { adminMode && authToken ? <AppSpeedDial /> : null }
+            { adminMode && authToken ? <AppSpeedDial content={content}/> : null }
           </Container>
         </main>
       </AdminContext.Provider>

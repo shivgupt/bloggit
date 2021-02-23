@@ -1,21 +1,15 @@
 import {
   Button,
   CardMedia,
-  IconButton,
   Input,
   makeStyles,
   Paper,
   TextField,
 } from "@material-ui/core";
-import {
-  Edit,
-  Save,
-} from "@material-ui/icons";
 import React, { useContext, useEffect, useState } from "react";
 import Markdown from "react-markdown";
 import ReactMde from "react-mde";
 import "react-mde/lib/styles/css/react-mde-all.css";
-import axios from "axios";
 import { Link } from "react-router-dom";
 import FastForwardIcon from '@material-ui/icons/FastForward';
 
@@ -64,12 +58,11 @@ export const PostPage = (props: { content: string, slug: string, gitRef: string 
   const { content, gitRef: ref, slug } = props;
   const classes = useStyles();
   const [isHistorical, setIsHistorical] = useState(false);
-  const [editMode, setEditMode] = useState(false);
   const [cardBgImg, setCardBgImg] = useState("");
-  const [newContent, setNewContent] = useState("Loading Page");
   const [selectedTab, setSelectedTab] = React.useState<"write" | "preview">("write");
   
   const adminContext = useContext(AdminContext);
+  const { newContent, updateNewContent, editMode, setEditMode } = adminContext;
 
   const post = (adminContext?.index?.posts?.[slug] || adminContext?.index?.drafts?.[slug]);
 
@@ -85,7 +78,7 @@ export const PostPage = (props: { content: string, slug: string, gitRef: string 
   }, [ref, slug]);
 
   useEffect(
-    () => setNewContent(content),
+    () => updateNewContent(content),
     [content],
   );
 
@@ -94,66 +87,6 @@ export const PostPage = (props: { content: string, slug: string, gitRef: string 
       setCardBgImg(post.img);
     }
   },[post]);
-
-  const save = async () => {
-    const newIndex = JSON.parse(JSON.stringify(adminContext.index))
-    const data = [] as Array<{path: string, content: string}>;
-    if (!post.category) {
-      const path = (document.getElementById("post_path") as HTMLInputElement).value;
-      console.log(path, post)
-      newIndex.posts[slug].path = path;
-      if (content === newContent && path === post.path) {
-        console.warn(`Nothing to update`);
-        return;
-      }
-      if (post.path !== path) {
-        data.push({ path: post.path!, content: ""});
-      }
-      data.push({ path, content: newContent });
-    } else {
-      // update to new format path = category/slug
-      const slug = (document.getElementById("post_slug") as HTMLInputElement).value;
-      const category = (document.getElementById("post_category") as HTMLInputElement).value.toLocaleLowerCase();
-      const title = (document.getElementById("post_title") as HTMLInputElement).value;
-      const tldr = (document.getElementById("post_tldr") as HTMLInputElement).value;
-      const img = (document.getElementById("post_img") as HTMLInputElement).value;
-      const tags = (document.getElementById("post_tags") as HTMLInputElement).value.split(",");
-      newIndex.posts[slug] = {
-        category,
-        lastEdit: (new Date()).toLocaleDateString("en-in"),
-        img,
-        tldr,
-        title,
-        slug,
-        tags,
-      };
-      if (content === newContent && JSON.stringify(newIndex.posts[slug]) === JSON.stringify(post)) {
-        console.warn(`Nothing to update`);
-        return;
-      }
-      if (post.path) {
-        data.push({ path: post.path, content: "" });
-      } else if (post.slug !== slug || post.category !== category) {
-        console.log("Path or category changed, deleting old file");
-        data.push({ path: `${post.category}/${post.slug}.md`, content: "" });
-      }
-      data.push({ path: `${category}/${slug}.md`, content: newContent });
-    }
-    if (content === newContent && JSON.stringify(newIndex) === JSON.stringify(adminContext.index) ){
-      console.log("no changes detected");
-      return;
-    }
-    data.push({ path: "index.json", content: JSON.stringify(newIndex, null, 2)});
-    console.log("Lets push it to git");
-    await axios({
-      data,
-      headers: { "content-type": "application/json" },
-      method: "post",
-      url: "git/edit",
-    });
-    await adminContext.syncRef(undefined, slug);
-    setEditMode(false);
-  }
 
   // TODO: handle loading better
   if (!post) return <> Loading </>
@@ -190,21 +123,6 @@ export const PostPage = (props: { content: string, slug: string, gitRef: string 
         ? <CardMedia image={post.img} className={classes.media} />
         : null
       }
-      {adminContext.adminMode && adminContext.authToken ?
-        <>
-          <IconButton
-            onClick={() => setEditMode(!editMode)}
-          >
-            <Edit />
-          </IconButton>
-          <IconButton
-            onClick={save}
-          >
-            <Save />
-          </IconButton>
-        </>
-        : null
-      }
       { editMode ? 
         <>
           { !post.category
@@ -227,7 +145,7 @@ export const PostPage = (props: { content: string, slug: string, gitRef: string 
           }
           <ReactMde
             value={newContent}
-            onChange={setNewContent}
+            onChange={updateNewContent}
             selectedTab={selectedTab}
             onTabChange={setSelectedTab}
             minEditorHeight={400}
