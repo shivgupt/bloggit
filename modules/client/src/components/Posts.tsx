@@ -132,8 +132,8 @@ export const PostPage = (props: { content: string, slug: string, gitRef: string 
     <Copyable
       className={classes.button}
       color={"primary"}
-      text={"Copy Permalink"}
-      tooltip={"Snapshot of the page that will never change or disappear"}
+      text={"Permalink"}
+      tooltip={"Snapshot of this page that will never change or disappear"}
       value={`${window.location.origin}/${ref}/${slug}`}
     />
 
