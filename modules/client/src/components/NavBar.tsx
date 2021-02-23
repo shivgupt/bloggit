@@ -158,18 +158,6 @@ export const NavBar = (props: any) => {
           >
             {title.page ? title.page : "Home"}
           </Typography>
-          {
-            adminContext.authToken && adminContext.adminMode
-            ? <IconButton
-              component={Link}
-              edge="end"
-              to={"/create-new-post"}
-              color="inherit"
-            >
-              <AddIcon />
-            </IconButton>
-            : null
-          }
           <Hidden mdUp>
             <IconButton
               edge="start"
