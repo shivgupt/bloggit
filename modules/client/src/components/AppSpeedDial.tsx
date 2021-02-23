@@ -15,12 +15,18 @@ import { useHistory, useRouteMatch } from "react-router-dom";
 import axios from "axios";
 
 import { AdminContext } from "../AdminContext";
+import { callbackify } from "util";
 
 const useStyles = makeStyles((theme: Theme) => ({
   speedDial: {
     position: "fixed",
     bottom: theme.spacing(2),
-    right: theme.spacing(2),
+    [theme.breakpoints.up("md")]: {
+      right: "23%",
+    },
+    [theme.breakpoints.down("sm")]: {
+      right: theme.spacing(2),
+    },
   },
 }));
 
@@ -35,8 +41,6 @@ export const AppSpeedDial = (props: any) => {
 
   const slugMatch = useRouteMatch("/:slug");
   const slugParam = slugMatch ? slugMatch.params.slug : "";
-
-  //console.log(slugMatch, refMatch, refParam, slugParam);
 
   let dialButtonRef;
 
