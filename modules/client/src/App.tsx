@@ -220,7 +220,7 @@ const App: React.FC = () => {
                 render={() => <PostPage content={content} slug={slug} gitRef={ref} />}
               />
             </Switch>
-            { adminMode && authToken ? <AppSpeedDial /> : null }
+            { adminMode && authToken ? <AppSpeedDial content={content}/> : null }
           </Container>
         </main>
       </AdminContext.Provider>

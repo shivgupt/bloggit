@@ -6,7 +6,7 @@ import {
 } from "@material-ui/lab";
 import {
   Add,
-  AddCircle,
+  Delete,
   Drafts,
   Edit,
   Public,
@@ -24,7 +24,9 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-export const AppSpeedDial = () => {
+export const AppSpeedDial = (props: any) => {
+
+  const { content } = props;
   const history = useHistory();
   const [open, setOpen] = useState(false);
   const classes = useStyles();
@@ -40,6 +42,70 @@ export const AppSpeedDial = () => {
 
   const handleRedirect = (to: string) => history.push(to)
   const handleOpen = () => {
+  }
+
+  const update = async () => {
+    const newIndex = JSON.parse(JSON.stringify(adminContext.index))
+    const data = [] as Array<{path: string, content: string}>;
+
+    const post = (adminContext.index.posts[slugParam] || adminContext.index.drafts[slugParam]);
+
+    if (!post.category) {
+      const path = (document.getElementById("post_path") as HTMLInputElement).value;
+      console.log(path, post)
+      newIndex.posts[slugParam].path = path;
+      if (content === newContent && path === post.path) {
+        console.warn(`Nothing to update`);
+        return;
+      }
+      if (post.path !== path) {
+        data.push({ path: post.path!, content: ""});
+      }
+      data.push({ path, content: newContent });
+    } else {
+      // update to new format path = category/slug
+      const slug = (document.getElementById("post_slug") as HTMLInputElement).value;
+      const category = (document.getElementById("post_category") as HTMLInputElement).value.toLocaleLowerCase();
+      const title = (document.getElementById("post_title") as HTMLInputElement).value;
+      const tldr = (document.getElementById("post_tldr") as HTMLInputElement).value;
+      const img = (document.getElementById("post_img") as HTMLInputElement).value;
+      const tags = (document.getElementById("post_tags") as HTMLInputElement).value.split(",");
+      newIndex.posts[slugParam] = {
+        category,
+        lastEdit: (new Date()).toLocaleDateString("en-in"),
+        img,
+        tldr,
+        title,
+        slug,
+        tags,
+      };
+      if (content === newContent && JSON.stringify(newIndex.posts[slugParam]) === JSON.stringify(post)) {
+        console.warn(`Nothing to update`);
+        return;
+      }
+      if (post.path) {
+        data.push({ path: post.path, content: "" });
+      } else if (post.slug !== slug || post.category !== category) {
+        console.log("Path or category changed, deleting old file");
+        data.push({ path: `${post.category}/${post.slug}.md`, content: "" });
+      }
+      data.push({ path: `${category}/${slug}.md`, content: newContent });
+    }
+    if (content === newContent && JSON.stringify(newIndex) === JSON.stringify(adminContext.index) ){
+      console.log("no changes detected");
+      return;
+    }
+    data.push({ path: "index.json", content: JSON.stringify(newIndex, null, 2)});
+    console.log("Lets push it to git");
+    await axios({
+      data,
+      headers: { "content-type": "application/json" },
+      method: "post",
+      url: "git/edit",
+    });
+    await adminContext.syncRef(undefined, slugParam);
+    setEditMode(false);
+
   }
 
   const save = async (as: string) => {
@@ -153,6 +219,11 @@ export const AppSpeedDial = () => {
         icon={ <Edit />}
         FabProps={{ref: (ref) => { dialButtonRef = ref }}}
       >
+        <SpeedDialAction
+          icon={<Delete />}
+          tooltipTitle="Discard changes"
+          onClick={() => setEditMode(false)}
+        />
         <SpeedDialAction
           icon={<Drafts />}
           tooltipTitle="Save Drafts"
