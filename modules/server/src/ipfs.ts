@@ -31,7 +31,7 @@ ipfsRouter.get("/*", async (req, res, _next): Promise<any> => {
     for await (const chunk of ipfs.cat(path)) {
       chunks.push(chunk);
     }
-    content = chunks.reduce((acc, cur) => Buffer.concat([acc, cur]));
+    content = chunks.reduce((acc, cur) => Buffer.concat([acc, cur]), Buffer.from([]));
   } catch (e) {
     if (e.message === "this dag node is a directory") {
       log.info(`Returning list of ${list.length} files from given directory`);
