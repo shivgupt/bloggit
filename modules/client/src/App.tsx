@@ -26,6 +26,7 @@ import { store } from "./utils/cache";
 import { AdminContext } from "./AdminContext";
 import { SidebarNode } from "./types";
 import { CreateNewPost } from "./components/CreateNewPost";
+import { AppSpeedDial } from "./components/AppSpeedDial";
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
   appBarSpacer: theme.mixins.toolbar,
@@ -208,6 +209,7 @@ const App: React.FC = () => {
                 render={() => <PostPage content={content} slug={slug} gitRef={ref} />}
               />
             </Switch>
+            { adminMode && authToken ? <AppSpeedDial /> : null }
           </Container>
         </main>
       </AdminContext.Provider>
