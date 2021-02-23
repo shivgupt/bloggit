@@ -109,19 +109,21 @@ const DrawerContent = (props: any) => {
       >
         {theme.palette.type === "dark" ? <LightIcon /> : <DarkIcon />}
       </IconButton>
-      <Box textAlign="center" m={2}>
-        {posts["top-level"].map((p) => {
+      {posts["top-level"]
+        ? posts["top-level"].map((p) => {
           return (
-            <Button
-              key={p.slug}
-              size="small"
-              disableFocusRipple={false}
-              component={Link}
-              to={`/${p.slug}`}
-            > {p.title} </Button>
-          )
-        })}
-      </Box>
+            <Box textAlign="center" m={1}>
+              <Button
+                key={p.slug}
+                size="small"
+                disableFocusRipple={false}
+                component={Link}
+                to={`/${p.slug}`}
+              > {p.title} </Button>
+            </Box>
+          )})
+        : null
+      }
     </>
   );
 };
