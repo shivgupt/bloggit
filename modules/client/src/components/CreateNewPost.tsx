@@ -6,8 +6,9 @@ import {
 } from "@material-ui/core";
 import React, { useContext, useEffect, useState } from "react";
 import Markdown from "react-markdown";
-import ReactMde from "react-mde";
+import ReactMde, { SaveImageHandler } from "react-mde";
 import "react-mde/lib/styles/css/react-mde-all.css";
+import axios from "axios";
 
 import { AdminContext } from "../AdminContext";
 
@@ -44,6 +45,23 @@ export const CreateNewPost = () => {
   const [selectedTab, setSelectedTab] = React.useState<"write" | "preview">("write");
   const [cardBgImg, setCardBgImg] = useState("");
   
+  const save: SaveImageHandler = async function*(data: ArrayBuffer) {
+
+    let res = await axios({
+      method: "POST",
+      url: "ipfs",
+      data: data,
+      headers: { "content-type": "multipart/form-data"}
+    });
+    if (res.status === 200) {
+      console.log(res);
+      yield res.data;
+    } else {
+      console.log(res);
+    }
+    return true;
+  };
+
   if (!(adminContext.adminMode && adminContext.authToken)) return <div>Invalid Page</div>
   return (
     <Paper variant="outlined" className={classes.paper}>
@@ -79,6 +97,9 @@ export const CreateNewPost = () => {
             }}
           />
         )}
+        paste={{
+          saveImage: save
+        }}
       />
     </Paper>
   );

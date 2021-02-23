@@ -77,11 +77,9 @@ export const PostPage = (props: { content: string, slug: string, gitRef: string 
     } else {
       console.log(res);
     }
-
     return true;
   };
 
-  
   const adminContext = useContext(AdminContext);
   const { newContent, updateNewContent, editMode, setEditMode } = adminContext;
 
