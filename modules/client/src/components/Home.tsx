@@ -41,7 +41,7 @@ export const Home = (props: any) => {
   return (
     <Grid container spacing={3} justify={"space-around"} alignItems={"center"}>
       {Object.keys(posts).map(slug => {
-        if (!posts[slug].category) return (<div/>);
+        if (!posts[slug].category) return ;
         return (
           <Grid className={classes.root} item xs={12} md={6} lg={4} key={slug}>
             <Card className={classes.card}>

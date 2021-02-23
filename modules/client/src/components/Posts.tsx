@@ -1,5 +1,6 @@
 import {
   Button,
+  CardMedia,
   IconButton,
   Input,
   makeStyles,
@@ -48,6 +49,14 @@ const useStyles = makeStyles((theme) => ({
     marginTop: theme.spacing(-1),
     marginLeft: theme.spacing(1),
   },
+  media: {
+    [theme.breakpoints.up("md")]: {
+      height: 500,
+    },
+    [theme.breakpoints.down("sm")]: {
+      height: 300,
+    }
+  }
 }));
 
 export const PostPage = (props: { content: string, slug: string, gitRef: string }) => {
@@ -148,6 +157,8 @@ export const PostPage = (props: { content: string, slug: string, gitRef: string 
     setEditMode(false);
   }
 
+  // TODO: handle loading better
+  if (!post) return <> Loading </>
   return (
   <>
 
@@ -176,7 +187,11 @@ export const PostPage = (props: { content: string, slug: string, gitRef: string 
         : null}
     </div>
 
-    <Paper variant="outlined">
+    <Paper variant="outlined" className={classes.root}>
+      {post.img
+        ? <CardMedia image={post.img} className={classes.media} />
+        : null
+      }
       {adminContext.adminMode && adminContext.authToken ?
         <>
           <IconButton
@@ -200,11 +215,11 @@ export const PostPage = (props: { content: string, slug: string, gitRef: string 
               </div>
             : (
             <div className={classes.root}>
-              <TextField id="post_title" label="title" defaultValue={post?.title} fullWidth />
-              <TextField id="post_category" label="category" defaultValue={post?.category} />
-              <TextField id="post_slug" label="slug" defaultValue={post?.slug} />
-              <TextField id="post_tldr" label="tldr" defaultValue={post?.tldr} multiline fullWidth />
-              <TextField id="post_tags" label="tags" defaultValue={post?.tags} />
+              <TextField id="post_title" label="title" defaultValue={post.title} fullWidth />
+              <TextField id="post_category" label="category" defaultValue={post.category} />
+              <TextField id="post_slug" label="slug" defaultValue={post.slug} />
+              <TextField id="post_tldr" label="tldr" defaultValue={post.tldr} multiline fullWidth />
+              <TextField id="post_tags" label="tags" defaultValue={post.tags} />
               <Input
                 id="post_img"
                 value={cardBgImg}
