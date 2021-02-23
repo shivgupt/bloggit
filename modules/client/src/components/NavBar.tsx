@@ -110,12 +110,17 @@ const DrawerContent = (props: any) => {
         {theme.palette.type === "dark" ? <LightIcon /> : <DarkIcon />}
       </IconButton>
       <Box textAlign="center" m={2}>
-        <Button
-          size="small"
-          disableFocusRipple={false}
-          component={Link}
-          to={"/about"}
-        > About </Button>
+        {posts["top-level"].map((p) => {
+          return (
+            <Button
+              key={p.slug}
+              size="small"
+              disableFocusRipple={false}
+              component={Link}
+              to={`/${p.slug}`}
+            > {p.title} </Button>
+          )
+        })}
       </Box>
     </>
   );

@@ -1,14 +1,14 @@
 
 export type PostData = {
-  category: string;
+  title: string;
+  slug: string;
+  category?: string;
   featured?: string;
   img?: string;
-  lastEdit: string;
+  lastEdit?: string;
   path?: string;
-  slug: string;
-  tags: string[];
-  title: string;
-  tldr: string;
+  tags?: string[];
+  tldr?: string;
 };
 
 export type PostIndex = {

@@ -34,6 +34,7 @@ export const Home = (props: any) => {
   return (
     <Grid container spacing={3} justify={"space-around"} alignItems={"center"}>
       {Object.keys(posts).map(slug => {
+        if (!posts[slug].category) return;
         return (
           <Grid className={classes.root} item xs={12} md={6} lg={4} key={slug}>
             <Card className={classes.card}>
@@ -51,7 +52,11 @@ export const Home = (props: any) => {
                     {posts[slug].lastEdit ? prettyDateString(posts[slug].lastEdit) : ""}
                     &nbsp;
                     &nbsp;
-                    Tags: {posts[slug].tags.map(tag => <Chip key={tag} label={tag} />)}
+                    {posts[slug].tags
+                      ? <> Tags: {posts[slug].tags.map(tag => <Chip key={tag} label={tag} />)} </>
+                      : null
+                    }
+                    
                   </Typography>
                   <br />
                   <Typography variant="subtitle1" component="p" gutterBottom>

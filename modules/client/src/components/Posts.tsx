@@ -36,7 +36,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export const PostPage = (props: { content: string, slug?: string }) => {
+export const PostPage = (props: { content: string, slug: string }) => {
 
   const { content, slug } = props;
   const classes = useStyles();
@@ -47,8 +47,7 @@ export const PostPage = (props: { content: string, slug?: string }) => {
   
   const adminContext = useContext(AdminContext);
 
-  const post = (!slug || slug === "about") ? "about"
-    : (adminContext.index.posts[slug] || adminContext.index.drafts[slug]);
+  const post = (adminContext.index.posts[slug] || adminContext.index.drafts[slug]);
 
   useEffect(
     () => setNewContent(content),
@@ -62,16 +61,20 @@ export const PostPage = (props: { content: string, slug?: string }) => {
   },[post]);
 
   const save = async () => {
-    if (!newContent || !(document.getElementById("post_slug") as HTMLInputElement)) {
-      console.warn(`Nothing to update`);
-      return;
-    }
     const newIndex = JSON.parse(JSON.stringify(adminContext.index))
     const data = [] as Array<{path: string, content: string}>;
 
-    if (typeof(post) === "string") {
+    if (!post.category) {
       const path = (document.getElementById("post_path") as HTMLInputElement).value;
-      newIndex.about = path;
+      console.log(path, post)
+      newIndex.posts[slug].path = path;
+      if (content === newContent && path === post.path) {
+        console.warn(`Nothing to update`);
+        return;
+      }
+      if (post.path !== path) {
+        data.push({ path: post.path!, content: ""});
+      }
       data.push({ path, content: newContent });
 
     } else {
@@ -91,13 +94,18 @@ export const PostPage = (props: { content: string, slug?: string }) => {
         slug,
         tags,
       };
+      if (content === newContent && JSON.stringify(newIndex.posts[slug]) === JSON.stringify(post)) {
+        console.warn(`Nothing to update`);
+        return;
+      }
+
       if (post.path) {
-        data.push({path: post.path, content: ""});
+        data.push({ path: post.path, content: "" });
       } else if (post.slug !== slug || post.category !== category) {
         console.log("Path or category changed, deleting old file");
-        data.push({ path: `${post.category}/${post.slug}.md`, content: ""});
+        data.push({ path: `${post.category}/${post.slug}.md`, content: "" });
       }
-      data.push({ path: `${category}/${slug}.md`, content: newContent});
+      data.push({ path: `${category}/${slug}.md`, content: newContent });
     }
 
     if (content === newContent && JSON.stringify(newIndex) === JSON.stringify(adminContext.index) ){
@@ -120,7 +128,7 @@ export const PostPage = (props: { content: string, slug?: string }) => {
 
   return (
     <Paper variant="outlined">
-      {adminContext.adminMode ?
+      {adminContext.adminMode && adminContext.authToken ?
         <>
           <IconButton
             onClick={() => setEditMode(!editMode)}
@@ -137,9 +145,9 @@ export const PostPage = (props: { content: string, slug?: string }) => {
       }
       { editMode ? 
         <>
-          { typeof(post) === "string"
+          { !post.category
             ? <div className={classes.root}>
-                <TextField id="post_path" label="path" defaultValue={adminContext.index.about} />
+                <TextField id="post_path" label="path" defaultValue={post.path} />
               </div>
             : (
             <div className={classes.root}>

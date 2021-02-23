@@ -66,25 +66,27 @@ export const Toc = (props: any) => {
       <div className={classes.list}>
         <List component="nav" className={classes.list}>
           {Object.keys(posts).map((c) => {
-            return (
-              <div key={c}>
-                <ListItem
-                  button
-                  onClick={() => setNode({ parent: "categories", current: "posts", child: c })}
-                >
-                  {c}
-                  <IconButton
-                    onClick={() => setNode({
-                      parent: "categories",
-                      current: "posts", child: c
-                    })}
+            if (c !== "top-level") {
+              return (
+                <div key={c}>
+                  <ListItem
+                    button
+                    onClick={() => setNode({ parent: "categories", current: "posts", child: c })}
                   >
-                    <NavigateNextIcon />
-                  </IconButton>
-                </ListItem>
-                <Divider />
-              </div>
-            );
+                    {c}
+                    <IconButton
+                      onClick={() => setNode({
+                        parent: "categories",
+                        current: "posts", child: c
+                      })}
+                    >
+                      <NavigateNextIcon />
+                    </IconButton>
+                  </ListItem>
+                  <Divider />
+                </div>
+              );
+            }
           })}
         </List>
       </div>
@@ -137,11 +139,13 @@ export const Toc = (props: any) => {
     return (
       <div className={classes.list}>
         <IconButton
-          onClick={() => setNode({
-            parent: "categories",
-            current: "posts",
-            child: node.child.category,
-          })}
+          onClick={() => {
+            if (node.child.category) {
+              setNode({ parent: "categories", current: "posts", child: node.child.category })
+            } else {
+              setNode({ parent: null, current: "categories", child: "posts" })
+            }
+          }}
         >
           <NavigateBackIcon />
         </IconButton>
