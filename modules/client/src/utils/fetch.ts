@@ -67,15 +67,25 @@ export const fetchContent = async(
   const entry = (index.posts && index.posts[slug]) ? index.posts[slug]
     : (index.drafts && index.drafts[slug]) ? index.drafts[slug]
     : {} as PostData;
-  if (!entry.path && slug === "about") {
-    entry.path = entry.path || index.about;
-  }
   if (entry.path) {
     try {
       return await fetchFile(entry.path, ref, force);
     } catch (e) {
       console.error(`${entry.path} does not exist: ${e.message}`)
     }
+  } else if (entry.category) {
+    try {
+      return await fetchFile(`${entry.category}/${slug}.md`, ref, force);
+    } catch (e) {
+      console.error(`${entry.category}/${slug}.md does not exist: ${e.message}`)
+    }
+  } else {
+    try {
+      return await fetchFile(`${slug}.md`, ref, force);
+    } catch (e) {
+      console.error(`${slug}.md does not exist: ${e.message}`)
+    }
   }
-  return await fetchFile(`${entry.category}/${slug}.md`, ref, force);
+
+  throw new Error(`Can't fetch content for ${slug}`);
 };
