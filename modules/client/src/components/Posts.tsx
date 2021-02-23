@@ -1,4 +1,5 @@
 import {
+  Button,
   IconButton,
   Input,
   makeStyles,
@@ -14,11 +15,14 @@ import Markdown from "react-markdown";
 import ReactMde from "react-mde";
 import "react-mde/lib/styles/css/react-mde-all.css";
 import axios from "axios";
+import { Link } from "react-router-dom";
+import FastForwardIcon from '@material-ui/icons/FastForward';
 
 import { AdminContext } from "../AdminContext";
+import { fetchConfig } from "../utils";
+
 import { Copyable } from "./Copyable";
 import { EditHistory } from "./EditHistory";
-
 import { CodeBlockRenderer } from "./CodeBlock";
 import { EmojiRenderer, HeadingRenderer, ImageRenderer, LinkRenderer } from "./Renderers";
 import { ImageUploader } from "./ImageUploader";
@@ -50,6 +54,7 @@ export const PostPage = (props: { content: string, slug: string, gitRef: string 
 
   const { content, gitRef: ref, slug } = props;
   const classes = useStyles();
+  const [isHistorical, setIsHistorical] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [cardBgImg, setCardBgImg] = useState("");
   const [newContent, setNewContent] = useState("Loading Page");
@@ -58,6 +63,19 @@ export const PostPage = (props: { content: string, slug: string, gitRef: string 
   const adminContext = useContext(AdminContext);
 
   const post = (adminContext.index.posts[slug] || adminContext.index.drafts[slug]);
+
+  useEffect(() => {
+    (async () => {
+      const latestRef = (await fetchConfig(true)).commit.substring(0, 8);
+      if (latestRef !== ref) {
+        console.log(`latestRef ${latestRef} !== current ref ${ref}`);
+        setIsHistorical(true);
+      } else {
+        console.log(`We're on the latest version`);
+        setIsHistorical(false);
+      }
+    })();
+  }, [ref, slug]);
 
   useEffect(
     () => setNewContent(content),
@@ -143,7 +161,19 @@ export const PostPage = (props: { content: string, slug: string, gitRef: string 
       />
       <EditHistory
         className={classes.button}
+        slug={slug}
+        gitRef={ref}
       />
+      {isHistorical
+        ? <Button
+            className={classes.button}
+            startIcon={<FastForwardIcon/>}
+            component={Link}
+            color={"primary"}
+            variant={"contained"}
+            to={`/${slug}`}
+          >Jump To Present</Button>
+        : null}
     </div>
 
     <Paper variant="outlined">

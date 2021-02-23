@@ -17,7 +17,12 @@ export type PostIndex = {
   posts: { [slug: string]: PostData };
   style?: any;
   title: string;
-}
+};
+
+export type PostHistory = Array<{
+  commit: string;
+  timestamp: string;
+}>;
 
 export type SidebarNode = {
   parent: string | null,

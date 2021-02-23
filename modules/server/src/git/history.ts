@@ -11,6 +11,7 @@ type HistoryResult = Array<{ commit: string; timestamp: string; }>;
 type DateString = string; // in ISO format
 
 const toISO = (secs: number): DateString => (new Date(secs * 1000)).toISOString();
+const cache = {} as any;
 
 // Timestamp MUST increase at every commit. If it doesn't, use the prev's timestamp instead
 const earliest = (current: number, _prev?: number): number => {
@@ -20,8 +21,9 @@ const earliest = (current: number, _prev?: number): number => {
     log.error(`prev timestamp ${toISO(prev)} is ahead of current time ${toISO(now)}`);
   }
   if (current > prev) {
-    log.warn(`Invalid timestamp: ${toISO(current)} using prev time instead: ${toISO(prev)}`);
-    return prev;
+    const newPrev = prev - 1;
+    log.warn(`Invalid timestamp: ${toISO(current)} using prev time - 1 instead: ${toISO(newPrev)}`);
+    return newPrev;
   }
   return current;
 };
@@ -30,23 +32,25 @@ const earliest = (current: number, _prev?: number): number => {
 // Return an array of all commits w/in which the given filepath was modified
 export const history = async (req, res, _): Promise<any> => {
   const filepath = req.path.replace(`/history/`, "");
-  const output = [] as HistoryResult;
+
+  const startRef = req.query.startRef || env.branch;
 
   const latestCommit = await git.readCommit({
     ...gitOpts,
-    oid: await resolveRef(env.branch),
+    oid: await resolveRef(startRef),
   });
   let latestBlob;
   try {
     latestBlob = (await git.readBlob({ ...gitOpts, oid: latestCommit.oid, filepath })).oid;
   } catch (e) {
     log.warn(e.message);
-    return res.status(200).json(output);
+    return res.status(200).json([]);
   }
 
-  const commits = await git.log({ ...gitOpts, ref: env.branch });
+  const commits = await git.log({ ...gitOpts, cache, ref: latestCommit.oid });
   log.info(`Scanning ${commits.length} commits searching for changes to ${filepath}`);
 
+  const output = [] as HistoryResult;
   let newFilepath = filepath;
   let prevBlob = latestBlob;
   let prevCommit = latestCommit.oid;
@@ -81,7 +85,7 @@ export const history = async (req, res, _): Promise<any> => {
         },
       });
       if (!newFilepathFlag) {
-        log.info(`File at ${newFilepath} wasn't renamed, it was probably created here.`);
+        log.info(`Blob at ${newFilepath} wasn't renamed, it must have been created here.`);
         output.push({ commit: prevCommit, timestamp: toISO(prevTimestamp) });
         break;
       }
