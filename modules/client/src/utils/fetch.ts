@@ -62,6 +62,7 @@ export const fetchIndex = async (_ref?: string, force?: boolean): Promise<PostIn
 };
 
 const slugToPath = async (slug: string, ref: string): Promise<string> => {
+  if (!slug) return "";
   const index = await fetchIndex(ref);
   const entry = (index.posts && index.posts[slug]) ? index.posts[slug]
     : (index.drafts && index.drafts[slug]) ? index.drafts[slug]
@@ -106,6 +107,7 @@ export const fetchContent = async(
 };
 
 export const fetchHistory = async (slug: string, _ref?: string): Promise<PostHistory> => {
+  if (!slug) return [];
   const ref = _ref || (await fetchConfig()).commit.substring(0, 8);
   const path = await slugToPath(slug, ref);
   const url = `/git/history/${path}?startRef=${ref}`;

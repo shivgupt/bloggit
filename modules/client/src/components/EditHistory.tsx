@@ -76,8 +76,7 @@ export const EditHistory = (props: { className: any; gitRef: string; slug: strin
         onClose={handleClose}
       >
         {
-          history.map(entry => {
-            if (entry.commit.substring(0,8) === ref) return null;
+          history.filter(entry => entry.commit.substring(0,8) !== ref).map(entry => {
             return (
               <MenuItem
                 key={entry.commit}
