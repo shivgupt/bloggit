@@ -201,11 +201,11 @@ const App: React.FC = () => {
               />
               <Route
                 path="/:ref/:slug"
-                render={() => <PostPage content={content} slug={slug} />}
+                render={() => <PostPage content={content} slug={slug} gitRef={ref} />}
               />
               <Route
                 path="/:slug"
-                render={() => <PostPage content={content} slug={slug} />}
+                render={() => <PostPage content={content} slug={slug} gitRef={ref} />}
               />
             </Switch>
           </Container>

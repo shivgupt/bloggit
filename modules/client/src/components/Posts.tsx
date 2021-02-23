@@ -16,6 +16,8 @@ import "react-mde/lib/styles/css/react-mde-all.css";
 import axios from "axios";
 
 import { AdminContext } from "../AdminContext";
+import { Copyable } from "./Copyable";
+
 
 import { CodeBlockRenderer } from "./CodeBlock";
 import { EmojiRenderer, HeadingRenderer, ImageRenderer, LinkRenderer } from "./Renderers";
@@ -34,11 +36,16 @@ const useStyles = makeStyles((theme) => ({
     textAlign: "justify",
     fontVariant: "discretionary-ligatures",
   },
+  button: {
+    marginBottom: theme.spacing(1),
+    marginTop: theme.spacing(-1),
+    marginLeft: theme.spacing(1),
+  },
 }));
 
-export const PostPage = (props: { content: string, slug: string }) => {
+export const PostPage = (props: { content: string, slug: string, gitRef: string }) => {
 
-  const { content, slug } = props;
+  const { content, gitRef: ref, slug } = props;
   const classes = useStyles();
   const [editMode, setEditMode] = useState(false);
   const [cardBgImg, setCardBgImg] = useState("");
@@ -63,7 +70,6 @@ export const PostPage = (props: { content: string, slug: string }) => {
   const save = async () => {
     const newIndex = JSON.parse(JSON.stringify(adminContext.index))
     const data = [] as Array<{path: string, content: string}>;
-
     if (!post.category) {
       const path = (document.getElementById("post_path") as HTMLInputElement).value;
       console.log(path, post)
@@ -76,7 +82,6 @@ export const PostPage = (props: { content: string, slug: string }) => {
         data.push({ path: post.path!, content: ""});
       }
       data.push({ path, content: newContent });
-
     } else {
       // update to new format path = category/slug
       const slug = (document.getElementById("post_slug") as HTMLInputElement).value;
@@ -98,7 +103,6 @@ export const PostPage = (props: { content: string, slug: string }) => {
         console.warn(`Nothing to update`);
         return;
       }
-
       if (post.path) {
         data.push({ path: post.path, content: "" });
       } else if (post.slug !== slug || post.category !== category) {
@@ -107,12 +111,10 @@ export const PostPage = (props: { content: string, slug: string }) => {
       }
       data.push({ path: `${category}/${slug}.md`, content: newContent });
     }
-
     if (content === newContent && JSON.stringify(newIndex) === JSON.stringify(adminContext.index) ){
       console.log("no changes detected");
       return;
     }
-
     data.push({ path: "index.json", content: JSON.stringify(newIndex, null, 2)});
     console.log("Lets push it to git");
     await axios({
@@ -121,12 +123,20 @@ export const PostPage = (props: { content: string, slug: string }) => {
       method: "post",
       url: "git/edit",
     });
-
     await adminContext.syncRef(undefined, slug);
     setEditMode(false);
   }
 
   return (
+  <>
+    <Copyable
+      className={classes.button}
+      color={"primary"}
+      text={"Copy Permalink"}
+      tooltip={"Snapshot of the page that will never change or disappear"}
+      value={`${window.location.origin}/${ref}/${slug}`}
+    />
+
     <Paper variant="outlined">
       {adminContext.adminMode && adminContext.authToken ?
         <>
@@ -198,5 +208,6 @@ export const PostPage = (props: { content: string, slug: string }) => {
           />
       }
     </Paper>
+  </>
   );
 };
