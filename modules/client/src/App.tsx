@@ -134,6 +134,11 @@ const App: React.FC = () => {
   useEffect(() => {
     if (slugParam === "admin" || slugParam === "create-new-post") return;
     setContent("Loading..");
+
+    // cleanup state
+    setNewContent("");
+    setEditMode(false);
+
     setSlug(slugParam);
     (async () => {
       try {

@@ -41,8 +41,6 @@ export const AppSpeedDial = (props: any) => {
   let dialButtonRef;
 
   const handleRedirect = (to: string) => history.push(to)
-  const handleOpen = () => {
-  }
 
   const update = async () => {
     const newIndex = JSON.parse(JSON.stringify(adminContext.index))
@@ -225,14 +223,9 @@ export const AppSpeedDial = (props: any) => {
           onClick={() => setEditMode(false)}
         />
         <SpeedDialAction
-          icon={<Drafts />}
-          tooltipTitle="Save Drafts"
-          onClick={() => save("draft")}
-        />
-        <SpeedDialAction
           icon={<Public />}
           tooltipTitle="Publish"
-          onClick={() => save("post")}
+          onClick={update}
         />
       </SpeedDial>
     )
