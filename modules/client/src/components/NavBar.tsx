@@ -109,14 +109,20 @@ const DrawerContent = (props: any) => {
       >
         {theme.palette.type === "dark" ? <LightIcon /> : <DarkIcon />}
       </IconButton>
-      <Box textAlign="center" m={2}>
-        <Button
-          size="small"
-          disableFocusRipple={false}
-          component={Link}
-          to={"/about"}
-        > About </Button>
-      </Box>
+      {posts["top-level"]
+        ? posts["top-level"].map((p) => {
+          return (
+            <Box key={p.slug} textAlign="center" m={1}>
+              <Button
+                size="small"
+                disableFocusRipple={false}
+                component={Link}
+                to={`/${p.slug}`}
+              > {p.title} </Button>
+            </Box>
+          )})
+        : null
+      }
     </>
   );
 };
@@ -152,18 +158,6 @@ export const NavBar = (props: any) => {
           >
             {title.page ? title.page : "Home"}
           </Typography>
-          {
-            adminContext.authToken && adminContext.adminMode
-            ? <IconButton
-              component={Link}
-              edge="end"
-              to={"/create-new-post"}
-              color="inherit"
-            >
-              <AddIcon />
-            </IconButton>
-            : null
-          }
           <Hidden mdUp>
             <IconButton
               edge="start"

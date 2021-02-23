@@ -1,9 +1,12 @@
 import { createMuiTheme } from "@material-ui/core";
 import "@fontsource/monsieur-la-doulaise";
 
+import { env } from "./env";
+
 export const siteTitleFont = createMuiTheme({
   typography: {
     fontFamily: [
+      env.fontFamily,
     ].join(","),
   },
 });
@@ -11,10 +14,10 @@ export const siteTitleFont = createMuiTheme({
 export const darkTheme = createMuiTheme({
   palette: {
     primary: {
-      main: "#2e3241",
+      main: env.dark.primary,
     },
     secondary: {
-      main: "#379179",
+      main: env.dark.secondary,
     },
     type: "dark",
   },
@@ -23,10 +26,10 @@ export const darkTheme = createMuiTheme({
 export const lightTheme = createMuiTheme({
   palette: {
     primary: {
-      main: "#88969f",
+      main: env.light.primary,
     },
     secondary: {
-      main: "#8bcfcf",
+      main: env.light.primary,
     },
     type: "light",
   },

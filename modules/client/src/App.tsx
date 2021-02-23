@@ -16,9 +16,8 @@ import { NavBar } from "./components/NavBar";
 import { PostPage } from "./components/Posts";
 import {
   emptyIndex,
-  fetchBranch,
+  fetchRef,
   fetchContent,
-  fetchFile,
   fetchIndex,
   getPostsByCategories,
 } from "./utils";
@@ -27,6 +26,7 @@ import { store } from "./utils/cache";
 import { AdminContext } from "./AdminContext";
 import { SidebarNode } from "./types";
 import { CreateNewPost } from "./components/CreateNewPost";
+import { AppSpeedDial } from "./components/AppSpeedDial";
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
   appBarSpacer: theme.mixins.toolbar,
@@ -56,6 +56,7 @@ const App: React.FC = () => {
     : slugMatch ? slugMatch.params.slug
     : "";
 
+  const [latestRef, setLatestRef] = useState(refParam);
   const [ref, setRef] = useState(refParam);
   const [slug, setSlug] = useState(slugParam);
   const [content, setContent] = useState("Loading...");
@@ -64,15 +65,20 @@ const App: React.FC = () => {
   const [theme, setTheme] = useState(lightTheme);
   const [index, setIndex] = useState(emptyIndex);
   const [title, setTitle] = useState({ site: "", page: "" });
-  const [about, setAbout] = useState("");
   const [authToken, setAuthToken] = useState("");
   const [adminMode, setAdminMode] = useState(true);
+  const [newContent, setNewContent] = useState("");
+  const [editMode, setEditMode] = useState(false);
   const [allContent, setAllContent] = useState({});
 
   // console.log(`Rendering App with ref=${ref} (${refParam}) and slug=${slug} (${slugParam})`);
   const updateAuthToken = (authToken: string) => {
     setAuthToken(authToken);
     store.save("authToken", authToken);
+  };
+
+  const updateNewContent = (newContent: string) => {
+    setNewContent(newContent);
   };
 
   const viewAdminMode = (viewAdminMode: boolean) => setAdminMode(viewAdminMode);
@@ -91,27 +97,21 @@ const App: React.FC = () => {
   const syncRef = async (
     _ref?: string | null,
     slug?: string | null,
-    force?: boolean,
   ) => {
-    const branch = await fetchBranch()
-    const newRef = _ref || branch;
+    const newRef = _ref || await fetchRef();
     setRef(newRef);
     // console.log(`Syncing ref ${newRef}${slug ? ` and slug ${slug}` : ""}`);
-    // if ref is not the branch, then it's immutable & never needs to be refreshed
-    const forceForReal = force && newRef === branch;
-    const newIndex = await fetchIndex(newRef, forceForReal);
+    const newIndex = await fetchIndex(newRef);
     if (slug) {
       if (!allContent[newRef]) {
         allContent[newRef] = {};
       }
-      allContent[newRef][slug] = await fetchContent(slug!, newRef, forceForReal);
+      allContent[newRef][slug] = await fetchContent(slug!, newRef);
       setContent(allContent[newRef][slug]);
       setAllContent(allContent);
     }
-    if (newIndex.about) {
-      setAbout(await fetchFile(newIndex.about, newRef, forceForReal));
-    }
     setIndex(JSON.parse(JSON.stringify(newIndex))); // new object forces a re-render
+    setRef(newRef);
   }
 
   // Run this effect exactly once when the page initially loads
@@ -125,17 +125,36 @@ const App: React.FC = () => {
     // Check local storage for admin edit keys
     const key = store.load("authToken");
     if (key) setAuthToken(key);
+    (async () => {
+      setLatestRef(await fetchRef());
+    })()
   }, []);
 
   // Fetch index & post content any time the url changes
   useEffect(() => {
+    if (slugParam === "admin" || slugParam === "create-new-post") return;
     setContent("Loading..");
+
+    // cleanup state
+    setNewContent("");
+    setEditMode(false);
+
     setSlug(slugParam);
     (async () => {
-      await syncRef(refParam, slugParam);
+      try {
+        await syncRef(refParam || latestRef, slugParam);
+      } catch (e) {
+        console.warn(e.message);
+        if (!allContent[refParam]) {
+          allContent[refParam] = {};
+        }
+        allContent[refParam][slugParam] = "Post does not exist";
+        setContent(allContent[refParam][slugParam]);
+        setAllContent(allContent);
+      }
     })()
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [refParam, slugParam]);
+  }, [latestRef, refParam, slugParam]);
 
   // Update auth headers any time the authToken changes
   useEffect(() => {
@@ -161,7 +180,7 @@ const App: React.FC = () => {
   return (
     <ThemeProvider theme={theme}>
       <AdminContext.Provider
-        value={{ syncRef, authToken, index, updateAuthToken, adminMode, viewAdminMode }}
+        value={{ syncRef, authToken, editMode, setEditMode, newContent, updateNewContent, index, updateAuthToken, adminMode, viewAdminMode }}
       >
         <CssBaseline />
         <NavBar
@@ -176,26 +195,14 @@ const App: React.FC = () => {
         />
         <main className={classes.main}>
           <div className={classes.appBarSpacer} />
-          <Container maxWidth="lg" className={classes.container}>
+          <Container maxWidth="xl" className={classes.container}>
             <Switch>
               <Route exact
                 path="/"
                 render={() => {
                   return (
-                    <Home
-                      posts={index.posts}
-                      title={title}
-                    />
+                    <Home posts={index.posts} title={title} />
                   );
-                }}
-              />
-              <Route exact
-                path="/about"
-                render={() => {
-                  return (<PostPage content={index.about ?
-                    about
-                    : "Not added yet" }
-                  />);
                 }}
               />
               <Route exact
@@ -214,13 +221,24 @@ const App: React.FC = () => {
               />
               <Route
                 path="/:ref/:slug"
-                render={() => <PostPage content={content} slug={slug} />}
+                render={() => <PostPage
+                  content={content}
+                  slug={slug}
+                  gitRef={ref}
+                  latestRef={latestRef}
+                />}
               />
               <Route
                 path="/:slug"
-                render={() => <PostPage content={content} slug={slug} />}
+                render={() => <PostPage
+                  content={content}
+                  slug={slug}
+                  gitRef={ref}
+                  latestRef={latestRef}
+                />}
               />
             </Switch>
+            { adminMode && authToken ? <AppSpeedDial content={content}/> : null }
           </Container>
         </main>
       </AdminContext.Provider>

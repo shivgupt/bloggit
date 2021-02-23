@@ -1,14 +1,14 @@
 
 export type PostData = {
-  category: string;
+  title: string;
+  slug: string;
+  category?: string;
   featured?: string;
   img?: string;
-  lastEdit: string;
+  lastEdit?: string;
   path?: string;
-  slug: string;
-  tags: string[];
-  title: string;
-  tldr: string;
+  tags?: string[];
+  tldr?: string;
 };
 
 export type PostIndex = {
@@ -17,7 +17,12 @@ export type PostIndex = {
   posts: { [slug: string]: PostData };
   style?: any;
   title: string;
-}
+};
+
+export type PostHistory = Array<{
+  commit: string;
+  timestamp: string;
+}>;
 
 export type SidebarNode = {
   parent: string | null,

@@ -16,7 +16,7 @@ export type GitTreeEntry = {
 };
 export type GitTree = GitTreeEntry[];
 
-// Roughly based on https://stackoverflow.com/a/25556917
+// Inspired by https://stackoverflow.com/a/25556917
 export const edit = async (req, res, _): Promise<void> => {
   const err = (e: string): void => {
     log.error(`Git edit failed: ${e}`);

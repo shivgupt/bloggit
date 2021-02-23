@@ -1,34 +1,31 @@
 import axios from "axios";
 
-import { PostData, PostIndex } from "../types";
+import { PostData, PostIndex, PostHistory } from "../types";
 
-let branchCache: string;
-export const fetchBranch = async (force?: boolean): Promise<string> => {
-  if (!branchCache || force) {
-    const configPath = "/git/config";
-    console.log(`F${force ? "orcefully f" : ""}etching branch from ${configPath}`);
-    const response = await axios(configPath);
-    if (!response || !response.data) {
-      throw new Error(`Failed to retrieve data from ${configPath}`);
-    }
-    if (!response.data.branch) {
-      throw new Error(`Failed to retrive branch from data: ${JSON.stringify(response.data)}`);
-    }
-    branchCache = response.data.branch;
+export const fetchRef = async (): Promise<string> => {
+  const configUrl = "/git/config";
+  console.log(`Fetching latest ref from ${configUrl}`);
+  const response = await axios(configUrl);
+  if (!response || !response.data) {
+    throw new Error(`Failed to retrieve data from ${configUrl}`);
   }
-  return branchCache;
+  if (!response.data.commit) {
+    throw new Error(`Failed to retrieve branch from data: ${JSON.stringify(response.data)}`);
+  }
+  return response.data.commit.substring(0, 8);
 }
 
+// TODO: instead of throwing, save null to cache so we never re-fetch invalid paths
 let fileCache: { [ref: string]: { [path: string]: string; } } = {};
-export const fetchFile = async (path: string, _ref?: string, force?: boolean): Promise<string> => {
-  const ref = _ref || await fetchBranch();
+export const fetchFile = async (path: string, _ref?: string): Promise<string> => {
+  const ref = _ref || await fetchRef();
   if (!fileCache[ref]) {
     fileCache[ref] = {};
   }
-  if (!fileCache[ref][path] || force) {
+  if (!fileCache[ref][path]) {
     const url = `/git/${ref}/${path}`;
     try {
-      console.log(`F${force ? "orcefully f" : ""}etching file from ${url}`);
+      console.log(`Fetching file from ${url}`);
       const response = await axios(url);
       if (response && response.data && response.data.content) {
         fileCache[ref][path] = response.data.content;
@@ -43,9 +40,9 @@ export const fetchFile = async (path: string, _ref?: string, force?: boolean): P
   return fileCache[ref][path];
 };
 
-export const fetchIndex = async(_ref?: string, force?: boolean): Promise<PostIndex> => {
-  const ref = _ref || await fetchBranch();
-  const indexContent = await fetchFile("index.json", ref, force);
+export const fetchIndex = async (_ref?: string): Promise<PostIndex> => {
+  const ref = _ref || await fetchRef();
+  const indexContent = await fetchFile("index.json", ref);
   const index = JSON.parse(indexContent);
   if (!index || !index.posts) {
     throw new Error(`Got invalid site index: ${JSON.stringify(index)}`);
@@ -57,25 +54,61 @@ export const fetchIndex = async(_ref?: string, force?: boolean): Promise<PostInd
   return index;
 };
 
-export const fetchContent = async(
-  slug: string,
-  _ref?: string,
-  force?: boolean,
-): Promise<string> => {
-  const ref = _ref || await fetchBranch();
-  const index = await fetchIndex(ref, force);
+const slugToPath = async (slug: string, ref: string): Promise<string> => {
+  if (!slug) return "";
+  const index = await fetchIndex(ref);
   const entry = (index.posts && index.posts[slug]) ? index.posts[slug]
     : (index.drafts && index.drafts[slug]) ? index.drafts[slug]
     : {} as PostData;
-  if (!entry.path && slug === "about") {
-    entry.path = entry.path || index.about;
-  }
+  let path;
   if (entry.path) {
+    path = entry.path;
     try {
-      return await fetchFile(entry.path, ref, force);
+      await fetchFile(path, ref);
+      return path;
     } catch (e) {
-      console.error(`${entry.path} does not exist: ${e.message}`)
+      console.warn(`${path} does not exist on ${ref}: ${e.message}`)
     }
   }
-  return await fetchFile(`${entry.category}/${slug}.md`, ref, force);
+  if (entry.category) {
+    path = `${entry.category}/${slug}.md`;
+    try {
+      await fetchFile(path, ref);
+      return path;
+    } catch (e) {
+      console.warn(`${path} does not exist on ${ref}: ${e.message}`)
+    }
+  }
+  path = `${slug}.md`;
+  try {
+    await fetchFile(path, ref);
+    return path;
+  } catch (e) {
+    console.warn(`${path} does not exist on ${ref}: ${e.message}`)
+  }
+  throw new Error(`No valid path exists for ${slug}`);
+};
+
+export const fetchContent = async(
+  slug: string,
+  _ref?: string,
+): Promise<string> => {
+  const ref = _ref || await fetchRef();
+  const path = await slugToPath(slug, ref);
+  return await fetchFile(path, ref)
+};
+
+export const fetchHistory = async (slug: string): Promise<PostHistory> => {
+  if (!slug) return [];
+  const url = `/git/history/${slug}`;
+  const response = await axios(url);
+  if (!response || !response.data) {
+    console.warn(`Failed to retrieve data from ${url}`);
+    return [];
+  }
+  if (!response.data.length) {
+    console.warn(`Failed to retrieve valid history entries for ${slug}`, response.data);
+    return [];
+  }
+  return response.data as PostHistory;
 };

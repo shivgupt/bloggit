@@ -1,40 +1,28 @@
 import express from "express";
-import git from "isomorphic-git";
 
 import { env } from "../env";
 import { logger } from "../utils";
 
-import { gitOpts, resolveRef } from "./utils";
+import { getCommit, readFile, resolveRef } from "./utils";
 
 export const gitRouter = express.Router();
 
 const log = logger.child({ module: "GitRead" });
 
-export const getConfig = (req, res, _): void => {
+export const getConfig = async (req, res, _): Promise<void> => {
   res.json({
+    commit: await resolveRef(env.branch),
     branch: env.branch,
   });
 };
 
 export const getFile = async (req, res, next): Promise<void> => {
-  const { ref: givenRef } = req.params;
-  const filepath = req.path.replace(`/${givenRef}/`, "");
-  log.info(`Returning content at ref ${givenRef} and path ${filepath}`);
-  let ref;
+  const { ref } = req.params;
+  const filepath = req.path.replace(`/${ref}/`, "");
+  log.info(`Returning content at ref ${ref} and path ${filepath}`);
   try {
-    ref = await resolveRef(givenRef);
-    log.info(`Expanded given ref "${givenRef}" to "${ref}"`);
-  } catch (e) {
-    log.info(`Failed to resolve ref ${givenRef}`);
-    return next();
-  }
-  try {
-    const commit = (await git.readCommit({ ...gitOpts, oid: ref })).commit;
-    const content = Buffer.from((await git.readBlob({
-      ...gitOpts,
-      oid: ref,
-      filepath,
-    })).blob).toString("utf8");
+    const commit = await getCommit(ref);
+    const content = await readFile(ref, filepath);
     log.info(`Returning ${content.length} chars of content for ${filepath}`);
     res.status(200).json({
       author: commit.committer.name,
@@ -42,7 +30,7 @@ export const getFile = async (req, res, next): Promise<void> => {
       content,
     });
   } catch (e) {
-    log.info(`Failed to read object w oid ${ref} and filepath ${filepath}: ${e.message}`);
-    return next();
+    log.warn(`Failed to read ${filepath} on ref ${ref}: ${e.message}`);
+    next();
   }
 };
