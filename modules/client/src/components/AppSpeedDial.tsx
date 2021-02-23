@@ -22,8 +22,9 @@ export const AppSpeedDial = () => {
   const history = useHistory();
   const [open, setOpen] = useState(false);
   const classes = useStyles();
+  let dialButtonRef;
 
-  const handelRedirect = (to: string) => history.push(to)
+  const handleRedirect = (to: string) => history.push(to)
   return (
     <SpeedDial
       ariaLabel="fab"
@@ -32,11 +33,12 @@ export const AppSpeedDial = () => {
       open={open}
       className={classes.speedDial}
       icon={ <Edit />}
+      FabProps={{ref: (ref) => { dialButtonRef = ref }}}
     >
       <SpeedDialAction
         icon={<AddCircle />}
         tooltipTitle="New Post"
-        onClick={() => handelRedirect("/create-new-post")}
+        onClick={() => handleRedirect("/create-new-post")}
       />
     </SpeedDial>
   )
