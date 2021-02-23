@@ -107,7 +107,7 @@ export const fetchHistory = async (slug: string): Promise<PostHistory> => {
     return [];
   }
   if (!response.data.length) {
-    console.warn(`Failed to retrieve valid history entries for ${slug}`);
+    console.warn(`Failed to retrieve valid history entries for ${slug}`, response.data);
     return [];
   }
   return response.data as PostHistory;

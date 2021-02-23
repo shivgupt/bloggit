@@ -53,9 +53,14 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-export const PostPage = (props: { content: string, slug: string, gitRef: string }) => {
+export const PostPage = (props: {
+  content: string,
+  gitRef: string,
+  latestRef: string,
+  slug: string,
+}) => {
 
-  const { content, gitRef: ref, slug } = props;
+  const { content, gitRef: ref, latestRef, slug } = props;
   const classes = useStyles();
   const [isHistorical, setIsHistorical] = useState(false);
   const [cardBgImg, setCardBgImg] = useState("");
@@ -68,14 +73,13 @@ export const PostPage = (props: { content: string, slug: string, gitRef: string 
 
   useEffect(() => {
     (async () => {
-      const latestRef = await fetchRef();
       if (latestRef !== ref) {
         setIsHistorical(true);
       } else {
         setIsHistorical(false);
       }
     })();
-  }, [ref, slug]);
+  }, [latestRef, ref]);
 
   useEffect(
     () => updateNewContent(content),
@@ -88,8 +92,6 @@ export const PostPage = (props: { content: string, slug: string, gitRef: string 
     }
   },[post]);
 
-  // TODO: handle loading better
-  if (!post) return <> Loading </>
   return (
   <>
 
@@ -119,7 +121,7 @@ export const PostPage = (props: { content: string, slug: string, gitRef: string 
     </div>
 
     <Paper variant="outlined" className={classes.root}>
-      {post.img
+      {post?.img
         ? <CardMedia image={post.img} className={classes.media} />
         : null
       }

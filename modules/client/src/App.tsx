@@ -56,6 +56,7 @@ const App: React.FC = () => {
     : slugMatch ? slugMatch.params.slug
     : "";
 
+  const [latestRef, setLatestRef] = useState(refParam);
   const [ref, setRef] = useState(refParam);
   const [slug, setSlug] = useState(slugParam);
   const [content, setContent] = useState("Loading...");
@@ -124,6 +125,9 @@ const App: React.FC = () => {
     // Check local storage for admin edit keys
     const key = store.load("authToken");
     if (key) setAuthToken(key);
+    (async () => {
+      setLatestRef(await fetchRef());
+    })()
   }, []);
 
   // Fetch index & post content any time the url changes
@@ -138,16 +142,19 @@ const App: React.FC = () => {
     setSlug(slugParam);
     (async () => {
       try {
-        await syncRef(refParam, slugParam);
+        await syncRef(refParam || latestRef, slugParam);
       } catch (e) {
         console.warn(e.message);
+        if (!allContent[refParam]) {
+          allContent[refParam] = {};
+        }
         allContent[refParam][slugParam] = "Post does not exist";
         setContent(allContent[refParam][slugParam]);
         setAllContent(allContent);
       }
     })()
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [refParam, slugParam]);
+  }, [latestRef, refParam, slugParam]);
 
   // Update auth headers any time the authToken changes
   useEffect(() => {
@@ -214,11 +221,21 @@ const App: React.FC = () => {
               />
               <Route
                 path="/:ref/:slug"
-                render={() => <PostPage content={content} slug={slug} gitRef={ref} />}
+                render={() => <PostPage
+                  content={content}
+                  slug={slug}
+                  gitRef={ref}
+                  latestRef={latestRef}
+                />}
               />
               <Route
                 path="/:slug"
-                render={() => <PostPage content={content} slug={slug} gitRef={ref} />}
+                render={() => <PostPage
+                  content={content}
+                  slug={slug}
+                  gitRef={ref}
+                  latestRef={latestRef}
+                />}
               />
             </Switch>
             { adminMode && authToken ? <AppSpeedDial content={content}/> : null }
