@@ -223,11 +223,6 @@ export const AppSpeedDial = (props: any) => {
           onClick={() => setEditMode(false)}
         />
         <SpeedDialAction
-          icon={<Drafts />}
-          tooltipTitle="Save Drafts"
-          onClick={() => save("draft")}
-        />
-        <SpeedDialAction
           icon={<Public />}
           tooltipTitle="Publish"
           onClick={update}
