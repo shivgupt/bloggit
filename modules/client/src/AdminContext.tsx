@@ -4,14 +4,14 @@ import { PostIndex } from "./types";
 export const AdminContext = React.createContext({
   authToken: "",
   adminMode: true,
+  newContent: "",
+  editMode: false,
   index: {} as PostIndex,
 
   // eslint-disable-next-line
   updateAuthToken: (authToken: string) => {},
+  setEditMode: (edit: boolean) => {},
+  updateNewContent: (newContent: string) => {},
   viewAdminMode: (viewAdminMode: boolean) => {},
-  updateIndex: async (
-    newIndex?: PostIndex,
-    fetch?: "content" | "index" | "about",
-    slug?: string
-  ) => {},
+  syncRef: async (ref?: string, slug?: string, force?: boolean) => {},
 });

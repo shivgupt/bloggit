@@ -1,64 +1,123 @@
 import axios from "axios";
 
-import { PostIndex } from "../types";
+import { PostData, PostIndex, PostHistory } from "../types";
 
-let indexCache: Promise<PostIndex> | undefined;
-const contentCache: { [key: string]: Promise<string>; } = {};
-let configCache: Promise<any> | undefined;
+type GitConfig = { branch: string; commit: string; };
 
-const get = async (file: string): Promise<string | PostIndex> => {
-  if (!configCache) {
-    configCache = axios("/git/config")
-  }
-  const config = (await configCache).data;
-  const url = `/git/${config.branch}/${file}`;
-  try {
-    const response = await axios(url);
-    if (response && response.data && response.data.content) {
-      return response.data.content;
+let configCache: GitConfig;
+export const fetchConfig = async (force?: boolean): Promise<GitConfig> => {
+  if (!configCache || force) {
+    const configPath = "/git/config";
+    console.log(`F${force ? "orcefully f" : ""}etching branch from ${configPath}`);
+    const response = await axios(configPath);
+    if (!response || !response.data) {
+      throw new Error(`Failed to retrieve data from ${configPath}`);
     }
-    console.warn(`Got bad data from ${url}: ${JSON.stringify(response.data)}`);
-  } catch (e) {
-    console.warn(e.message);
+    if (!response.data.branch || !response.data.commit) {
+      throw new Error(`Failed to retrieve branch from data: ${JSON.stringify(response.data)}`);
+    }
+    configCache = response.data;
   }
-  throw new Error(`Couldn't get ${file}`);
+  return configCache;
+}
+
+// TODO: never force, always resovle branch refs to a commit hash
+// TODO: instead of throwing, save null to cache so we never re-fetch invalid paths
+let fileCache: { [ref: string]: { [path: string]: string; } } = {};
+export const fetchFile = async (path: string, _ref?: string, force?: boolean): Promise<string> => {
+  const ref = _ref || (await fetchConfig(force)).commit.substring(0, 8);
+  if (!fileCache[ref]) {
+    fileCache[ref] = {};
+  }
+  if (!fileCache[ref][path] || force) {
+    const url = `/git/${ref}/${path}`;
+    try {
+      console.log(`F${force ? "orcefully f" : ""}etching file from ${url}`);
+      const response = await axios(url);
+      if (response && response.data && response.data.content) {
+        fileCache[ref][path] = response.data.content;
+      } else {
+        throw new Error(`Got bad data from ${url}: ${JSON.stringify(response.data)}`);
+      }
+    } catch (e) {
+      console.error(e.message);
+      throw new Error(`Couldn't get ${path}: ${e.message}`);
+    }
+  }
+  return fileCache[ref][path];
 };
 
-export const fetchIndex = async(force?: boolean): Promise<PostIndex> => {
-  if (!indexCache || force) {
-    indexCache = get("index.json") as Promise<PostIndex>;
-  }
-  const index = JSON.parse((await indexCache) as any);
+export const fetchIndex = async (_ref?: string, force?: boolean): Promise<PostIndex> => {
+  const ref = _ref || (await fetchConfig(force)).commit.substring(0, 8);
+  const indexContent = await fetchFile("index.json", ref, force);
+  const index = JSON.parse(indexContent);
   if (!index || !index.posts) {
-    throw new Error(`Got invalid site index ${typeof index}: ${index}`);
+    throw new Error(`Got invalid site index: ${JSON.stringify(index)}`);
   }
-  // Set some default values
-  Object.keys(index!.posts).forEach(slug => {
-    const post = index.posts[slug];
+  // Also set slug property based on the keynames
+  Object.keys(index.posts).forEach(slug => {
     index.posts[slug].slug = slug;
   });
   return index;
 };
 
-export const fetchFile = async (path: string): Promise<string> => get(path) as Promise<string>;
-
-export const fetchContent = async(slug: string, force?: boolean): Promise<string> => {
-  if (!contentCache[slug] || force) {
-    const index = await fetchIndex();
-    if (index.posts[slug]) {
-      if (index.posts[slug].path)
-        contentCache[slug] = get(index.posts[slug].path!) as Promise<string>;
-      else
-        contentCache[slug] = get(`${index.posts[slug].category}/${slug}.md`) as Promise<string>;
-
-    } else if (index.drafts[slug]) {
-      if (index.drafts[slug].path)
-        contentCache[slug] = get(index.drafts[slug].path!) as Promise<string>;
-      else
-        contentCache[slug] = get(`${index.drafts[slug].category}/${slug}.md`) as Promise<string>;
-    } else {
-      return "Page does not exist"
+const slugToPath = async (slug: string, ref: string): Promise<string> => {
+  if (!slug) return "";
+  const index = await fetchIndex(ref);
+  const entry = (index.posts && index.posts[slug]) ? index.posts[slug]
+    : (index.drafts && index.drafts[slug]) ? index.drafts[slug]
+    : {} as PostData;
+  let path;
+  if (entry.path) {
+    path = entry.path;
+    try {
+      await fetchFile(path, ref);
+      return path;
+    } catch (e) {
+      console.warn(`${path} does not exist on ${ref}: ${e.message}`)
     }
   }
-  return contentCache[slug];
+  if (entry.category) {
+    path = `${entry.category}/${slug}.md`;
+    try {
+      await fetchFile(path, ref);
+      return path;
+    } catch (e) {
+      console.warn(`${path} does not exist on ${ref}: ${e.message}`)
+    }
+  }
+  path = `${slug}.md`;
+  try {
+    await fetchFile(path, ref);
+    return path;
+  } catch (e) {
+    console.warn(`${path} does not exist on ${ref}: ${e.message}`)
+  }
+  throw new Error(`No valid path exists for ${slug}`);
+};
+
+export const fetchContent = async(
+  slug: string,
+  _ref?: string,
+  force?: boolean,
+): Promise<string> => {
+  const ref = _ref || (await fetchConfig()).commit.substring(0, 8);
+  const path = await slugToPath(slug, ref);
+  return await fetchFile(path, ref, force)
+};
+
+export const fetchHistory = async (slug: string, _ref?: string): Promise<PostHistory> => {
+  if (!slug) return [];
+  const ref = _ref || (await fetchConfig()).commit.substring(0, 8);
+  const path = await slugToPath(slug, ref);
+  const url = `/git/history/${path}?startRef=${ref}`;
+  console.log(`Fetching file history from ${url}`);
+  const response = await axios(url);
+  if (!response || !response.data) {
+    throw new Error(`Failed to retrieve data from ${url}`);
+  }
+  if (!response.data.length) {
+    throw new Error(`Failed to retrieve any history entries for ${path}`);
+  }
+  return response.data as PostHistory;
 };

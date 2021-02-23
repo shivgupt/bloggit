@@ -57,7 +57,7 @@ const TocGenerator = (props: any) => {
 };
 
 export const Toc = (props: any) => {
-  const { node, posts, postsContent, setNode } = props;
+  const { node, allContent, posts, gitRef: ref, setNode } = props;
   const classes = useStyles();
 
   switch(node.current) {
@@ -66,25 +66,27 @@ export const Toc = (props: any) => {
       <div className={classes.list}>
         <List component="nav" className={classes.list}>
           {Object.keys(posts).map((c) => {
-            return (
-              <div key={c}>
-                <ListItem
-                  button
-                  onClick={() => setNode({ parent: "categories", current: "posts", child: c })}
-                >
-                  {c}
-                  <IconButton
-                    onClick={() => setNode({
-                      parent: "categories",
-                      current: "posts", child: c
-                    })}
+            if (c !== "top-level") {
+              return (
+                <div key={c}>
+                  <ListItem
+                    button
+                    onClick={() => setNode({ parent: "categories", current: "posts", child: c })}
                   >
-                    <NavigateNextIcon />
-                  </IconButton>
-                </ListItem>
-                <Divider />
-              </div>
-            );
+                    {c}
+                    <IconButton
+                      onClick={() => setNode({
+                        parent: "categories",
+                        current: "posts", child: c
+                      })}
+                    >
+                      <NavigateNextIcon />
+                    </IconButton>
+                  </ListItem>
+                  <Divider />
+                </div>
+              );
+            }
           })}
         </List>
       </div>
@@ -109,19 +111,19 @@ export const Toc = (props: any) => {
               <div key={p.slug}>
                 <ListItem button key={p.title} component={Link} to={`/${p.slug}`}>
                   {p.title}
-                  {postsContent[p.slug] ? 
-                    <IconButton
-                      onClick={() => {
-                        setNode({
-                          parent: "posts",
-                          current: "toc",
-                          child: p,
-                        });
-                      }}
-                      className={classes.tocButton}
-                    >
-                      <TocIcon/>
-                    </IconButton>
+                  {allContent && allContent[ref] && allContent[ref][p.slug]
+                    ?  <IconButton
+                        onClick={() => {
+                          setNode({
+                            parent: "posts",
+                            current: "toc",
+                            child: p,
+                          });
+                        }}
+                        className={classes.tocButton}
+                      >
+                        <TocIcon/>
+                      </IconButton>
                     : null
                   }
                 </ListItem>
@@ -137,11 +139,13 @@ export const Toc = (props: any) => {
     return (
       <div className={classes.list}>
         <IconButton
-          onClick={() => setNode({
-            parent: "categories",
-            current: "posts",
-            child: node.child.category,
-          })}
+          onClick={() => {
+            if (node.child.category) {
+              setNode({ parent: "categories", current: "posts", child: node.child.category })
+            } else {
+              setNode({ parent: null, current: "categories", child: "posts" })
+            }
+          }}
         >
           <NavigateBackIcon />
         </IconButton>
@@ -149,7 +153,7 @@ export const Toc = (props: any) => {
         <List component="nav" className={classes.list}>
           <Markdown
             allowedTypes={["text", "heading"]}
-            source={postsContent[node.child.slug]}
+            source={allContent[ref] ? allContent[ref][node.child.slug] : ""}
             renderers={{ heading: TocGenerator }}
             className={classes.list}
           />

@@ -6,7 +6,7 @@ import { logger, strToArray } from "../utils";
 import { pushToMirror } from "./push";
 import { gitOpts, resolveRef } from "./utils";
 
-const log = logger.child({ module: "GitRouter" });
+const log = logger.child({ module: "GitEdit" });
 
 export type GitTreeEntry = {
   mode: string;

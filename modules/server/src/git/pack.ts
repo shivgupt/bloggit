@@ -6,7 +6,7 @@ import { logger } from "../utils";
 import { pushToMirror } from "./push";
 import { bufferToStream, streamToBuffer } from "./utils";
 
-const log = logger.child({ module: "GitRouter" });
+const log = logger.child({ module: "GitBackend" });
 
 const regex = {
   "git-receive-pack": RegExp("([0-9a-fA-F]+) ([0-9a-fA-F]+) (refs/[^ \x00]+)( |00|\x00)|^(0000)$"),

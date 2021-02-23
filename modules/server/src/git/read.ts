@@ -10,8 +10,9 @@ export const gitRouter = express.Router();
 
 const log = logger.child({ module: "GitRead" });
 
-export const getConfig = (req, res, _): void => {
+export const getConfig = async (req, res, _): Promise<void> => {
   res.json({
+    commit: await resolveRef(env.branch),
     branch: env.branch,
   });
 };
