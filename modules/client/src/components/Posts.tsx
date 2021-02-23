@@ -139,7 +139,6 @@ export const PostPage = (props: { content: string, slug: string, gitRef: string 
   // TODO: handle loading better
   if (!post) return <> Loading </>
   return (
-<<<<<<< HEAD
   <>
     <Copyable
       className={classes.button}
@@ -149,14 +148,11 @@ export const PostPage = (props: { content: string, slug: string, gitRef: string 
       value={`${window.location.origin}/${ref}/${slug}`}
     />
 
-    <Paper variant="outlined">
-=======
     <Paper variant="outlined" className={classes.root}>
       {post.img
         ? <CardMedia image={post.img} className={classes.media} />
         : null
       }
->>>>>>> ✨ add img header to post
       {adminContext.adminMode && adminContext.authToken ?
         <>
           <IconButton
