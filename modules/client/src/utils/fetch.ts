@@ -2,6 +2,8 @@ import axios from "axios";
 
 import { PostData, PostIndex, PostHistory } from "../types";
 
+import { emptyIndex } from "./constants";
+
 export const fetchRef = async (): Promise<string> => {
   const configUrl = "/git/config";
   console.log(`Fetching latest ref from ${configUrl}`);
@@ -34,24 +36,29 @@ export const fetchFile = async (path: string, _ref?: string): Promise<string> =>
       }
     } catch (e) {
       console.error(e.message);
-      throw new Error(`Couldn't get ${path}: ${e.message}`);
+      fileCache[ref][path] = "Does Not Exist"
     }
   }
   return fileCache[ref][path];
 };
 
 export const fetchIndex = async (_ref?: string): Promise<PostIndex> => {
-  const ref = _ref || await fetchRef();
-  const indexContent = await fetchFile("index.json", ref);
-  const index = JSON.parse(indexContent);
-  if (!index || !index.posts) {
-    throw new Error(`Got invalid site index: ${JSON.stringify(index)}`);
+  try {
+    const ref = _ref || await fetchRef();
+    const indexContent = await fetchFile("index.json", ref);
+    const index = JSON.parse(indexContent);
+    if (!index || !index.posts) {
+      throw new Error(`Got invalid site index: ${JSON.stringify(index)}`);
+    }
+    // Also set slug property based on the keynames
+    Object.keys(index.posts).forEach(slug => {
+      index.posts[slug].slug = slug;
+    });
+    return index;
+  } catch (e) {
+    console.warn(e.message);
+    return emptyIndex;
   }
-  // Also set slug property based on the keynames
-  Object.keys(index.posts).forEach(slug => {
-    index.posts[slug].slug = slug;
-  });
-  return index;
 };
 
 const slugToPath = async (slug: string, ref: string): Promise<string> => {

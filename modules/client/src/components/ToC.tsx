@@ -9,7 +9,6 @@ import {
   ListItem,
 } from "@material-ui/core";
 import {
-  Toc as TocIcon,
   NavigateNext as NavigateNextIcon,
   ArrowBackIos as NavigateBackIcon,
 } from "@material-ui/icons";
@@ -63,7 +62,8 @@ const TocGenerator = (props: any) => {
 };
 
 export const Toc = (props: any) => {
-  const { node, allContent, posts, currentRef: ref, setNode } = props;
+  const { node, posts, gitState, setNode } = props;
+  const { currentContent, slug } = gitState
   const classes = useStyles();
 
   switch(node.current) {
@@ -92,6 +92,8 @@ export const Toc = (props: any) => {
                   <Divider />
                 </div>
               );
+            } else {
+              return null;
             }
           })}
         </List>
@@ -116,17 +118,12 @@ export const Toc = (props: any) => {
             return (
               <div key={p.slug}>
                 <ListItem button key={p.title} component={Link} to={`/${p.slug}`} onClick={() =>
-                  setNode({
-                    parent: "posts",
-                    current: "toc",
-                    child: p,
-                  })}
-                >
-                  {p.title}
-                  {allContent && allContent[ref] && allContent[ref][p.slug]
-                    ? <TocIcon className={classes.tocIcon} />
+                  (slug === p.slug)
+                    ? setNode({ parent: "posts", current: "toc", child: p })
                     : null
                   }
+                >
+                  {p.title}
                 </ListItem>
                 <Divider />
               </div>
@@ -154,7 +151,7 @@ export const Toc = (props: any) => {
         <List component="nav" className={classes.list}>
           <Markdown
             allowedTypes={["text", "heading"]}
-            source={allContent[ref] ? allContent[ref][node.child.slug] : ""}
+            source={currentContent}
             renderers={{ heading: TocGenerator }}
             className={classes.list}
           />

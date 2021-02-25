@@ -15,16 +15,15 @@ import { AdminHome } from "./components/AdminHome";
 import { NavBar } from "./components/NavBar";
 import { PostPage } from "./components/Posts";
 import {
-  emptyIndex,
-  fetchRef,
+  emptyEntry,
   fetchContent,
   fetchIndex,
-  getPostsByCategories,
+  fetchRef,
 } from "./utils";
 import { darkTheme, lightTheme } from "./style";
 import { store } from "./utils/cache";
 import { AdminContext } from "./AdminContext";
-import { SidebarNode } from "./types";
+import { GitState, SidebarNode } from "./types";
 import { CreateNewPost } from "./components/CreateNewPost";
 import { AppSpeedDial } from "./components/AppSpeedDial";
 
@@ -49,6 +48,14 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
 const App: React.FC = () => {
   const classes = useStyles();
 
+  const [gitState, setGitState] = useState({} as GitState);
+  const [node, setNode] = useState({} as SidebarNode);
+  const [theme, setTheme] = useState(lightTheme);
+  const [authToken, setAuthToken] = useState("");
+  const [adminMode, setAdminMode] = useState(true);
+  const [newContent, setNewContent] = useState("");
+  const [editMode, setEditMode] = useState(false);
+
   const slugMatch = useRouteMatch("/:slug");
   const refMatch = useRouteMatch("/:ref/:slug");
   const refParam = refMatch ? refMatch.params.ref : "";
@@ -56,22 +63,8 @@ const App: React.FC = () => {
     : slugMatch ? slugMatch.params.slug
     : "";
 
-  const [latestRef, setLatestRef] = useState(refParam);
-  const [currentRef, setRef] = useState(refParam);
-  const [slug, setSlug] = useState(slugParam);
-  const [content, setContent] = useState("Loading...");
+  // console.log(`Rendering App with refParam=${refParam} and slugParam=${slugParam}`);
 
-  const [node, setNode] = useState({} as SidebarNode);
-  const [theme, setTheme] = useState(lightTheme);
-  const [index, setIndex] = useState(emptyIndex);
-  const [title, setTitle] = useState({ site: "", page: "" });
-  const [authToken, setAuthToken] = useState("");
-  const [adminMode, setAdminMode] = useState(true);
-  const [newContent, setNewContent] = useState("");
-  const [editMode, setEditMode] = useState(false);
-  const [allContent, setAllContent] = useState({});
-
-  // console.log(`Rendering App with currentRef=${currentRef} (${refParam}) and slug=${slug} (${slugParam})`);
   const updateAuthToken = (authToken: string) => {
     setAuthToken(authToken);
     store.save("authToken", authToken);
@@ -88,24 +81,32 @@ const App: React.FC = () => {
     }
   };
 
-  const syncRef = async (
-    _ref?: string | null,
-    slug?: string | null,
-  ) => {
-    const newRef = _ref || await fetchRef();
-    setRef(newRef);
-    // console.log(`Syncing ref ${newRef}${slug ? ` and slug ${slug}` : ""}`);
-    const newIndex = await fetchIndex(newRef);
-    if (slug) {
-      if (!allContent[newRef]) {
-        allContent[newRef] = {};
-      }
-      allContent[newRef][slug] = await fetchContent(slug!, newRef);
-      setContent(allContent[newRef][slug]);
-      setAllContent(allContent);
+  const syncGitState = async (ref?: string, slug?: string) => {
+    const latestRef = await fetchRef();
+    const currentRef = ref || latestRef;
+    const index = await fetchIndex(currentRef);
+    const newGitState = {
+      latestRef,
+      currentRef,
+      slug: slug || "",
+      index: index,
+    } as GitState;
+    console.log(`Syncing ref ${currentRef}${slug ? ` and slug ${slug}` : ""}`);
+    if (slug && !["admin", "create-new-post"].includes(slug)) {
+      newGitState.currentContent = await fetchContent(slug, currentRef)
+      newGitState.indexEntry = index.posts?.[slug] || index.drafts?.[slug];
+    } else {
+      newGitState.currentContent = "Does Not Exist";
+      newGitState.indexEntry = emptyEntry;
     }
-    setIndex(JSON.parse(JSON.stringify(newIndex))); // new object forces a re-render
-    setRef(newRef);
+    setGitState(newGitState);
+
+    // Update sidebar node
+    if (slug !== "" && index?.posts?.[slug || ""]){
+      setNode({ parent: "posts", current: "toc", child: index?.posts?.[slug || ""] });
+    } else {
+      setNode({ parent: "", current: "categories", child: "posts" });
+    }
   }
 
   // Run this effect exactly once when the page initially loads
@@ -119,72 +120,32 @@ const App: React.FC = () => {
     // Check local storage for admin edit keys
     const key = store.load("authToken");
     if (key) setAuthToken(key);
-    (async () => {
-      setLatestRef(await fetchRef());
-    })()
   }, []);
 
   // Fetch index & post content any time the url changes
   useEffect(() => {
-    if (slugParam === "admin" || slugParam === "create-new-post") return;
-    setContent("Loading..");
-
-    // cleanup state
     setNewContent("");
     setEditMode(false);
-
-    setSlug(slugParam);
-    (async () => {
-      try {
-        await syncRef(refParam || latestRef, slugParam);
-      } catch (e) {
-        console.warn(e.message);
-        if (!allContent[refParam]) {
-          allContent[refParam] = {};
-        }
-        allContent[refParam][slugParam] = "Post does not exist";
-        setContent(allContent[refParam][slugParam]);
-        setAllContent(allContent);
-      }
-    })()
+    syncGitState(refParam || gitState.latestRef, slugParam);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [latestRef, refParam, slugParam]);
+  }, [refParam, slugParam]);
 
   // Update auth headers any time the authToken changes
   useEffect(() => {
     axios.defaults.headers.common["authorization"] = `Basic ${btoa(`admin:${authToken}`)}`;
   }, [authToken]);
 
-  // Update the title & sidebar node when the index or slug changes
-  useEffect(() => {
-    // Update title
-    // console.log("Setting title & sidebar node");
-    const siteTitle = index ? index.title : "My personal website";
-    const pageTitle = index.posts[slug] ? index.posts[slug].title : "";
-    document.title = pageTitle ? `${pageTitle} | ${siteTitle}` : siteTitle;
-    setTitle({ site: siteTitle, page: pageTitle });
-    // Update sidebar node
-    if (slug !== "" && index.posts[slug]){
-      setNode({ parent: "posts", current: "toc", child: index.posts[slug] });
-    } else {
-      setNode({ parent: "", current: "categories", child: "posts" });
-    }
-  }, [slug, index]);
-
   return (
     <ThemeProvider theme={theme}>
       <AdminContext.Provider
-        value={{ syncRef, authToken, editMode, setEditMode, newContent, setNewContent, index, updateAuthToken, adminMode, setAdminMode }}
+        value={{ gitState, syncGitState, authToken, editMode, setEditMode, newContent, setNewContent, updateAuthToken, adminMode, setAdminMode }}
       >
         <CssBaseline />
         <NavBar
+          gitState={gitState}
           node={node}
-          allContent={allContent}
-          posts={getPostsByCategories(index.posts)}
-          currentRef={currentRef}
           setNode={setNode}
           theme={theme}
-          title={title}
           toggleTheme={toggleTheme}
         />
         <main className={classes.main}>
@@ -195,7 +156,7 @@ const App: React.FC = () => {
                 path="/"
                 render={() => {
                   return (
-                    <Home posts={index.posts} title={title} />
+                    <Home gitState={gitState} />
                   );
                 }}
               />
@@ -215,27 +176,14 @@ const App: React.FC = () => {
               />
               <Route
                 path="/:ref/:slug"
-                render={() => <PostPage
-                  content={content}
-                  slug={slug}
-                  currentRef={currentRef}
-                  latestRef={latestRef}
-                />}
+                render={() => <PostPage gitState={gitState} />}
               />
               <Route
                 path="/:slug"
-                render={() => <PostPage
-                  content={content}
-                  slug={slug}
-                  currentRef={currentRef}
-                  latestRef={latestRef}
-                />}
+                render={() => <PostPage gitState={gitState} />}
               />
             </Switch>
-            {(adminMode && authToken)
-              ? <AppSpeedDial content={content} readOnly={currentRef && currentRef !== latestRef} />
-              : null
-            }
+            {(adminMode && authToken) ? <AppSpeedDial gitState={gitState} /> : null}
           </Container>
         </main>
       </AdminContext.Provider>

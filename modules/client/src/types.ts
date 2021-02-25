@@ -1,4 +1,13 @@
 
+export type GitState = {
+  currentContent: string;
+  currentRef: string;
+  index: PostIndex;
+  indexEntry: PostData;
+  latestRef: string;
+  slug: string;
+};
+
 export type PostData = {
   title: string;
   slug: string;
@@ -26,7 +35,7 @@ export type PostHistory = Array<{
 }>;
 
 export type SidebarNode = {
-  parent: string | null,
+  parent: string,
   current: string,
   child: any,
 }

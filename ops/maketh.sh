@@ -15,7 +15,9 @@ else echo "Running in non-interactive mode"
 fi
 
 if [[ -n "$REACT_APP_ENV" ]]
-then cat "$REACT_APP_ENV" >> "$root/modules/client/.env.production.local"
+then
+  echo "Loading env vars from $REACT_APP_ENV:"
+  tee "$root/modules/client/.env.production.local" < "$REACT_APP_ENV"
 fi
 
 docker run \

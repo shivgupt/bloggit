@@ -11,7 +11,7 @@ import {
   Edit,
   Public,
 } from "@material-ui/icons";
-import { useHistory, useRouteMatch } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import axios from "axios";
 
 import { AdminContext } from "../AdminContext";
@@ -31,37 +31,36 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 export const AppSpeedDial = (props: any) => {
 
-  const { content } = props;
+  const { gitState } = props;
   const history = useHistory();
   const [open, setOpen] = useState(false);
   const classes = useStyles();
   const adminContext = useContext(AdminContext);
   const { newContent, editMode, setEditMode } = adminContext;
 
-  const slugMatch = useRouteMatch("/:slug");
-  const slugParam = slugMatch ? slugMatch.params.slug : "";
+  const { currentContent, slug } = props.gitState;
+  const readOnly = gitState.currentRef !== gitState.latestRef;
 
   let dialButtonRef;
 
   const handleRedirect = (to: string) => history.push(to)
 
   const update = async () => {
-    const newIndex = JSON.parse(JSON.stringify(adminContext.index))
+    const oldIndex = adminContext.gitState?.index;
+    const newIndex = JSON.parse(JSON.stringify(oldIndex))
     const data = [] as Array<{path: string, content: string}>;
-
     let post, key;
-    if (adminContext.index.posts[slugParam]) {
-      post = adminContext.index.posts[slugParam];
+    if (oldIndex?.posts?.[slug]) {
+      post = oldIndex.posts[slug];
       key = "posts";
     } else {
-      post = adminContext.index.drafts[slugParam];
+      post = oldIndex.drafts[slug];
       key = "drafts";
     }
-
     if (!post.category) {
       const path = (document.getElementById("post_path") as HTMLInputElement).value;
-      newIndex.posts[slugParam].path = path;
-      if (content === newContent && path === post.path) {
+      newIndex.posts[slug].path = path;
+      if (currentContent === newContent && path === post.path) {
         console.warn(`Nothing to update`);
         return;
       }
@@ -77,8 +76,8 @@ export const AppSpeedDial = (props: any) => {
       const tldr = (document.getElementById("post_tldr") as HTMLInputElement).value;
       const img = (document.getElementById("post_img") as HTMLInputElement).value;
       const tags = (document.getElementById("post_tags") as HTMLInputElement).value.split(",");
-      newIndex[key][slugParam] = {
-        ...newIndex[key][slugParam],
+      newIndex[key][slug] = {
+        ...newIndex[key][slug],
         category,
         lastEdit: (new Date()).toLocaleDateString("en-in"),
         img,
@@ -87,7 +86,7 @@ export const AppSpeedDial = (props: any) => {
         slug,
         tags,
       };
-      if (content === newContent && JSON.stringify(newIndex[key][slugParam]) === JSON.stringify(post)) {
+      if (currentContent === newContent && JSON.stringify(newIndex[key][slug]) === JSON.stringify(post)) {
         console.warn(`Nothing to update`);
         return;
       }
@@ -99,34 +98,37 @@ export const AppSpeedDial = (props: any) => {
       }
       data.push({ path: `${category}/${slug}.md`, content: newContent });
     }
-    if (content === newContent && JSON.stringify(newIndex) === JSON.stringify(adminContext.index) ){
+    if (currentContent === newContent && JSON.stringify(newIndex) === JSON.stringify(oldIndex) ){
       console.log("no changes detected");
       return;
     }
     data.push({ path: "index.json", content: JSON.stringify(newIndex, null, 2)});
     console.log("Lets push it to git");
-    await axios({
+    const res = await axios({
       data,
       headers: { "content-type": "application/json" },
       method: "post",
       url: "git/edit",
     });
-    await adminContext.syncRef(undefined, slugParam);
-    setEditMode(false);
-
+    if (res && res.status === 200 && res.data) {
+      console.log(`git/edit result:`, res);
+      setEditMode(false);
+      await adminContext.syncGitState(res.data.commit?.substring(0, 8), slug);
+    } else {
+      console.error(`Something went wrong`, res);
+    }
   }
 
   const createNew = async (as: string) => {
     // create new index.json entry
-    const newIndex = JSON.parse(JSON.stringify(adminContext.index))
-
+    const oldIndex = adminContext.gitState?.index;
+    const newIndex = JSON.parse(JSON.stringify(oldIndex));
     const slug = (document.getElementById("post_slug") as HTMLInputElement).value;
     const category = (document.getElementById("post_category") as HTMLInputElement).value.toLocaleLowerCase();
     const title = (document.getElementById("post_title") as HTMLInputElement).value;
     const tldr = (document.getElementById("post_tldr") as HTMLInputElement).value;
     const img = (document.getElementById("post_img") as HTMLInputElement).value;
     const tags = (document.getElementById("post_tags") as HTMLInputElement).value.split(",");
-
     if (as === "draft") {
       if (!newIndex.drafts) newIndex.drafts = {};
       newIndex.drafts[slug] = {
@@ -151,7 +153,6 @@ export const AppSpeedDial = (props: any) => {
         tags,
       };
     }
-
     // Send request to update index.json and create new file
     let res = await axios({
       method: "post",
@@ -168,31 +169,32 @@ export const AppSpeedDial = (props: any) => {
     ],
       headers: { "content-type": "application/json" }
     });
-    
-    if (res.status === 200) {
-      adminContext.syncRef(undefined, undefined, true);
+    if (res && res.status === 200 && res.data) {
+      console.log(`git/edit result:`, res);
+      setEditMode(false);
+      await adminContext.syncGitState(res.data.commit?.substring(0, 8), slug);
+      handleRedirect(`/${slug}`)
     } else { 
-      console.log("Something went wrong")
+      console.error(`Something went wrong`, res);
     }
-    history.goBack();
   };
 
   const discard = () => {
     setEditMode(false);
-    if (slugParam === "create-new-post") {
+    if (slug === "create-new-post") {
       history.goBack();
     }
   }
 
-  if (!slugMatch || slugParam === "admin" || props.readOnly) {
+  if (!slug || slug === "admin" || readOnly) {
     return (
       <Fab 
-      className={classes.speedDial}
-      color="primary"
-      onClick={() => handleRedirect("/create-new-post")}
+        className={classes.speedDial}
+        color="primary"
+        onClick={() => handleRedirect("/create-new-post")}
       > <Add /> </Fab>
     );
-  } else if (slugParam === "create-new-post") {
+  } else if (slug === "create-new-post") {
     return (
       <SpeedDial
         ariaLabel="fab"
