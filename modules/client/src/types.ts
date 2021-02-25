@@ -2,6 +2,7 @@
 export type PostData = {
   title: string;
   slug: string;
+  createdOn: string;
   category?: string;
   featured?: string;
   img?: string;

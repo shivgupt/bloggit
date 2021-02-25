@@ -13,16 +13,20 @@ import {
   NavigateNext as NavigateNextIcon,
   ArrowBackIos as NavigateBackIcon,
 } from "@material-ui/icons";
+import emoji from "emoji-dictionary";
 
 import { getChildValue } from "../utils";
 
 import { HashLink } from "./HashLink";
 
 const useStyles = makeStyles(theme => ({
-  list: {
-    width: "100%",
-  },
-  tocButton: {
+  list: { width: "100%" },
+  list1: { width: "100%", "paddingLeft": theme.spacing(2) },
+  list2: { width: "100%", "paddingLeft": theme.spacing(4) },
+  list3: { width: "100%", "paddingLeft": theme.spacing(6) },
+  list4: { width: "100%", "paddingLeft": theme.spacing(8) },
+  list5: { width: "100%", "paddingLeft": theme.spacing(10) },
+  tocIcon: {
     marginLeft: theme.spacing(2),
   },
 }));
@@ -39,17 +43,19 @@ const TocGenerator = (props: any) => {
     return null;
   }
   const headingSlug = value.toLowerCase().replace(/[^a-z0-9 ]/g, "").replace(/\W+/g, "-");
+  const heading = value.replace(/:\w+:/gi, name => emoji.getUnicode(name) || name);
 
+  const marginStyle = classes[`list${props.level || 1}`];
   return (
     <>
       <ListItem
         button
         key={headingSlug}
-        className={classes.list}
+        className={marginStyle}
         component={HashLink as any}
         to={{ hash:`#${headingSlug}` }}
       >
-        {value}
+        {heading}
       </ListItem>
       <Divider />
     </>
@@ -57,7 +63,7 @@ const TocGenerator = (props: any) => {
 };
 
 export const Toc = (props: any) => {
-  const { node, allContent, posts, gitRef: ref, setNode } = props;
+  const { node, allContent, posts, currentRef: ref, setNode } = props;
   const classes = useStyles();
 
   switch(node.current) {
@@ -109,21 +115,16 @@ export const Toc = (props: any) => {
           {posts[node.child].map((p) => {
             return (
               <div key={p.slug}>
-                <ListItem button key={p.title} component={Link} to={`/${p.slug}`}>
+                <ListItem button key={p.title} component={Link} to={`/${p.slug}`} onClick={() =>
+                  setNode({
+                    parent: "posts",
+                    current: "toc",
+                    child: p,
+                  })}
+                >
                   {p.title}
                   {allContent && allContent[ref] && allContent[ref][p.slug]
-                    ?  <IconButton
-                        onClick={() => {
-                          setNode({
-                            parent: "posts",
-                            current: "toc",
-                            child: p,
-                          });
-                        }}
-                        className={classes.tocButton}
-                      >
-                        <TocIcon/>
-                      </IconButton>
+                    ? <TocIcon className={classes.tocIcon} />
                     : null
                   }
                 </ListItem>
