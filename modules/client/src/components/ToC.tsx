@@ -13,6 +13,7 @@ import {
   NavigateNext as NavigateNextIcon,
   ArrowBackIos as NavigateBackIcon,
 } from "@material-ui/icons";
+import emoji from "emoji-dictionary";
 
 import { getChildValue } from "../utils";
 
@@ -39,6 +40,7 @@ const TocGenerator = (props: any) => {
     return null;
   }
   const headingSlug = value.toLowerCase().replace(/[^a-z0-9 ]/g, "").replace(/\W+/g, "-");
+  const heading = value.replace(/:\w+:/gi, name => emoji.getUnicode(name) || name);
 
   return (
     <>
@@ -49,7 +51,7 @@ const TocGenerator = (props: any) => {
         component={HashLink as any}
         to={{ hash:`#${headingSlug}` }}
       >
-        {value}
+        {heading}
       </ListItem>
       <Divider />
     </>
