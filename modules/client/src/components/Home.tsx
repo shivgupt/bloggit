@@ -45,7 +45,6 @@ export const Home = (props: any) => {
       {Object.keys(posts).map(slug => {
         if (!posts[slug].category) return ;
 
-        console.log(posts, posts[slug])
         const title = posts[slug].title.replace(/:\w+:/gi, name => emoji.getUnicode(name) || name);
         const tldr = posts[slug].tldr.replace(/:\w+:/gi, name => emoji.getUnicode(name) || name);
 
