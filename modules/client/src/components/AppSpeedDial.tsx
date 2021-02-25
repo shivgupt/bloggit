@@ -50,11 +50,17 @@ export const AppSpeedDial = (props: any) => {
     const newIndex = JSON.parse(JSON.stringify(adminContext.index))
     const data = [] as Array<{path: string, content: string}>;
 
-    const post = (adminContext.index.posts[slugParam] || adminContext.index.drafts[slugParam]);
+    let post, key;
+    if (adminContext.index.posts[slugParam]) {
+      post = adminContext.index.posts[slugParam];
+      key = "posts";
+    } else {
+      post = adminContext.index.drafts[slugParam];
+      key = "drafts";
+    }
 
     if (!post.category) {
       const path = (document.getElementById("post_path") as HTMLInputElement).value;
-      console.log(path, post)
       newIndex.posts[slugParam].path = path;
       if (content === newContent && path === post.path) {
         console.warn(`Nothing to update`);
@@ -72,7 +78,7 @@ export const AppSpeedDial = (props: any) => {
       const tldr = (document.getElementById("post_tldr") as HTMLInputElement).value;
       const img = (document.getElementById("post_img") as HTMLInputElement).value;
       const tags = (document.getElementById("post_tags") as HTMLInputElement).value.split(",");
-      newIndex.posts[slugParam] = {
+      newIndex[key][slugParam] = {
         category,
         lastEdit: (new Date()).toLocaleDateString("en-in"),
         img,
@@ -81,7 +87,7 @@ export const AppSpeedDial = (props: any) => {
         slug,
         tags,
       };
-      if (content === newContent && JSON.stringify(newIndex.posts[slugParam]) === JSON.stringify(post)) {
+      if (content === newContent && JSON.stringify(newIndex[key][slugParam]) === JSON.stringify(post)) {
         console.warn(`Nothing to update`);
         return;
       }
@@ -170,6 +176,10 @@ export const AppSpeedDial = (props: any) => {
     history.goBack();
   };
 
+  const discard = () => {
+    setEditMode(false);
+    history.goBack();
+  }
 
   if (!slugMatch || slugParam === "admin") {
     return (
@@ -191,8 +201,13 @@ export const AppSpeedDial = (props: any) => {
         FabProps={{ref: (ref) => { dialButtonRef = ref }}}
       >
         <SpeedDialAction
+          icon={<Delete />}
+          tooltipTitle="Discard changes"
+          onClick={discard}
+        />
+        <SpeedDialAction
           icon={<Drafts />}
-          tooltipTitle="Save Drafts"
+          tooltipTitle="Save As Draft"
           onClick={() => save("draft")}
         />
         <SpeedDialAction
@@ -224,11 +239,11 @@ export const AppSpeedDial = (props: any) => {
         <SpeedDialAction
           icon={<Delete />}
           tooltipTitle="Discard changes"
-          onClick={() => setEditMode(false)}
+          onClick={discard}
         />
         <SpeedDialAction
-          icon={<Public />}
-          tooltipTitle="Publish"
+          icon={<Drafts />}
+          tooltipTitle="Save"
           onClick={update}
         />
       </SpeedDial>
