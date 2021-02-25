@@ -103,8 +103,15 @@ export const PostPage = (props: {
   useEffect(() => setNewContent(content), [content]);
 
   useEffect(() => {
-    if (typeof(post) === "object" && post.img) {
+    if (post && post.img) {
       setCardBgImg(post.img);
+    }
+    const hash = window.location.hash;
+
+    if (hash) {
+      const anchor = document.getElementById(hash.substr(1));
+      if (anchor) anchor.scrollIntoView();
+
     }
   },[post]);
 
@@ -137,8 +144,8 @@ export const PostPage = (props: {
     </div>
 
     <Paper variant="outlined" className={classes.root}>
-      {post?.img
-        ? <CardMedia image={post.img} className={classes.media} />
+      {cardBgImg
+        ? <CardMedia image={cardBgImg} className={classes.media} />
         : null
       }
       { editMode ? 
