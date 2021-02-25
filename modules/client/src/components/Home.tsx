@@ -14,24 +14,35 @@ import emoji from "emoji-dictionary";
 
 import { prettyDateString } from "../utils";
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
     alignContent: "center",
     alignItems: "center",
   },
   card: {
-    width: "100%",
-    height: "300px",
+    display: "flex",
+  },
+  content: {
+    flex: '1 0 auto',
+  },
+  details: {
+    display: "flex",
+    flexDirection: 'column',
   },
   wrapper: {
-    width: "100%",
+    [theme.breakpoints.up("md")]: {
+      width: "40%",
+    },
+    [theme.breakpoints.down("sm")]: {
+      maxWidth: "100%",
+    },
     height: "150px",
     overflow: "hidden",
   },
   media: {
     height: "auto",
-    maxWidth: "100%",
+    width: "100%",
     marginTop: "-40%",
   },
 }));
@@ -45,26 +56,18 @@ export const Home = (props: any) => {
       {Object.keys(posts).map(slug => {
         if (!posts[slug].category) return ;
 
-        console.log(posts, posts[slug])
         const title = posts[slug].title.replace(/:\w+:/gi, name => emoji.getUnicode(name) || name);
         const tldr = posts[slug].tldr.replace(/:\w+:/gi, name => emoji.getUnicode(name) || name);
 
         return (
-          <Grid className={classes.root} item xs={12} md={6} lg={4} key={slug}>
+          <Grid className={classes.root} item xs={12} md={12} lg={12} key={slug}>
             <Card className={classes.card}>
-              <CardActionArea className={classes.card} component={Link} to={`/${slug}`}>
-                {posts[slug].img
-                  ? <div className={classes.wrapper}><CardMedia
-                      className={classes.media}
-                      component="img"
-                      image={posts[slug].img}
-                      title={slug}
-                    /></div>
-                  : null}
-                <CardContent>
+              <CardActionArea component={Link} to={`/${slug}`}>
+                <div className={classes.details}>
+                <CardContent className={classes.content}>
                   <Typography variant="h5" gutterBottom>{title}</Typography>
                   <Typography variant="caption" gutterBottom display="block">
-                    {posts[slug].lastEdit ? prettyDateString(posts[slug].lastEdit) : ""}
+                    {posts[slug].createdOn ? prettyDateString(posts[slug].createdOn) : ""}
                     &nbsp;
                     &nbsp;
                     {posts[slug].tags
@@ -74,9 +77,18 @@ export const Home = (props: any) => {
                   </Typography>
                   <br />
                   <Typography variant="subtitle1" component="p" gutterBottom>
-                    {tldr}
+                    {tldr.substr(0,140)} ...
                   </Typography>
                 </CardContent>
+                </div>
+                {posts[slug].img
+                  ? <div className={classes.wrapper}><CardMedia
+                      className={classes.media}
+                      component="img"
+                      image={posts[slug].img}
+                      title={slug}
+                    /></div>
+                  : null}
               </CardActionArea>
             </Card>
           </Grid>
