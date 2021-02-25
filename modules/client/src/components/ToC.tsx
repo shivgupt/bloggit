@@ -20,9 +20,12 @@ import { getChildValue } from "../utils";
 import { HashLink } from "./HashLink";
 
 const useStyles = makeStyles(theme => ({
-  list: {
-    width: "100%",
-  },
+  list: { width: "100%" },
+  list1: { width: "100%", "paddingLeft": theme.spacing(2) },
+  list2: { width: "100%", "paddingLeft": theme.spacing(4) },
+  list3: { width: "100%", "paddingLeft": theme.spacing(6) },
+  list4: { width: "100%", "paddingLeft": theme.spacing(8) },
+  list5: { width: "100%", "paddingLeft": theme.spacing(10) },
   tocButton: {
     marginLeft: theme.spacing(2),
   },
@@ -42,12 +45,13 @@ const TocGenerator = (props: any) => {
   const headingSlug = value.toLowerCase().replace(/[^a-z0-9 ]/g, "").replace(/\W+/g, "-");
   const heading = value.replace(/:\w+:/gi, name => emoji.getUnicode(name) || name);
 
+  const marginStyle = classes[`list${props.level || 1}`];
   return (
     <>
       <ListItem
         button
         key={headingSlug}
-        className={classes.list}
+        className={marginStyle}
         component={HashLink as any}
         to={{ hash:`#${headingSlug}` }}
       >

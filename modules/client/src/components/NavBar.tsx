@@ -51,7 +51,7 @@ const useStyles = makeStyles(theme => ({
     width: "20%",
   },
   list: {
-    width: "40%",
+    width: "60%",
   },
   rightButton: {
     marginLeft: theme.spacing(1),
