@@ -57,7 +57,7 @@ const App: React.FC = () => {
     : "";
 
   const [latestRef, setLatestRef] = useState(refParam);
-  const [ref, setRef] = useState(refParam);
+  const [currentRef, setRef] = useState(refParam);
   const [slug, setSlug] = useState(slugParam);
   const [content, setContent] = useState("Loading...");
 
@@ -71,17 +71,11 @@ const App: React.FC = () => {
   const [editMode, setEditMode] = useState(false);
   const [allContent, setAllContent] = useState({});
 
-  // console.log(`Rendering App with ref=${ref} (${refParam}) and slug=${slug} (${slugParam})`);
+  // console.log(`Rendering App with currentRef=${currentRef} (${refParam}) and slug=${slug} (${slugParam})`);
   const updateAuthToken = (authToken: string) => {
     setAuthToken(authToken);
     store.save("authToken", authToken);
   };
-
-  const updateNewContent = (newContent: string) => {
-    setNewContent(newContent);
-  };
-
-  const viewAdminMode = (viewAdminMode: boolean) => setAdminMode(viewAdminMode);
 
   const toggleTheme = () => {
     if ( theme.palette.type === "dark") {
@@ -180,14 +174,14 @@ const App: React.FC = () => {
   return (
     <ThemeProvider theme={theme}>
       <AdminContext.Provider
-        value={{ syncRef, authToken, editMode, setEditMode, newContent, updateNewContent, index, updateAuthToken, adminMode, viewAdminMode }}
+        value={{ syncRef, authToken, editMode, setEditMode, newContent, setNewContent, index, updateAuthToken, adminMode, setAdminMode }}
       >
         <CssBaseline />
         <NavBar
           node={node}
           allContent={allContent}
           posts={getPostsByCategories(index.posts)}
-          gitRef={ref}
+          currentRef={currentRef}
           setNode={setNode}
           theme={theme}
           title={title}
@@ -224,7 +218,7 @@ const App: React.FC = () => {
                 render={() => <PostPage
                   content={content}
                   slug={slug}
-                  gitRef={ref}
+                  currentRef={currentRef}
                   latestRef={latestRef}
                 />}
               />
@@ -233,12 +227,15 @@ const App: React.FC = () => {
                 render={() => <PostPage
                   content={content}
                   slug={slug}
-                  gitRef={ref}
+                  currentRef={currentRef}
                   latestRef={latestRef}
                 />}
               />
             </Switch>
-            { adminMode && authToken ? <AppSpeedDial content={content}/> : null }
+            {(adminMode && authToken)
+              ? <AppSpeedDial content={content} readOnly={currentRef && currentRef !== latestRef} />
+              : null
+            }
           </Container>
         </main>
       </AdminContext.Provider>

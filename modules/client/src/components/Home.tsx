@@ -10,6 +10,7 @@ import {
 } from "@material-ui/core";
 import React from "react";
 import { Link } from "react-router-dom";
+import emoji from "emoji-dictionary";
 
 import { prettyDateString } from "../utils";
 
@@ -38,10 +39,15 @@ const useStyles = makeStyles(() => ({
 export const Home = (props: any) => {
   const classes = useStyles();
   const { posts } = props;
+
   return (
     <Grid container spacing={3} justify={"space-around"} alignItems={"center"}>
       {Object.keys(posts).map(slug => {
         if (!posts[slug].category) return ;
+
+        const title = posts[slug].title.replace(/:\w+:/gi, name => emoji.getUnicode(name) || name);
+        const tldr = posts[slug].tldr.replace(/:\w+:/gi, name => emoji.getUnicode(name) || name);
+
         return (
           <Grid className={classes.root} item xs={12} md={6} lg={4} key={slug}>
             <Card className={classes.card}>
@@ -55,7 +61,7 @@ export const Home = (props: any) => {
                     /></div>
                   : null}
                 <CardContent>
-                  <Typography variant="h5" gutterBottom>{posts[slug].title}</Typography>
+                  <Typography variant="h5" gutterBottom>{title}</Typography>
                   <Typography variant="caption" gutterBottom display="block">
                     {posts[slug].lastEdit ? prettyDateString(posts[slug].lastEdit) : ""}
                     &nbsp;
@@ -67,7 +73,7 @@ export const Home = (props: any) => {
                   </Typography>
                   <br />
                   <Typography variant="subtitle1" component="p" gutterBottom>
-                    {posts[slug].tldr}
+                    {tldr}
                   </Typography>
                 </CardContent>
               </CardActionArea>

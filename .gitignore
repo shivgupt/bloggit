@@ -4,11 +4,15 @@
 **/.docker-compose.yml
 **/.node-gyp
 **/.npm
+**/.rpt2_cache
 modules/*/package-lock.json
 
 # Local storage
-.media
+**/*.local
 .blog-content.git
+.media
+.env
+!modules/client/.env
 
 # Compiled output
 .flags
@@ -30,10 +34,6 @@ node_modules/
 # Logs
 *.log*
 package.json.lerna_backup
-
-# Misc
-**/.env
-.rpt2_cache
 
 # OS
 .bash_history

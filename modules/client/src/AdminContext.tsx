@@ -11,7 +11,7 @@ export const AdminContext = React.createContext({
   // eslint-disable-next-line
   updateAuthToken: (authToken: string) => {},
   setEditMode: (edit: boolean) => {},
-  updateNewContent: (newContent: string) => {},
-  viewAdminMode: (viewAdminMode: boolean) => {},
+  setNewContent: (newContent: string) => {},
+  setAdminMode: (viewAdminMode: boolean) => {},
   syncRef: async (ref?: string, slug?: string, force?: boolean) => {},
 });

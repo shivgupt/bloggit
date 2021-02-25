@@ -41,7 +41,7 @@ export const CreateNewPost = () => {
 
   const classes = useStyles();
   const adminContext = useContext(AdminContext);
-  const { newContent, updateNewContent } = adminContext;
+  const { newContent, setNewContent } = adminContext;
   const [selectedTab, setSelectedTab] = React.useState<"write" | "preview">("write");
   const [cardBgImg, setCardBgImg] = useState("");
   
@@ -79,7 +79,7 @@ export const CreateNewPost = () => {
       </div>
       <ReactMde
         value={newContent}
-        onChange={updateNewContent}
+        onChange={setNewContent}
         selectedTab={selectedTab}
         onTabChange={setSelectedTab}
         minEditorHeight={400}
