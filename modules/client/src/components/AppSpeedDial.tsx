@@ -112,8 +112,8 @@ export const AppSpeedDial = (props: any) => {
     });
     if (res && res.status === 200 && res.data) {
       console.log(`git/edit result:`, res);
-      await adminContext.syncGitState(undefined, slug);
       setEditMode(false);
+      await adminContext.syncGitState(res.data.commit?.substring(0, 8), slug);
     } else {
       console.error(`Something went wrong`, res);
     }
@@ -172,7 +172,7 @@ export const AppSpeedDial = (props: any) => {
     if (res && res.status === 200 && res.data) {
       console.log(`git/edit result:`, res);
       setEditMode(false);
-      await adminContext.syncGitState(undefined, slug);
+      await adminContext.syncGitState(res.data.commit?.substring(0, 8), slug);
       handleRedirect(`/${slug}`)
     } else { 
       console.error(`Something went wrong`, res);
