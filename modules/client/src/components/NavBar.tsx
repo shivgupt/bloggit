@@ -75,6 +75,13 @@ const DrawerContent = (props: any) => {
           </Box>
         </Typography>
       </ThemeProvider>
+      <IconButton
+        onClick={toggleTheme}
+        edge="start"
+        color="secondary"
+      >
+        {theme.palette.type === "dark" ? <LightIcon /> : <DarkIcon />}
+      </IconButton>
       {adminContext.authToken ?
         <>
           <Box textAlign="center" m={1}> 
@@ -102,13 +109,6 @@ const DrawerContent = (props: any) => {
         : null
       }
       <Toc posts={posts} allContent={allContent} node={node} currentRef={currentRef} setNode={setNode}/>
-      <IconButton
-        onClick={toggleTheme}
-        size="small"
-        color="secondary"
-      >
-        {theme.palette.type === "dark" ? <LightIcon /> : <DarkIcon />}
-      </IconButton>
       {posts["top-level"]
         ? posts["top-level"].map((p) => {
           return (
