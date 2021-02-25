@@ -14,6 +14,10 @@ then interactive=(--interactive --tty)
 else echo "Running in non-interactive mode"
 fi
 
+if [[ -n "$REACT_APP_ENV" ]]
+then cat "$REACT_APP_ENV" >> "$root/modules/client/.env.production.local"
+fi
+
 docker run \
   "${interactive[@]}" \
   "--env=REACT_APP_DARK_PRIMARY=$REACT_APP_DARK_PRIMARY" \
@@ -21,6 +25,8 @@ docker run \
   "--env=REACT_APP_FONT_FAMILY=$REACT_APP_FONT_FAMILY" \
   "--env=REACT_APP_LIGHT_PRIMARY=$REACT_APP_LIGHT_PRIMARY" \
   "--env=REACT_APP_LIGHT_SECONDARY=$REACT_APP_LIGHT_SECONDARY" \
+  "--env=REACT_APP_SITE_DESCRIPTION=$REACT_APP_SITE_DESCRIPTION" \
+  "--env=REACT_APP_SITE_TITLE=$REACT_APP_SITE_TITLE" \
   "--name=${project}_builder" \
   "--volume=$root:/root" \
   --rm \
