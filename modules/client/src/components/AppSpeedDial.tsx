@@ -49,7 +49,6 @@ export const AppSpeedDial = (props: any) => {
     const oldIndex = adminContext.gitState?.index;
     const newIndex = JSON.parse(JSON.stringify(oldIndex))
     const data = [] as Array<{path: string, content: string}>;
-
     let post, key;
     if (oldIndex?.posts?.[slug]) {
       post = oldIndex.posts[slug];
@@ -58,7 +57,6 @@ export const AppSpeedDial = (props: any) => {
       post = oldIndex.drafts[slug];
       key = "drafts";
     }
-
     if (!post.category) {
       const path = (document.getElementById("post_path") as HTMLInputElement).value;
       newIndex.posts[slug].path = path;
@@ -106,29 +104,31 @@ export const AppSpeedDial = (props: any) => {
     }
     data.push({ path: "index.json", content: JSON.stringify(newIndex, null, 2)});
     console.log("Lets push it to git");
-    await axios({
+    const res = await axios({
       data,
       headers: { "content-type": "application/json" },
       method: "post",
       url: "git/edit",
     });
-    await adminContext.syncGitState(undefined, slug);
-    setEditMode(false);
-
+    if (res && res.status === 200 && res.data) {
+      console.log(`git/edit result:`, res);
+      await adminContext.syncGitState(undefined, slug);
+      setEditMode(false);
+    } else {
+      console.error(`Something went wrong`, res);
+    }
   }
 
   const createNew = async (as: string) => {
     // create new index.json entry
     const oldIndex = adminContext.gitState?.index;
     const newIndex = JSON.parse(JSON.stringify(oldIndex));
-
     const slug = (document.getElementById("post_slug") as HTMLInputElement).value;
     const category = (document.getElementById("post_category") as HTMLInputElement).value.toLocaleLowerCase();
     const title = (document.getElementById("post_title") as HTMLInputElement).value;
     const tldr = (document.getElementById("post_tldr") as HTMLInputElement).value;
     const img = (document.getElementById("post_img") as HTMLInputElement).value;
     const tags = (document.getElementById("post_tags") as HTMLInputElement).value.split(",");
-
     if (as === "draft") {
       if (!newIndex.drafts) newIndex.drafts = {};
       newIndex.drafts[slug] = {
@@ -153,7 +153,6 @@ export const AppSpeedDial = (props: any) => {
         tags,
       };
     }
-
     // Send request to update index.json and create new file
     let res = await axios({
       method: "post",
@@ -170,13 +169,14 @@ export const AppSpeedDial = (props: any) => {
     ],
       headers: { "content-type": "application/json" }
     });
-    
-    if (res.status === 200) {
-      adminContext.syncGitState(undefined, undefined, true);
+    if (res && res.status === 200 && res.data) {
+      console.log(`git/edit result:`, res);
+      setEditMode(false);
+      await adminContext.syncGitState(undefined, slug);
+      handleRedirect(`/${slug}`)
     } else { 
-      console.log("Something went wrong")
+      console.error(`Something went wrong`, res);
     }
-    history.goBack();
   };
 
   const discard = () => {
@@ -189,9 +189,9 @@ export const AppSpeedDial = (props: any) => {
   if (!slug || slug === "admin" || readOnly) {
     return (
       <Fab 
-      className={classes.speedDial}
-      color="primary"
-      onClick={() => handleRedirect("/create-new-post")}
+        className={classes.speedDial}
+        color="primary"
+        onClick={() => handleRedirect("/create-new-post")}
       > <Add /> </Fab>
     );
   } else if (slug === "create-new-post") {

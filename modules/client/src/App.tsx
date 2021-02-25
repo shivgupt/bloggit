@@ -48,6 +48,14 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
 const App: React.FC = () => {
   const classes = useStyles();
 
+  const [gitState, setGitState] = useState({} as GitState);
+  const [node, setNode] = useState({} as SidebarNode);
+  const [theme, setTheme] = useState(lightTheme);
+  const [authToken, setAuthToken] = useState("");
+  const [adminMode, setAdminMode] = useState(true);
+  const [newContent, setNewContent] = useState("");
+  const [editMode, setEditMode] = useState(false);
+
   const slugMatch = useRouteMatch("/:slug");
   const refMatch = useRouteMatch("/:ref/:slug");
   const refParam = refMatch ? refMatch.params.ref : "";
@@ -55,14 +63,7 @@ const App: React.FC = () => {
     : slugMatch ? slugMatch.params.slug
     : "";
 
-  const [gitState, setGitState] = useState({} as GitState);
-
-  const [node, setNode] = useState({} as SidebarNode);
-  const [theme, setTheme] = useState(lightTheme);
-  const [authToken, setAuthToken] = useState("");
-  const [adminMode, setAdminMode] = useState(true);
-  const [newContent, setNewContent] = useState("");
-  const [editMode, setEditMode] = useState(false);
+  // console.log(`Rendering App with refParam=${refParam} and slugParam=${slugParam}`);
 
   const updateAuthToken = (authToken: string) => {
     setAuthToken(authToken);
@@ -91,7 +92,7 @@ const App: React.FC = () => {
       index: index,
     } as GitState;
     console.log(`Syncing ref ${currentRef}${slug ? ` and slug ${slug}` : ""}`);
-    if (slug) {
+    if (slug && !["admin", "create-new-post"].includes(slug)) {
       newGitState.currentContent = await fetchContent(slug, currentRef)
       newGitState.indexEntry = index.posts?.[slug] || index.drafts?.[slug];
     } else {
@@ -123,19 +124,9 @@ const App: React.FC = () => {
 
   // Fetch index & post content any time the url changes
   useEffect(() => {
-    if (slugParam === "admin" || slugParam === "create-new-post") return;
-
-    // cleanup state
     setNewContent("");
     setEditMode(false);
-
-    (async () => {
-      try {
-        await syncGitState(refParam || gitState.latestRef, slugParam);
-      } catch (e) {
-        console.error(e.message);
-      }
-    })()
+    syncGitState(refParam || gitState.latestRef, slugParam);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refParam, slugParam]);
 

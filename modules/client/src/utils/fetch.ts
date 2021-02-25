@@ -36,7 +36,7 @@ export const fetchFile = async (path: string, _ref?: string): Promise<string> =>
       }
     } catch (e) {
       console.error(e.message);
-      throw new Error(`Couldn't get ${path}: ${e.message}`);
+      fileCache[ref][path] = "Does Not Exist"
     }
   }
   return fileCache[ref][path];

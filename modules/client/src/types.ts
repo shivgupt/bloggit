@@ -35,7 +35,7 @@ export type PostHistory = Array<{
 }>;
 
 export type SidebarNode = {
-  parent: string | null,
+  parent: string,
   current: string,
   child: any,
 }

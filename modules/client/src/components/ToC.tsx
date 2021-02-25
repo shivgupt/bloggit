@@ -9,7 +9,6 @@ import {
   ListItem,
 } from "@material-ui/core";
 import {
-  Toc as TocIcon,
   NavigateNext as NavigateNextIcon,
   ArrowBackIos as NavigateBackIcon,
 } from "@material-ui/icons";
@@ -64,7 +63,7 @@ const TocGenerator = (props: any) => {
 
 export const Toc = (props: any) => {
   const { node, posts, gitState, setNode } = props;
-  const { currentContent } = gitState
+  const { currentContent, slug } = gitState
   const classes = useStyles();
 
   switch(node.current) {
@@ -119,11 +118,10 @@ export const Toc = (props: any) => {
             return (
               <div key={p.slug}>
                 <ListItem button key={p.title} component={Link} to={`/${p.slug}`} onClick={() =>
-                  setNode({
-                    parent: "posts",
-                    current: "toc",
-                    child: p,
-                  })}
+                  (slug === p.slug)
+                    ? setNode({ parent: "posts", current: "toc", child: p })
+                    : null
+                  }
                 >
                   {p.title}
                 </ListItem>
