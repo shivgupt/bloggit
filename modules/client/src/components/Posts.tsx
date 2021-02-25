@@ -12,6 +12,7 @@ import "react-mde/lib/styles/css/react-mde-all.css";
 import axios from "axios";
 
 import { AdminContext } from "../AdminContext";
+import { ContentCache } from "../types";
 
 import { BrowseHistory } from "./BrowseHistory";
 import { CodeBlockRenderer } from "./CodeBlock";
@@ -42,16 +43,18 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export const PostPage = (props: {
-  content: string,
+  allContent: ContentCache,
   currentRef: string,
   latestRef: string,
   slug: string,
 }) => {
-  const { content, currentRef, latestRef, slug } = props;
+  const { allContent, currentRef, latestRef, slug } = props;
   const classes = useStyles();
 
   const [cardBgImg, setCardBgImg] = useState("");
   const [selectedTab, setSelectedTab] = React.useState<"write" | "preview">("write");
+
+  const content = allContent?.[currentRef]?.[slug] || "Loading..";
 
   // MDE command lis
   const save: SaveImageHandler = async function*(data: ArrayBuffer) {
@@ -152,7 +155,7 @@ export const PostPage = (props: {
           />
         </>
         : <Markdown
-            source={content || "Loading Page"}
+            source={content}
             className={classes.text}
             renderers={{
               heading: HeadingRenderer,

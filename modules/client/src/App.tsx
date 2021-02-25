@@ -24,7 +24,7 @@ import {
 import { darkTheme, lightTheme } from "./style";
 import { store } from "./utils/cache";
 import { AdminContext } from "./AdminContext";
-import { SidebarNode } from "./types";
+import { /*GitState,*/ SidebarNode } from "./types";
 import { CreateNewPost } from "./components/CreateNewPost";
 import { AppSpeedDial } from "./components/AppSpeedDial";
 
@@ -56,22 +56,24 @@ const App: React.FC = () => {
     : slugMatch ? slugMatch.params.slug
     : "";
 
+  // TODO: delete
   const [latestRef, setLatestRef] = useState(refParam);
   const [currentRef, setRef] = useState(refParam);
   const [slug, setSlug] = useState(slugParam);
-  const [content, setContent] = useState("Loading...");
+  const [allContent, setAllContent] = useState({});
+  const [index, setIndex] = useState(emptyIndex);
+
+  // const [gitState, setGitState] = useState({} as GitState);
 
   const [node, setNode] = useState({} as SidebarNode);
   const [theme, setTheme] = useState(lightTheme);
-  const [index, setIndex] = useState(emptyIndex);
   const [title, setTitle] = useState({ site: "", page: "" });
   const [authToken, setAuthToken] = useState("");
   const [adminMode, setAdminMode] = useState(true);
   const [newContent, setNewContent] = useState("");
   const [editMode, setEditMode] = useState(false);
-  const [allContent, setAllContent] = useState({});
 
-  // console.log(`Rendering App with currentRef=${currentRef} (${refParam}) and slug=${slug} (${slugParam})`);
+  console.log(`Rendering App with currentRef=${currentRef} (${refParam}) and slug=${slug} (${slugParam})`);
   const updateAuthToken = (authToken: string) => {
     setAuthToken(authToken);
     store.save("authToken", authToken);
@@ -101,7 +103,6 @@ const App: React.FC = () => {
         allContent[newRef] = {};
       }
       allContent[newRef][slug] = await fetchContent(slug!, newRef);
-      setContent(allContent[newRef][slug]);
       setAllContent(allContent);
     }
     setIndex(JSON.parse(JSON.stringify(newIndex))); // new object forces a re-render
@@ -127,7 +128,6 @@ const App: React.FC = () => {
   // Fetch index & post content any time the url changes
   useEffect(() => {
     if (slugParam === "admin" || slugParam === "create-new-post") return;
-    setContent("Loading..");
 
     // cleanup state
     setNewContent("");
@@ -143,7 +143,6 @@ const App: React.FC = () => {
           allContent[refParam] = {};
         }
         allContent[refParam][slugParam] = "Post does not exist";
-        setContent(allContent[refParam][slugParam]);
         setAllContent(allContent);
       }
     })()
@@ -216,7 +215,7 @@ const App: React.FC = () => {
               <Route
                 path="/:ref/:slug"
                 render={() => <PostPage
-                  content={content}
+                  allContent={allContent}
                   slug={slug}
                   currentRef={currentRef}
                   latestRef={latestRef}
@@ -225,7 +224,7 @@ const App: React.FC = () => {
               <Route
                 path="/:slug"
                 render={() => <PostPage
-                  content={content}
+                  allContent={allContent}
                   slug={slug}
                   currentRef={currentRef}
                   latestRef={latestRef}
@@ -233,7 +232,7 @@ const App: React.FC = () => {
               />
             </Switch>
             {(adminMode && authToken)
-              ? <AppSpeedDial content={content} readOnly={currentRef && currentRef !== latestRef} />
+              ? <AppSpeedDial allContent={allContent} readOnly={currentRef && currentRef !== latestRef} />
               : null
             }
           </Container>

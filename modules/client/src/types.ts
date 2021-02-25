@@ -1,4 +1,18 @@
 
+export type ContentCache = {
+  [ref: string]: {
+    [slug: string]: string;
+  };
+};
+
+export type GitState = {
+  current: string
+  latest: string;
+  slug: string;
+  index: PostIndex;
+  contentCache: ContentCache
+};
+
 export type PostData = {
   title: string;
   slug: string;
