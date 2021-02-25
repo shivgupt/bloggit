@@ -181,7 +181,7 @@ const App: React.FC = () => {
           node={node}
           allContent={allContent}
           posts={getPostsByCategories(index.posts)}
-          gitRef={ref}
+          currentRef={ref}
           setNode={setNode}
           theme={theme}
           title={title}
@@ -218,7 +218,7 @@ const App: React.FC = () => {
                 render={() => <PostPage
                   content={content}
                   slug={slug}
-                  gitRef={ref}
+                  currentRef={ref}
                   latestRef={latestRef}
                 />}
               />
@@ -227,7 +227,7 @@ const App: React.FC = () => {
                 render={() => <PostPage
                   content={content}
                   slug={slug}
-                  gitRef={ref}
+                  currentRef={ref}
                   latestRef={latestRef}
                 />}
               />

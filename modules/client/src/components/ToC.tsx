@@ -63,7 +63,7 @@ const TocGenerator = (props: any) => {
 };
 
 export const Toc = (props: any) => {
-  const { node, allContent, posts, gitRef: ref, setNode } = props;
+  const { node, allContent, posts, currentRef: ref, setNode } = props;
   const classes = useStyles();
 
   switch(node.current) {

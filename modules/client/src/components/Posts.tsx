@@ -1,5 +1,4 @@
 import {
-  Button,
   CardMedia,
   Input,
   makeStyles,
@@ -10,14 +9,11 @@ import React, { useContext, useEffect, useState } from "react";
 import Markdown from "react-markdown";
 import ReactMde, { SaveImageHandler } from "react-mde";
 import "react-mde/lib/styles/css/react-mde-all.css";
-import { Link } from "react-router-dom";
-import FastForwardIcon from '@material-ui/icons/FastForward';
 import axios from "axios";
 
 import { AdminContext } from "../AdminContext";
 
-import { Copyable } from "./Copyable";
-import { SelectHistorical } from "./SelectHistorical";
+import { BrowseHistory } from "./BrowseHistory";
 import { CodeBlockRenderer } from "./CodeBlock";
 import { EmojiRenderer, HeadingRenderer, ImageRenderer, LinkRenderer } from "./Renderers";
 import { ImageUploader } from "./ImageUploader";
@@ -35,14 +31,6 @@ const useStyles = makeStyles((theme) => ({
     textAlign: "justify",
     fontVariant: "discretionary-ligatures",
   },
-  buttonBar: {
-    display: "flex",
-  },
-  button: {
-    marginBottom: theme.spacing(1),
-    marginTop: theme.spacing(-1),
-    marginLeft: theme.spacing(1),
-  },
   media: {
     [theme.breakpoints.up("md")]: {
       height: 500,
@@ -55,14 +43,13 @@ const useStyles = makeStyles((theme) => ({
 
 export const PostPage = (props: {
   content: string,
-  gitRef: string,
+  currentRef: string,
   latestRef: string,
   slug: string,
 }) => {
-
-  const { content, gitRef: ref, latestRef, slug } = props;
+  const { content, currentRef, latestRef, slug } = props;
   const classes = useStyles();
-  const [isHistorical, setIsHistorical] = useState(false);
+
   const [cardBgImg, setCardBgImg] = useState("");
   const [selectedTab, setSelectedTab] = React.useState<"write" | "preview">("write");
 
@@ -88,16 +75,6 @@ export const PostPage = (props: {
   const { newContent, setNewContent, editMode } = adminContext;
 
   const post = (adminContext?.index?.posts?.[slug] || adminContext?.index?.drafts?.[slug]);
-
-  useEffect(() => {
-    (async () => {
-      if (latestRef !== ref) {
-        setIsHistorical(true);
-      } else {
-        setIsHistorical(false);
-      }
-    })();
-  }, [latestRef, ref]);
  
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => setNewContent(content), [content]);
@@ -118,30 +95,11 @@ export const PostPage = (props: {
   return (
   <>
 
-    <div className={classes.buttonBar}>
-      <Copyable
-        className={classes.button}
-        color={"primary"}
-        text={"Permalink"}
-        tooltip={"Snapshot of this page that will never change or disappear"}
-        value={`${window.location.origin}/${ref}/${slug}`}
-      />
-      <SelectHistorical
-        className={classes.button}
-        slug={slug}
-        gitRef={ref}
-      />
-      {isHistorical
-        ? <Button
-            className={classes.button}
-            startIcon={<FastForwardIcon/>}
-            component={Link}
-            color={"primary"}
-            variant={"contained"}
-            to={`/${slug}`}
-          >Jump To Present</Button>
-        : null}
-    </div>
+    <BrowseHistory
+      currentRef={currentRef}
+      latestRef={latestRef}
+      slug={slug}
+    />
 
     <Paper variant="outlined" className={classes.root}>
       {cardBgImg

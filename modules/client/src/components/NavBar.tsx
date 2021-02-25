@@ -62,7 +62,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const DrawerContent = (props: any) => {
-  const { title, posts, allContent, node, gitRef, setNode, toggleTheme, theme } = props;
+  const { title, posts, allContent, node, currentRef, setNode, toggleTheme, theme } = props;
 
   const adminContext = useContext(AdminContext);
 
@@ -101,7 +101,7 @@ const DrawerContent = (props: any) => {
         </>
         : null
       }
-      <Toc posts={posts} allContent={allContent} node={node} gitRef={gitRef} setNode={setNode}/>
+      <Toc posts={posts} allContent={allContent} node={node} currentRef={currentRef} setNode={setNode}/>
       <IconButton
         onClick={toggleTheme}
         size="small"
