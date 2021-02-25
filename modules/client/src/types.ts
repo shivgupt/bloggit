@@ -1,12 +1,5 @@
 
-export type ContentCache = {
-  [ref: string]: {
-    [slug: string]: string;
-  };
-};
-
 export type GitState = {
-  contentCache: ContentCache;
   currentContent: string;
   currentRef: string;
   index: PostIndex;

@@ -64,7 +64,7 @@ const TocGenerator = (props: any) => {
 
 export const Toc = (props: any) => {
   const { node, posts, gitState, setNode } = props;
-  const { contentCache: allContent, currentRef } = gitState
+  const { currentContent } = gitState
   const classes = useStyles();
 
   switch(node.current) {
@@ -126,10 +126,6 @@ export const Toc = (props: any) => {
                   })}
                 >
                   {p.title}
-                  {allContent?.[currentRef]?.[p.slug]
-                    ? <TocIcon className={classes.tocIcon} />
-                    : null
-                  }
                 </ListItem>
                 <Divider />
               </div>
@@ -157,7 +153,7 @@ export const Toc = (props: any) => {
         <List component="nav" className={classes.list}>
           <Markdown
             allowedTypes={["text", "heading"]}
-            source={allContent?.[currentRef] ? allContent?.[currentRef]?.[node.child.slug] : ""}
+            source={currentContent}
             renderers={{ heading: TocGenerator }}
             className={classes.list}
           />

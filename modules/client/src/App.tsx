@@ -89,15 +89,10 @@ const App: React.FC = () => {
       currentRef,
       slug: slug || "",
       index: index,
-      contentCache: gitState?.contentCache || { [currentRef]: {} },
     } as GitState;
     console.log(`Syncing ref ${currentRef}${slug ? ` and slug ${slug}` : ""}`);
     if (slug) {
-      if (!newGitState.contentCache[currentRef]) {
-        newGitState.contentCache[currentRef] = {};
-      }
-      newGitState.contentCache[currentRef][slug] = await fetchContent(slug!, currentRef);
-      newGitState.currentContent = newGitState.contentCache[currentRef][slug];
+      newGitState.currentContent = await fetchContent(slug, currentRef)
       newGitState.indexEntry = index.posts?.[slug] || index.drafts?.[slug];
     } else {
       newGitState.currentContent = "Does Not Exist";
