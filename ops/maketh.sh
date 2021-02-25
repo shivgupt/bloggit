@@ -16,8 +16,8 @@ fi
 
 if [[ -n "$REACT_APP_ENV" ]]
 then
-  echo "Loading env vars from $REACT_APP_ENV:"
-  tee "$root/modules/client/.env.production.local" < "$REACT_APP_ENV"
+  echo "Loading env vars from $REACT_APP_ENV"
+  cat "$REACT_APP_ENV" > "$root/modules/client/.env.production.local"
   # shellcheck disable=SC1090
   source "$root/modules/client/.env.production.local"
 fi
