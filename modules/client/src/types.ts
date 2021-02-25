@@ -6,11 +6,13 @@ export type ContentCache = {
 };
 
 export type GitState = {
-  current: string
-  latest: string;
-  slug: string;
+  contentCache: ContentCache;
+  currentContent: string;
+  currentRef: string;
   index: PostIndex;
-  contentCache: ContentCache
+  indexEntry: PostData;
+  latestRef: string;
+  slug: string;
 };
 
 export type PostData = {

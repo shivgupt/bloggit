@@ -31,15 +31,14 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 export const AppSpeedDial = (props: any) => {
 
-  const { content } = props;
+  const { gitState } = props;
   const history = useHistory();
   const [open, setOpen] = useState(false);
   const classes = useStyles();
   const adminContext = useContext(AdminContext);
   const { newContent, editMode, setEditMode } = adminContext;
 
-  const slugMatch = useRouteMatch("/:slug");
-  const slugParam = slugMatch ? slugMatch.params.slug : "";
+  const { currentContent, slug } = props.gitState;
 
   let dialButtonRef;
 
@@ -50,18 +49,18 @@ export const AppSpeedDial = (props: any) => {
     const data = [] as Array<{path: string, content: string}>;
 
     let post, key;
-    if (adminContext.index.posts[slugParam]) {
-      post = adminContext.index.posts[slugParam];
+    if (adminContext.index.posts[slug]) {
+      post = adminContext.index.posts[slug];
       key = "posts";
     } else {
-      post = adminContext.index.drafts[slugParam];
+      post = adminContext.index.drafts[slug];
       key = "drafts";
     }
 
     if (!post.category) {
       const path = (document.getElementById("post_path") as HTMLInputElement).value;
-      newIndex.posts[slugParam].path = path;
-      if (content === newContent && path === post.path) {
+      newIndex.posts[slug].path = path;
+      if (currentContent === newContent && path === post.path) {
         console.warn(`Nothing to update`);
         return;
       }
@@ -77,8 +76,8 @@ export const AppSpeedDial = (props: any) => {
       const tldr = (document.getElementById("post_tldr") as HTMLInputElement).value;
       const img = (document.getElementById("post_img") as HTMLInputElement).value;
       const tags = (document.getElementById("post_tags") as HTMLInputElement).value.split(",");
-      newIndex[key][slugParam] = {
-        ...newIndex[key][slugParam],
+      newIndex[key][slug] = {
+        ...newIndex[key][slug],
         category,
         lastEdit: (new Date()).toLocaleDateString("en-in"),
         img,
@@ -87,7 +86,7 @@ export const AppSpeedDial = (props: any) => {
         slug,
         tags,
       };
-      if (content === newContent && JSON.stringify(newIndex[key][slugParam]) === JSON.stringify(post)) {
+      if (currentContent === newContent && JSON.stringify(newIndex[key][slug]) === JSON.stringify(post)) {
         console.warn(`Nothing to update`);
         return;
       }
@@ -99,7 +98,7 @@ export const AppSpeedDial = (props: any) => {
       }
       data.push({ path: `${category}/${slug}.md`, content: newContent });
     }
-    if (content === newContent && JSON.stringify(newIndex) === JSON.stringify(adminContext.index) ){
+    if (currentContent === newContent && JSON.stringify(newIndex) === JSON.stringify(adminContext.index) ){
       console.log("no changes detected");
       return;
     }
@@ -111,7 +110,7 @@ export const AppSpeedDial = (props: any) => {
       method: "post",
       url: "git/edit",
     });
-    await adminContext.syncRef(undefined, slugParam);
+    await adminContext.syncGitState(undefined, slug);
     setEditMode(false);
 
   }
@@ -170,7 +169,7 @@ export const AppSpeedDial = (props: any) => {
     });
     
     if (res.status === 200) {
-      adminContext.syncRef(undefined, undefined, true);
+      adminContext.syncGitState(undefined, undefined, true);
     } else { 
       console.log("Something went wrong")
     }
@@ -179,12 +178,12 @@ export const AppSpeedDial = (props: any) => {
 
   const discard = () => {
     setEditMode(false);
-    if (slugParam === "create-new-post") {
+    if (slug === "create-new-post") {
       history.goBack();
     }
   }
 
-  if (!slugMatch || slugParam === "admin" || props.readOnly) {
+  if (!slug || slug === "admin" || props.readOnly) {
     return (
       <Fab 
       className={classes.speedDial}
@@ -192,7 +191,7 @@ export const AppSpeedDial = (props: any) => {
       onClick={() => handleRedirect("/create-new-post")}
       > <Add /> </Fab>
     );
-  } else if (slugParam === "create-new-post") {
+  } else if (slug === "create-new-post") {
     return (
       <SpeedDial
         ariaLabel="fab"

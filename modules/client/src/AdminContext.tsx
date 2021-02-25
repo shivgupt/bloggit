@@ -13,5 +13,5 @@ export const AdminContext = React.createContext({
   setEditMode: (edit: boolean) => {},
   setNewContent: (newContent: string) => {},
   setAdminMode: (viewAdminMode: boolean) => {},
-  syncRef: async (ref?: string, slug?: string, force?: boolean) => {},
+  syncGitState: async (ref?: string, slug?: string, force?: boolean) => {},
 });
