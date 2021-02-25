@@ -13,6 +13,7 @@ import { fetchHistory } from "../utils";
 const StyledMenu = withStyles({
   paper: {
     border: "1px solid #d3d4d5",
+    maxHeight: "50%",
   },
 })((props: any) => (
   <Menu
