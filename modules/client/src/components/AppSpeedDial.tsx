@@ -15,7 +15,6 @@ import { useHistory, useRouteMatch } from "react-router-dom";
 import axios from "axios";
 
 import { AdminContext } from "../AdminContext";
-import { callbackify } from "util";
 
 const useStyles = makeStyles((theme: Theme) => ({
   speedDial: {
@@ -79,6 +78,7 @@ export const AppSpeedDial = (props: any) => {
       const img = (document.getElementById("post_img") as HTMLInputElement).value;
       const tags = (document.getElementById("post_tags") as HTMLInputElement).value.split(",");
       newIndex[key][slugParam] = {
+        ...newIndex[key][slugParam],
         category,
         lastEdit: (new Date()).toLocaleDateString("en-in"),
         img,
@@ -116,7 +116,7 @@ export const AppSpeedDial = (props: any) => {
 
   }
 
-  const save = async (as: string) => {
+  const createNew = async (as: string) => {
     // create new index.json entry
     const newIndex = JSON.parse(JSON.stringify(adminContext.index))
 
@@ -142,6 +142,7 @@ export const AppSpeedDial = (props: any) => {
       if (!newIndex.posts) newIndex.posts = {};
       newIndex.posts[slug] = {
         category,
+        createdOn: (new Date()).toLocaleDateString("en-in"),
         lastEdit: (new Date()).toLocaleDateString("en-in"),
         tldr,
         title,
@@ -208,12 +209,12 @@ export const AppSpeedDial = (props: any) => {
         <SpeedDialAction
           icon={<Drafts />}
           tooltipTitle="Save As Draft"
-          onClick={() => save("draft")}
+          onClick={() => createNew("draft")}
         />
         <SpeedDialAction
           icon={<Public />}
           tooltipTitle="Publish"
-          onClick={() => save("post")}
+          onClick={() => createNew("post")}
         />
       </SpeedDial>
     )

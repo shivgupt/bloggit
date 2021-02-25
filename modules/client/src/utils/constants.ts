@@ -8,6 +8,7 @@ export const emptyIndex: PostIndex = {
 };
 
 export const emptyPost: PostData = {
+  createdOn: "",
   category: "",
   lastEdit: "",
   slug: "",
