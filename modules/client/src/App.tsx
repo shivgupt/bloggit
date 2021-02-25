@@ -16,11 +16,9 @@ import { NavBar } from "./components/NavBar";
 import { PostPage } from "./components/Posts";
 import {
   emptyEntry,
-  emptyIndex,
   fetchContent,
   fetchIndex,
   fetchRef,
-  getPostsByCategories,
 } from "./utils";
 import { darkTheme, lightTheme } from "./style";
 import { store } from "./utils/cache";
@@ -57,24 +55,15 @@ const App: React.FC = () => {
     : slugMatch ? slugMatch.params.slug
     : "";
 
-  // TODO: delete
-  const [latestRef, setLatestRef] = useState(refParam);
-  const [currentRef, setRef] = useState(refParam);
-  const [slug, setSlug] = useState(slugParam);
-  const [allContent, setAllContent] = useState({});
-  const [index, setIndex] = useState(emptyIndex);
-
   const [gitState, setGitState] = useState({} as GitState);
 
   const [node, setNode] = useState({} as SidebarNode);
   const [theme, setTheme] = useState(lightTheme);
-  const [title, setTitle] = useState({ site: "", page: "" });
   const [authToken, setAuthToken] = useState("");
   const [adminMode, setAdminMode] = useState(true);
   const [newContent, setNewContent] = useState("");
   const [editMode, setEditMode] = useState(false);
 
-  console.log(`Rendering App with currentRef=${currentRef} (${refParam}) and slug=${slug} (${slugParam})`);
   const updateAuthToken = (authToken: string) => {
     setAuthToken(authToken);
     store.save("authToken", authToken);
@@ -108,17 +97,20 @@ const App: React.FC = () => {
         newGitState.contentCache[currentRef] = {};
       }
       newGitState.contentCache[currentRef][slug] = await fetchContent(slug!, currentRef);
-      setAllContent(newGitState.contentCache);
       newGitState.currentContent = newGitState.contentCache[currentRef][slug];
       newGitState.indexEntry = index.posts?.[slug] || index.drafts?.[slug];
     } else {
       newGitState.currentContent = "Does Not Exist";
       newGitState.indexEntry = emptyEntry;
     }
-    setRef(currentRef);
-    setIndex(JSON.parse(JSON.stringify(newGitState.index))); // new object forces a re-render
-    setRef(currentRef);
     setGitState(newGitState);
+
+    // Update sidebar node
+    if (slug !== "" && index?.posts?.[slug || ""]){
+      setNode({ parent: "posts", current: "toc", child: index?.posts?.[slug || ""] });
+    } else {
+      setNode({ parent: "", current: "categories", child: "posts" });
+    }
   }
 
   // Run this effect exactly once when the page initially loads
@@ -132,9 +124,6 @@ const App: React.FC = () => {
     // Check local storage for admin edit keys
     const key = store.load("authToken");
     if (key) setAuthToken(key);
-    (async () => {
-      setLatestRef(await fetchRef());
-    })()
   }, []);
 
   // Fetch index & post content any time the url changes
@@ -145,17 +134,11 @@ const App: React.FC = () => {
     setNewContent("");
     setEditMode(false);
 
-    setSlug(slugParam);
     (async () => {
       try {
         await syncGitState(refParam || gitState.latestRef, slugParam);
       } catch (e) {
-        console.warn(e.message);
-        if (!allContent[refParam]) {
-          allContent[refParam] = {};
-        }
-        allContent[refParam][slugParam] = "Post does not exist";
-        setAllContent(allContent);
+        console.error(e.message);
       }
     })()
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -166,36 +149,17 @@ const App: React.FC = () => {
     axios.defaults.headers.common["authorization"] = `Basic ${btoa(`admin:${authToken}`)}`;
   }, [authToken]);
 
-  // Update the title & sidebar node when the index or slug changes
-  useEffect(() => {
-    // Update title
-    // console.log("Setting title & sidebar node");
-    const siteTitle = index ? index.title : "My personal website";
-    const pageTitle = index.posts[slug] ? index.posts[slug].title : "";
-    document.title = pageTitle ? `${pageTitle} | ${siteTitle}` : siteTitle;
-    setTitle({ site: siteTitle, page: pageTitle });
-    // Update sidebar node
-    if (slug !== "" && index.posts[slug]){
-      setNode({ parent: "posts", current: "toc", child: index.posts[slug] });
-    } else {
-      setNode({ parent: "", current: "categories", child: "posts" });
-    }
-  }, [slug, index]);
-
   return (
     <ThemeProvider theme={theme}>
       <AdminContext.Provider
-        value={{ syncGitState, authToken, editMode, setEditMode, newContent, setNewContent, index, updateAuthToken, adminMode, setAdminMode }}
+        value={{ gitState, syncGitState, authToken, editMode, setEditMode, newContent, setNewContent, updateAuthToken, adminMode, setAdminMode }}
       >
         <CssBaseline />
         <NavBar
+          gitState={gitState}
           node={node}
-          allContent={allContent}
-          posts={getPostsByCategories(index.posts)}
-          currentRef={currentRef}
           setNode={setNode}
           theme={theme}
-          title={title}
           toggleTheme={toggleTheme}
         />
         <main className={classes.main}>
@@ -206,7 +170,7 @@ const App: React.FC = () => {
                 path="/"
                 render={() => {
                   return (
-                    <Home posts={index.posts} title={title} />
+                    <Home gitState={gitState} />
                   );
                 }}
               />
@@ -233,10 +197,7 @@ const App: React.FC = () => {
                 render={() => <PostPage gitState={gitState} />}
               />
             </Switch>
-            {(adminMode && authToken)
-              ? <AppSpeedDial gitState={gitState} allContent={allContent} readOnly={currentRef && currentRef !== latestRef} />
-              : null
-            }
+            {(adminMode && authToken) ? <AppSpeedDial gitState={gitState} /> : null}
           </Container>
         </main>
       </AdminContext.Provider>

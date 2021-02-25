@@ -11,7 +11,7 @@ import {
   Edit,
   Public,
 } from "@material-ui/icons";
-import { useHistory, useRouteMatch } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import axios from "axios";
 
 import { AdminContext } from "../AdminContext";
@@ -39,21 +39,23 @@ export const AppSpeedDial = (props: any) => {
   const { newContent, editMode, setEditMode } = adminContext;
 
   const { currentContent, slug } = props.gitState;
+  const readOnly = gitState.currentRef !== gitState.latestRef;
 
   let dialButtonRef;
 
   const handleRedirect = (to: string) => history.push(to)
 
   const update = async () => {
-    const newIndex = JSON.parse(JSON.stringify(adminContext.index))
+    const oldIndex = adminContext.gitState?.index;
+    const newIndex = JSON.parse(JSON.stringify(oldIndex))
     const data = [] as Array<{path: string, content: string}>;
 
     let post, key;
-    if (adminContext.index.posts[slug]) {
-      post = adminContext.index.posts[slug];
+    if (oldIndex?.posts?.[slug]) {
+      post = oldIndex.posts[slug];
       key = "posts";
     } else {
-      post = adminContext.index.drafts[slug];
+      post = oldIndex.drafts[slug];
       key = "drafts";
     }
 
@@ -98,7 +100,7 @@ export const AppSpeedDial = (props: any) => {
       }
       data.push({ path: `${category}/${slug}.md`, content: newContent });
     }
-    if (currentContent === newContent && JSON.stringify(newIndex) === JSON.stringify(adminContext.index) ){
+    if (currentContent === newContent && JSON.stringify(newIndex) === JSON.stringify(oldIndex) ){
       console.log("no changes detected");
       return;
     }
@@ -117,7 +119,8 @@ export const AppSpeedDial = (props: any) => {
 
   const createNew = async (as: string) => {
     // create new index.json entry
-    const newIndex = JSON.parse(JSON.stringify(adminContext.index))
+    const oldIndex = adminContext.gitState?.index;
+    const newIndex = JSON.parse(JSON.stringify(oldIndex));
 
     const slug = (document.getElementById("post_slug") as HTMLInputElement).value;
     const category = (document.getElementById("post_category") as HTMLInputElement).value.toLocaleLowerCase();
@@ -183,7 +186,7 @@ export const AppSpeedDial = (props: any) => {
     }
   }
 
-  if (!slug || slug === "admin" || props.readOnly) {
+  if (!slug || slug === "admin" || readOnly) {
     return (
       <Fab 
       className={classes.speedDial}

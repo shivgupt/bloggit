@@ -38,12 +38,12 @@ const useStyles = makeStyles(() => ({
 
 export const Home = (props: any) => {
   const classes = useStyles();
-  const { posts } = props;
+  const posts = props.gitState?.index?.posts || [];
 
   return (
     <Grid container spacing={3} justify={"space-around"} alignItems={"center"}>
       {Object.keys(posts).map(slug => {
-        if (!posts[slug].category) return ;
+        if (!posts[slug].category) return null;
 
         const title = posts[slug].title.replace(/:\w+:/gi, name => emoji.getUnicode(name) || name);
         const tldr = posts[slug].tldr.replace(/:\w+:/gi, name => emoji.getUnicode(name) || name);

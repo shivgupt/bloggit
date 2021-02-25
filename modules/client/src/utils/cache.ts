@@ -6,10 +6,6 @@ const load = (key: string): any => {
   try {
     const data = localStorage.getItem(key);
     if (data) {
-      // console.log(`Loaded ${(data)} for key ${key}`);
-      if (key === "FitnessProfile") {
-        return JSON.parse(data);
-      }
       return JSON.parse(data);
     }
     return emptyStore[key];

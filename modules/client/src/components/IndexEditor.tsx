@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import { 
   Button,
   Collapse,
@@ -11,10 +11,10 @@ import {
   Theme,
 } from "@material-ui/core";
 import { Link } from "react-router-dom";
-
-import { AdminContext } from "../AdminContext";
 import { Drafts, ExpandLess, ExpandMore, Public } from "@material-ui/icons";
 import axios from "axios";
+
+import { AdminContext } from "../AdminContext";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -35,18 +35,17 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 export const IndexEditor = (props: any) => {
 
-  const adminContext = useContext(AdminContext);
-  const [index, setIndex] = useState(adminContext.index);
   const [openPosts, setOpenPosts] = useState(false);
   const [openDrafts, setOpenDrafts] = useState(false);
+  const adminContext = useContext(AdminContext);
+  const index = adminContext.gitState?.index;
 
   const classes = useStyles();
   const togglePosts = () => setOpenPosts(!openPosts);
   const toggleDrafts = () => setOpenDrafts(!openDrafts);
 
-  useEffect(() => setIndex(adminContext.index), [adminContext.index]);
-
   const handleArchive = async (slug: string) => {
+    if (!index) return;
     const newIndex = JSON.parse(JSON.stringify(index));
     newIndex.drafts[slug] = index.posts[slug];
     delete newIndex.posts[slug];
@@ -65,6 +64,7 @@ export const IndexEditor = (props: any) => {
   };
 
   const handlePublish = async (slug: string) => {
+    if (!index) return;
     const newIndex = JSON.parse(JSON.stringify(index));
     newIndex.posts[slug] = index.drafts![slug];
     delete newIndex.drafts[slug];
