@@ -85,7 +85,7 @@ export const PostPage = (props: {
   };
 
   const adminContext = useContext(AdminContext);
-  const { newContent, updateNewContent, editMode } = adminContext;
+  const { newContent, setNewContent, editMode } = adminContext;
 
   const post = (adminContext?.index?.posts?.[slug] || adminContext?.index?.drafts?.[slug]);
 
@@ -100,7 +100,7 @@ export const PostPage = (props: {
   }, [latestRef, ref]);
  
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => updateNewContent(content), [content]);
+  useEffect(() => setNewContent(content), [content]);
 
   useEffect(() => {
     if (typeof(post) === "object" && post.img) {
@@ -163,7 +163,7 @@ export const PostPage = (props: {
           }
           <ReactMde
             value={newContent}
-            onChange={updateNewContent}
+            onChange={setNewContent}
             selectedTab={selectedTab}
             onTabChange={setSelectedTab}
             minEditorHeight={400}

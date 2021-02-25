@@ -83,7 +83,7 @@ const DrawerContent = (props: any) => {
                 <Switch
                   size="small"
                   checked={adminContext.adminMode}
-                  onChange={() => adminContext.viewAdminMode(!adminContext.adminMode)}
+                  onChange={() => adminContext.setAdminMode(!adminContext.adminMode)}
                 />
               }
               label="Admin"

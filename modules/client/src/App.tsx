@@ -77,12 +77,6 @@ const App: React.FC = () => {
     store.save("authToken", authToken);
   };
 
-  const updateNewContent = (newContent: string) => {
-    setNewContent(newContent);
-  };
-
-  const viewAdminMode = (viewAdminMode: boolean) => setAdminMode(viewAdminMode);
-
   const toggleTheme = () => {
     if ( theme.palette.type === "dark") {
       store.save("theme", "light");
@@ -180,7 +174,7 @@ const App: React.FC = () => {
   return (
     <ThemeProvider theme={theme}>
       <AdminContext.Provider
-        value={{ syncRef, authToken, editMode, setEditMode, newContent, updateNewContent, index, updateAuthToken, adminMode, viewAdminMode }}
+        value={{ syncRef, authToken, editMode, setEditMode, newContent, setNewContent, index, updateAuthToken, adminMode, setAdminMode }}
       >
         <CssBaseline />
         <NavBar
