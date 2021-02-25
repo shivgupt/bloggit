@@ -26,7 +26,7 @@ const useStyles = makeStyles(theme => ({
   list3: { width: "100%", "paddingLeft": theme.spacing(6) },
   list4: { width: "100%", "paddingLeft": theme.spacing(8) },
   list5: { width: "100%", "paddingLeft": theme.spacing(10) },
-  tocButton: {
+  tocIcon: {
     marginLeft: theme.spacing(2),
   },
 }));
@@ -115,21 +115,16 @@ export const Toc = (props: any) => {
           {posts[node.child].map((p) => {
             return (
               <div key={p.slug}>
-                <ListItem button key={p.title} component={Link} to={`/${p.slug}`}>
+                <ListItem button key={p.title} component={Link} to={`/${p.slug}`} onClick={() =>
+                  setNode({
+                    parent: "posts",
+                    current: "toc",
+                    child: p,
+                  })}
+                >
                   {p.title}
                   {allContent && allContent[ref] && allContent[ref][p.slug]
-                    ?  <IconButton
-                        onClick={() => {
-                          setNode({
-                            parent: "posts",
-                            current: "toc",
-                            child: p,
-                          });
-                        }}
-                        className={classes.tocButton}
-                      >
-                        <TocIcon/>
-                      </IconButton>
+                    ? <TocIcon className={classes.tocIcon} />
                     : null
                   }
                 </ListItem>
