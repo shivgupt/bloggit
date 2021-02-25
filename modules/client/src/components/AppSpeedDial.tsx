@@ -179,10 +179,12 @@ export const AppSpeedDial = (props: any) => {
 
   const discard = () => {
     setEditMode(false);
-    history.goBack();
+    if (slugParam === "create-new-post") {
+      history.goBack();
+    }
   }
 
-  if (!slugMatch || slugParam === "admin") {
+  if (!slugMatch || slugParam === "admin" || props.readOnly) {
     return (
       <Fab 
       className={classes.speedDial}
