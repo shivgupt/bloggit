@@ -27,7 +27,7 @@ app.use((req, res, next) => {
 app.use(authRouter);
 
 app.use(bodyParser.json({ type: ["application/json"] }));
-app.use(bodyParser.raw({ limit: "100mb", type: [
+app.use(bodyParser.raw({ limit: "4gb", type: [
   "application/octet-stream",
   "application/x-git-receive-pack-request",
   "application/x-git-upload-pack-request",
