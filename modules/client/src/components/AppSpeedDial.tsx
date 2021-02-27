@@ -15,6 +15,12 @@ import { useHistory } from "react-router-dom";
 import axios from "axios";
 import { GitState, PostData } from "../types";
 
+const getPath = (post: PostData) => {
+  if (post?.path) return post.path;
+  if (post?.category) return `${post.category}/${post.slug}.md`;
+  return `${post.slug}.md`;
+};
+
 const useStyles = makeStyles((theme: Theme) => ({
   speedDial: {
     position: "fixed",
@@ -53,9 +59,8 @@ export const AppSpeedDial = (props: {
     const oldIndex = gitState?.index;
     const newIndex = JSON.parse(JSON.stringify(oldIndex))
     const data = [] as Array<{path: string, content: string}>;
-
+    
     let post, key;
-
     if (oldIndex?.posts?.[slug]) {
       post = oldIndex.posts[slug];
       key = "posts";
@@ -64,46 +69,28 @@ export const AppSpeedDial = (props: {
       key = "drafts";
     }
 
-    if (!post.category) {
-      const path = newPostData.path;
-      newIndex[key][slug].path = path;
+    const newPath = getPath(newPostData);
+    const oldPath = getPath(oldIndex[key][slug]);
 
-      newIndex[key][slug] = {
-        ...newPostData,
-        lastEdit: (new Date()).toLocaleDateString("en-in"),
-      }
 
-      if (currentContent === newContent && path === post.path) {
-        console.warn(`Nothing to update`);
-        return;
-      }
-      if (post.path !== path) {
-        data.push({ path: post.path!, content: ""});
-      }
-      data.push({ path, content: newContent });
-    } else {
-      // update to new format path = category/slug
-      newIndex[key][slug] = {
-        ...newIndex[key][slug],
-        lastEdit: (new Date()).toLocaleDateString("en-in"),
-      };
-      if (currentContent === newContent && JSON.stringify(newIndex[key][slug]) === JSON.stringify(post)) {
-        console.warn(`Nothing to update`);
-        return;
-      }
-      if (post.path) {
-        data.push({ path: post.path, content: "" });
-      } else if (post.slug !== slug || post.category !== category) {
-        console.log("Path or category changed, deleting old file");
-        data.push({ path: `${post.category}/${post.slug}.md`, content: "" });
-      }
-      data.push({ path: `${category}/${slug}.md`, content: newContent });
-    }
-    if (currentContent === newContent && JSON.stringify(newIndex) === JSON.stringify(oldIndex) ){
-      console.log("no changes detected");
+    newIndex[key][slug] = {
+      ...newPostData,
+      lastEdit: (new Date()).toLocaleDateString("en-in"),
+    };
+
+    if (currentContent === newContent
+      && JSON.stringify(newIndex[key][slug]) === JSON.stringify(oldIndex[key][slug])
+    ) {
+      console.warn(`Nothing to update`);
       return;
     }
+    if (oldPath !== newPath) {
+      data.push({ path: oldPath, content: "" });
+    }
+
+    data.push({ path: newPath, content: newContent });
     data.push({ path: "index.json", content: JSON.stringify(newIndex, null, 2)});
+
     console.log("Lets push it to git");
     const res = await axios({
       data,
@@ -112,7 +99,6 @@ export const AppSpeedDial = (props: {
       url: "git/edit",
     });
     if (res && res.status === 200 && res.data) {
-      console.log(`git/edit result:`, res);
       setEditMode(false);
       await syncGitState(res.data.commit?.substring(0, 8), slug);
     } else {
@@ -120,23 +106,24 @@ export const AppSpeedDial = (props: {
     }
   }
 
-  const createNew = async (as: string) => {
+  const createNew = async (as: "drafts" | "posts") => {
     // create new index.json entry
-    const oldIndex = gitState?.index;
-    const newIndex = JSON.parse(JSON.stringify(oldIndex));
+    const newIndex = JSON.parse(JSON.stringify(gitState?.index));
 
-    if (as === "draft") {
+    const path = getPath(newPostData);
+
+    if (as === "drafts") {
       if (!newIndex.drafts) newIndex.drafts = {};
-      newIndex.drafts[slug] = {
+      newIndex.drafts[newPostData.slug] = {
         ...newPostData,
         lastEdit: (new Date()).toLocaleDateString("en-in"),
       };
     } else {
       if (!newIndex.posts) newIndex.posts = {};
-      newIndex.posts[slug] = {
+      newIndex.posts[newPostData.slug] = {
         ...newPostData,
         lastEdit: (new Date()).toLocaleDateString("en-in"),
-        createdOn: (new Date()).toLocaleDateString("en-in"),
+        publishedOn: (new Date()).toLocaleDateString("en-in"),
       };
     }
     // Send request to update index.json and create new file
@@ -145,8 +132,8 @@ export const AppSpeedDial = (props: {
       url: "git/edit",
       data: [
       {
-        path: `${newPostData.category}/${newPostData.slug}.md`,
-        content: newContent || "Coming Soon",
+        path: path,
+        content: newContent,
       },
       {
         path: "index.json",
@@ -156,16 +143,15 @@ export const AppSpeedDial = (props: {
       headers: { "content-type": "application/json" }
     });
     if (res && res.status === 200 && res.data) {
-      console.log(`git/edit result:`, res);
       setEditMode(false);
-      await syncGitState(res.data.commit?.substring(0, 8), slug);
-      handleRedirect(`/${slug}`)
+      await syncGitState(res.data.commit?.substring(0, 8), newPostData.slug);
+      handleRedirect(`/${newPostData.slug}`)
     } else { 
       console.error(`Something went wrong`, res);
     }
   };
 
-  if (!slug || slug === "admin" || readOnly) {
+  if (!editMode && (!slug || slug === "admin" || readOnly)) {
     return (
       <Fab 
         className={classes.speedDial}
@@ -176,7 +162,7 @@ export const AppSpeedDial = (props: {
         }}
       > <Add /> </Fab>
     );
-  } else if (slug === "" && editMode) {
+  } else if (editMode && slug === "") {
     return (
       <SpeedDial
         ariaLabel="fab"
@@ -195,12 +181,12 @@ export const AppSpeedDial = (props: {
         <SpeedDialAction
           icon={<Drafts />}
           tooltipTitle="Save As Draft"
-          onClick={() => createNew("draft")}
+          onClick={() => createNew("drafts")}
         />
         <SpeedDialAction
           icon={<Public />}
           tooltipTitle="Publish"
-          onClick={() => createNew("post")}
+          onClick={() => createNew("posts")}
         />
       </SpeedDial>
     )

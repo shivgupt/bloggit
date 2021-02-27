@@ -11,7 +11,7 @@ export type GitState = {
 export type PostData = {
   title: string;
   slug: string;
-  createdOn: string;
+  publishedOn: string;
   category?: string;
   featured?: string;
   img?: string;

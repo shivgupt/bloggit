@@ -85,17 +85,18 @@ export const EditPost = (props: {
       <div className={classes.root}>
         {["title", "category", "slug", "tldr", "tags", "path"].map(name => (
           <TextField
+            key={`post_${name}`}
             id={`post_${name}`}
             label={name}
             name={name}
-            value={postData?.[name]}
+            value={postData?.[name] || ""}
             fullWidth={fullWidth.includes(name)}
             onChange={handleChange}
           />
         ))}
         <Input
           id="post_img"
-          value={postData?.img}
+          value={postData?.img || ""}
           endAdornment={ <ImageUploader setImageHash={handleImageUpload} /> }
         />
       </div>

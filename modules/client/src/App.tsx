@@ -94,7 +94,7 @@ const App: React.FC = () => {
       slug: slug || "",
       index: index,
     } as GitState;
-    console.log(`Syncing ref ${currentRef}${slug ? ` and slug ${slug}` : ""}`);
+    // console.log(`Syncing ref ${currentRef}${slug ? ` and slug ${slug}` : ""}`);
     if (slug && !["admin", "create-new-post"].includes(slug)) {
       newGitState.currentContent = await fetchContent(slug, currentRef)
       newGitState.indexEntry = index.posts?.[slug] || index.drafts?.[slug];
