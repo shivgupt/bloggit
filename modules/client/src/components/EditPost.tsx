@@ -88,7 +88,7 @@ export const EditPost = (props: {
             id={`post_${name}`}
             label={name}
             name={name}
-            defaultValue={postData?.[name]}
+            value={postData?.[name]}
             fullWidth={fullWidth.includes(name)}
             onChange={handleChange}
           />

@@ -137,7 +137,7 @@ const DrawerContent = (props: any) => {
 };
 
 export const NavBar = (props: any) => {
-  const { gitState } = props;
+  const { gitState, setEditMode } = props;
   const classes = useStyles();
   const [drawer, setDrawer] = useState(false);
 
@@ -158,6 +158,7 @@ export const NavBar = (props: any) => {
             edge="start"
             to={"/"}
             color="inherit"
+            onClick={() => setEditMode(false)}
             className={classes.homeButton}
           >
             <HomeIcon />

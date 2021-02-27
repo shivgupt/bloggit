@@ -133,6 +133,13 @@ const App: React.FC = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refParam, slugParam]);
 
+  useEffect(() => {
+    if (editMode) {
+      setNewContent(gitState.currentContent);
+      setNewPostData(gitState.indexEntry);
+    }
+  }, [editMode]);
+
   // Update auth headers any time the authToken changes
   useEffect(() => {
     axios.defaults.headers.common["authorization"] = `Basic ${btoa(`admin:${authToken}`)}`;
@@ -150,6 +157,7 @@ const App: React.FC = () => {
           setNode={setNode}
           theme={theme}
           toggleTheme={toggleTheme}
+          setEditMode={setEditMode}
         />
         <main className={classes.main}>
           <div className={classes.appBarSpacer} />
@@ -158,9 +166,14 @@ const App: React.FC = () => {
               <Route exact
                 path="/"
                 render={() => {
-                  return (
-                    <Home gitState={gitState} />
-                  );
+                  return editMode
+                  ? <EditPost
+                    postData={newPostData}
+                    content={newContent}
+                    setPostData={setNewPostData}
+                    setContent={setNewContent}
+                  />
+                  : <Home gitState={gitState} />
                 }}
               />
               <Route exact
@@ -171,27 +184,34 @@ const App: React.FC = () => {
                   );
                 }}
               />
-              <Route exact
-                path="/create-new-post"
-                render={() => {
-                  return <EditPost
-                    postData={newPostData}
-                    content={newContent}
-                    setPostData={setNewPostData}
-                    setContent={setNewContent}
-                  />;
-                }}
-              />
               <Route
                 path="/:ref/:slug"
                 render={() => <PostPage gitState={gitState} />}
               />
               <Route
                 path="/:slug"
-                render={() => <PostPage gitState={gitState} />}
+                render={() => {
+                  return editMode
+                  ? <EditPost
+                      postData={newPostData}
+                      content={newContent}
+                      setPostData={setNewPostData}
+                      setContent={setNewContent}
+                    /> 
+                  : <PostPage gitState={gitState} />
+                }}
               />
             </Switch>
-            {(adminMode && authToken) ? <AppSpeedDial gitState={gitState} /> : null}
+            {(adminMode && authToken)
+            ? <AppSpeedDial
+                gitState={gitState}
+                syncGitState={syncGitState}
+                newContent={newContent}
+                newPostData={newPostData}
+                editMode={editMode}
+                setEditMode={setEditMode}
+              />
+            : null}
           </Container>
         </main>
       </AdminContext.Provider>
