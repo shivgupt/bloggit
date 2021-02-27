@@ -12,6 +12,7 @@ import "react-mde/lib/styles/css/react-mde-all.css";
 import axios from "axios";
 
 import { AdminContext } from "../AdminContext";
+import { GitState } from "../types";
 
 import { BrowseHistory } from "./BrowseHistory";
 import { CodeBlockRenderer } from "./CodeBlock";
@@ -42,12 +43,9 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export const PostPage = (props: {
-  content: string,
-  currentRef: string,
-  latestRef: string,
-  slug: string,
+  gitState: GitState,
 }) => {
-  const { content, currentRef, latestRef, slug } = props;
+  const { currentRef, latestRef, slug, currentContent, indexEntry } = props.gitState;
   const classes = useStyles();
 
   const [cardBgImg, setCardBgImg] = useState("");
@@ -74,14 +72,13 @@ export const PostPage = (props: {
   const adminContext = useContext(AdminContext);
   const { newContent, setNewContent, editMode } = adminContext;
 
-  const post = (adminContext?.index?.posts?.[slug] || adminContext?.index?.drafts?.[slug]);
  
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => setNewContent(content), [content]);
+  useEffect(() => setNewContent(currentContent), [currentContent]);
 
   useEffect(() => {
-    if (post && post.img) {
-      setCardBgImg(post.img);
+    if (indexEntry && indexEntry.img) {
+      setCardBgImg(indexEntry.img);
     }
     const hash = window.location.hash;
 
@@ -90,7 +87,7 @@ export const PostPage = (props: {
       if (anchor) anchor.scrollIntoView();
 
     }
-  },[post]);
+  },[indexEntry]);
 
   return (
   <>
@@ -108,17 +105,17 @@ export const PostPage = (props: {
       }
       { editMode ? 
         <>
-          { !post.category
+          { !indexEntry?.category
             ? <div className={classes.root}>
-                <TextField id="post_path" label="path" defaultValue={post.path} />
+                <TextField id="post_path" label="path" defaultValue={indexEntry.path} />
               </div>
             : (
             <div className={classes.root}>
-              <TextField id="post_title" label="title" defaultValue={post.title} fullWidth />
-              <TextField id="post_category" label="category" defaultValue={post.category} />
-              <TextField id="post_slug" label="slug" defaultValue={post.slug} />
-              <TextField id="post_tldr" label="tldr" defaultValue={post.tldr} multiline fullWidth />
-              <TextField id="post_tags" label="tags" defaultValue={post.tags} />
+              <TextField id="post_title" label="title" defaultValue={indexEntry.title} fullWidth />
+              <TextField id="post_category" label="category" defaultValue={indexEntry.category} />
+              <TextField id="post_slug" label="slug" defaultValue={indexEntry.slug} />
+              <TextField id="post_tldr" label="tldr" defaultValue={indexEntry.tldr} multiline fullWidth />
+              <TextField id="post_tags" label="tags" defaultValue={indexEntry.tags} />
               <Input
                 id="post_img"
                 value={cardBgImg}
@@ -152,7 +149,7 @@ export const PostPage = (props: {
           />
         </>
         : <Markdown
-            source={content || "Loading Page"}
+            source={currentContent}
             className={classes.text}
             renderers={{
               heading: HeadingRenderer,

@@ -76,9 +76,10 @@ export const BrowseHistory = (props: {
   }, [latestRef, currentRef]);
 
   useEffect(() => {
-    console.log(`Triggering BrowseHistory effect bc ${slug} changed`);
+    if (!slug) return;
     (async () => {
       try {
+        console.log(`Fetching history bc slug changed to "${slug}"`);
         setEditHistory(await fetchHistory(slug));
       } catch (e) {
         console.warn(e.message);

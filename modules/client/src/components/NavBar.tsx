@@ -18,13 +18,13 @@ import {
   BrightnessHigh as LightIcon,
   Home as HomeIcon,
   Menu as MenuIcon,
-  AddCircle as AddIcon,
 } from "@material-ui/icons";
 import React, { useState, useContext } from "react";
 import { Link } from "react-router-dom";
 
 import { siteTitleFont } from "../style";
 import { AdminContext } from "../AdminContext";
+import { getPostsByCategories } from "../utils";
 
 import { Toc } from "./ToC";
 
@@ -62,16 +62,18 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const DrawerContent = (props: any) => {
-  const { title, posts, allContent, node, currentRef, setNode, toggleTheme, theme } = props;
+  const { siteTitle, node, gitState, setNode, toggleTheme, theme } = props;
 
   const adminContext = useContext(AdminContext);
+  const { index } = gitState;
+  const posts = getPostsByCategories(index?.posts || []);
 
   return (
     <>
       <ThemeProvider theme={siteTitleFont}>
         <Typography variant="h4" component="div" >
           <Box textAlign="center" m={2} p={2}>
-            {title.site}
+            {siteTitle}
           </Box>
         </Typography>
       </ThemeProvider>
@@ -108,7 +110,14 @@ const DrawerContent = (props: any) => {
         </>
         : null
       }
-      <Toc posts={posts} allContent={allContent} node={node} currentRef={currentRef} setNode={setNode}/>
+      <Toc gitState={gitState} posts={posts} node={node} setNode={setNode}/>
+      <IconButton
+        onClick={toggleTheme}
+        size="small"
+        color="secondary"
+      >
+        {theme.palette.type === "dark" ? <LightIcon /> : <DarkIcon />}
+      </IconButton>
       {posts["top-level"]
         ? posts["top-level"].map((p) => {
           return (
@@ -128,13 +137,17 @@ const DrawerContent = (props: any) => {
 };
 
 export const NavBar = (props: any) => {
-  const { title } = props;
+  const { gitState } = props;
   const classes = useStyles();
   const [drawer, setDrawer] = useState(false);
 
   const toggleDrawer = () => setDrawer(!drawer);
 
-  const adminContext = useContext(AdminContext);
+  const { index, slug } = gitState;
+  const posts = getPostsByCategories(index?.posts || []);
+  const siteTitle = index?.title || "My Blog";
+  const pageTitle = index?.posts?.[slug || ""]?.title || "";
+  document.title = pageTitle ? `${pageTitle} | ${siteTitle}` : siteTitle;
 
   return (
     <>
@@ -156,7 +169,7 @@ export const NavBar = (props: any) => {
             component={"h2"}
             noWrap
           >
-            {title.page ? title.page : "Home"}
+            {pageTitle ? pageTitle : "Home"}
           </Typography>
           <Hidden mdUp>
             <IconButton
@@ -179,7 +192,7 @@ export const NavBar = (props: any) => {
             onClose={toggleDrawer}
             classes={{ paper: classes.list }}
           >
-            <DrawerContent {...props} />
+            <DrawerContent siteTitle={siteTitle} {...props} />
           </Drawer>
         </Hidden>
         <Hidden smDown>
@@ -189,7 +202,7 @@ export const NavBar = (props: any) => {
             variant="permanent"
             open
           >
-            <DrawerContent {...props} />
+            <DrawerContent siteTitle={siteTitle} {...props} />
           </Drawer>
         </Hidden>
       </nav>

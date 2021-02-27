@@ -7,7 +7,7 @@ export const emptyIndex: PostIndex = {
   title: "My Personal Website",
 };
 
-export const emptyPost: PostData = {
+export const emptyEntry: PostData = {
   createdOn: "",
   category: "",
   lastEdit: "",
