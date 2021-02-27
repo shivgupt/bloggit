@@ -24,7 +24,7 @@ import { darkTheme, lightTheme } from "./style";
 import { store } from "./utils/cache";
 import { AdminContext } from "./AdminContext";
 import { GitState, SidebarNode } from "./types";
-import { CreateNewPost } from "./components/CreateNewPost";
+import { EditPost } from "./components/EditPost";
 import { AppSpeedDial } from "./components/AppSpeedDial";
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
@@ -53,6 +53,9 @@ const App: React.FC = () => {
   const [theme, setTheme] = useState(lightTheme);
   const [authToken, setAuthToken] = useState("");
   const [adminMode, setAdminMode] = useState(true);
+
+
+  const [newPostData, setNewPostData] = useState(emptyEntry);
   const [newContent, setNewContent] = useState("");
   const [editMode, setEditMode] = useState(false);
 
@@ -171,7 +174,12 @@ const App: React.FC = () => {
               <Route exact
                 path="/create-new-post"
                 render={() => {
-                  return <CreateNewPost />;
+                  return <EditPost
+                    postData={newPostData}
+                    content={newContent}
+                    setPostData={setNewPostData}
+                    setContent={setNewContent}
+                  />;
                 }}
               />
               <Route
