@@ -12,10 +12,9 @@ import {
   NavigateNext as NavigateNextIcon,
   ArrowBackIos as NavigateBackIcon,
 } from "@material-ui/icons";
-import emoji from "emoji-dictionary";
 
 import { GitContext } from "../GitContext";
-import { getChildValue } from "../utils";
+import { getChildValue, replaceEmojiString } from "../utils";
 
 import { HashLink } from "./HashLink";
 
@@ -43,7 +42,7 @@ const TocGenerator = (props: any) => {
     return null;
   }
   const headingSlug = value.toLowerCase().replace(/[^a-z0-9 ]/g, "").replace(/\W+/g, "-");
-  const heading = value.replace(/:\w+:/gi, name => emoji.getUnicode(name) || name);
+  const heading = replaceEmojiString(value);
 
   const marginStyle = classes[`list${props.level || 1}`];
   return (

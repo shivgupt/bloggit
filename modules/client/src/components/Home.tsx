@@ -10,9 +10,8 @@ import {
 } from "@material-ui/core";
 import React, { useContext } from "react";
 import { Link } from "react-router-dom";
-import emoji from "emoji-dictionary";
 
-import { prettyDateString } from "../utils";
+import { prettyDateString, replaceEmojiString } from "../utils";
 import { GitContext } from "../GitContext";
 
 const useStyles = makeStyles(() => ({
@@ -47,8 +46,8 @@ export const Home = () => {
       {Object.keys(posts).map(slug => {
         if (!posts[slug].category) return null;
 
-        const title = posts[slug].title.replace(/:\w+:/gi, name => emoji.getUnicode(name) || name);
-        const tldr = posts[slug].tldr?.replace(/:\w+:/gi, name => emoji.getUnicode(name) || name);
+        const title = replaceEmojiString(posts[slug].title);
+        const tldr = replaceEmojiString(posts[slug].tldr!);
 
         return (
           <Grid className={classes.root} item xs={12} md={6} lg={4} key={slug}>

@@ -11,8 +11,13 @@ import { GitState } from "../types";
 import { GitContext } from "../GitContext";
 
 import { BrowseHistory } from "./BrowseHistory";
-import { CodeBlockRenderer } from "./CodeBlock";
-import { EmojiRenderer, HeadingRenderer, ImageRenderer, LinkRenderer } from "./Renderers";
+import {
+  CodeBlockRenderer,
+  TextRenderer,
+  HeadingRenderer,
+  ImageRenderer,
+  LinkRenderer
+  } from "./Renderers";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -69,7 +74,7 @@ export const PostPage = () => {
         renderers={{
           heading: HeadingRenderer,
           code: CodeBlockRenderer,
-          text: EmojiRenderer,
+          text: TextRenderer,
           link: LinkRenderer,
           image: ImageRenderer,
         }}
