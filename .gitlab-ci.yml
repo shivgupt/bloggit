@@ -41,8 +41,10 @@ test-client:
     - name: docker:dind
       alias: localhost
   script:
-    - apk add bash curl git jq make nodejs
-    - make test-client
+    - apk add bash curl git jq make
+    - make pull-latest
+    - make all
+    - BLOG_PROD=true make test-client
 
 deploy:
   image: docker:stable
