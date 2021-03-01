@@ -28,18 +28,9 @@ test:
   services:
     - name: docker:dind
       alias: localhost
-  variables:
-    BLOG_DOMAINNAME: "localhost"
-    BLOG_PROD: "true"
   script:
     - apk add bash curl git jq make
     - make pull-commit
-    - BLOG_DOMAINNAME="" BLOG_PROD="true" make restart
-    - sleep 5
-    - make dls
-    - docker service logs --raw --tail 100 blog_server
-    - docker service logs --raw --tail 100 blog_webserver
-    - docker service logs --raw --tail 100 blog_proxy
     - make test-server
 
 deploy:
