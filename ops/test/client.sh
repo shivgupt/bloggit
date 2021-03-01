@@ -19,7 +19,7 @@ then cd modules/client || exit 1;
 fi
 
 export ELECTRON_ENABLE_LOGGING=true
-if [[ "$cmd" == "--watch" ]]
+if [[ "$cmd" == "watch" ]]
 then
   cypress="$root/node_modules/.bin/cypress"
   if [[ ! -f "$cypress" ]];
