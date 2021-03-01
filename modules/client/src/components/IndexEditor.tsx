@@ -14,7 +14,7 @@ import { Link } from "react-router-dom";
 import { Drafts, ExpandLess, ExpandMore, Public } from "@material-ui/icons";
 import axios from "axios";
 
-import { AdminContext } from "../AdminContext";
+import { GitContext } from "../GitContext";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -33,12 +33,12 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 
-export const IndexEditor = (props: any) => {
+export const IndexEditor = () => {
 
   const [openPosts, setOpenPosts] = useState(false);
   const [openDrafts, setOpenDrafts] = useState(false);
-  const adminContext = useContext(AdminContext);
-  const index = adminContext.gitState?.index;
+  const gitContext = useContext(GitContext);
+  const index = gitContext.gitState?.index;
 
   const classes = useStyles();
   const togglePosts = () => setOpenPosts(!openPosts);
@@ -60,7 +60,7 @@ export const IndexEditor = (props: any) => {
     ],
       headers: { "content-type": "application/json" }
     });
-    adminContext.syncGitState();
+    gitContext.syncGitState();
   };
 
   const handlePublish = async (slug: string) => {
@@ -79,13 +79,13 @@ export const IndexEditor = (props: any) => {
     ],
       headers: { "content-type": "application/json" }
     });
-    adminContext.syncGitState();
+    gitContext.syncGitState();
   };
 
   return (
     <List className={classes.root}>
       <ListItem key="index_title">
-        <TextField id="index_title" label="title" defaultValue={index.title} />
+        <TextField id="index_title" label="title" defaultValue={index?.title} />
       </ListItem>
       <ListItem key="index_posts">
         <ListItemText primary="Posts" onClick={togglePosts} />
@@ -93,24 +93,27 @@ export const IndexEditor = (props: any) => {
       </ListItem>
       <Collapse in={openPosts} timeout="auto" unmountOnExit>
         <List>
-        {Object.values(index.posts).map((post) => {
-          return (
-            <ListItem button component={Link} to={`/${post.slug}`} key={post.slug} alignItems="flex-start">
-              <ListItemText primary={post.title} className={classes.listText} />
-              <ListItemSecondaryAction>
-                <Button
-                  onClick={() => handleArchive(post.slug)}
-                  size="small"
-                  color="primary"
-                  variant="contained"
-                  startIcon={<Drafts />}
-                >
-                  Archive
-                </Button>
-              </ListItemSecondaryAction>
-            </ListItem>
-          )
-        })}
+        {index?.posts
+          ? Object.values(index?.posts || []).map((post) => {
+            return (
+              <ListItem button component={Link} to={`/${post.slug}`} key={post.slug} alignItems="flex-start">
+                <ListItemText primary={post.title} className={classes.listText} />
+                <ListItemSecondaryAction>
+                  <Button
+                    onClick={() => handleArchive(post.slug)}
+                    size="small"
+                    color="primary"
+                    variant="contained"
+                    startIcon={<Drafts />}
+                  >
+                    Archive
+                  </Button>
+                </ListItemSecondaryAction>
+              </ListItem>
+            )
+          })
+          : null
+        }
         </List>
       </Collapse> 
       <ListItem key="index_drafts">
@@ -119,8 +122,8 @@ export const IndexEditor = (props: any) => {
       </ListItem>
       <Collapse in={openDrafts} timeout="auto" unmountOnExit>
         <List>
-        {index.drafts
-         ? Object.values(index.drafts).map((draft) => {
+        {index?.drafts
+         ? Object.values(index?.drafts).map((draft) => {
             return (
               <ListItem button component={Link} to={`/${draft.slug}`} key={draft.slug} alignItems="flex-start">
                 <ListItemText primary={draft.title} className={classes.listText} />

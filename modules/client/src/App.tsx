@@ -22,9 +22,9 @@ import {
 } from "./utils";
 import { darkTheme, lightTheme } from "./style";
 import { store } from "./utils/cache";
-import { AdminContext } from "./AdminContext";
-import { GitState, SidebarNode } from "./types";
-import { CreateNewPost } from "./components/CreateNewPost";
+import { GitContext } from "./GitContext";
+import { AdminMode, GitState } from "./types";
+import { EditPost } from "./components/EditPost";
 import { AppSpeedDial } from "./components/AppSpeedDial";
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
@@ -49,10 +49,10 @@ const App: React.FC = () => {
   const classes = useStyles();
 
   const [gitState, setGitState] = useState({} as GitState);
-  const [node, setNode] = useState({} as SidebarNode);
   const [theme, setTheme] = useState(lightTheme);
-  const [authToken, setAuthToken] = useState("");
-  const [adminMode, setAdminMode] = useState(true);
+  const [adminMode, setAdminMode] = useState<AdminMode>("invalid");
+
+  const [newPostData, setNewPostData] = useState(emptyEntry);
   const [newContent, setNewContent] = useState("");
   const [editMode, setEditMode] = useState(false);
 
@@ -65,10 +65,28 @@ const App: React.FC = () => {
 
   // console.log(`Rendering App with refParam=${refParam} and slugParam=${slugParam}`);
 
-  const updateAuthToken = (authToken: string) => {
-    setAuthToken(authToken);
-    store.save("authToken", authToken);
-  };
+  const validateAuthToken = async (_authToken?: string) => {
+    const authToken = _authToken || store.load("authToken");
+    try {
+      await axios({
+        headers: {
+          "authorization": `Basic ${btoa(`admin:${authToken}`)}`,
+        },
+        method: "post",
+        url: "git",
+      });
+      // Auth is valid, update localStorage, axios header and adminMode
+      store.save("authToken", authToken);
+      axios.defaults.headers.common["authorization"] = `Basic ${btoa(`admin:${authToken}`)}`;
+      setAdminMode("disabled");
+    } catch (e) {
+      // Auth is invalid, update localStorage, axios header and adminMode
+      console.error(`Auth token is not valid: ${e.message}`);
+      store.save("authToken", "");
+      axios.defaults.headers.common["authorization"] = `Basic ${btoa(`admin:`)}`;
+      setAdminMode("invalid");
+    }
+  }
 
   const toggleTheme = () => {
     if ( theme.palette.type === "dark") {
@@ -91,7 +109,7 @@ const App: React.FC = () => {
       slug: slug || "",
       index: index,
     } as GitState;
-    console.log(`Syncing ref ${currentRef}${slug ? ` and slug ${slug}` : ""}`);
+    // console.log(`Syncing ref ${currentRef}${slug ? ` and slug ${slug}` : ""}`);
     if (slug && !["admin", "create-new-post"].includes(slug)) {
       newGitState.currentContent = await fetchContent(slug, currentRef)
       newGitState.indexEntry = index.posts?.[slug] || index.drafts?.[slug];
@@ -101,12 +119,6 @@ const App: React.FC = () => {
     }
     setGitState(newGitState);
 
-    // Update sidebar node
-    if (slug !== "" && index?.posts?.[slug || ""]){
-      setNode({ parent: "posts", current: "toc", child: index?.posts?.[slug || ""] });
-    } else {
-      setNode({ parent: "", current: "categories", child: "posts" });
-    }
   }
 
   // Run this effect exactly once when the page initially loads
@@ -117,9 +129,7 @@ const App: React.FC = () => {
     const themeSelection = store.load("theme");
     if (themeSelection === "light") setTheme(lightTheme);
     else setTheme(darkTheme);
-    // Check local storage for admin edit keys
-    const key = store.load("authToken");
-    if (key) setAuthToken(key);
+    validateAuthToken();
   }, []);
 
   // Fetch index & post content any time the url changes
@@ -130,23 +140,23 @@ const App: React.FC = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refParam, slugParam]);
 
-  // Update auth headers any time the authToken changes
   useEffect(() => {
-    axios.defaults.headers.common["authorization"] = `Basic ${btoa(`admin:${authToken}`)}`;
-  }, [authToken]);
+    if (editMode) {
+      setNewContent(gitState.currentContent);
+      setNewPostData(gitState.indexEntry);
+    }
+  }, [editMode, gitState]);
 
   return (
     <ThemeProvider theme={theme}>
-      <AdminContext.Provider
-        value={{ gitState, syncGitState, authToken, editMode, setEditMode, newContent, setNewContent, updateAuthToken, adminMode, setAdminMode }}
-      >
+      <GitContext.Provider value={{ gitState, syncGitState }}>
         <CssBaseline />
         <NavBar
-          gitState={gitState}
-          node={node}
-          setNode={setNode}
+          adminMode={adminMode}
+          setAdminMode={setAdminMode}
           theme={theme}
           toggleTheme={toggleTheme}
+          setEditMode={setEditMode}
         />
         <main className={classes.main}>
           <div className={classes.appBarSpacer} />
@@ -155,38 +165,53 @@ const App: React.FC = () => {
               <Route exact
                 path="/"
                 render={() => {
-                  return (
-                    <Home gitState={gitState} />
-                  );
+                  return editMode
+                  ? <EditPost
+                    postData={newPostData}
+                    content={newContent}
+                    setPostData={setNewPostData}
+                    setContent={setNewContent}
+                  />
+                  : <Home />
                 }}
               />
               <Route exact
                 path="/admin"
                 render={() => {
                   return (
-                    <AdminHome />
+                    <AdminHome adminMode={adminMode} validateAuthToken={validateAuthToken} />
                   );
-                }}
-              />
-              <Route exact
-                path="/create-new-post"
-                render={() => {
-                  return <CreateNewPost />;
                 }}
               />
               <Route
                 path="/:ref/:slug"
-                render={() => <PostPage gitState={gitState} />}
+                render={() => <PostPage />}
               />
               <Route
                 path="/:slug"
-                render={() => <PostPage gitState={gitState} />}
+                render={() => {
+                  return editMode
+                  ? <EditPost
+                      postData={newPostData}
+                      content={newContent}
+                      setPostData={setNewPostData}
+                      setContent={setNewContent}
+                    /> 
+                  : <PostPage />
+                }}
               />
             </Switch>
-            {(adminMode && authToken) ? <AppSpeedDial gitState={gitState} /> : null}
+            {(adminMode === "enabled")
+            ? <AppSpeedDial
+                newContent={newContent}
+                newPostData={newPostData}
+                editMode={editMode}
+                setEditMode={setEditMode}
+              />
+            : null}
           </Container>
         </main>
-      </AdminContext.Provider>
+      </GitContext.Provider>
     </ThemeProvider>
   );
 };

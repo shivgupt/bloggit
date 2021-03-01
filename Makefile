@@ -47,7 +47,7 @@ clean: stop
 reset: stop
 	docker container prune -f
 	rm -rf .docker-compose.yml
-	rm -rf .blog-content.git .media
+	rm -rf .blog-content.git .test-content .test-content.git
 	rm -rf .bash_history .config
 
 purge: clean reset
@@ -74,8 +74,15 @@ build-report:
 dls:
 	@docker service ls && echo '=====' && docker container ls -a
 
-test:
-	bash ops/test.sh
+test-server: server-js
+	bash ops/test/server.sh test
+watch-server: node-modules
+	bash ops/test/server.sh watch
+
+test-client:
+	bash ops/test/client.sh test
+watch-client:
+	bash ops/test/client.sh watch
 
 ########################################
 # Common Prerequisites

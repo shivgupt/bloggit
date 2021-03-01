@@ -1,11 +1,10 @@
 stages:
- - build
  - test
  - deploy
 
 build:
   image: docker:stable
-  stage: build
+  stage: test
   only:
     refs:
       - branches
@@ -19,7 +18,7 @@ build:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - make push
 
-test:
+test-server:
   image: docker:stable
   stage: test
   only:
@@ -28,19 +27,24 @@ test:
   services:
     - name: docker:dind
       alias: localhost
-  variables:
-    BLOG_DOMAINNAME: "localhost"
-    BLOG_PROD: "true"
   script:
     - apk add bash curl git jq make
-    - make pull-commit
-    - BLOG_DOMAINNAME="" BLOG_PROD="true" make restart
-    - sleep 5
-    - make dls
-    - docker service logs --raw --tail 100 blog_server
-    - docker service logs --raw --tail 100 blog_webserver
-    - docker service logs --raw --tail 100 blog_proxy
-    - make test
+    - make test-server
+
+test-client:
+  image: docker:stable
+  stage: test
+  only:
+    refs:
+      - branches
+  services:
+    - name: docker:dind
+      alias: localhost
+  script:
+    - apk add bash curl git jq make
+    - make pull-latest
+    - make all
+    - BLOG_PROD=true make test-client
 
 deploy:
   image: docker:stable
@@ -67,6 +71,6 @@ deploy:
           make pull-commit;
           make pull-semver;
           make restart;
-          docker container prune -f;
-          docker image ls -q | xargs docker image rm 2> /dev/null || true;
+          docker container prune --force;
+          docker image ls -q | xargs docker image rm --force 2> /dev/null || true;
         '

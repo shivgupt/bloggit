@@ -1,12 +1,16 @@
 #!/usr/bin/env bash
 set -e
 
-root="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." >/dev/null 2>&1 && pwd )"
+root=$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." >/dev/null 2>&1 && pwd )
 project=$(grep -m 1 '"name":' "$root/package.json" | cut -d '"' -f 4)
 
 # turn on swarm mode if it's not already on
 docker swarm init 2> /dev/null || true
 docker network create --attachable --driver overlay "$project" 2> /dev/null || true
+
+if grep -qs "$project" <<<"$(docker stack ls | tail -n +2)"
+then echo "$project stack is already running" && exit
+fi
 
 ####################
 # External Env Vars
@@ -20,11 +24,10 @@ BLOG_BRANCH="${BLOG_BRANCH:-main}"
 BLOG_DOMAINNAME="${BLOG_DOMAINNAME:-}"
 BLOG_EMAIL="${BLOG_EMAIL:-noreply@gmail.com}" # for notifications when ssl certs expire
 BLOG_HOST_CONTENT_DIR="${BLOG_HOST_CONTENT_DIR:-$root/.blog-content.git}"
-BLOG_HOST_MEDIA_DIR="${BLOG_HOST_MEDIA_DIR:-$root/.media}" # mounted into IPFS
 BLOG_INTERNAL_CONTENT_DIR="${BLOG_INTERNAL_CONTENT_DIR:-/blog-content.git}"
 BLOG_LOG_LEVEL="${BLOG_LOG_LEVEL:-info}"
 BLOG_MIRROR_KEY="${BLOG_MIRROR_KEY:-}"
-BLOG_MIRROR_URL="${BLOG_MIRROR_URL:-https://gitlab.com/bohendo/blog-content.git}"
+BLOG_MIRROR_URL="${BLOG_MIRROR_URL:-}"
 BLOG_PROD="${BLOG_PROD:-false}"
 BLOG_SEMVER="${BLOG_SEMVER:-false}"
 
@@ -40,7 +43,6 @@ echo "- BLOG_BRANCH=$BLOG_BRANCH"
 echo "- BLOG_DOMAINNAME=$BLOG_DOMAINNAME"
 echo "- BLOG_EMAIL=$BLOG_EMAIL"
 echo "- BLOG_HOST_CONTENT_DIR=$BLOG_HOST_CONTENT_DIR"
-echo "- BLOG_HOST_MEDIA_DIR=$BLOG_HOST_MEDIA_DIR"
 echo "- BLOG_INTERNAL_CONTENT_DIR=$BLOG_INTERNAL_CONTENT_DIR"
 echo "- BLOG_LOG_LEVEL=$BLOG_LOG_LEVEL"
 echo "- BLOG_MIRROR_KEY=$BLOG_MIRROR_KEY"
@@ -53,10 +55,6 @@ echo "- BLOG_SEMVER=$BLOG_SEMVER"
 
 if [[ "$BLOG_HOST_CONTENT_DIR" == "/"* ]]
 then mkdir -p "$BLOG_HOST_CONTENT_DIR"
-fi
-
-if [[ "$BLOG_HOST_MEDIA_DIR" == "/"* ]]
-then mkdir -p "$BLOG_HOST_MEDIA_DIR"
 fi
 
 if [[ "$BLOG_SEMVER" == "true" ]]
@@ -188,9 +186,7 @@ networks:
 
 volumes:
   certs:
-  content:
   ipfs:
-  media:
 
 services:
 
@@ -215,7 +211,6 @@ services:
     $common
     volumes:
       - 'ipfs:/data/ipfs'
-      - '$BLOG_HOST_MEDIA_DIR:/media'
 
 EOF
 

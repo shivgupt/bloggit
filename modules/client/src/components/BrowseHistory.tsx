@@ -119,7 +119,7 @@ export const BrowseHistory = (props: {
           onClose={handleClose}
         >
           {
-            editHistory.map(entry => {
+            editHistory.filter(entry => !entry.commit.startsWith(latestRef)).map(entry => {
               const commit = entry.commit.substring(0,8);
               return (
                 <MenuItem

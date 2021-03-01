@@ -14,7 +14,14 @@ import {
 import { useHistory } from "react-router-dom";
 import axios from "axios";
 
-import { AdminContext } from "../AdminContext";
+import { GitContext } from "../GitContext";
+import { PostData } from "../types";
+
+const getPath = (post: PostData) => {
+  if (post?.path) return post.path;
+  if (post?.category) return `${post.category}/${post.slug}.md`;
+  return `${post.slug}.md`;
+};
 
 const useStyles = makeStyles((theme: Theme) => ({
   speedDial: {
@@ -29,16 +36,22 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-export const AppSpeedDial = (props: any) => {
+export const AppSpeedDial = (props: {
+  newContent: string,
+  newPostData: PostData,
+  editMode: boolean,
+  setEditMode: (val: boolean) => void,
+}) => {
 
-  const { gitState } = props;
+  const { editMode, setEditMode, newContent, newPostData } = props;
+
   const history = useHistory();
   const [open, setOpen] = useState(false);
   const classes = useStyles();
-  const adminContext = useContext(AdminContext);
-  const { newContent, editMode, setEditMode } = adminContext;
 
-  const { currentContent, slug } = props.gitState;
+  const gitContext = useContext(GitContext);
+  const { gitState, syncGitState } = gitContext;
+  const { currentContent, slug } = gitState;
   const readOnly = gitState.currentRef !== gitState.latestRef;
 
   let dialButtonRef;
@@ -46,63 +59,39 @@ export const AppSpeedDial = (props: any) => {
   const handleRedirect = (to: string) => history.push(to)
 
   const update = async () => {
-    const oldIndex = adminContext.gitState?.index;
+    const oldIndex = gitState?.index;
     const newIndex = JSON.parse(JSON.stringify(oldIndex))
     const data = [] as Array<{path: string, content: string}>;
-    let post, key;
+
+    let key;
     if (oldIndex?.posts?.[slug]) {
-      post = oldIndex.posts[slug];
       key = "posts";
     } else {
-      post = oldIndex.drafts[slug];
       key = "drafts";
     }
-    if (!post.category) {
-      const path = (document.getElementById("post_path") as HTMLInputElement).value;
-      newIndex.posts[slug].path = path;
-      if (currentContent === newContent && path === post.path) {
-        console.warn(`Nothing to update`);
-        return;
-      }
-      if (post.path !== path) {
-        data.push({ path: post.path!, content: ""});
-      }
-      data.push({ path, content: newContent });
-    } else {
-      // update to new format path = category/slug
-      const slug = (document.getElementById("post_slug") as HTMLInputElement).value;
-      const category = (document.getElementById("post_category") as HTMLInputElement).value.toLocaleLowerCase();
-      const title = (document.getElementById("post_title") as HTMLInputElement).value;
-      const tldr = (document.getElementById("post_tldr") as HTMLInputElement).value;
-      const img = (document.getElementById("post_img") as HTMLInputElement).value;
-      const tags = (document.getElementById("post_tags") as HTMLInputElement).value.split(",");
-      newIndex[key][slug] = {
-        ...newIndex[key][slug],
-        category,
-        lastEdit: (new Date()).toLocaleDateString("en-in"),
-        img,
-        tldr,
-        title,
-        slug,
-        tags,
-      };
-      if (currentContent === newContent && JSON.stringify(newIndex[key][slug]) === JSON.stringify(post)) {
-        console.warn(`Nothing to update`);
-        return;
-      }
-      if (post.path) {
-        data.push({ path: post.path, content: "" });
-      } else if (post.slug !== slug || post.category !== category) {
-        console.log("Path or category changed, deleting old file");
-        data.push({ path: `${post.category}/${post.slug}.md`, content: "" });
-      }
-      data.push({ path: `${category}/${slug}.md`, content: newContent });
-    }
-    if (currentContent === newContent && JSON.stringify(newIndex) === JSON.stringify(oldIndex) ){
-      console.log("no changes detected");
+
+    const newPath = getPath(newPostData);
+    const oldPath = getPath(oldIndex[key][slug]);
+
+
+    newIndex[key][slug] = {
+      ...newPostData,
+      lastEdit: (new Date()).toLocaleDateString("en-in"),
+    };
+
+    if (currentContent === newContent
+      && JSON.stringify(newIndex[key][slug]) === JSON.stringify(oldIndex[key][slug])
+    ) {
+      console.warn(`Nothing to update`);
       return;
     }
+    if (oldPath !== newPath) {
+      data.push({ path: oldPath, content: "" });
+    }
+
+    data.push({ path: newPath, content: newContent });
     data.push({ path: "index.json", content: JSON.stringify(newIndex, null, 2)});
+
     console.log("Lets push it to git");
     const res = await axios({
       data,
@@ -111,46 +100,31 @@ export const AppSpeedDial = (props: any) => {
       url: "git/edit",
     });
     if (res && res.status === 200 && res.data) {
-      console.log(`git/edit result:`, res);
       setEditMode(false);
-      await adminContext.syncGitState(res.data.commit?.substring(0, 8), slug);
+      await syncGitState(res.data.commit?.substring(0, 8), slug);
     } else {
       console.error(`Something went wrong`, res);
     }
   }
 
-  const createNew = async (as: string) => {
+  const createNew = async (as: "drafts" | "posts") => {
     // create new index.json entry
-    const oldIndex = adminContext.gitState?.index;
-    const newIndex = JSON.parse(JSON.stringify(oldIndex));
-    const slug = (document.getElementById("post_slug") as HTMLInputElement).value;
-    const category = (document.getElementById("post_category") as HTMLInputElement).value.toLocaleLowerCase();
-    const title = (document.getElementById("post_title") as HTMLInputElement).value;
-    const tldr = (document.getElementById("post_tldr") as HTMLInputElement).value;
-    const img = (document.getElementById("post_img") as HTMLInputElement).value;
-    const tags = (document.getElementById("post_tags") as HTMLInputElement).value.split(",");
-    if (as === "draft") {
+    const newIndex = JSON.parse(JSON.stringify(gitState?.index));
+
+    const path = getPath(newPostData);
+
+    if (as === "drafts") {
       if (!newIndex.drafts) newIndex.drafts = {};
-      newIndex.drafts[slug] = {
-        category,
+      newIndex.drafts[newPostData.slug] = {
+        ...newPostData,
         lastEdit: (new Date()).toLocaleDateString("en-in"),
-        tldr,
-        title,
-        img,
-        slug,
-        tags,
       };
     } else {
       if (!newIndex.posts) newIndex.posts = {};
-      newIndex.posts[slug] = {
-        category,
-        createdOn: (new Date()).toLocaleDateString("en-in"),
+      newIndex.posts[newPostData.slug] = {
+        ...newPostData,
         lastEdit: (new Date()).toLocaleDateString("en-in"),
-        tldr,
-        title,
-        img,
-        slug,
-        tags,
+        publishedOn: (new Date()).toLocaleDateString("en-in"),
       };
     }
     // Send request to update index.json and create new file
@@ -159,8 +133,8 @@ export const AppSpeedDial = (props: any) => {
       url: "git/edit",
       data: [
       {
-        path: `${category}/${slug}.md`,
-        content: newContent || "Coming Soon",
+        path: path,
+        content: newContent,
       },
       {
         path: "index.json",
@@ -170,87 +144,89 @@ export const AppSpeedDial = (props: any) => {
       headers: { "content-type": "application/json" }
     });
     if (res && res.status === 200 && res.data) {
-      console.log(`git/edit result:`, res);
       setEditMode(false);
-      await adminContext.syncGitState(res.data.commit?.substring(0, 8), slug);
-      handleRedirect(`/${slug}`)
-    } else { 
+      await syncGitState(res.data.commit?.substring(0, 8), newPostData.slug);
+      handleRedirect(`/${newPostData.slug}`)
+    } else {
       console.error(`Something went wrong`, res);
     }
   };
 
-  const discard = () => {
-    setEditMode(false);
-    if (slug === "create-new-post") {
-      history.goBack();
+  if (!editMode) {
+    if (!slug || slug === "admin" || readOnly) {
+      console.log("edit mode is OFF and we have no slug");
+      return (
+        <Fab
+          id={"fab"}
+          className={classes.speedDial}
+          color="primary"
+          onClick={() => {
+            handleRedirect("/");
+            setEditMode(true);
+          }}
+        ><Add/></Fab>
+      );
+    } else {
+      console.log("edit mode is OFF and we got slug");
+      return (
+        <Fab
+          id={"fab"}
+          className={classes.speedDial}
+          color="primary"
+          onClick={() => setEditMode(true)}
+        ><Edit/></Fab>
+      );
     }
-  }
-
-  if (!slug || slug === "admin" || readOnly) {
-    return (
-      <Fab 
-        className={classes.speedDial}
-        color="primary"
-        onClick={() => handleRedirect("/create-new-post")}
-      > <Add /> </Fab>
-    );
-  } else if (slug === "create-new-post") {
-    return (
-      <SpeedDial
-        ariaLabel="fab"
-        onClose={() => setOpen(false)}
-        onOpen={() => setOpen(true)}
-        open={open}
-        className={classes.speedDial}
-        icon={ <Add />}
-        FabProps={{ref: (ref) => { dialButtonRef = ref }}}
-      >
-        <SpeedDialAction
-          icon={<Delete />}
-          tooltipTitle="Discard changes"
-          onClick={discard}
-        />
-        <SpeedDialAction
-          icon={<Drafts />}
-          tooltipTitle="Save As Draft"
-          onClick={() => createNew("draft")}
-        />
-        <SpeedDialAction
-          icon={<Public />}
-          tooltipTitle="Publish"
-          onClick={() => createNew("post")}
-        />
-      </SpeedDial>
-    )
-  } else if (!editMode) {
-    return (
-      <Fab 
-      className={classes.speedDial}
-      color="primary"
-      onClick={() => setEditMode(true)}
-      > <Edit /> </Fab>
-    );
   } else {
+    console.log("edit mode is ON");
     return (
       <SpeedDial
+        id={"fab"}
         ariaLabel="fab"
         onClose={() => setOpen(false)}
         onOpen={() => setOpen(true)}
         open={open}
         className={classes.speedDial}
-        icon={ <Edit />}
+        icon={<Add/>}
         FabProps={{ref: (ref) => { dialButtonRef = ref }}}
       >
-        <SpeedDialAction
-          icon={<Delete />}
-          tooltipTitle="Discard changes"
-          onClick={discard}
-        />
-        <SpeedDialAction
-          icon={<Drafts />}
-          tooltipTitle="Save"
-          onClick={update}
-        />
+        {slug === ""
+          ?  ([<SpeedDialAction
+              FabProps={{id: "fab-discard"}}
+              icon={<Delete />}
+              key="fab-discard"
+              onClick={() => setEditMode(false)}
+              tooltipTitle="Discard changes"
+            />,
+            <SpeedDialAction
+              FabProps={{id: "fab-draft"}}
+              icon={<Drafts />}
+              key="fab-draft"
+              onClick={() => createNew("drafts")}
+              tooltipTitle="Save As Draft"
+            />,
+            <SpeedDialAction
+              FabProps={{id: "fab-publish"}}
+              icon={<Public />}
+              key="fab-publish"
+              onClick={() => createNew("posts")}
+              tooltipTitle="Publish"
+            />])
+          : ([<SpeedDialAction
+              FabProps={{id: "fab-discard"}}
+              icon={<Delete />}
+              key="fab-discard"
+              onClick={() => setEditMode(false)}
+              tooltipTitle="Discard changes"
+            />,
+            <SpeedDialAction
+              FabProps={{id: "fab-save"}}
+              icon={<Drafts />}
+              key="fab-save"
+              onClick={update}
+              tooltipTitle="Save"
+            />])
+        }
       </SpeedDial>
     )
   }
