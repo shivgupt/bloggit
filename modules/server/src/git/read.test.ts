@@ -7,6 +7,10 @@ describe("git read endpoint", () => {
     await expect(getFile()).to.eventually.be.rejectedWith(/invalid/i);
     await expect(getFile("ref")).to.eventually.be.rejectedWith(/invalid/i);
   });
+
+  it("should return the content at a valid filepath", async () => {
+    await expect(getFile("main", "index.json")).to.eventually.be.ok;
+  });
 });
 
 

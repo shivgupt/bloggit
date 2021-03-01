@@ -21,10 +21,11 @@ docker run \
   "${interactive[@]}" \
   --entrypoint="bash" \
   --env="CI=$CI" \
-  --env="LOG_LEVEL=${LOG_LEVEL:-silent}" \
+  --env="BLOG_LOG_LEVEL=${BLOG_LOG_LEVEL:-silent}" \
   --name="${project}_test_$unit" \
   --network "$project" \
   --rm \
   --tmpfs="/tmp" \
   --volume="$root:/root" \
+  --volume="$root/.blog-content.git:/blog-content.git" \
   "${project}_builder" "/test.sh" "$unit" "$cmd"
