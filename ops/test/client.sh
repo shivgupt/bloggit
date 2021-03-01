@@ -10,12 +10,6 @@ docker network create --attachable --driver overlay "$project" 2> /dev/null || t
 
 cmd=$1
 
-cypress="$root/node_modules/.bin/cypress"
-if [[ ! -f "$cypress" ]];
-then echo "Can't find cypress cli at $cypress" && exit 1;
-else $cypress install
-fi
-
 export BLOG_HOST_CONTENT_DIR="$root/.test-content.git"
 export BLOG_MIRROR_URL=""
 make start
@@ -26,6 +20,27 @@ fi
 
 export ELECTRON_ENABLE_LOGGING=true
 if [[ "$cmd" == "--watch" ]]
-then exec "$cypress" open
-else exec "$cypress" run --spec cypress/tests/index.js
+then
+  cypress="$root/node_modules/.bin/cypress"
+  if [[ ! -f "$cypress" ]];
+  then echo "Can't find cypress cli at $cypress" && exit 1;
+  else $cypress install
+  fi
+  exec "$cypress" open
+else
+  # If file descriptors 0-2 exist, then we're prob running via interactive shell instead of on CD/CI
+  if [[ -t 0 && -t 1 && -t 2 ]]
+  then interactive=(--interactive --tty)
+  else echo "Running in non-interactive mode"
+  fi
+  cypress_image="cypress/included:$(grep -m 1 '"cypress":' "$root/package.json" | cut -d '"' -f 4)"
+  bash "$root/ops/pull-images.sh" "$cypress_image"
+  docker run \
+    "${interactive[@]}" \
+    --name="${project}_${cmd}_client" \
+    --network "$project" \
+    --rm \
+    --volume="$root/modules/client:/client" \
+    --workdir="/client" \
+    "$cypress_image" run --spec "cypress/tests/index.js" --env "baseUrl=http://proxy"
 fi

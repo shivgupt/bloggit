@@ -2,7 +2,7 @@
 
 describe("Blog Client", () => {
   beforeEach(() => {
-    cy.visit(Cypress.env("publicUrl"));
+    cy.visit(Cypress.env("baseUrl"));
   });
 
   it(`should perform key actions without error`, () => {

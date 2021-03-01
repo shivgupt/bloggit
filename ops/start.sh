@@ -8,7 +8,7 @@ project=$(grep -m 1 '"name":' "$root/package.json" | cut -d '"' -f 4)
 docker swarm init 2> /dev/null || true
 docker network create --attachable --driver overlay "$project" 2> /dev/null || true
 
-if grep "$project" <<<"$(docker stack ls | tail -n +2)"
+if grep -qs "$project" <<<"$(docker stack ls | tail -n +2)"
 then echo "$project stack is already running" && exit
 fi
 
