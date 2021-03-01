@@ -1,11 +1,10 @@
 stages:
- - build
  - test
  - deploy
 
 build:
   image: docker:stable
-  stage: build
+  stage: test
   only:
     refs:
       - branches
@@ -19,7 +18,7 @@ build:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - make push
 
-test:
+test-server:
   image: docker:stable
   stage: test
   only:
@@ -30,8 +29,20 @@ test:
       alias: localhost
   script:
     - apk add bash curl git jq make
-    - make pull-commit
     - make test-server
+
+test-client:
+  image: docker:stable
+  stage: test
+  only:
+    refs:
+      - branches
+  services:
+    - name: docker:dind
+      alias: localhost
+  script:
+    - apk add bash curl git jq make
+    - make test-client
 
 deploy:
   image: docker:stable

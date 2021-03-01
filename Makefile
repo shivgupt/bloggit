@@ -79,6 +79,11 @@ test-server: server-js
 watch-server: node-modules
 	bash ops/test/server.sh watch
 
+test-client: node-modules
+	bash ops/test/client.sh test
+watch-client: node-modules
+	bash ops/test/client.sh watch
+
 ########################################
 # Common Prerequisites
 
