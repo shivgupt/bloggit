@@ -23,7 +23,7 @@ import {
 import { darkTheme, lightTheme } from "./style";
 import { store } from "./utils/cache";
 import { AdminContext } from "./AdminContext";
-import { GitState, SidebarNode } from "./types";
+import { AdminMode, GitState, SidebarNode } from "./types";
 import { EditPost } from "./components/EditPost";
 import { AppSpeedDial } from "./components/AppSpeedDial";
 
@@ -51,8 +51,7 @@ const App: React.FC = () => {
   const [gitState, setGitState] = useState({} as GitState);
   const [node, setNode] = useState({} as SidebarNode);
   const [theme, setTheme] = useState(lightTheme);
-  const [authToken, setAuthToken] = useState("");
-  const [adminMode, setAdminMode] = useState(true);
+  const [adminMode, setAdminMode] = useState<AdminMode>("invalid");
 
 
   const [newPostData, setNewPostData] = useState(emptyEntry);
@@ -69,8 +68,9 @@ const App: React.FC = () => {
   // console.log(`Rendering App with refParam=${refParam} and slugParam=${slugParam}`);
 
   const updateAuthToken = (authToken: string) => {
-    setAuthToken(authToken);
     store.save("authToken", authToken);
+    // update auth header anytime authToken changes;
+    axios.defaults.headers.common["authorization"] = `Basic ${btoa(`admin:${authToken}`)}`;
   };
 
   const toggleTheme = () => {
@@ -120,9 +120,12 @@ const App: React.FC = () => {
     const themeSelection = store.load("theme");
     if (themeSelection === "light") setTheme(lightTheme);
     else setTheme(darkTheme);
-    // Check local storage for admin edit keys
-    const key = store.load("authToken");
-    if (key) setAuthToken(key);
+    // Check local storage for authToken and update auth header
+    const authToken = store.load("authToken");
+    if (authToken) {
+      axios.defaults.headers.common["authorization"] = `Basic ${btoa(`admin:${authToken}`)}`;
+      setAdminMode("disabled");
+    }
   }, []);
 
   // Fetch index & post content any time the url changes
@@ -140,18 +143,15 @@ const App: React.FC = () => {
     }
   }, [editMode]);
 
-  // Update auth headers any time the authToken changes
-  useEffect(() => {
-    axios.defaults.headers.common["authorization"] = `Basic ${btoa(`admin:${authToken}`)}`;
-  }, [authToken]);
-
   return (
     <ThemeProvider theme={theme}>
       <AdminContext.Provider
-        value={{ gitState, syncGitState, authToken, editMode, setEditMode, newContent, setNewContent, updateAuthToken, adminMode, setAdminMode }}
+        value={{ gitState, syncGitState, editMode, setEditMode, newContent, setNewContent, updateAuthToken }}
       >
         <CssBaseline />
         <NavBar
+          adminMode={adminMode}
+          setAdminMode={setAdminMode}
           gitState={gitState}
           node={node}
           setNode={setNode}
@@ -180,7 +180,7 @@ const App: React.FC = () => {
                 path="/admin"
                 render={() => {
                   return (
-                    <AdminHome />
+                    <AdminHome adminMode={adminMode} />
                   );
                 }}
               />
@@ -202,7 +202,7 @@ const App: React.FC = () => {
                 }}
               />
             </Switch>
-            {(adminMode && authToken)
+            {(adminMode === "enabled")
             ? <AppSpeedDial
                 gitState={gitState}
                 syncGitState={syncGitState}

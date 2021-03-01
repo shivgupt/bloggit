@@ -11,6 +11,7 @@ import axios from "axios";
 
 import { IndexEditor } from "./IndexEditor";
 import { AdminContext } from "../AdminContext";
+import { AdminMode } from "../types";
 
 const useStyles = makeStyles((theme: Theme) => ({
   section: {
@@ -21,8 +22,9 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-export const AdminHome = () => {
+export const AdminHome = (props: {adminMode: AdminMode}) => {
 
+  const { adminMode } = props;
   const adminContext = useContext(AdminContext);
   const classes = useStyles();
 
@@ -47,7 +49,7 @@ export const AdminHome = () => {
 
   return (
     <div>
-      {adminContext.authToken
+      {adminMode === "enabled"
         ? (
           <div className={classes.section}>
             <Typography variant="subtitle1">
@@ -79,7 +81,7 @@ export const AdminHome = () => {
       </div>
 
       <Divider variant="middle" />
-      { adminContext.authToken
+      { adminMode === "enabled"
         ? (<div className={classes.section}>
           <IndexEditor />
         </div>)
