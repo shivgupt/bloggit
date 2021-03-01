@@ -1,18 +1,19 @@
 # Cache
-**/.cache
-**/.config
-**/.docker-compose.yml
-**/.node-gyp
-**/.npm
-**/.rpt2_cache
+.cache
+.config
+.docker-compose.yml
+.node-gyp
+.npm
+.rpt2_cache
 modules/*/package-lock.json
 
 # Local storage
+!modules/client/.env
 **/*.local
 .blog-content.git
-.test-content.git
 .env
-!modules/client/.env
+.test-content
+.test-content.git
 
 # Compiled output
 .flags
