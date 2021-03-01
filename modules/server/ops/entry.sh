@@ -1,8 +1,6 @@
 #!/bin/bash
 set -e
 
-chown -R "$(id -u):$(id -g)" /root/.config
-
 # Ensure defaults are set for important env vars
 export BLOG_BRANCH="${BLOG_BRANCH:-main}"
 export BLOG_INTERNAL_CONTENT_DIR="${BLOG_INTERNAL_CONTENT_DIR:-/blog-content.git}"

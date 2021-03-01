@@ -1,7 +1,5 @@
 #!/bin/bash
 
-chown -R "$(id -u):$(id -g)" /root/.config
-
 unit=$1
 cmd="${2:-test}"
 

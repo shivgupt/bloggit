@@ -48,7 +48,6 @@ docker run \
   --network "$project" \
   --rm \
   --tmpfs="/tmp" \
-  --user="$(id -u):$(id -g)" \
   --volume="$root:/root" \
   --volume="$test_repo:/blog-content.git" \
   "${project}_builder" "/test.sh" "server" "$cmd"

@@ -116,7 +116,6 @@ else
     entrypoint: 'bash modules/server/ops/entry.sh'
     ports:
       - '5000:5000'
-    user: '$(id -u):$(id -g)'
     volumes:
       - '$root:/root'
       - '$BLOG_HOST_CONTENT_DIR:$BLOG_INTERNAL_CONTENT_DIR'"
