@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Markdown from "react-markdown";
 import { Link } from "react-router-dom";
 import {
@@ -17,6 +17,7 @@ import { GitContext } from "../GitContext";
 import { getChildValue, replaceEmojiString } from "../utils";
 
 import { HashLink } from "./HashLink";
+import { SidebarNode } from "../types";
 
 const useStyles = makeStyles(theme => ({
   list: { width: "100%" },
@@ -62,10 +63,22 @@ const TocGenerator = (props: any) => {
 };
 
 export const Toc = (props: any) => {
+  const [node, setNode] = useState({} as SidebarNode);
   const gitContext = useContext(GitContext);
-  const { node, posts, setNode } = props;
-  const { currentContent, slug } = gitContext.gitState
+  const { currentContent, slug, index } = gitContext.gitState
+
+  const { posts} = props;
+
   const classes = useStyles();
+
+  useEffect(() => {
+    // Update sidebar node
+    if (slug !== "" && index?.posts?.[slug || ""]){
+      setNode({ parent: "posts", current: "toc", child: index?.posts?.[slug || ""] });
+    } else {
+      setNode({ parent: "", current: "categories", child: "posts" });
+    }
+  }, [slug, index]);
 
   switch(node.current) {
   case "categories": 
@@ -106,7 +119,7 @@ export const Toc = (props: any) => {
       <div className={classes.list}>
         <IconButton
           onClick={() => setNode({ 
-            parent: null,
+            parent: "",
             current: "categories",
             child: "posts",
           })}
@@ -142,7 +155,7 @@ export const Toc = (props: any) => {
             if (node.child.category) {
               setNode({ parent: "categories", current: "posts", child: node.child.category })
             } else {
-              setNode({ parent: null, current: "categories", child: "posts" })
+              setNode({ parent: "", current: "categories", child: "posts" })
             }
           }}
         >

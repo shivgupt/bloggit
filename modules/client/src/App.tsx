@@ -23,7 +23,7 @@ import {
 import { darkTheme, lightTheme } from "./style";
 import { store } from "./utils/cache";
 import { GitContext } from "./GitContext";
-import { AdminMode, GitState, SidebarNode } from "./types";
+import { AdminMode, GitState } from "./types";
 import { EditPost } from "./components/EditPost";
 import { AppSpeedDial } from "./components/AppSpeedDial";
 
@@ -49,10 +49,8 @@ const App: React.FC = () => {
   const classes = useStyles();
 
   const [gitState, setGitState] = useState({} as GitState);
-  const [node, setNode] = useState({} as SidebarNode);
   const [theme, setTheme] = useState(lightTheme);
   const [adminMode, setAdminMode] = useState<AdminMode>("invalid");
-
 
   const [newPostData, setNewPostData] = useState(emptyEntry);
   const [newContent, setNewContent] = useState("");
@@ -122,12 +120,6 @@ const App: React.FC = () => {
     }
     setGitState(newGitState);
 
-    // Update sidebar node
-    if (slug !== "" && index?.posts?.[slug || ""]){
-      setNode({ parent: "posts", current: "toc", child: index?.posts?.[slug || ""] });
-    } else {
-      setNode({ parent: "", current: "categories", child: "posts" });
-    }
   }
 
   // Run this effect exactly once when the page initially loads
@@ -163,8 +155,6 @@ const App: React.FC = () => {
         <NavBar
           adminMode={adminMode}
           setAdminMode={setAdminMode}
-          node={node}
-          setNode={setNode}
           theme={theme}
           toggleTheme={toggleTheme}
           setEditMode={setEditMode}
