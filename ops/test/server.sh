@@ -16,22 +16,28 @@ then interactive=(--interactive --tty)
 else echo "Running in non-interactive mode"
 fi
 
-# Initialize a bare git repo to use during tests
 test_repo="$root/.test-content.git"
-rm -rf "$test_repo"
-git init --quiet --bare "$test_repo"
-
-# Use a temporary non-bare repo to create the bare repo's first commit
-test_temp_repo="$root/.test-content"
-rm -rf "$test_temp_repo"
-git init --quiet "$test_temp_repo"
-echo "ref: refs/heads/main" > "$test_temp_repo/.git/HEAD"
-(
-  cd "$test_temp_repo"
-  git commit --allow-empty -m "initial commit"
-  git push "$test_repo" main
-)
-rm -rf "$test_temp_repo"
+if [[ ! -d "$test_repo" || ! -f "$test_repo/refs/heads/main" ]]
+then
+  echo "Initializing git repo at $test_repo"
+  # Initialize a bare git repo to use during tests
+  rm -rf "$test_repo"
+  git init --quiet --bare "$test_repo"
+  echo "ref: refs/heads/main" > "$test_repo/HEAD"
+  # Use a temporary non-bare repo to create the bare repo's first commit
+  test_temp_repo="$root/.test-content"
+  rm -rf "$test_temp_repo"
+  git init --quiet "$test_temp_repo"
+  echo "ref: refs/heads/main" > "$test_temp_repo/.git/HEAD"
+  (
+    cd "$test_temp_repo"
+    git config user.email "test@localhost"
+    git config user.name "test"
+    git commit --allow-empty -m "initial commit"
+    git push "$test_repo" main
+  )
+  rm -rf "$test_temp_repo"
+fi
 
 docker run \
   "${interactive[@]}" \
