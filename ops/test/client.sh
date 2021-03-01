@@ -10,6 +10,7 @@ docker network create --attachable --driver overlay "$project" 2> /dev/null || t
 
 cmd=$1
 
+export ELECTRON_ENABLE_LOGGING=true
 export BLOG_HOST_CONTENT_DIR="$root/.test-content.git"
 export BLOG_MIRROR_URL=""
 make start
@@ -18,7 +19,6 @@ if [[ -d "modules/client" ]]
 then cd modules/client || exit 1;
 fi
 
-export ELECTRON_ENABLE_LOGGING=true
 if [[ "$cmd" == "watch" ]]
 then
   cypress="$root/node_modules/.bin/cypress"

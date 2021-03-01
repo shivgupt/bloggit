@@ -50,7 +50,7 @@ const useStyles = makeStyles(theme => ({
   permanentDrawer: {
     width: "20%",
   },
-  list: {
+  hiddenDrawer: {
     width: "60%",
   },
   rightButton: {
@@ -187,7 +187,7 @@ export const NavBar = (props: any) => {
             anchor="right"
             open={drawer}
             onClose={toggleDrawer}
-            classes={{ paper: classes.list }}
+            classes={{ paper: classes.hiddenDrawer }}
           >
             <DrawerContent siteTitle={siteTitle} {...props} />
           </Drawer>

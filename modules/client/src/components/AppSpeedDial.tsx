@@ -15,7 +15,7 @@ import { useHistory } from "react-router-dom";
 import axios from "axios";
 
 import { GitContext } from "../GitContext";
-import { GitState, PostData } from "../types";
+import { PostData } from "../types";
 
 const getPath = (post: PostData) => {
   if (post?.path) return post.path;
@@ -63,12 +63,10 @@ export const AppSpeedDial = (props: {
     const newIndex = JSON.parse(JSON.stringify(oldIndex))
     const data = [] as Array<{path: string, content: string}>;
     
-    let post, key;
+    let key;
     if (oldIndex?.posts?.[slug]) {
-      post = oldIndex.posts[slug];
       key = "posts";
     } else {
-      post = oldIndex.drafts[slug];
       key = "drafts";
     }
 
@@ -157,36 +155,41 @@ export const AppSpeedDial = (props: {
   if (!editMode && (!slug || slug === "admin" || readOnly)) {
     return (
       <Fab 
+        id={"fab-create-new-post"}
         className={classes.speedDial}
         color="primary"
         onClick={() => {
           handleRedirect("/");
           setEditMode(true);
         }}
-      > <Add /> </Fab>
+      ><Add/></Fab>
     );
   } else if (editMode && slug === "") {
     return (
       <SpeedDial
+        id={"fab-save-post"}
         ariaLabel="fab"
         onClose={() => setOpen(false)}
         onOpen={() => setOpen(true)}
         open={open}
         className={classes.speedDial}
-        icon={ <Add />}
+        icon={<Add/>}
         FabProps={{ref: (ref) => { dialButtonRef = ref }}}
       >
         <SpeedDialAction
+          FabProps={{id: "sd-discard"}}
           icon={<Delete />}
           tooltipTitle="Discard changes"
           onClick={() => setEditMode(false)}
         />
         <SpeedDialAction
+          FabProps={{id: "sd-draft"}}
           icon={<Drafts />}
           tooltipTitle="Save As Draft"
           onClick={() => createNew("drafts")}
         />
         <SpeedDialAction
+          FabProps={{id: "sd-publish"}}
           icon={<Public />}
           tooltipTitle="Publish"
           onClick={() => createNew("posts")}
@@ -196,14 +199,16 @@ export const AppSpeedDial = (props: {
   } else if (!editMode) {
     return (
       <Fab 
-      className={classes.speedDial}
-      color="primary"
-      onClick={() => setEditMode(true)}
-      > <Edit /> </Fab>
+        id={"fab-edit-post"}
+        className={classes.speedDial}
+        color="primary"
+        onClick={() => setEditMode(true)}
+      ><Edit/></Fab>
     );
   } else {
     return (
       <SpeedDial
+        id={"fab-save-changes"}
         ariaLabel="fab"
         onClose={() => setOpen(false)}
         onOpen={() => setOpen(true)}
@@ -213,11 +218,13 @@ export const AppSpeedDial = (props: {
         FabProps={{ref: (ref) => { dialButtonRef = ref }}}
       >
         <SpeedDialAction
+          FabProps={{id: "sd-discard"}}
           icon={<Delete />}
           tooltipTitle="Discard changes"
           onClick={() => setEditMode(false)}
         />
         <SpeedDialAction
+          FabProps={{id: "sd-save"}}
           icon={<Drafts />}
           tooltipTitle="Save"
           onClick={update}

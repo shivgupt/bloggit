@@ -74,7 +74,6 @@ const App: React.FC = () => {
         },
         method: "post",
         url: "git",
-        validateStatus: (code) => code === 404,
       });
       // Auth is valid, update localStorage, axios header and adminMode
       store.save("authToken", authToken);
@@ -146,7 +145,7 @@ const App: React.FC = () => {
       setNewContent(gitState.currentContent);
       setNewPostData(gitState.indexEntry);
     }
-  }, [editMode]);
+  }, [editMode, gitState]);
 
   return (
     <ThemeProvider theme={theme}>
