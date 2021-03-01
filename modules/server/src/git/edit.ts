@@ -5,35 +5,21 @@ import { logger, strToArray } from "../utils";
 
 import { pushToMirror } from "./push";
 import { gitOpts, resolveRef } from "./utils";
+import { EditRequest, EditResponse } from "./types";
 
 const log = logger.child({ module: "GitEdit" });
 
-export type GitTreeEntry = {
-  mode: string;
-  path: string;
-  oid: string;
-  type: "blob" | "tree" | "commit";
-};
-export type GitTree = GitTreeEntry[];
-
 // Inspired by https://stackoverflow.com/a/25556917
-export const edit = async (req, res, _): Promise<void> => {
-  const err = (e: string): void => {
-    log.error(`Git edit failed: ${e}`);
-    res.status(500).send(e);
-  };
-  if (!req.body) {
-    return err("Body Required");
+export const edit = async (editReq: EditRequest): Promise<EditResponse> => {
+  if (!editReq || !editReq.length) {
+    throw new Error("Invalid edit request");
   }
-  if (!req.body.length) {
-    return err("Body not iterable");
-  }
-  for (const edit of req.body) {
+  for (const edit of editReq) {
     if (typeof edit.path !== "string" || typeof edit.content !== "string") {
-      return err("Body contains non-string path or content values");
+      throw new Error("Invalid edit request");
     }
   }
-  log.debug(`Pending edits: ${JSON.stringify(req.body)}`);
+  log.debug(`Received request to edit: ${JSON.stringify(editReq)}`);
 
   const latestCommit = await resolveRef(env.branch);
   const latestTree = await git.readTree({ ...gitOpts, oid: latestCommit });
@@ -41,14 +27,13 @@ export const edit = async (req, res, _): Promise<void> => {
   log.info(`Editing on top of root tree ${latestTree.oid} at commit ${latestCommit}`);
 
   let rootTreeOid = latestTree.oid;
-  for (const edit of req.body) {
-    // const subTrees = [tree] as Array<GitTree | string>;
+  for (const edit of editReq) {
 
     const filename = edit.path.includes("/") ? edit.path.split("/").pop() : edit.path;
     // Split the path into an array of subdirs (omitting the filename)
     const dirs = edit.path.split("/").reverse().slice(1).reverse();
     if (filename === "" || dirs.includes("")) {
-      return err(`Filename or some dir is an empty string for path ${edit.path}`);
+      throw new Error(`Filename or some dir is an empty string for path ${edit.path}`);
     }
     log.debug(`filename: ${filename} | dirs: ${dirs}`);
 
@@ -135,12 +120,12 @@ export const edit = async (req, res, _): Promise<void> => {
 
   if (rootTreeOid === latestTree.oid) {
     log.info(`No differences detected, doing nothing`);
-    return res.json({ status: "no change", commit: latestCommit });
+    return { status: "no change", commit: latestCommit };
   }
   log.info(`Final root tree has oid: ${rootTreeOid}`);
 
   if (await resolveRef(env.branch) !== latestCommit) {
-    return err(`Latest commit on ${env.branch} was updated mid-edit`);
+    throw new Error(`Latest commit on ${env.branch} was updated mid-edit`);
   }
 
   const committer = {
@@ -150,7 +135,7 @@ export const edit = async (req, res, _): Promise<void> => {
     timezoneOffset: 0,
   };
   const newCommit = await git.writeCommit({ ...gitOpts, commit: {
-    message: `edit ${req.body.map(e => e.path).join(", ")}`,
+    message: `edit ${editReq.map(e => e.path).join(", ")}`,
     tree: rootTreeOid,
     parent: [latestCommit],
     author: committer,
@@ -163,8 +148,6 @@ export const edit = async (req, res, _): Promise<void> => {
     value: newCommit,
   });
   log.info(`Wrote new commit to ${env.branch} w hash: ${newCommit}`);
-  res.json({ status: "success", commit: newCommit });
-
   await pushToMirror();
-  return;
+  return { status: "success", commit: newCommit };
 };
