@@ -14,6 +14,11 @@ export ELECTRON_ENABLE_LOGGING=true
 export BLOG_HOST_CONTENT_DIR="$root/.test-content.git"
 export BLOG_MIRROR_URL=""
 make start
+docker service ls
+echo "====="
+docker container ls
+echo "====="
+docker service logs blog_webserver
 
 if [[ -d "modules/client" ]]
 then cd modules/client || exit 1;
