@@ -15,6 +15,12 @@ export type HistoryResponse = Array<{
   timestamp: string;
 }>;
 
+export type ReadResponse = {
+  author: string;
+  timestamp: number;
+  content: string;
+};
+
 export type DateString = string; // in ISO format
 
 export type GitTreeEntry = {

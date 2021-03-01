@@ -6,7 +6,7 @@ import { edit } from "./edit";
 import { history } from "./history";
 import { execPackService } from "./pack";
 import { pushToMirror } from "./push";
-import { getConfig, getFile } from "./read";
+import { getRef, getFile } from "./read";
 
 export const gitRouter = express.Router();
 
@@ -21,11 +21,11 @@ gitRouter.get("/info/refs", async (req, res) => {
     res.send(response);
   } catch (e) {
     log.error(`Git ref info failed: ${e.message}`);
-    return res.status(500).send(e.message);
+    res.status(500).send(e.message);
   }
 });
 
-gitRouter.post(["/git-receive-pack", "/git-upload-pack"], async (res, req) => {
+gitRouter.post(["/git-receive-pack", "/git-upload-pack"], async (req, res) => {
   const service = req.path.split("/").pop();
   try {
     const response = await execPackService(service, req.body);
@@ -33,30 +33,54 @@ gitRouter.post(["/git-receive-pack", "/git-upload-pack"], async (res, req) => {
     res.send(response);
   } catch (e) {
     log.error(`Git ${service} service failed: ${e.message}`);
-    return res.status(500).send(e.message);
+    res.status(500).send(e.message);
   }
   if (service === "git-receive-pack") {
-    await pushToMirror();
+    try {
+      await pushToMirror();
+    } catch (e) {
+      log.warn(`Git push failed: ${e.message}`);
+    }
   }
 });
 
 gitRouter.post("/edit", async (req, res) => {
   try {
-    return res.json(await edit(req.body));
+    res.json(await edit(req.body));
   } catch (e) {
     log.error(`Git edit failed: ${e.message}`);
-    return res.status(500).send(e.message);
+    res.status(500).send(e.message);
   }
 });
 
 gitRouter.get("/history/:slug", async (req, res) => {
   try {
-    return res.status(200).json(await history(req.path.replace(`/history/`, "")));
+    res.status(200).json(await history(req.path.replace(`/history/`, "")));
   } catch (e) {
-    log.warn(e.message);
-    return res.status(200).json([]);
+    log.error(e.message);
+    res.status(200).json([]);
   }
 });
 
-gitRouter.get("/config", getConfig);
-gitRouter.get("/:ref/*", getFile);
+gitRouter.get(["/config", "/ref"], async (req, res) => {
+  try {
+    res.json(await getRef());
+  } catch (e) {
+    log.error(e.message);
+    res.status(500).send(e.message);
+  }
+});
+
+gitRouter.get("/:ref/*", async (req, res) => {
+  try {
+    const { ref } = req.params;
+    const filepath = req.path.replace(`/${ref}/`, "");
+    res.json(await getFile(ref, filepath));
+  } catch (e) {
+    log.error(e.message);
+    res.status(500).send(e.message);
+  }
+});
+
+// do nothing successfully so that POSTing to /git can be used to verify auth token
+gitRouter.use("/", async (req, res) => res.send(""));

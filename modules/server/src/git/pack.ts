@@ -13,7 +13,7 @@ const regex = {
 };
 
 export const execPackService = async (
-  service: "git-upload-pack" | "git-receive-pack",
+  service: string,
   payload?: Buffer,
 ): Promise<Buffer> => new Promise((resolve, reject) => {
   let output = Buffer.from([]);
