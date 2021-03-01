@@ -159,7 +159,7 @@ const App: React.FC = () => {
   return (
     <ThemeProvider theme={theme}>
       <AdminContext.Provider
-        value={{ gitState, syncGitState, newContent, setNewContent }}
+        value={{ gitState, syncGitState }}
       >
         <CssBaseline />
         <NavBar
