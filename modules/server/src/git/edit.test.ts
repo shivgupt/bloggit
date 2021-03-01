@@ -3,7 +3,7 @@ import { expect } from "../test-utils";
 import { edit } from "./edit";
 
 describe("git/edit", () => {
-  it("should error if given an invalid edit request", async () => {
+  it("should throw if given an invalid request", async () => {
     const invalidMsg = "Invalid edit request";
     await expect(edit()).to.eventually.be.rejectedWith(invalidMsg);
     await expect(edit([])).to.eventually.be.rejectedWith(invalidMsg);

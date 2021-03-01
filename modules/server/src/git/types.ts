@@ -9,7 +9,7 @@ export type EditResponse = {
   commit: string;
 };
 
-export type HistoryResult = Array<{
+export type HistoryResponse = Array<{
   commit: string;
   path: string;
   timestamp: string;
