@@ -8,6 +8,10 @@ project=$(grep -m 1 '"name":' "$root/package.json" | cut -d '"' -f 4)
 docker swarm init 2> /dev/null || true
 docker network create --attachable --driver overlay "$project" 2> /dev/null || true
 
+if grep "$project" <<<"$(docker stack ls | tail -n +2)"
+then echo "$project stack is already running" && exit
+fi
+
 ####################
 # External Env Vars
 
@@ -23,7 +27,7 @@ BLOG_HOST_CONTENT_DIR="${BLOG_HOST_CONTENT_DIR:-$root/.blog-content.git}"
 BLOG_INTERNAL_CONTENT_DIR="${BLOG_INTERNAL_CONTENT_DIR:-/blog-content.git}"
 BLOG_LOG_LEVEL="${BLOG_LOG_LEVEL:-info}"
 BLOG_MIRROR_KEY="${BLOG_MIRROR_KEY:-}"
-BLOG_MIRROR_URL="${BLOG_MIRROR_URL:-https://gitlab.com/bohendo/blog-content.git}"
+BLOG_MIRROR_URL="${BLOG_MIRROR_URL:-}"
 BLOG_PROD="${BLOG_PROD:-false}"
 BLOG_SEMVER="${BLOG_SEMVER:-false}"
 
@@ -112,6 +116,7 @@ else
     entrypoint: 'bash modules/server/ops/entry.sh'
     ports:
       - '5000:5000'
+    user: '$(id -u):$(id -g)'
     volumes:
       - '$root:/root'
       - '$BLOG_HOST_CONTENT_DIR:$BLOG_INTERNAL_CONTENT_DIR'"
