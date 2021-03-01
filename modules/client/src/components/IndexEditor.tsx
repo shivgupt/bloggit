@@ -85,7 +85,7 @@ export const IndexEditor = () => {
   return (
     <List className={classes.root}>
       <ListItem key="index_title">
-        <TextField id="index_title" label="title" defaultValue={index.title} />
+        <TextField id="index_title" label="title" defaultValue={index?.title} />
       </ListItem>
       <ListItem key="index_posts">
         <ListItemText primary="Posts" onClick={togglePosts} />
@@ -93,24 +93,27 @@ export const IndexEditor = () => {
       </ListItem>
       <Collapse in={openPosts} timeout="auto" unmountOnExit>
         <List>
-        {Object.values(index.posts).map((post) => {
-          return (
-            <ListItem button component={Link} to={`/${post.slug}`} key={post.slug} alignItems="flex-start">
-              <ListItemText primary={post.title} className={classes.listText} />
-              <ListItemSecondaryAction>
-                <Button
-                  onClick={() => handleArchive(post.slug)}
-                  size="small"
-                  color="primary"
-                  variant="contained"
-                  startIcon={<Drafts />}
-                >
-                  Archive
-                </Button>
-              </ListItemSecondaryAction>
-            </ListItem>
-          )
-        })}
+        {index?.posts
+          ? Object.values(index?.posts || []).map((post) => {
+            return (
+              <ListItem button component={Link} to={`/${post.slug}`} key={post.slug} alignItems="flex-start">
+                <ListItemText primary={post.title} className={classes.listText} />
+                <ListItemSecondaryAction>
+                  <Button
+                    onClick={() => handleArchive(post.slug)}
+                    size="small"
+                    color="primary"
+                    variant="contained"
+                    startIcon={<Drafts />}
+                  >
+                    Archive
+                  </Button>
+                </ListItemSecondaryAction>
+              </ListItem>
+            )
+          })
+          : null
+        }
         </List>
       </Collapse> 
       <ListItem key="index_drafts">
@@ -119,8 +122,8 @@ export const IndexEditor = () => {
       </ListItem>
       <Collapse in={openDrafts} timeout="auto" unmountOnExit>
         <List>
-        {index.drafts
-         ? Object.values(index.drafts).map((draft) => {
+        {index?.drafts
+         ? Object.values(index?.drafts).map((draft) => {
             return (
               <ListItem button component={Link} to={`/${draft.slug}`} key={draft.slug} alignItems="flex-start">
                 <ListItemText primary={draft.title} className={classes.listText} />

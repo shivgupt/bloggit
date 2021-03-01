@@ -62,7 +62,7 @@ export const AppSpeedDial = (props: {
     const oldIndex = gitState?.index;
     const newIndex = JSON.parse(JSON.stringify(oldIndex))
     const data = [] as Array<{path: string, content: string}>;
-    
+
     let key;
     if (oldIndex?.posts?.[slug]) {
       key = "posts";
@@ -147,27 +147,41 @@ export const AppSpeedDial = (props: {
       setEditMode(false);
       await syncGitState(res.data.commit?.substring(0, 8), newPostData.slug);
       handleRedirect(`/${newPostData.slug}`)
-    } else { 
+    } else {
       console.error(`Something went wrong`, res);
     }
   };
 
-  if (!editMode && (!slug || slug === "admin" || readOnly)) {
-    return (
-      <Fab 
-        id={"fab-create-new-post"}
-        className={classes.speedDial}
-        color="primary"
-        onClick={() => {
-          handleRedirect("/");
-          setEditMode(true);
-        }}
-      ><Add/></Fab>
-    );
-  } else if (editMode && slug === "") {
+  if (!editMode) {
+    if (!slug || slug === "admin" || readOnly) {
+      console.log("edit mode is OFF and we have no slug");
+      return (
+        <Fab
+          id={"fab"}
+          className={classes.speedDial}
+          color="primary"
+          onClick={() => {
+            handleRedirect("/");
+            setEditMode(true);
+          }}
+        ><Add/></Fab>
+      );
+    } else {
+      console.log("edit mode is OFF and we got slug");
+      return (
+        <Fab
+          id={"fab"}
+          className={classes.speedDial}
+          color="primary"
+          onClick={() => setEditMode(true)}
+        ><Edit/></Fab>
+      );
+    }
+  } else {
+    console.log("edit mode is ON");
     return (
       <SpeedDial
-        id={"fab-save-post"}
+        id={"fab"}
         ariaLabel="fab"
         onClose={() => setOpen(false)}
         onOpen={() => setOpen(true)}
@@ -176,59 +190,43 @@ export const AppSpeedDial = (props: {
         icon={<Add/>}
         FabProps={{ref: (ref) => { dialButtonRef = ref }}}
       >
-        <SpeedDialAction
-          FabProps={{id: "sd-discard"}}
-          icon={<Delete />}
-          tooltipTitle="Discard changes"
-          onClick={() => setEditMode(false)}
-        />
-        <SpeedDialAction
-          FabProps={{id: "sd-draft"}}
-          icon={<Drafts />}
-          tooltipTitle="Save As Draft"
-          onClick={() => createNew("drafts")}
-        />
-        <SpeedDialAction
-          FabProps={{id: "sd-publish"}}
-          icon={<Public />}
-          tooltipTitle="Publish"
-          onClick={() => createNew("posts")}
-        />
-      </SpeedDial>
-    )
-  } else if (!editMode) {
-    return (
-      <Fab 
-        id={"fab-edit-post"}
-        className={classes.speedDial}
-        color="primary"
-        onClick={() => setEditMode(true)}
-      ><Edit/></Fab>
-    );
-  } else {
-    return (
-      <SpeedDial
-        id={"fab-save-changes"}
-        ariaLabel="fab"
-        onClose={() => setOpen(false)}
-        onOpen={() => setOpen(true)}
-        open={open}
-        className={classes.speedDial}
-        icon={ <Edit />}
-        FabProps={{ref: (ref) => { dialButtonRef = ref }}}
-      >
-        <SpeedDialAction
-          FabProps={{id: "sd-discard"}}
-          icon={<Delete />}
-          tooltipTitle="Discard changes"
-          onClick={() => setEditMode(false)}
-        />
-        <SpeedDialAction
-          FabProps={{id: "sd-save"}}
-          icon={<Drafts />}
-          tooltipTitle="Save"
-          onClick={update}
-        />
+        {slug === ""
+          ?  ([<SpeedDialAction
+              FabProps={{id: "fab-discard"}}
+              icon={<Delete />}
+              key="fab-discard"
+              onClick={() => setEditMode(false)}
+              tooltipTitle="Discard changes"
+            />,
+            <SpeedDialAction
+              FabProps={{id: "fab-draft"}}
+              icon={<Drafts />}
+              key="fab-draft"
+              onClick={() => createNew("drafts")}
+              tooltipTitle="Save As Draft"
+            />,
+            <SpeedDialAction
+              FabProps={{id: "fab-publish"}}
+              icon={<Public />}
+              key="fab-publish"
+              onClick={() => createNew("posts")}
+              tooltipTitle="Publish"
+            />])
+          : ([<SpeedDialAction
+              FabProps={{id: "fab-discard"}}
+              icon={<Delete />}
+              key="fab-discard"
+              onClick={() => setEditMode(false)}
+              tooltipTitle="Discard changes"
+            />,
+            <SpeedDialAction
+              FabProps={{id: "fab-save"}}
+              icon={<Drafts />}
+              key="fab-save"
+              onClick={update}
+              tooltipTitle="Save"
+            />])
+        }
       </SpeedDial>
     )
   }
