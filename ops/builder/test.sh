@@ -1,5 +1,7 @@
 #!/bin/bash
 
+chown -R "$(id -u):$(id -g)" /root/.config
+
 unit=$1
 cmd="${2:-test}"
 
@@ -16,7 +18,7 @@ if [[ "${cmd##*-}" == "test" ]]
 then
   set -o pipefail
   echo "Starting $unit tester"
-  if [[ -n "$(which pino-pretty)" ]]
+  if [[ -n "$(command -v pino-pretty)" ]]
   then exec npm run test -- $opts | pino-pretty --colorize
   else exec npm run test -- $opts
   fi
@@ -24,6 +26,10 @@ then
 elif [[ "${cmd##*-}" == "watch" ]]
 then
   echo "Starting $unit watcher"
+
+  function getChecksum {
+    find "${src[@]}" -type f -not -name "*.swp" -exec sha256sum {} \; | sha256sum;
+  }
 
   src=()
   for dir in src src.ts src.sol
@@ -37,7 +43,7 @@ then
   prev_checksum=""
   while true
   do
-    checksum="$(find "${src[@]}" -type f -not -name "*.swp" -exec sha256sum {} \; | sha256sum)"
+    checksum="$(getChecksum)"
     if [[ "$checksum" != "$prev_checksum" ]]
     then
       echo
@@ -55,8 +61,8 @@ then
       sleep 2
       echo "Re-running tests..."
 
-      prev_checksum="$(find "${src[@]}" -type f -not -name "*.swp" -exec sha256sum {} \; | sha256sum)"
-      if [[ -n "$(which pino-pretty)" ]]
+      prev_checksum="$(getChecksum)"
+      if [[ -n "$(command -v pino-pretty)" ]]
       then (npm run test -- $opts | pino-pretty --colorize &)
       else (npm run test -- $opts &)
       fi
