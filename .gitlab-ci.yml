@@ -40,7 +40,7 @@ test:
     - docker service logs --raw --tail 100 blog_server
     - docker service logs --raw --tail 100 blog_webserver
     - docker service logs --raw --tail 100 blog_proxy
-    - make test
+    - make test-server
 
 deploy:
   image: docker:stable

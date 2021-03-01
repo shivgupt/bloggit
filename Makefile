@@ -74,8 +74,10 @@ build-report:
 dls:
 	@docker service ls && echo '=====' && docker container ls -a
 
-test:
-	bash ops/test.sh
+test-server: server-js
+	bash ops/test-unit.sh server test
+watch-server: node-modules
+	bash ops/test-unit.sh server watch
 
 ########################################
 # Common Prerequisites
