@@ -18,6 +18,10 @@ docker service ls
 echo "====="
 docker container ls
 echo "====="
+docker service logs blog_proxy
+echo "====="
+docker service logs blog_server
+echo "====="
 docker service logs blog_webserver
 
 if [[ -d "modules/client" ]]
