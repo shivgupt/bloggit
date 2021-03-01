@@ -67,11 +67,29 @@ const App: React.FC = () => {
 
   // console.log(`Rendering App with refParam=${refParam} and slugParam=${slugParam}`);
 
-  const updateAuthToken = (authToken: string) => {
-    store.save("authToken", authToken);
-    // update auth header anytime authToken changes;
-    axios.defaults.headers.common["authorization"] = `Basic ${btoa(`admin:${authToken}`)}`;
-  };
+  const validateAuthToken = async (_authToken?: string) => {
+    const authToken = _authToken || store.load("authToken");
+    try {
+      await axios({
+        headers: {
+          "authorization": `Basic ${btoa(`admin:${authToken}`)}`,
+        },
+        method: "post",
+        url: "git",
+        validateStatus: (code) => code === 404,
+      });
+      // Auth is valid, update localStorage, axios header and adminMode
+      store.save("authToken", authToken);
+      axios.defaults.headers.common["authorization"] = `Basic ${btoa(`admin:${authToken}`)}`;
+      setAdminMode("disabled");
+    } catch (e) {
+      // Auth is invalid, update localStorage, axios header and adminMode
+      console.error(`Auth token is not valid: ${e.message}`);
+      store.save("authToken", "");
+      axios.defaults.headers.common["authorization"] = `Basic ${btoa(`admin:`)}`;
+      setAdminMode("invalid");
+    }
+  }
 
   const toggleTheme = () => {
     if ( theme.palette.type === "dark") {
@@ -120,12 +138,7 @@ const App: React.FC = () => {
     const themeSelection = store.load("theme");
     if (themeSelection === "light") setTheme(lightTheme);
     else setTheme(darkTheme);
-    // Check local storage for authToken and update auth header
-    const authToken = store.load("authToken");
-    if (authToken) {
-      axios.defaults.headers.common["authorization"] = `Basic ${btoa(`admin:${authToken}`)}`;
-      setAdminMode("disabled");
-    }
+    validateAuthToken();
   }, []);
 
   // Fetch index & post content any time the url changes
@@ -146,7 +159,7 @@ const App: React.FC = () => {
   return (
     <ThemeProvider theme={theme}>
       <AdminContext.Provider
-        value={{ gitState, syncGitState, editMode, setEditMode, newContent, setNewContent, updateAuthToken }}
+        value={{ gitState, syncGitState, editMode, setEditMode, newContent, setNewContent }}
       >
         <CssBaseline />
         <NavBar
@@ -180,7 +193,7 @@ const App: React.FC = () => {
                 path="/admin"
                 render={() => {
                   return (
-                    <AdminHome adminMode={adminMode} />
+                    <AdminHome adminMode={adminMode} validateAuthToken={validateAuthToken} />
                   );
                 }}
               />

@@ -7,7 +7,6 @@ export const AdminContext = React.createContext({
   gitState: {} as GitState,
 
   // eslint-disable-next-line
-  updateAuthToken: (authToken: string) => {},
   setEditMode: (edit: boolean) => {},
   setNewContent: (newContent: string) => {},
   syncGitState: async (ref?: string, slug?: string, force?: boolean) => {},

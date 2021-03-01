@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { 
   Button,
   Divider,
@@ -10,7 +10,6 @@ import {
 import axios from "axios";
 
 import { IndexEditor } from "./IndexEditor";
-import { AdminContext } from "../AdminContext";
 import { AdminMode } from "../types";
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -22,34 +21,18 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-export const AdminHome = (props: {adminMode: AdminMode}) => {
+export const AdminHome = (props: {
+  adminMode: AdminMode,
+  validateAuthToken: (_authToken?: string) => Promise<void>
+}) => {
 
-  const { adminMode } = props;
-  const adminContext = useContext(AdminContext);
+  const { adminMode, validateAuthToken } = props;
   const classes = useStyles();
 
-  const handleRegister = async () => {
-    const authToken = (document.getElementById("auth-token") as HTMLInputElement).value;
-    try {
-      await axios({
-        headers: {
-          "authorization": `Basic ${btoa(`admin:${authToken}`)}`,
-        },
-        method: "post",
-        url: "git",
-        validateStatus: (code) => code === 404,
-      });
-      console.log(`Auth token is valid!`);
-      adminContext.updateAuthToken(authToken);
-    } catch (e) {
-      console.error(`Auth token is not valid: ${e.message}`);
-      adminContext.updateAuthToken("");
-    }
-  };
-
+  const [authToken, setAuthToken] = useState("");
   return (
     <div>
-      {adminMode === "enabled"
+      {adminMode !== "invalid"
         ? (
           <div className={classes.section}>
             <Typography variant="subtitle1">
@@ -73,15 +56,16 @@ export const AdminHome = (props: {adminMode: AdminMode}) => {
           label="Auth Token"
           placeholder="AUTH-TOKEN"
           helperText="Register device with New AUTH TOKEN"
-          defaultValue={""}
+          value={authToken}
+          onChange={(e) => setAuthToken(e.target.value)}
           variant="outlined"
         />
 
-        <Button onClick={handleRegister}> Register </Button>
+        <Button onClick={() => validateAuthToken(authToken)}> Register </Button>
       </div>
 
       <Divider variant="middle" />
-      { adminMode === "enabled"
+      { adminMode !== "invalid"
         ? (<div className={classes.section}>
           <IndexEditor />
         </div>)
