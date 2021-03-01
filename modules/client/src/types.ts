@@ -1,3 +1,4 @@
+export type AdminMode = "invalid" | "enabled" | "disabled";
 
 export type GitState = {
   currentContent: string;

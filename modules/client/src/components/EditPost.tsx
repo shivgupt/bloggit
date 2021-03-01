@@ -4,14 +4,19 @@ import {
   Paper,
   TextField,
 } from "@material-ui/core";
-import React, { useContext, useEffect, useState } from "react";
+import React from "react";
 import Markdown from "react-markdown";
 import ReactMde, { SaveImageHandler } from "react-mde";
 import "react-mde/lib/styles/css/react-mde-all.css";
 import axios from "axios";
 
-import { CodeBlockRenderer } from "./CodeBlock";
-import { EmojiRenderer, HeadingRenderer, ImageRenderer, LinkRenderer } from "./Renderers";
+import {
+  CodeBlockRenderer,
+  TextRenderer,
+  HeadingRenderer,
+  ImageRenderer,
+  LinkRenderer
+} from "./Renderers";
 import { ImageUploader } from "./ImageUploader";
 import { PostData } from "../types";
 
@@ -114,7 +119,7 @@ export const EditPost = (props: {
               renderers={{
                 heading: HeadingRenderer,
                 code: CodeBlockRenderer,
-                text: EmojiRenderer,
+                text: TextRenderer,
                 link: LinkRenderer,
                 image: ImageRenderer,
               }}

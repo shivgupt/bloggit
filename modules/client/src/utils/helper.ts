@@ -1,4 +1,8 @@
 import { PostData } from "../types";
+import emoji from "emoji-dictionary";
+
+export const replaceEmojiString = (s: string) =>
+ s.replace(/:\w+:/gi, name => emoji.getUnicode(name) || name);
 
 export const prettyDateString = (s: string) => {
   let m: string, d: string, y: string;

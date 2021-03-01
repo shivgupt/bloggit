@@ -14,7 +14,7 @@ import { Link } from "react-router-dom";
 import { Drafts, ExpandLess, ExpandMore, Public } from "@material-ui/icons";
 import axios from "axios";
 
-import { AdminContext } from "../AdminContext";
+import { GitContext } from "../GitContext";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -33,12 +33,12 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 
-export const IndexEditor = (props: any) => {
+export const IndexEditor = () => {
 
   const [openPosts, setOpenPosts] = useState(false);
   const [openDrafts, setOpenDrafts] = useState(false);
-  const adminContext = useContext(AdminContext);
-  const index = adminContext.gitState?.index;
+  const gitContext = useContext(GitContext);
+  const index = gitContext.gitState?.index;
 
   const classes = useStyles();
   const togglePosts = () => setOpenPosts(!openPosts);
@@ -60,7 +60,7 @@ export const IndexEditor = (props: any) => {
     ],
       headers: { "content-type": "application/json" }
     });
-    adminContext.syncGitState();
+    gitContext.syncGitState();
   };
 
   const handlePublish = async (slug: string) => {
@@ -79,7 +79,7 @@ export const IndexEditor = (props: any) => {
     ],
       headers: { "content-type": "application/json" }
     });
-    adminContext.syncGitState();
+    gitContext.syncGitState();
   };
 
   return (
