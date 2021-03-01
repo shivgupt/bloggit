@@ -10,7 +10,7 @@ modules/*/package-lock.json
 # Local storage
 **/*.local
 .blog-content.git
-.media
+.test-content.git
 .env
 !modules/client/.env
 
