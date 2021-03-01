@@ -22,7 +22,7 @@ import {
 } from "./utils";
 import { darkTheme, lightTheme } from "./style";
 import { store } from "./utils/cache";
-import { AdminContext } from "./AdminContext";
+import { GitContext } from "./GitContext";
 import { AdminMode, GitState, SidebarNode } from "./types";
 import { EditPost } from "./components/EditPost";
 import { AppSpeedDial } from "./components/AppSpeedDial";
@@ -158,14 +158,11 @@ const App: React.FC = () => {
 
   return (
     <ThemeProvider theme={theme}>
-      <AdminContext.Provider
-        value={{ gitState, syncGitState }}
-      >
+      <GitContext.Provider value={{ gitState, syncGitState }}>
         <CssBaseline />
         <NavBar
           adminMode={adminMode}
           setAdminMode={setAdminMode}
-          gitState={gitState}
           node={node}
           setNode={setNode}
           theme={theme}
@@ -186,7 +183,7 @@ const App: React.FC = () => {
                     setPostData={setNewPostData}
                     setContent={setNewContent}
                   />
-                  : <Home gitState={gitState} />
+                  : <Home />
                 }}
               />
               <Route exact
@@ -199,7 +196,7 @@ const App: React.FC = () => {
               />
               <Route
                 path="/:ref/:slug"
-                render={() => <PostPage gitState={gitState} />}
+                render={() => <PostPage />}
               />
               <Route
                 path="/:slug"
@@ -211,14 +208,12 @@ const App: React.FC = () => {
                       setPostData={setNewPostData}
                       setContent={setNewContent}
                     /> 
-                  : <PostPage gitState={gitState} />
+                  : <PostPage />
                 }}
               />
             </Switch>
             {(adminMode === "enabled")
             ? <AppSpeedDial
-                gitState={gitState}
-                syncGitState={syncGitState}
                 newContent={newContent}
                 newPostData={newPostData}
                 editMode={editMode}
@@ -227,7 +222,7 @@ const App: React.FC = () => {
             : null}
           </Container>
         </main>
-      </AdminContext.Provider>
+      </GitContext.Provider>
     </ThemeProvider>
   );
 };

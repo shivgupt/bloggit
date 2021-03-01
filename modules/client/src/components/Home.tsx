@@ -8,11 +8,12 @@ import {
   Typography,
   makeStyles,
 } from "@material-ui/core";
-import React from "react";
+import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 import emoji from "emoji-dictionary";
 
 import { prettyDateString } from "../utils";
+import { GitContext } from "../GitContext";
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -36,9 +37,10 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-export const Home = (props: any) => {
+export const Home = () => {
   const classes = useStyles();
-  const posts = props.gitState?.index?.posts || [];
+  const gitContext = useContext(GitContext);
+  const posts = gitContext.gitState?.index?.posts || [];
 
   return (
     <Grid container spacing={3} justify={"space-around"} alignItems={"center"}>
@@ -46,7 +48,7 @@ export const Home = (props: any) => {
         if (!posts[slug].category) return null;
 
         const title = posts[slug].title.replace(/:\w+:/gi, name => emoji.getUnicode(name) || name);
-        const tldr = posts[slug].tldr.replace(/:\w+:/gi, name => emoji.getUnicode(name) || name);
+        const tldr = posts[slug].tldr?.replace(/:\w+:/gi, name => emoji.getUnicode(name) || name);
 
         return (
           <Grid className={classes.root} item xs={12} md={6} lg={4} key={slug}>
@@ -63,11 +65,11 @@ export const Home = (props: any) => {
                 <CardContent>
                   <Typography variant="h5" gutterBottom>{title}</Typography>
                   <Typography variant="caption" gutterBottom display="block">
-                    {posts[slug].lastEdit ? prettyDateString(posts[slug].lastEdit) : ""}
+                    {posts[slug].lastEdit ? prettyDateString(posts[slug].lastEdit!) : ""}
                     &nbsp;
                     &nbsp;
                     {posts[slug].tags
-                      ? <> Tags: {posts[slug].tags.map(tag => <Chip key={tag} label={tag} />)} </>
+                      ? <> Tags: {posts[slug].tags?.map(tag => <Chip key={tag} label={tag} />)} </>
                       : null
                     }
                   </Typography>

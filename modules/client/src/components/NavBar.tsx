@@ -24,6 +24,7 @@ import { Link } from "react-router-dom";
 
 import { siteTitleFont } from "../style";
 import { getPostsByCategories } from "../utils";
+import { GitContext } from "../GitContext";
 
 import { Toc } from "./ToC";
 
@@ -61,9 +62,10 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const DrawerContent = (props: any) => {
-  const { siteTitle, node, gitState, setNode, toggleTheme, theme, adminMode, setAdminMode } = props;
+  const { siteTitle, node, setNode, toggleTheme, theme, adminMode, setAdminMode } = props;
 
-  const { index } = gitState;
+  const gitContext = useContext(GitContext);
+  const { index } = gitContext.gitState;
   const posts = getPostsByCategories(index?.posts || []);
 
   return (
@@ -111,7 +113,7 @@ const DrawerContent = (props: any) => {
         </>
         : null
       }
-      <Toc gitState={gitState} posts={posts} node={node} setNode={setNode}/>
+      <Toc posts={posts} node={node} setNode={setNode}/>
       {posts["top-level"]
         ? posts["top-level"].map((p) => {
           return (
@@ -131,13 +133,14 @@ const DrawerContent = (props: any) => {
 };
 
 export const NavBar = (props: any) => {
-  const { gitState, setEditMode } = props;
+  const { setEditMode } = props;
+  const gitContext = useContext(GitContext);
   const classes = useStyles();
   const [drawer, setDrawer] = useState(false);
 
   const toggleDrawer = () => setDrawer(!drawer);
 
-  const { index, slug } = gitState;
+  const { index, slug } = gitContext.gitState;
   const posts = getPostsByCategories(index?.posts || []);
   const siteTitle = index?.title || "My Blog";
   const pageTitle = index?.posts?.[slug || ""]?.title || "";

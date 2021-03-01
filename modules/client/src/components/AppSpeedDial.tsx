@@ -13,6 +13,8 @@ import {
 } from "@material-ui/icons";
 import { useHistory } from "react-router-dom";
 import axios from "axios";
+
+import { GitContext } from "../GitContext";
 import { GitState, PostData } from "../types";
 
 const getPath = (post: PostData) => {
@@ -35,20 +37,21 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 export const AppSpeedDial = (props: {
-  gitState: GitState,
-  syncGitState: (ref?: string, slug?: string) => Promise<void>,
   newContent: string,
   newPostData: PostData,
   editMode: boolean,
   setEditMode: (val: boolean) => void,
 }) => {
 
-  const { gitState, syncGitState, editMode, setEditMode, newContent, newPostData } = props;
+  const { editMode, setEditMode, newContent, newPostData } = props;
+
   const history = useHistory();
   const [open, setOpen] = useState(false);
   const classes = useStyles();
 
-  const { currentContent, slug } = props.gitState;
+  const gitContext = useContext(GitContext);
+  const { gitState, syncGitState } = gitContext;
+  const { currentContent, slug } = gitState;
   const readOnly = gitState.currentRef !== gitState.latestRef;
 
   let dialButtonRef;

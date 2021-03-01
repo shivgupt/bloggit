@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import Markdown from "react-markdown";
 import { Link } from "react-router-dom";
 import {
@@ -14,6 +14,7 @@ import {
 } from "@material-ui/icons";
 import emoji from "emoji-dictionary";
 
+import { GitContext } from "../GitContext";
 import { getChildValue } from "../utils";
 
 import { HashLink } from "./HashLink";
@@ -62,8 +63,9 @@ const TocGenerator = (props: any) => {
 };
 
 export const Toc = (props: any) => {
-  const { node, posts, gitState, setNode } = props;
-  const { currentContent, slug } = gitState
+  const gitContext = useContext(GitContext);
+  const { node, posts, setNode } = props;
+  const { currentContent, slug } = gitContext.gitState
   const classes = useStyles();
 
   switch(node.current) {

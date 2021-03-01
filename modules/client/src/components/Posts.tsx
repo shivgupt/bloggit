@@ -3,11 +3,12 @@ import {
   makeStyles,
   Paper,
 } from "@material-ui/core";
-import React, { useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import Markdown from "react-markdown";
 import "react-mde/lib/styles/css/react-mde-all.css";
 
 import { GitState } from "../types";
+import { GitContext } from "../GitContext";
 
 import { BrowseHistory } from "./BrowseHistory";
 import { CodeBlockRenderer } from "./CodeBlock";
@@ -36,8 +37,9 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-export const PostPage = (props: { gitState: GitState }) => {
-  const { currentRef, latestRef, slug, currentContent, indexEntry } = props.gitState;
+export const PostPage = () => {
+  const gitContext = useContext(GitContext);
+  const { currentRef, latestRef, slug, currentContent, indexEntry } = gitContext.gitState;
   const classes = useStyles();
 
   useEffect(() => {
