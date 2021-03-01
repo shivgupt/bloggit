@@ -141,7 +141,6 @@ export const NavBar = (props: any) => {
   const toggleDrawer = () => setDrawer(!drawer);
 
   const { index, slug } = gitContext.gitState;
-  const posts = getPostsByCategories(index?.posts || []);
   const siteTitle = index?.title || "My Blog";
   const pageTitle = index?.posts?.[slug || ""]?.title || "";
   document.title = pageTitle ? `${pageTitle} | ${siteTitle}` : siteTitle;

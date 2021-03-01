@@ -7,7 +7,6 @@ import React, { useContext, useEffect } from "react";
 import Markdown from "react-markdown";
 import "react-mde/lib/styles/css/react-mde-all.css";
 
-import { GitState } from "../types";
 import { GitContext } from "../GitContext";
 
 import { BrowseHistory } from "./BrowseHistory";
