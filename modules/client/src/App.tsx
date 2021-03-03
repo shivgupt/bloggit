@@ -140,6 +140,7 @@ const App: React.FC = () => {
   useEffect(() => {
     setNewContent("");
     setEditMode(false);
+    setValidation(defaultValidation);
     syncGitState(refParam || gitState.latestRef, slugParam);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refParam, slugParam]);

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import { PostData } from "@blog/types";
 import { makeStyles, Fab, Theme } from "@material-ui/core"
 import {
