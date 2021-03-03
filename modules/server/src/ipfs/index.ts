@@ -2,7 +2,8 @@ import express from "express";
 
 import { logger } from "../utils";
 
-import { list } from "./list";
+import { rmPin } from "./delete";
+import { lsPins } from "./list";
 import { read } from "./read";
 import { save } from "./save";
 
@@ -10,9 +11,10 @@ export const ipfsRouter = express.Router();
 
 const log = logger.child({ module: "IpfsRouter" });
 
+// Get list of pins
 ipfsRouter.get("/", async (req, res, _next): Promise<any> => {
   try {
-    const result = await list();
+    const result = await lsPins();
     res.setHeader("content-type", "application/json");
     res.status(200).send(result);
   } catch (e) {
@@ -21,6 +23,7 @@ ipfsRouter.get("/", async (req, res, _next): Promise<any> => {
   }
 });
 
+// Get content at path
 ipfsRouter.get("/*", async (req, res, _next): Promise<any> => {
   try {
     const path = `/ipfs/${req.path.replace(/^\//, "")}`;
@@ -35,6 +38,21 @@ ipfsRouter.get("/*", async (req, res, _next): Promise<any> => {
   }
 });
 
+// Delete pin for content at path
+ipfsRouter.delete("/*", async (req, res, _next): Promise<any> => {
+  try {
+    const path = `/ipfs/${req.path.replace(/^\//, "")}`;
+    log.info(`${req.method}-ing path ${path}`);
+    const result = await rmPin(path);
+    res.setHeader("content-type", "application/json");
+    res.status(200).send(result);
+  } catch (e) {
+    log.error(e);
+    return res.status(500).send(e.message);
+  }
+});
+
+// Upload payload
 const upload = async (req, res, _next): Promise<any> => {
   try {
     log.info(`${req.method}-ing path ${req.path} w ${req.body.length || 0} bytes of data`);
@@ -46,6 +64,5 @@ const upload = async (req, res, _next): Promise<any> => {
     return res.status(500).send(e.message);
   }
 };
-
 ipfsRouter.put("/", upload);
 ipfsRouter.post("/", upload);
