@@ -2,6 +2,7 @@ import "react-mde/lib/styles/css/react-mde-all.css";
 
 import { PostData } from "@blog/types";
 import {
+  Button,
   Input,
   makeStyles,
   Paper,
@@ -25,7 +26,7 @@ import ReactMde, { SaveImageHandler } from "react-mde";
 import { useHistory } from "react-router-dom";
 
 import { GitContext } from "../GitContext";
-import { EditPostValidation } from "../types";
+import { EditPostValidation, SnackAlert } from "../types";
 import { defaultValidation, emptyEdit, slugify } from "../utils";
 
 import {
@@ -77,8 +78,9 @@ const getPath = (post: PostData) => {
 
 export const EditPost = (props: {
   setEditMode: any;
+  setSnackAlert: (snackAlert: SnackAlert) => void;
 }) => {
-  const { setEditMode } = props;
+  const { setEditMode, setSnackAlert } = props;
 
   const [validation, setValidation] = React.useState<EditPostValidation>(defaultValidation);
   const [newPostData, setNewPostData] = useState(emptyEdit);
@@ -198,7 +200,14 @@ export const EditPost = (props: {
 
   const createNew = async (as: "drafts" | "posts") => {
     // create new index.json entry
-    if (!validate()) return;
+    if (!validate()) {
+      setSnackAlert({
+        open: true,
+        msg: "Please enter post details",
+        severity: "error"
+      });
+      return;
+    }
     const newIndex = JSON.parse(JSON.stringify(gitState?.index));
     const path = getPath(newPostData);
     const newPostSlug = newPostData.slug || slugify(newPostData.title);
@@ -244,6 +253,23 @@ export const EditPost = (props: {
   };
 
   let dialButtonRef;
+
+  const discardConfirm = () => {
+    setSnackAlert({
+      open: true,
+      msg: "Do you want to discard all the changes",
+      severity: "warning",
+      action: <Button onClick={() => {
+        setEditMode(false);
+        setSnackAlert({
+          open: true,
+          msg: "Changes discarded",
+          severity: "success",
+          hideDuration: 6000,
+        })
+      }}> Yes </Button>
+    });
+  };
 
   const fullWidth = ["title", "tldr"];
   const required = ["title"];
@@ -318,7 +344,7 @@ export const EditPost = (props: {
             FabProps={{id: "fab-discard"}}
             icon={<Delete />}
             key="fab-discard"
-            onClick={() => setEditMode(false)}
+            onClick={discardConfirm}
             tooltipTitle="Discard changes"
           />,
           <SpeedDialAction

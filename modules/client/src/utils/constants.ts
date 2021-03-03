@@ -1,7 +1,11 @@
 import { PostData, BlogIndex } from "@blog/types";
-import { EditPostValidation } from "../types";
 
-import { EditData, GitState } from "../types";
+import {
+  EditData,
+  EditPostValidation,
+  GitState,
+  SnackAlert,
+} from "../types";
 
 export const emptyIndex: BlogIndex = {
   posts: {},
@@ -15,7 +19,6 @@ export const emptyEntry: PostData = {
   lastEdit: "",
   slug: "",
   path: "",
-  tags: [],
   tldr: "",
   title: "",
 };
@@ -44,3 +47,9 @@ export const defaultValidation: EditPostValidation = {
   slug: { err: false, msg: "" },
   tldr: { err: false, msg: "" },
 };
+
+export const defaultSnackAlert: SnackAlert = {
+  open: false,
+  msg: "",
+  severity: "info",
+}

@@ -29,6 +29,7 @@ export const AdminHome = (props: {
   const classes = useStyles();
 
   const [authToken, setAuthToken] = useState("");
+
   return (
     <div>
       {adminMode !== "invalid"
@@ -63,6 +64,7 @@ export const AdminHome = (props: {
         <Button
           id="register-auth-token"
           onClick={() => validateAuthToken(authToken)}
+          variant="contained"
         >
           Register
         </Button>
