@@ -86,6 +86,7 @@ export const AppSpeedDial = (props: {
   const handleRedirect = (to: string) => history.push(to)
 
   const update = async () => {
+    if (!validate()) return;
     const oldIndex = gitState?.index;
     const newIndex = JSON.parse(JSON.stringify(oldIndex))
     const data = [] as Array<{path: string, content: string}>;
