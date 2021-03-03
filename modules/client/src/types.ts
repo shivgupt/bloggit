@@ -16,3 +16,11 @@ export type SidebarNode = {
   current: string,
   child: any,
 }
+
+export type EditPostValidation = {
+  [entry: string]: {
+    err: boolean,
+    msg: string,
+    req: boolean,
+  }
+}

@@ -1,5 +1,5 @@
 import React from "react";
-import PropTypes from "prop-types";
+// import PropTypes from "prop-types";
 import { Link, NavLink } from "react-router-dom";
 
 let hashFragment = "";
@@ -89,12 +89,12 @@ export const NavHashLink = React.forwardRef((props, ref) => {
   return genericHashLink(props, NavLink, ref);
 });
 
-const propTypes = {
-  onClick: PropTypes.func,
-  children: PropTypes.node,
-  scroll: PropTypes.func,
-  to: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
-};
+// const propTypes = {
+//   onClick: PropTypes.func,
+//   children: PropTypes.node,
+//   scroll: PropTypes.func,
+//   to: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+// };
 
 //HashLink.propTypes = propTypes;
 //NavHashLink.propTypes = propTypes;

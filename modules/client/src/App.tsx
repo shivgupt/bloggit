@@ -27,6 +27,9 @@ import { AdminMode, GitState } from "./types";
 import { EditPost } from "./components/EditPost";
 import { AppSpeedDial } from "./components/AppSpeedDial";
 
+import { EditPostValidation } from "./types";
+import  { defaultValidation } from "./utils/constants";
+
 const useStyles = makeStyles((theme: Theme) => createStyles({
   appBarSpacer: theme.mixins.toolbar,
   root: {
@@ -55,6 +58,7 @@ const App: React.FC = () => {
   const [newPostData, setNewPostData] = useState(emptyEntry);
   const [newContent, setNewContent] = useState("");
   const [editMode, setEditMode] = useState(false);
+  const [validation, setValidation] = React.useState<EditPostValidation>(defaultValidation);
 
   const slugMatch = useRouteMatch("/:slug");
   const refMatch = useRouteMatch("/:ref/:slug");
@@ -171,6 +175,7 @@ const App: React.FC = () => {
                     content={newContent}
                     setPostData={setNewPostData}
                     setContent={setNewContent}
+                    validation={validation}
                   />
                   : <Home />
                 }}
@@ -196,6 +201,7 @@ const App: React.FC = () => {
                       content={newContent}
                       setPostData={setNewPostData}
                       setContent={setNewContent}
+                      validation={validation}
                     /> 
                   : <PostPage />
                 }}

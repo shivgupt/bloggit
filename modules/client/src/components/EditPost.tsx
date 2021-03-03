@@ -11,6 +11,8 @@ import ReactMde, { SaveImageHandler } from "react-mde";
 import "react-mde/lib/styles/css/react-mde-all.css";
 import axios from "axios";
 
+import { EditPostValidation } from "../types";
+
 import {
   CodeBlockRenderer,
   TextRenderer,
@@ -45,10 +47,11 @@ export const EditPost = (props: {
   postData: PostData,
   content: string,
   setPostData: any,
-  setContent: any
+  setContent: any,
+  validation: EditPostValidation
 }) => {
 
-  const { postData, content, setPostData, setContent } = props;
+  const { postData, content, setPostData, setContent, validation } = props;
 
   const classes = useStyles();
   const [selectedTab, setSelectedTab] = React.useState<"write" | "preview">("write");
@@ -88,13 +91,16 @@ export const EditPost = (props: {
   return (
     <Paper variant="outlined" className={classes.paper}>
       <div className={classes.root}>
-        {["title", "category", "slug", "tldr", "tags", "path"].map(name => (
+        {["title", "category", "slug", "tldr"].map(name => (
           <TextField
             key={`post_${name}`}
+            error={validation[name].err}
+            helperText={validation[name].msg}
             id={`post_${name}`}
             label={name}
             name={name}
             value={postData?.[name] || ""}
+            required={validation[name].req}
             fullWidth={fullWidth.includes(name)}
             onChange={handleChange}
           />

@@ -188,6 +188,7 @@ export const AppSpeedDial = (props: {
         open={open}
         className={classes.speedDial}
         icon={<Add/>}
+        // eslint-disable-next-line
         FabProps={{ref: (ref) => { dialButtonRef = ref }}}
       >
         {slug === ""
