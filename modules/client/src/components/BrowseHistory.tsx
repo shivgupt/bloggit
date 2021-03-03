@@ -77,15 +77,17 @@ export const BrowseHistory = (props: {
 
   useEffect(() => {
     if (!slug || slug === "admin") return;
+    let unmounted = false;
     (async () => {
       try {
         console.log(`Refreshing history bc slug changed to "${slug}"`);
-        setEditHistory(await fetchHistory(slug));
+        const history = await fetchHistory(slug);
+        if (!unmounted) setEditHistory(history);
       } catch (e) {
         console.warn(e.message);
-        setEditHistory([]);
       }
     })();
+    return () => { unmounted = true; };
   }, [slug]);
 
   return (
