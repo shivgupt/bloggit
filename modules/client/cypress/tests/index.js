@@ -8,6 +8,14 @@ describe("Blog Client", () => {
     my.enableAdmin();
   });
 
+  it(`should reject an invalid auth token`, () => {
+    cy.visit(`${Cypress.env("baseUrl")}/admin`);
+    cy.get(`input[type="text"]`).clear().type("invalid");
+    cy.contains("button", /register/i).click();
+    cy.contains("div", /NOT registered for admin access/i).should("exist")
+    cy.get(`div#fab > button`).should("not.exist");
+  });
+
   it(`should create, edit, and delete a new post`, () => {
     const slug = "test";
     my.createPost({

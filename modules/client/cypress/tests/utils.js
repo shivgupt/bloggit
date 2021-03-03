@@ -7,7 +7,6 @@ my.authenticate = () => {
   cy.get(`input[type="text"]`).clear().type("abc123");
   cy.contains("button", /register/i).click();
   cy.contains("div", /registered for admin access/i).should("exist")
-  cy.contains("button", /register/i).click();
   cy.get(`a[href="/"]`).click();
 };
 
