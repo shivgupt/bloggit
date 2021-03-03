@@ -8,6 +8,7 @@ export type Env = {
   domainname: string;
   email: string;
   ipfsUrl: string;
+  maxUploadSize: string;
   logLevel: string;
   mirrorKey: string;
   mirrorRef: string;
@@ -24,6 +25,7 @@ export const env: Env = {
   domainname: process?.env?.BLOG_DOMAINNAME || "localhost",
   email: process?.env?.BLOG_EMAIL || "noreply@localhost",
   ipfsUrl: process?.env?.IPFS_URL || "http://ipfs:5001",
+  maxUploadSize: process?.env?.BLOG_MAX_UPLOAD_SIZE || "100mb",
   logLevel: process?.env?.BLOG_LOG_LEVEL || "info",
   mirrorKey: process?.env?.BLOG_MIRROR_KEY || "",
   mirrorRef: process?.env?.BLOG_MIRROR_REF || "mirror",
