@@ -29,7 +29,7 @@ export const lightTheme = createMuiTheme({
       main: env.light.primary,
     },
     secondary: {
-      main: env.light.primary,
+      main: env.light.secondary,
     },
     type: "light",
   },

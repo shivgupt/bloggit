@@ -1,8 +1,15 @@
-import { PostData } from "../types";
+import { PostData } from "@blog/types";
 import emoji from "emoji-dictionary";
 
+export const slugify = (s: string) => s
+  .toLocaleLowerCase()
+  .replace(/[^a-z0-9 -]/g, "")
+  .replace(/\W+/g, "-")
+  .replace(/^-+/g, "")
+  .replace(/-+$/g, "");
+
 export const replaceEmojiString = (s: string) =>
- s.replace(/:\w+:/gi, name => emoji.getUnicode(name) || name);
+  s.replace(/:\w+:/gi, name => emoji.getUnicode(name) || name);
 
 export const prettyDateString = (s: string) => {
   let m: string, d: string, y: string;
@@ -64,7 +71,7 @@ export const getPostsByCategories = (posts: { [slug: string]: PostData }) => {
       } else {
         return ({
           ...categories,
-          ["top-level"]: [ ...(categories["top-level"] || []), post ]
+          "top-level": [ ...(categories["top-level"] || []), post ]
         })
       }
     }, {})

@@ -35,6 +35,7 @@ node_modules/
 # Logs
 *.log*
 package.json.lerna_backup
+modules/client/cypress/screenshots
 
 # OS
 .bash_history

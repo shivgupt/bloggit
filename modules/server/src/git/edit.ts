@@ -1,3 +1,4 @@
+import { EditRequest, EditResponse } from "@blog/types";
 import git from "isomorphic-git";
 
 import { env } from "../env";
@@ -5,7 +6,6 @@ import { logger, strToArray } from "../utils";
 
 import { pushToMirror } from "./push";
 import { gitOpts, resolveRef } from "./utils";
-import { EditRequest, EditResponse } from "./types";
 
 const log = logger.child({ module: "GitEdit" });
 

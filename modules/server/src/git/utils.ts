@@ -1,14 +1,28 @@
 import fs from "fs";
 import path from "path";
-import { Readable } from "stream";
 
 import git from "isomorphic-git";
 
 import { env } from "../env";
 
-import { GitCommit } from "./types";
-
 const gitdir = path.normalize(env.contentDir);
+
+type GitAuthor = {
+  name: string;
+  email: string;
+  timestamp: number;
+  timezoneOffset: number;
+};
+
+export type GitCommit = {
+  author: GitAuthor;
+  committer: GitAuthor;
+  gpgsig?: string;
+  message: string;
+  oid: string; // not standard
+  parent: string[];
+  tree: string;
+};
 
 export const gitOpts = { fs, dir: gitdir, gitdir };
 
@@ -21,16 +35,6 @@ export const resolveRef = async (givenRef: string): Promise<string> => {
     ref = await git.expandOid({ ...gitOpts, oid: givenRef });
   }
   return ref;
-};
-
-export const bufferToStream = (buf: Buffer): Readable => Readable.from(buf);
-export const streamToBuffer = (stream: Readable): Promise<Buffer> => {
-  const chunks = [];
-  return new Promise((resolve, reject) => {
-    stream.on("data", chunk => chunks.push(chunk));
-    stream.on("error", reject);
-    stream.on("end", () => resolve(Buffer.concat(chunks)));
-  });
 };
 
 export const getFileOid = async (ref: string, target: string): Promise<string | null> => {

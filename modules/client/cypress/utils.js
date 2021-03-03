@@ -2,23 +2,21 @@
 
 const my = {};
 
+my.goHome = () => cy.get(`a#go-home`).click()
+my.openDrawer = () => cy.get(`button#open-drawer`).click();
+my.closeDrawer = () => cy.get(`div[role="presentation"]`).first().click(10, 10);
+my.toggleAdminMode = () => cy.get(`label#toggle-admin-mode `).click();
+
 my.authenticate = () => {
   cy.visit(`${Cypress.env("baseUrl")}/admin`);
-  cy.get(`input[type="text"]`).clear().type("abc123");
-  cy.contains("button", /register/i).click();
+  cy.get(`input#admin-token`).clear().type("abc123");
+  cy.get("button#register-admin-token").click();
   cy.contains("div", /registered for admin access/i).should("exist")
-  cy.contains("button", /register/i).click();
-  cy.get(`a[href="/"]`).click();
-};
-
-my.enableAdmin = () => {
-  cy.get(`button[aria-label="open drawer"]`).click();
-  cy.get(`input[type="checkbox"]`).click();
-  cy.get(`div[role="presentation"]`).first().click(10, 10);
+  my.goHome();
 };
 
 my.enterPostData = (data) => {
-  for (const key of ["category", "path", "slug", "tags", "title", "tldr"]) {
+  for (const key of ["title", "category", "slug", "tldr"]) {
     if (typeof data[key] === "string") {
       if (data[key].length > 0) {
         cy.get(`input[name="${key}"]`).clear().type(data[key]);
@@ -36,35 +34,35 @@ my.enterPostData = (data) => {
   }
 };
 
-my.createPost = (data) => {
-  cy.get(`button#fab`).click();
-  my.enterPostData(data);
+my.publishPost = () => {
   cy.get(`div#fab > button`).click();
   cy.get(`button#fab-publish`).click();
-  cy.contains(`p`, data.content).should("exist");
-  cy.contains(`h2`, data.title).should("exist");
-  cy.location(`pathname`).should(`eq`, `/${data.slug}`)
-  cy.get(`a[href="/"]`).click();
-  cy.contains(`p`, data.tldr).should("exist");
-  cy.get(`button[aria-label="open drawer"]`).click();
-  cy.contains(`div[role="button"]`, data.category).should("exist");
-  cy.get(`div[role="presentation"]`).click(10, 10);
+};
+
+my.createPost = (data) => {
+  my.goHome();
+  cy.get(`button#fab`).click();
+  my.enterPostData(data);
+  my.publishPost();
+};
+
+my.discard = () => {
+  cy.get(`div#fab > button`).click();
+  cy.get(`button#fab-discard`).click();
+};
+
+my.saveChanges = () => {
+  cy.get(`div#fab > button`).click();
+  cy.get(`button#fab-save`).click(10, 10);
 };
 
 my.editPost = (data) => {
+  my.goHome();
   cy.get(`a[href="/${data.slug}"]`).click();
   cy.get(`button#fab`).dblclick(); // TODO: why do we need to dblclick here?
   my.enterPostData(data);
-  cy.get(`div#fab > button`).click();
-  cy.get(`button#fab-save`).click();
-  cy.contains(`p`, data.content).should("exist");
-  cy.contains(`h2`, data.title).should("exist");
-  cy.location(`pathname`).should(`eq`, `/${data.slug}`)
-  cy.get(`a[href="/"]`).click();
-  cy.contains(`p`, data.tldr).should("exist");
-  cy.get(`button[aria-label="open drawer"]`).click();
-  cy.contains(`div[role="button"]`, data.category).should("exist");
-  cy.get(`div[role="presentation"]`).click(10, 10);
+  my.saveChanges();
+  my.goHome();
 };
 
 my.archivePost = (slug) => {

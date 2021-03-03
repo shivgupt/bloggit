@@ -1,9 +1,13 @@
-import { PostData, PostIndex } from "../types";
+import { PostData, BlogIndex } from "@blog/types";
 
-export const emptyIndex: PostIndex = {
+import {
+  GitState,
+  SnackAlert,
+} from "../types";
+
+export const emptyIndex: BlogIndex = {
   posts: {},
   drafts: {},
-  about: "",
   title: "My Personal Website",
 };
 
@@ -13,11 +17,25 @@ export const emptyEntry: PostData = {
   lastEdit: "",
   slug: "",
   path: "",
-  tags: [],
   tldr: "",
   title: "",
+};
+
+export const initialGitState: GitState = {
+  currentContent: "Loading..",
+  currentRef: "",
+  index: emptyIndex,
+  indexEntry: emptyEntry,
+  latestRef: "",
+  slug: "",
 };
 
 export const dateOptions = { weekday: "long", year: "numeric", month: "long", day: "numeric" };
 
 export const timeOptions = { hour12: false, hour: "2-digit", minute: "2-digit" };
+
+export const defaultSnackAlert: SnackAlert = {
+  open: false,
+  msg: "",
+  severity: "info",
+}

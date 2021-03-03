@@ -1,12 +1,13 @@
+import { HistoryResponse } from "@blog/types";
+
 import { env } from "../env";
 import { logger } from "../utils";
 
 import { getCommit, getPrevCommits, getFileOid, slugToPath } from "./utils";
-import { HistoryResponse, DateString } from "./types";
 
 const log = logger.child({ module: "GitHistory" });
 
-const toISO = (secs: number): DateString => (new Date(secs * 1000)).toISOString();
+const toISO = (secs: number): string => (new Date(secs * 1000)).toISOString();
 
 // Timestamp MUST increase at every commit. If it doesn't, use the prev timestamp - 1 second
 const earliest = (current: number, _prev?: number): number => {

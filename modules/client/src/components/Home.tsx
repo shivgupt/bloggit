@@ -14,7 +14,7 @@ import { Link } from "react-router-dom";
 import { prettyDateString, replaceEmojiString } from "../utils";
 import { GitContext } from "../GitContext";
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
     alignContent: "center",
@@ -22,7 +22,7 @@ const useStyles = makeStyles(() => ({
   },
   card: {
     width: "100%",
-    height: "300px",
+    height: "420px",
   },
   wrapper: {
     width: "100%",
@@ -36,15 +36,20 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-export const Home = () => {
+export const Home = (props: { filter?: string, by?: string }) => {
+  const { filter, by } = props;
   const classes = useStyles();
   const gitContext = useContext(GitContext);
-  const posts = gitContext.gitState?.index?.posts || [];
+
+  const posts = gitContext.gitState?.index?.posts || {};
 
   return (
     <Grid container spacing={3} justify={"space-around"} alignItems={"center"}>
       {Object.keys(posts).map(slug => {
         if (!posts[slug].category) return null;
+        if (filter && by && posts[slug][filter] !== by) {
+          return null;
+        }
 
         const title = replaceEmojiString(posts[slug].title);
         const tldr = replaceEmojiString(posts[slug].tldr!);
@@ -64,17 +69,18 @@ export const Home = () => {
                 <CardContent>
                   <Typography variant="h5" gutterBottom>{title}</Typography>
                   <Typography variant="caption" gutterBottom display="block">
-                    {posts[slug].lastEdit ? prettyDateString(posts[slug].lastEdit!) : ""}
+                    {posts[slug].publishedOn ? prettyDateString(posts[slug].publishedOn!) : ""}
                     &nbsp;
-                    &nbsp;
-                    {posts[slug].tags
-                      ? <> Tags: {posts[slug].tags?.map(tag => <Chip key={tag} label={tag} />)} </>
-                      : null
-                    }
+                    <Chip
+                      label={posts[slug].category}
+                      component={Link}
+                      to={`/category/${posts[slug].category}`}
+                      clickable
+                    />
                   </Typography>
                   <br />
                   <Typography variant="subtitle1" component="p" gutterBottom>
-                    {tldr}
+                    {tldr.substr(0,140)}...
                   </Typography>
                 </CardContent>
               </CardActionArea>

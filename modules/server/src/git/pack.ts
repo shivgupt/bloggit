@@ -1,15 +1,24 @@
 import { spawn } from "child_process";
+import { Readable } from "stream";
 
 import { env } from "../env";
 import { logger } from "../utils";
 
-import { bufferToStream, streamToBuffer } from "./utils";
-
-const log = logger.child({ module: "GitBackend" });
+const log = logger.child({ module: "GitPack" });
 
 const regex = {
   "git-receive-pack": RegExp("([0-9a-fA-F]+) ([0-9a-fA-F]+) (refs/[^ \x00]+)( |00|\x00)|^(0000)$"),
   "git-upload-pack": /^\S+ ([0-9a-fA-F]+)/,
+};
+
+const bufferToStream = (buf: Buffer): Readable => Readable.from(buf);
+const streamToBuffer = (stream: Readable): Promise<Buffer> => {
+  const chunks = [];
+  return new Promise((resolve, reject) => {
+    stream.on("data", chunk => chunks.push(chunk));
+    stream.on("error", reject);
+    stream.on("end", () => resolve(Buffer.concat(chunks)));
+  });
 };
 
 export const execPackService = async (

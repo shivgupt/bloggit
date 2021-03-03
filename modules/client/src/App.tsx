@@ -1,31 +1,37 @@
 import {
   Container,
-  CssBaseline,
-  Theme,
   createStyles,
+  CssBaseline,
+  Fab,
   makeStyles,
+  Snackbar,
+  Theme,
   ThemeProvider,
 } from "@material-ui/core";
-import React, { useEffect, useState } from "react";
-import { Route, Switch, useRouteMatch} from "react-router-dom";
+import { Add, Edit } from "@material-ui/icons";
+import { Alert } from "@material-ui/lab";
 import axios from "axios";
+import React, { useEffect, useState } from "react";
+import { Route, Switch, useRouteMatch, useHistory } from "react-router-dom";
 
-import { Home } from "./components/Home";
 import { AdminHome } from "./components/AdminHome";
+import { EditPost } from "./components/EditPost";
+import { Home } from "./components/Home";
 import { NavBar } from "./components/NavBar";
 import { PostPage } from "./components/Posts";
+import { GitContext } from "./GitContext";
+import { darkTheme, lightTheme } from "./style";
+import { AdminMode, GitState, SnackAlert } from "./types";
 import {
+  defaultSnackAlert, 
   emptyEntry,
   fetchContent,
   fetchIndex,
   fetchRef,
+  initialGitState,
+  store,
 } from "./utils";
-import { darkTheme, lightTheme } from "./style";
-import { store } from "./utils/cache";
-import { GitContext } from "./GitContext";
-import { AdminMode, GitState } from "./types";
-import { EditPost } from "./components/EditPost";
-import { AppSpeedDial } from "./components/AppSpeedDial";
+
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
   appBarSpacer: theme.mixins.toolbar,
@@ -43,26 +49,37 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
     marginTop: theme.spacing(2),
     padding: theme.spacing(0.25),
   },
+  fab: {
+    position: "fixed",
+    bottom: theme.spacing(2),
+    [theme.breakpoints.up("md")]: {
+      right: "23%",
+    },
+    [theme.breakpoints.down("sm")]: {
+      right: theme.spacing(2),
+    },
+  },
 }));
 
 const App: React.FC = () => {
   const classes = useStyles();
 
-  const [gitState, setGitState] = useState({} as GitState);
+  const [gitState, setGitState] = useState(initialGitState);
   const [theme, setTheme] = useState(lightTheme);
   const [adminMode, setAdminMode] = useState<AdminMode>("invalid");
-
-  const [newPostData, setNewPostData] = useState(emptyEntry);
-  const [newContent, setNewContent] = useState("");
   const [editMode, setEditMode] = useState(false);
+  const [snackAlert, setSnackAlert] = useState<SnackAlert>(defaultSnackAlert);
 
+  const history = useHistory();
+  const categoryMatch = useRouteMatch("/category/:slug");
   const slugMatch = useRouteMatch("/:slug");
   const refMatch = useRouteMatch("/:ref/:slug");
-  const refParam = refMatch ? refMatch.params.ref : "";
-  const slugParam = refMatch ? refMatch.params.slug
+  const refParam = categoryMatch ? null : refMatch ? refMatch.params.ref : "";
+  const slugParam = categoryMatch ? null : refMatch ? refMatch.params.slug
     : slugMatch ? slugMatch.params.slug
     : "";
 
+  console.log(categoryMatch, slugMatch, refMatch)
   // console.log(`Rendering App with refParam=${refParam} and slugParam=${slugParam}`);
 
   const validateAuthToken = async (_authToken?: string) => {
@@ -73,17 +90,29 @@ const App: React.FC = () => {
           "authorization": `Basic ${btoa(`admin:${authToken}`)}`,
         },
         method: "post",
-        url: "git",
+        url: "/git",
       });
       // Auth is valid, update localStorage, axios header and adminMode
       store.save("authToken", authToken);
       axios.defaults.headers.common["authorization"] = `Basic ${btoa(`admin:${authToken}`)}`;
-      setAdminMode("disabled");
+      setSnackAlert({
+        open: true,
+        msg: "Auth token registered",
+        severity: "success",
+        hideDuration: 6000,
+      });
+      setAdminMode("enabled");
     } catch (e) {
       // Auth is invalid, update localStorage, axios header and adminMode
       console.error(`Auth token is not valid: ${e.message}`);
       store.save("authToken", "");
       axios.defaults.headers.common["authorization"] = `Basic ${btoa(`admin:`)}`;
+      setSnackAlert({
+        open: true,
+        msg: "Invalid Auth Token",
+        severity: "error",
+        hideDuration: 6000,
+      });
       setAdminMode("invalid");
     }
   }
@@ -99,8 +128,8 @@ const App: React.FC = () => {
     }
   };
 
-  const syncGitState = async (ref?: string, slug?: string) => {
-    const latestRef = await fetchRef();
+  const syncGitState = async (ref?: string, slug?: string, getLatest?: boolean) => {
+    const latestRef = (getLatest ? null : gitState.latestRef) || await fetchRef();
     const currentRef = ref || latestRef;
     const index = await fetchIndex(currentRef);
     const newGitState = {
@@ -114,11 +143,10 @@ const App: React.FC = () => {
       newGitState.currentContent = await fetchContent(slug, currentRef)
       newGitState.indexEntry = index.posts?.[slug] || index.drafts?.[slug];
     } else {
-      newGitState.currentContent = "Does Not Exist";
+      newGitState.currentContent = "";
       newGitState.indexEntry = emptyEntry;
     }
     setGitState(newGitState);
-
   }
 
   // Run this effect exactly once when the page initially loads
@@ -134,18 +162,12 @@ const App: React.FC = () => {
 
   // Fetch index & post content any time the url changes
   useEffect(() => {
-    setNewContent("");
-    setEditMode(false);
+    if (slugParam) {
+      setEditMode(false);
+    }
     syncGitState(refParam || gitState.latestRef, slugParam);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refParam, slugParam]);
-
-  useEffect(() => {
-    if (editMode) {
-      setNewContent(gitState.currentContent);
-      setNewPostData(gitState.indexEntry);
-    }
-  }, [editMode, gitState]);
 
   return (
     <ThemeProvider theme={theme}>
@@ -164,24 +186,21 @@ const App: React.FC = () => {
             <Switch>
               <Route exact
                 path="/"
-                render={() => {
-                  return editMode
-                  ? <EditPost
-                    postData={newPostData}
-                    content={newContent}
-                    setPostData={setNewPostData}
-                    setContent={setNewContent}
-                  />
-                  : <Home />
-                }}
+                render={() => (
+                  editMode
+                    ? <EditPost setEditMode={setEditMode} setSnackAlert={setSnackAlert} />
+                    : <Home />
+                )}
+              />
+              <Route exact
+                path="/category/:slug"
+                render={() => <Home filter="category" by={categoryMatch.params.slug} />}
               />
               <Route exact
                 path="/admin"
-                render={() => {
-                  return (
-                    <AdminHome adminMode={adminMode} validateAuthToken={validateAuthToken} />
-                  );
-                }}
+                render={() => (
+                  <AdminHome adminMode={adminMode} validateAuthToken={validateAuthToken} />
+                )}
               />
               <Route
                 path="/:ref/:slug"
@@ -191,27 +210,47 @@ const App: React.FC = () => {
                 path="/:slug"
                 render={() => {
                   return editMode
-                  ? <EditPost
-                      postData={newPostData}
-                      content={newContent}
-                      setPostData={setNewPostData}
-                      setContent={setNewContent}
-                    /> 
+                  ? <EditPost setEditMode={setEditMode} setSnackAlert={setSnackAlert} />
                   : <PostPage />
                 }}
               />
             </Switch>
-            {(adminMode === "enabled")
-            ? <AppSpeedDial
-                newContent={newContent}
-                newPostData={newPostData}
-                editMode={editMode}
-                setEditMode={setEditMode}
-              />
-            : null}
+            {(adminMode === "enabled" && !editMode)
+              ? (
+                  !gitState.slug
+                  || gitState.slug === "admin"
+                  || gitState.currentRef !== gitState.latestRef
+                )
+                  ? <Fab
+                      id={"fab"}
+                      className={classes.fab}
+                      color="primary"
+                      onClick={() => {
+                        setEditMode(true);
+                        history.push("/");
+                      }}
+                    ><Add/></Fab>
+
+                  : <Fab
+                      id={"fab"}
+                      className={classes.fab}
+                      color="primary"
+                      onClick={() => { setEditMode(true); }}
+                    ><Edit/></Fab>
+
+               : null}
           </Container>
         </main>
       </GitContext.Provider>
+      <Snackbar
+        id="snackbar"
+        open={snackAlert.open}
+        autoHideDuration={snackAlert.hideDuration}
+        onClose={() => setSnackAlert(defaultSnackAlert)}
+      >
+        <Alert severity={snackAlert.severity} action={snackAlert.action}>
+          {snackAlert.msg}</Alert>
+      </Snackbar>
     </ThemeProvider>
   );
 };
