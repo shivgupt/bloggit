@@ -16,7 +16,7 @@ import {
   Drafts,
   Public,
 } from "@material-ui/icons";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Markdown from "react-markdown";
 import ReactMde, { SaveImageHandler } from "react-mde";
 import "react-mde/lib/styles/css/react-mde-all.css";
@@ -34,7 +34,7 @@ import {
   LinkRenderer
 } from "./Renderers";
 import { ImageUploader } from "./ImageUploader";
-import { defaultValidation, slugify } from "../utils";
+import { defaultValidation, emptyEdit, slugify } from "../utils";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -75,21 +75,16 @@ const getPath = (post: PostData) => {
 };
 
 export const EditPost = (props: {
-  postData: PostData;
-  content: string;
-  setPostData: any;
-  setContent: any;
-  newContent: string;
-  newPostData: PostData;
   validation: EditPostValidation;
   setValidation: any;
   setEditMode: any;
 }) => {
   const {
-    postData, newPostData, newContent, content, setPostData,
-    setContent, validation, setValidation, setEditMode,
+    validation, setValidation, setEditMode,
   } = props;
 
+  const [newPostData, setNewPostData] = useState(emptyEdit);
+  const [newContent, setNewContent] = useState("");
   const [selectedTab, setSelectedTab] = React.useState<"write" | "preview">("write");
   const [open, setOpen] = useState(false);
   const classes = useStyles();
@@ -98,16 +93,23 @@ export const EditPost = (props: {
   const { gitState, syncGitState } = gitContext;
   const { currentContent, slug } = gitState;
 
+  useEffect(() => {
+    setNewContent(gitState.currentContent);
+    setNewPostData(gitState.indexEntry);
+    // On unmount, clear edit data
+    return () => setNewContent("");
+  }, [gitState]);
+
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setPostData({
-      ...postData,
+    setNewPostData({
+      ...newPostData,
       [e.target.name]: e.target.value
     });
   }
 
   const handleImageUpload = (value: string) => {
-    setPostData({
-      ...postData,
+    setNewPostData({
+      ...newPostData,
       img: value,
     });
   };
@@ -244,9 +246,9 @@ export const EditPost = (props: {
     <Paper variant="outlined" className={classes.paper}>
       <div className={classes.root}>
         {["title", "category", "slug", "tldr"].map(name => {
-          let value = postData?.[name] || "";
-          if (name === "slug" && postData?.[name] === null) {
-            value = slugify(postData?.title || "");
+          let value = newPostData?.[name] || "";
+          if (name === "slug" && newPostData?.[name] === null) {
+            value = slugify(newPostData?.title || "");
           }
           return (
             <TextField
@@ -265,13 +267,13 @@ export const EditPost = (props: {
         })}
         <Input
           id="post_img"
-          value={postData?.img || ""}
+          value={newPostData?.img || ""}
           endAdornment={ <ImageUploader setImageHash={handleImageUpload} /> }
         />
       </div>
       <ReactMde
-        value={content}
-        onChange={setContent}
+        value={newContent}
+        onChange={setNewContent}
         selectedTab={selectedTab}
         onTabChange={setSelectedTab}
         minEditorHeight={400}

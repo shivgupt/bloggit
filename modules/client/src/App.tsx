@@ -18,7 +18,6 @@ import { NavBar } from "./components/NavBar";
 import { PostPage } from "./components/Posts";
 import {
   emptyEntry,
-  emptyEdit,
   fetchContent,
   fetchIndex,
   fetchRef,
@@ -68,8 +67,6 @@ const App: React.FC = () => {
   const [theme, setTheme] = useState(lightTheme);
   const [adminMode, setAdminMode] = useState<AdminMode>("invalid");
 
-  const [newPostData, setNewPostData] = useState(emptyEdit);
-  const [newContent, setNewContent] = useState("");
   const [editMode, setEditMode] = useState(false);
   const [validation, setValidation] = React.useState<EditPostValidation>(defaultValidation);
 
@@ -152,20 +149,12 @@ const App: React.FC = () => {
 
   // Fetch index & post content any time the url changes
   useEffect(() => {
-    setNewContent("");
     if (slugParam) {
       setEditMode(false);
     }
     syncGitState(refParam || gitState.latestRef, slugParam);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refParam, slugParam]);
-
-  useEffect(() => {
-    if (editMode) {
-      setNewContent(gitState.currentContent);
-      setNewPostData(gitState.indexEntry);
-    }
-  }, [editMode, gitState]);
 
   return (
     <ThemeProvider theme={theme}>
@@ -187,15 +176,9 @@ const App: React.FC = () => {
                 render={() => (
                   editMode
                     ? <EditPost
-                        postData={newPostData}
                         setEditMode={setEditMode}
-                        newPostData={newPostData}
-                        content={newContent}
-                        newContent={newContent}
-                        setPostData={setNewPostData}
-                        setContent={setNewContent}
-                        validation={validation}
                         setValidation={setValidation}
+                        validation={validation}
                       />
                     : <Home />
                 )}
@@ -216,14 +199,8 @@ const App: React.FC = () => {
                   return editMode
                   ? <EditPost
                       setEditMode={setEditMode}
-                      postData={newPostData}
-                      newPostData={newPostData}
-                      content={newContent}
-                      newContent={newContent}
-                      setPostData={setNewPostData}
-                      setContent={setNewContent}
-                      validation={validation}
                       setValidation={setValidation}
+                      validation={validation}
                     /> 
                   : <PostPage />
                 }}
@@ -250,7 +227,10 @@ const App: React.FC = () => {
                       id={"fab"}
                       className={classes.fab}
                       color="primary"
-                      onClick={() => { setEditMode(true); setValidation(defaultValidation)}}
+                      onClick={() => {
+                        setEditMode(true);
+                        setValidation(defaultValidation);
+                      }}
                     ><Edit/></Fab>
 
                : null}
