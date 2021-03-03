@@ -21,6 +21,5 @@ export type EditPostValidation = {
   [entry: string]: {
     err: boolean,
     msg: string,
-    req: boolean,
   }
 }

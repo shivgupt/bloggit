@@ -21,6 +21,7 @@ import {
   LinkRenderer
 } from "./Renderers";
 import { ImageUploader } from "./ImageUploader";
+import { slugify } from "../utils";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -88,23 +89,36 @@ export const EditPost = (props: {
   };
 
   const fullWidth = ["title", "tldr"];
+  const required = ["title"];
   return (
     <Paper variant="outlined" className={classes.paper}>
       <div className={classes.root}>
-        {["title", "category", "slug", "tldr"].map(name => (
-          <TextField
-            key={`post_${name}`}
-            error={validation[name].err}
-            helperText={validation[name].msg}
-            id={`post_${name}`}
-            label={name}
-            name={name}
-            value={postData?.[name] || ""}
-            required={validation[name].req}
-            fullWidth={fullWidth.includes(name)}
-            onChange={handleChange}
-          />
-        ))}
+        {["title", "category", "slug", "tldr"].map(name => {
+          let value;
+          if (name === "slug" && postData.slug === "") {
+            console.log("if")
+            value = slugify(postData?.title || "");
+          }
+          else {
+            console.log("else")
+            value = postData?.[name] || "";
+          }
+
+          return (
+            <TextField
+              key={`post_${name}`}
+              error={validation[name].err}
+              helperText={validation[name].msg}
+              id={`post_${name}`}
+              label={name}
+              name={name}
+              value={value}
+              required={required.includes(name)}
+              fullWidth={fullWidth.includes(name)}
+              onChange={handleChange}
+            />
+          )
+        })}
         <Input
           id="post_img"
           value={postData?.img || ""}

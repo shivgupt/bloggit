@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { PostData } from "@blog/types";
 import { makeStyles, Fab, Theme } from "@material-ui/core"
 import {
@@ -16,11 +16,15 @@ import { useHistory } from "react-router-dom";
 import axios from "axios";
 
 import { GitContext } from "../GitContext";
+import { EditPostValidation } from "../types";
+import { defaultValidation, slugify } from "../utils";
 
 const getPath = (post: PostData) => {
   if (post?.path) return post.path;
   if (post?.category) return `${post.category}/${post.slug}.md`;
-  return `${post.slug}.md`;
+  if (post?.slug) return `${post.slug}.md`;
+
+  return `${slugify(post?.title)}.md`;
 };
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -41,9 +45,10 @@ export const AppSpeedDial = (props: {
   newPostData: PostData,
   editMode: boolean,
   setEditMode: (val: boolean) => void,
+  setValidation: (val: EditPostValidation) => void
 }) => {
 
-  const { editMode, setEditMode, newContent, newPostData } = props;
+  const { editMode, setEditMode, newContent, newPostData, setValidation } = props;
 
   const history = useHistory();
   const [open, setOpen] = useState(false);
@@ -55,6 +60,28 @@ export const AppSpeedDial = (props: {
   const readOnly = gitState.currentRef !== gitState.latestRef;
 
   let dialButtonRef;
+
+  const validate = (): boolean => {
+    const invalidSlug = /[^a-z0-9-]/;
+    const newValidation = JSON.parse(JSON.stringify(defaultValidation));
+    console.log(newPostData)
+    let valid = true;
+
+    // Validate Post Title
+    if (newPostData.title === "") {
+      newValidation.title = { err: true, msg: "Required" };
+      valid = false;
+    }
+
+    // Validate Post Slug
+    if (newPostData.slug.toLowerCase().match(invalidSlug)?.length) {
+      newValidation.slug = { err: true, msg: "Slug should only contain a-z, 0-9 and -" };
+      valid = false;
+    }
+
+    setValidation(newValidation);
+    return valid;
+  };
 
   const handleRedirect = (to: string) => history.push(to)
 
@@ -109,20 +136,24 @@ export const AppSpeedDial = (props: {
 
   const createNew = async (as: "drafts" | "posts") => {
     // create new index.json entry
+    if (!validate()) return;
     const newIndex = JSON.parse(JSON.stringify(gitState?.index));
 
     const path = getPath(newPostData);
+    const newPostSlug = newPostData.slug || slugify(newPostData.title);
 
     if (as === "drafts") {
       if (!newIndex.drafts) newIndex.drafts = {};
-      newIndex.drafts[newPostData.slug] = {
+      newIndex.drafts[newPostSlug] = {
         ...newPostData,
+        slug: newPostSlug,
         lastEdit: (new Date()).toLocaleDateString("en-in"),
       };
     } else {
       if (!newIndex.posts) newIndex.posts = {};
-      newIndex.posts[newPostData.slug] = {
+      newIndex.posts[newPostSlug] = {
         ...newPostData,
+        slug: newPostSlug,
         lastEdit: (new Date()).toLocaleDateString("en-in"),
         publishedOn: (new Date()).toLocaleDateString("en-in"),
       };
@@ -145,8 +176,8 @@ export const AppSpeedDial = (props: {
     });
     if (res && res.status === 200 && res.data) {
       setEditMode(false);
-      await syncGitState(res.data.commit?.substring(0, 8), newPostData.slug);
-      handleRedirect(`/${newPostData.slug}`)
+      await syncGitState(res.data.commit?.substring(0, 8), newPostSlug);
+      handleRedirect(`/${newPostSlug}`)
     } else {
       console.error(`Something went wrong`, res);
     }

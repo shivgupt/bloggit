@@ -213,7 +213,6 @@ const App: React.FC = () => {
                 newPostData={newPostData}
                 editMode={editMode}
                 setEditMode={setEditMode}
-                validation={validation}
                 setValidation={setValidation}
               />
             : null}

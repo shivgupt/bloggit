@@ -23,8 +23,8 @@ export const dateOptions = { weekday: "long", year: "numeric", month: "long", da
 export const timeOptions = { hour12: false, hour: "2-digit", minute: "2-digit" };
 
 export const defaultValidation: EditPostValidation = {
-  title: { err: false, msg: "", req: true },
-  category: { err: false, msg: "", req: false },
-  slug: { err: false, msg: "", req: true },
-  tldr: { err: false, msg: "", req: false },
+  title: { err: false, msg: "" },
+  category: { err: false, msg: "" },
+  slug: { err: false, msg: "" },
+  tldr: { err: false, msg: "" },
 };

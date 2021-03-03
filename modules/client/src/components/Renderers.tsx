@@ -5,7 +5,7 @@ import React from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { atomDark, vs } from "react-syntax-highlighter/dist/esm/styles/prism";
 
-import { getChildValue, replaceEmojiString } from "../utils";
+import { getChildValue, replaceEmojiString, slugify } from "../utils";
 
 import { HashLink } from "./HashLink";
 
@@ -60,7 +60,7 @@ export const HeadingRenderer = (props: any) => {
     return null;
   }
 
-  const slug = value.toLowerCase().replace(/[^a-z0-9 ]/g, "").replace(/\W+/g, "-");
+  const slug = slugify(value)
 
   return React.createElement(
     `h${props.level}`,
