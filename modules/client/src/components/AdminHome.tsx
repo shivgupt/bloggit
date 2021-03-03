@@ -60,7 +60,12 @@ export const AdminHome = (props: {
           variant="outlined"
         />
 
-        <Button onClick={() => validateAuthToken(authToken)}> Register </Button>
+        <Button
+          id="register-auth-token"
+          onClick={() => validateAuthToken(authToken)}
+        >
+          Register
+        </Button>
       </div>
 
       <Divider variant="middle" />
