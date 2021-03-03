@@ -2,10 +2,6 @@ import { BlogIndex, PostData } from "@blog/types";
 
 export type AdminMode = "invalid" | "enabled" | "disabled";
 
-export type EditData = PostData & {
-  slug: string | null;
-}
-
 export type GitState = {
   currentContent: string;
   currentRef: string;
@@ -19,13 +15,6 @@ export type SidebarNode = {
   parent: string,
   current: string,
   child: any,
-}
-
-export type EditPostValidation = {
-  [entry: string]: {
-    err: boolean,
-    msg: string,
-  }
 }
 
 export type SnackAlert = {

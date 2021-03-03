@@ -26,8 +26,8 @@ import ReactMde, { SaveImageHandler } from "react-mde";
 import { useHistory } from "react-router-dom";
 
 import { GitContext } from "../GitContext";
-import { EditPostValidation, SnackAlert } from "../types";
-import { defaultValidation, emptyEdit, slugify } from "../utils";
+import { SnackAlert } from "../types";
+import { emptyEntry, slugify } from "../utils";
 
 import {
   CodeBlockRenderer,
@@ -37,6 +37,29 @@ import {
   LinkRenderer
 } from "./Renderers";
 import { ImageUploader } from "./ImageUploader";
+
+type EditData = PostData & {
+  slug: string | null;
+  displaySlug: string
+}
+const emptyEdit = {
+  ...(emptyEntry as any),
+  slug: null,
+  displaySlug: "",
+} as EditData;
+
+type EditPostValidation = {
+  hasError: boolean;
+  errs: { [entry: string]: string; }
+}
+
+const defaultValidation: EditPostValidation = {
+  hasError: false,
+  errs: {
+    title: "",
+    slug: "",
+  }
+};
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -82,10 +105,10 @@ export const EditPost = (props: {
 }) => {
   const { setEditMode, setSnackAlert } = props;
 
-  const [validation, setValidation] = React.useState<EditPostValidation>(defaultValidation);
-  const [newPostData, setNewPostData] = useState(emptyEdit);
+  const [validation, setValidation] = useState<EditPostValidation>(defaultValidation);
+  const [newPostData, setNewPostData] = useState<EditData>(emptyEdit);
   const [newContent, setNewContent] = useState("");
-  const [selectedTab, setSelectedTab] = React.useState<"write" | "preview">("write");
+  const [selectedTab, setSelectedTab] = useState<"write" | "preview">("write");
   const [open, setOpen] = useState(false);
   const classes = useStyles();
   const history = useHistory();
@@ -93,13 +116,14 @@ export const EditPost = (props: {
   const { gitState, syncGitState } = gitContext;
   const { currentContent, slug } = gitState;
 
+  // This should only run once before this component is unmounted
   useEffect(() => {
     // On mount, set initial data to edit
-    setValidation(defaultValidation);
     if (gitState.slug) {
       setNewContent(gitState.currentContent);
-      setNewPostData(gitState.indexEntry);
+      setNewPostData({ ...gitState.indexEntry, displaySlug: "" });
     }
+    setValidation(defaultValidation);
     // On unmount, clear edit data
     return () => {
       setNewContent("");
@@ -108,10 +132,20 @@ export const EditPost = (props: {
   }, [gitState]); // gitState will only be updated after turning editMode off
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setNewPostData({
-      ...newPostData,
-      [e.target.name]: e.target.value
-    });
+    const updatedPostData = { ...newPostData, [e.target.name]: e.target.value } as EditData;
+    updatedPostData.displaySlug = updatedPostData.slug === null
+      ? slugify(updatedPostData?.title || "")
+      : updatedPostData.slug;
+    const titleErr =
+      !updatedPostData.title ? "Title is required"
+      : "";
+    const slugErr =
+      !updatedPostData.displaySlug ? "Slug is required"
+      : updatedPostData.displaySlug.match(/[^a-z0-9-]/) ? "Slug should only contain a-z, 0-9 and -"
+      : "";
+    const hasError = !!(slugErr || titleErr);
+    setValidation({ errs: { title: titleErr, slug: slugErr }, hasError});
+    setNewPostData(updatedPostData);
   }
 
   const handleImageUpload = (value: string) => {
@@ -121,7 +155,7 @@ export const EditPost = (props: {
     });
   };
 
-  const save: SaveImageHandler = async function*(data: ArrayBuffer) {
+  const saveImage: SaveImageHandler = async function*(data: ArrayBuffer) {
     let res = await axios({
       method: "POST",
       url: "ipfs",
@@ -137,27 +171,8 @@ export const EditPost = (props: {
     return true;
   };
 
-  const validate = (): boolean => {
-    const invalidSlug = /[^a-z0-9-]/;
-    const newValidation = JSON.parse(JSON.stringify(defaultValidation));
-    console.log(newPostData)
-    let valid = true;
-    // Validate Post Title
-    if (newPostData.title === "") {
-      newValidation.title = { err: true, msg: "Required" };
-      valid = false;
-    }
-    // Validate Post Slug
-    if (newPostData.slug.toLowerCase().match(invalidSlug)?.length) {
-      newValidation.slug = { err: true, msg: "Slug should only contain a-z, 0-9 and -" };
-      valid = false;
-    }
-    setValidation(newValidation);
-    return valid;
-  };
-
   const update = async () => {
-    if (!validate()) {
+    if (validation.hasError) {
       setSnackAlert({
         open: true,
         msg: "Please enter valid post details",
@@ -178,8 +193,9 @@ export const EditPost = (props: {
     const oldPath = getPath(oldIndex[key][slug]);
     newIndex[key][slug] = {
       ...newPostData,
+      displaySlug: undefined,
       lastEdit: (new Date()).toLocaleDateString("en-in"),
-    };
+    } as PostData;
     if (currentContent === newContent
       && JSON.stringify(newIndex[key][slug]) === JSON.stringify(oldIndex[key][slug])
     ) {
@@ -206,8 +222,7 @@ export const EditPost = (props: {
   }
 
   const createNew = async (as: "drafts" | "posts") => {
-    // create new index.json entry
-    if (!validate()) {
+    if (validation.hasError) {
       setSnackAlert({
         open: true,
         msg: "Please enter valid post details",
@@ -217,22 +232,24 @@ export const EditPost = (props: {
     }
     const newIndex = JSON.parse(JSON.stringify(gitState?.index));
     const path = getPath(newPostData);
-    const newPostSlug = newPostData.slug || slugify(newPostData.title);
+    const newPostSlug = newPostData.slug || newPostData.displaySlug;
     if (as === "drafts") {
       if (!newIndex.drafts) newIndex.drafts = {};
       newIndex.drafts[newPostSlug] = {
         ...newPostData,
-        slug: newPostSlug,
+        displaySlug: undefined,
         lastEdit: (new Date()).toLocaleDateString("en-in"),
-      };
+        slug: newPostSlug,
+      } as PostData;
     } else {
       if (!newIndex.posts) newIndex.posts = {};
       newIndex.posts[newPostSlug] = {
         ...newPostData,
-        slug: newPostSlug,
+        displaySlug: undefined,
         lastEdit: (new Date()).toLocaleDateString("en-in"),
         publishedOn: (new Date()).toLocaleDateString("en-in"),
-      };
+        slug: newPostSlug,
+      } as PostData;
     }
     // Send request to update index.json and create new file
     let res = await axios({
@@ -259,7 +276,7 @@ export const EditPost = (props: {
     }
   };
 
-  let dialButtonRef;
+  // let dialButtonRef;
 
   const discardConfirm = () => {
     setSnackAlert({
@@ -278,34 +295,32 @@ export const EditPost = (props: {
     });
   };
 
-  const fullWidth = ["title", "tldr"];
-  const required = ["title"];
   return (<>
     <Paper variant="outlined" className={classes.paper}>
       <div className={classes.root}>
         {["title", "category", "slug", "tldr"].map(name => {
           let value = newPostData?.[name] || "";
           if (name === "slug" && newPostData?.[name] === null) {
-            value = slugify(newPostData?.title || "");
-            console.log(`Using slugified title: ${value}`);
+            value = newPostData.displaySlug;
           }
           return (
             <TextField
-              key={`post_${name}`}
-              error={validation[name].err}
-              helperText={validation[name].msg}
-              id={`post_${name}`}
+              autoComplete={"off"}
+              error={!!validation.errs[name]}
+              fullWidth={["title", "tldr"].includes(name)}
+              helperText={validation.errs[name]}
+              id={`edit_${name}`}
+              key={`edit_${name}`}
               label={name}
               name={name}
-              value={value}
-              required={required.includes(name)}
-              fullWidth={fullWidth.includes(name)}
               onChange={handleChange}
+              required={["title"].includes(name)}
+              value={value}
             />
           )
         })}
         <Input
-          id="post_img"
+          id="edit_img"
           value={newPostData?.img || ""}
           endAdornment={ <ImageUploader setImageHash={handleImageUpload} /> }
         />
@@ -330,9 +345,7 @@ export const EditPost = (props: {
               }}
             />
           )}
-        paste={{
-          saveImage: save
-        }}
+        paste={{ saveImage }}
       />
     </Paper>
     <SpeedDial
@@ -344,7 +357,7 @@ export const EditPost = (props: {
       className={classes.speedDial}
       icon={slug ? <Edit/> : <Add/>}
       // eslint-disable-next-line
-      FabProps={{ref: (ref) => { dialButtonRef = ref }}}
+      // FabProps={{ref: (ref) => { dialButtonRef = ref }}}
     >
       {slug === ""
         ?  ([<SpeedDialAction

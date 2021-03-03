@@ -1,8 +1,6 @@
 import { PostData, BlogIndex } from "@blog/types";
 
 import {
-  EditData,
-  EditPostValidation,
   GitState,
   SnackAlert,
 } from "../types";
@@ -23,11 +21,6 @@ export const emptyEntry: PostData = {
   title: "",
 };
 
-export const emptyEdit = {
-  ...(emptyEntry as any),
-  slug: null,
-} as EditData;
-
 export const initialGitState: GitState = {
   currentContent: "Loading..",
   currentRef: "",
@@ -40,13 +33,6 @@ export const initialGitState: GitState = {
 export const dateOptions = { weekday: "long", year: "numeric", month: "long", day: "numeric" };
 
 export const timeOptions = { hour12: false, hour: "2-digit", minute: "2-digit" };
-
-export const defaultValidation: EditPostValidation = {
-  title: { err: false, msg: "" },
-  category: { err: false, msg: "" },
-  slug: { err: false, msg: "" },
-  tldr: { err: false, msg: "" },
-};
 
 export const defaultSnackAlert: SnackAlert = {
   open: false,
