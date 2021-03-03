@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import { 
   Button,
   Divider,
@@ -7,7 +7,6 @@ import {
   Theme,
   Typography,
 } from "@material-ui/core";
-import axios from "axios";
 
 import { IndexEditor } from "./IndexEditor";
 import { AdminMode } from "../types";

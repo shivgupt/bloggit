@@ -100,8 +100,8 @@ const App: React.FC = () => {
     }
   };
 
-  const syncGitState = async (ref?: string, slug?: string) => {
-    const latestRef = await fetchRef();
+  const syncGitState = async (ref?: string, slug?: string, getLatest?: boolean) => {
+    const latestRef = (getLatest ? null : gitState.latestRef) || await fetchRef();
     const currentRef = ref || latestRef;
     const index = await fetchIndex(currentRef);
     const newGitState = {
@@ -119,7 +119,6 @@ const App: React.FC = () => {
       newGitState.indexEntry = emptyEntry;
     }
     setGitState(newGitState);
-
   }
 
   // Run this effect exactly once when the page initially loads

@@ -1,4 +1,4 @@
-import { Button, Grid, Tooltip, Typography, withStyles } from "@material-ui/core";
+import { Button, Tooltip, Typography, withStyles } from "@material-ui/core";
 import { FileCopy as CopyIcon, Done as CopiedIcon } from "@material-ui/icons";
 import React, { useState } from "react";
 import { CopyToClipboard } from "react-copy-to-clipboard";

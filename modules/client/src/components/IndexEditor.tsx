@@ -60,7 +60,7 @@ export const IndexEditor = () => {
     ],
       headers: { "content-type": "application/json" }
     });
-    gitContext.syncGitState();
+    await gitContext.syncGitState(undefined, undefined, true);
   };
 
   const handlePublish = async (slug: string) => {
@@ -79,7 +79,7 @@ export const IndexEditor = () => {
     ],
       headers: { "content-type": "application/json" }
     });
-    gitContext.syncGitState();
+    await gitContext.syncGitState(undefined, undefined, true);
   };
 
   return (
