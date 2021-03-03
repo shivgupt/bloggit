@@ -18,6 +18,9 @@ const useStyles = makeStyles((theme: Theme) => ({
       margin: theme.spacing(1),
     }
   },
+  button: {
+    marginTop: theme.spacing(2)
+  },
 }));
 
 export const AdminHome = (props: {
@@ -52,17 +55,19 @@ export const AdminHome = (props: {
       <Divider variant="middle" />
       <div className={classes.section}>
         <TextField
-          id="auth-token"
-          label="Auth Token"
-          placeholder="AUTH-TOKEN"
-          helperText="Register device with New AUTH TOKEN"
-          value={authToken}
+          autoComplete={"off"}
+          helperText="Register device by providing the admin token"
+          id="admin-token"
+          label="Admin Token"
           onChange={(e) => setAuthToken(e.target.value)}
+          placeholder="Admin Token"
+          value={authToken}
           variant="outlined"
         />
 
         <Button
-          id="register-auth-token"
+          className={classes.button}
+          id="register-admin-token"
           onClick={() => validateAuthToken(authToken)}
           variant="contained"
         >
@@ -75,7 +80,7 @@ export const AdminHome = (props: {
         ? (<div className={classes.section}>
           <IndexEditor />
         </div>)
-        : <>Supply a valid auth token to activate admin mode</>
+        : <>Supply a valid admin token to activate admin mode</>
       }
     </div>
   );

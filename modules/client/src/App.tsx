@@ -236,6 +236,7 @@ const App: React.FC = () => {
         </main>
       </GitContext.Provider>
       <Snackbar
+        id="snackbar"
         open={snackAlert.open}
         autoHideDuration={snackAlert.hideDuration}
         onClose={() => setSnackAlert(defaultSnackAlert)}

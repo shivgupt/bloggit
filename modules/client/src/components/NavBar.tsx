@@ -86,8 +86,20 @@ const DrawerContent = (props: any) => {
       </IconButton>
       { adminMode !== "invalid" ?
         <>
-          <Box textAlign="center" m={1}> 
+          <Box textAlign="center" m={1}>
+
+            <IconButton
+              id="go-to-admin-page"
+              component={Link}
+              edge="start"
+              to={"/admin"}
+              color="inherit"
+            >
+              <AdminAccount />
+            </IconButton>
+
             <FormControlLabel
+              id="toggle-admin-mode"
               control={
                 <Switch
                   size="small"
@@ -98,18 +110,12 @@ const DrawerContent = (props: any) => {
                   }}
                 />
               }
-              label="Admin"
-              labelPlacement="end"
-            /> 
+              label="Admin Mode"
+              labelPlacement="start"
+            />
+
           </Box>
-          <IconButton
-            component={Link}
-            edge="start"
-            to={"/admin"}
-            color="inherit"
-          >
-            <AdminAccount />
-          </IconButton>
+
         </>
         : null
       }
@@ -150,6 +156,7 @@ export const NavBar = (props: any) => {
       <AppBar position="fixed" className={classes.appBar}>
         <Toolbar>
           <IconButton
+            id="go-home"
             component={Link}
             edge="start"
             to={"/"}
@@ -170,6 +177,7 @@ export const NavBar = (props: any) => {
           </Typography>
           <Hidden mdUp>
             <IconButton
+              id="open-drawer"
               edge="start"
               color="inherit"
               aria-label="open drawer"

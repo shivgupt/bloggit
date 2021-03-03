@@ -217,15 +217,15 @@ export const EditPost = (props: {
       url: "git/edit",
     });
     if (res && res.status === 200 && res.data) {
-      setEditMode(false);
       await syncGitState(res.data.commit?.substring(0, 8), gitState.slug, true);
+      setEditMode(false);
       // TODO: redirect to new slug if it changed
     } else {
       console.error(`Something went wrong`, res);
     }
   }
 
-  const createNew = async (asDraft?: boolean) => {
+  const saveChanges = async (asDraft?: boolean) => {
     if (validation.hasError) {
       setSnackAlert({ open: true, msg: "Please enter valid post details", severity: "error" });
       return;
@@ -239,6 +239,7 @@ export const EditPost = (props: {
     const newPostSlug = editData.slug || editData.displaySlug;
     const now = (new Date()).toLocaleDateString("en-in");
     const newIndexEntry = {
+      ...gitState.indexEntry,
       category: editData.category,
       img: editData.img,
       lastEdit: now,
@@ -249,10 +250,12 @@ export const EditPost = (props: {
     if (asDraft === true) {
       if (!newIndex.drafts) newIndex.drafts = {};
       newIndex.drafts[newPostSlug] = newIndexEntry;
+      if (newIndex.posts?.[newPostSlug]) delete newIndex.posts[newPostSlug];
     } else {
       if (!newIndex.posts) newIndex.posts = {};
       newIndex.posts[newPostSlug] = newIndexEntry;
-      newIndex.posts[newPostSlug].publishedOn = now;
+      newIndex.posts[newPostSlug].publishedOn = newIndexEntry.publishedOn || now;
+      if (newIndex.drafts?.[newPostSlug]) delete newIndex.drafts[newPostSlug];
     }
     // Send request to update index.json and create new file
     let res = await axios({
@@ -265,8 +268,8 @@ export const EditPost = (props: {
       headers: { "content-type": "application/json" }
     });
     if (res && res.status === 200 && res.data) {
-      setEditMode(false);
       await syncGitState(res.data.commit?.substring(0, 8), newPostSlug, true);
+      setEditMode(false);
       history.push(`/${newPostSlug}`)
     } else {
       console.error(`Something went wrong`, res);
@@ -368,14 +371,14 @@ export const EditPost = (props: {
             FabProps={{id: "fab-draft"}}
             icon={<Drafts />}
             key="fab-draft"
-            onClick={() => createNew(true)}
+            onClick={() => saveChanges(true)}
             tooltipTitle="Save As Draft"
           />,
           <SpeedDialAction
             FabProps={{id: "fab-publish"}}
             icon={<Public />}
             key="fab-publish"
-            onClick={() => createNew()}
+            onClick={() => saveChanges()}
             tooltipTitle="Publish"
           />])
         : ([<SpeedDialAction
