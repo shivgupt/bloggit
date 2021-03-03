@@ -38,33 +38,6 @@ import {
 } from "./Renderers";
 import { ImageUploader } from "./ImageUploader";
 
-type EditData = PostData & {
-  slug: string | null;
-  displaySlug: string;
-  content: string;
-}
-const emptyEdit = {
-  ...(emptyEntry as any),
-  slug: null,
-  displaySlug: "",
-  content: "",
-} as EditData;
-
-type EditPostValidation = {
-  hasError: boolean;
-  hasChanged: boolean;
-  errs: { [entry: string]: string; }
-}
-
-const defaultValidation: EditPostValidation = {
-  hasError: false,
-  hasChanged: false,
-  errs: {
-    title: "",
-    slug: "",
-  }
-};
-
 const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
@@ -96,6 +69,32 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+type EditData = PostData & {
+  slug: string | null;
+  displaySlug: string;
+  content: string;
+}
+const emptyEdit = {
+  ...(emptyEntry as any),
+  slug: null,
+  displaySlug: "",
+  content: "",
+} as EditData;
+
+type EditPostValidation = {
+  hasError: boolean;
+  hasChanged: boolean;
+  errs: { [entry: string]: string; }
+}
+const defaultValidation: EditPostValidation = {
+  hasError: false,
+  hasChanged: false,
+  errs: {
+    title: "",
+    slug: "",
+  }
+};
+
 const getPath = (post: PostData) => {
   if (post?.path) return post.path;
   if (post?.category) return `${post.category}/${post.slug}.md`;
@@ -104,21 +103,20 @@ const getPath = (post: PostData) => {
 };
 
 export const EditPost = (props: {
-  setEditMode: any;
+  setEditMode: (editMode: boolean) => void;
   setSnackAlert: (snackAlert: SnackAlert) => void;
 }) => {
   const { setEditMode, setSnackAlert } = props;
+
+  const classes = useStyles();
+  const history = useHistory();
+  const { gitState, syncGitState } = useContext(GitContext);
 
   const [validation, setValidation] = useState<EditPostValidation>(defaultValidation);
   const [editData, setEditData] = useState<EditData>(emptyEdit);
   const [originalEditData, setOriginalEditData] = useState<EditData>(emptyEdit);
   const [selectedTab, setSelectedTab] = useState<"write" | "preview">("write");
   const [open, setOpen] = useState(false);
-  const classes = useStyles();
-  const history = useHistory();
-  const gitContext = useContext(GitContext);
-  const { gitState, syncGitState } = gitContext;
-  const { currentContent, slug } = gitState;
 
   // This should only run once when this component is unmounted
   useEffect(() => {
@@ -190,26 +188,23 @@ export const EditPost = (props: {
     }
     const oldIndex = gitState?.index;
     const newIndex = JSON.parse(JSON.stringify(oldIndex))
-    const data = [] as Array<{path: string, content: string}>;
     let key;
-    if (oldIndex?.posts?.[slug]) {
+    if (oldIndex?.posts?.[gitState.slug]) {
       key = "posts";
     } else {
       key = "drafts";
     }
-    newIndex[key][slug] = {
-      ...editData,
-      displaySlug: undefined,
+    newIndex[key][gitState.slug] = {
+      category: editData.category,
+      img: editData.img,
       lastEdit: (new Date()).toLocaleDateString("en-in"),
+      slug: editData.slug,
+      title: editData.title,
+      tldr: editData.tldr,
     } as PostData;
-    if (currentContent === editData.content
-      && JSON.stringify(newIndex[key][slug]) === JSON.stringify(oldIndex[key][slug])
-    ) {
-      console.warn(`Nothing to update`);
-      return;
-    }
     const newPath = getPath(editData);
-    const oldPath = getPath(oldIndex[key][slug]);
+    const oldPath = getPath(oldIndex[key][gitState.slug]);
+    const data = [] as Array<{path: string, content: string}>;
     if (oldPath !== newPath) {
       data.push({ path: oldPath, content: "" });
     }
@@ -223,13 +218,14 @@ export const EditPost = (props: {
     });
     if (res && res.status === 200 && res.data) {
       setEditMode(false);
-      await syncGitState(res.data.commit?.substring(0, 8), slug, true);
+      await syncGitState(res.data.commit?.substring(0, 8), gitState.slug, true);
+      // TODO: redirect to new slug if it changed
     } else {
       console.error(`Something went wrong`, res);
     }
   }
 
-  const createNew = async (as: "drafts" | "posts") => {
+  const createNew = async (asDraft?: boolean) => {
     if (validation.hasError) {
       setSnackAlert({ open: true, msg: "Please enter valid post details", severity: "error" });
       return;
@@ -241,38 +237,31 @@ export const EditPost = (props: {
     const newIndex = JSON.parse(JSON.stringify(gitState?.index));
     const path = getPath(editData);
     const newPostSlug = editData.slug || editData.displaySlug;
-    if (as === "drafts") {
+    const now = (new Date()).toLocaleDateString("en-in");
+    const newIndexEntry = {
+      category: editData.category,
+      img: editData.img,
+      lastEdit: now,
+      slug: editData.slug,
+      title: editData.title,
+      tldr: editData.tldr,
+    } as PostData;
+    if (asDraft === true) {
       if (!newIndex.drafts) newIndex.drafts = {};
-      newIndex.drafts[newPostSlug] = {
-        ...editData,
-        displaySlug: undefined,
-        lastEdit: (new Date()).toLocaleDateString("en-in"),
-        slug: newPostSlug,
-      } as PostData;
+      newIndex.drafts[newPostSlug] = newIndexEntry;
     } else {
       if (!newIndex.posts) newIndex.posts = {};
-      newIndex.posts[newPostSlug] = {
-        ...editData,
-        displaySlug: undefined,
-        lastEdit: (new Date()).toLocaleDateString("en-in"),
-        publishedOn: (new Date()).toLocaleDateString("en-in"),
-        slug: newPostSlug,
-      } as PostData;
+      newIndex.posts[newPostSlug] = newIndexEntry;
+      newIndex.posts[newPostSlug].publishedOn = now;
     }
     // Send request to update index.json and create new file
     let res = await axios({
       method: "post",
       url: "git/edit",
       data: [
-      {
-        path: path,
-        content: editData.content,
-      },
-      {
-        path: "index.json",
-        content: JSON.stringify(newIndex, null, 2),
-      }
-    ],
+        { path: path, content: editData.content, },
+        { path: "index.json", content: JSON.stringify(newIndex, null, 2), }
+      ],
       headers: { "content-type": "application/json" }
     });
     if (res && res.status === 200 && res.data) {
@@ -284,9 +273,7 @@ export const EditPost = (props: {
     }
   };
 
-  // let dialButtonRef;
-
-  const discardConfirm = () => {
+  const confirmDiscard = () => {
     if (!validation.hasChanged) {
       setEditMode(false);
     } else {
@@ -367,37 +354,35 @@ export const EditPost = (props: {
       onOpen={() => setOpen(true)}
       open={open}
       className={classes.speedDial}
-      icon={slug ? <Edit/> : <Add/>}
-      // eslint-disable-next-line
-      // FabProps={{ref: (ref) => { dialButtonRef = ref }}}
+      icon={gitState.slug ? <Edit/> : <Add/>}
     >
-      {slug === ""
+      {gitState.slug === ""
         ?  ([<SpeedDialAction
             FabProps={{id: "fab-discard"}}
             icon={<Delete />}
             key="fab-discard"
-            onClick={discardConfirm}
+            onClick={confirmDiscard}
             tooltipTitle="Discard changes"
           />,
           <SpeedDialAction
             FabProps={{id: "fab-draft"}}
             icon={<Drafts />}
             key="fab-draft"
-            onClick={() => createNew("drafts")}
+            onClick={() => createNew(true)}
             tooltipTitle="Save As Draft"
           />,
           <SpeedDialAction
             FabProps={{id: "fab-publish"}}
             icon={<Public />}
             key="fab-publish"
-            onClick={() => createNew("posts")}
+            onClick={() => createNew()}
             tooltipTitle="Publish"
           />])
         : ([<SpeedDialAction
             FabProps={{id: "fab-discard"}}
             icon={<Delete />}
             key="fab-discard"
-            onClick={discardConfirm}
+            onClick={confirmDiscard}
             tooltipTitle="Discard changes"
           />,
           <SpeedDialAction
