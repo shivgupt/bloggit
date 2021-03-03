@@ -23,3 +23,11 @@ export type EditPostValidation = {
     msg: string,
   }
 }
+
+export type SnackAlert = {
+  open: boolean,
+  msg: string,
+  severity: "error" | "warning" | "info" | "success",
+  action?: any,
+  hideDuration?: number,
+}

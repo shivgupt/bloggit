@@ -1,5 +1,5 @@
 import { PostData, BlogIndex } from "@blog/types";
-import { EditPostValidation } from "../types";
+import { EditPostValidation, SnackAlert } from "../types";
 
 import { GitState } from "../types";
 
@@ -38,3 +38,9 @@ export const defaultValidation: EditPostValidation = {
   slug: { err: false, msg: "" },
   tldr: { err: false, msg: "" },
 };
+
+export const defaultSnackAlert: SnackAlert = {
+  open: false,
+  msg: "",
+  severity: "info",
+}

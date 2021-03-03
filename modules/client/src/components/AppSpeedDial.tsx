@@ -1,6 +1,6 @@
 import React, { useContext, useState } from "react";
 import { PostData } from "@blog/types";
-import { makeStyles, Fab, Theme } from "@material-ui/core"
+import { makeStyles, Fab, Theme, Button } from "@material-ui/core"
 import {
   SpeedDial,
   SpeedDialAction
@@ -16,8 +16,8 @@ import { useHistory } from "react-router-dom";
 import axios from "axios";
 
 import { GitContext } from "../GitContext";
-import { EditPostValidation } from "../types";
-import { defaultValidation, slugify } from "../utils";
+import { EditPostValidation, SnackAlert } from "../types";
+import { defaultSnackAlert, defaultValidation, slugify } from "../utils";
 
 const getPath = (post: PostData) => {
   if (post?.path) return post.path;
@@ -45,13 +45,15 @@ export const AppSpeedDial = (props: {
   newPostData: PostData,
   editMode: boolean,
   setEditMode: (val: boolean) => void,
-  setValidation: (val: EditPostValidation) => void
+  setValidation: (val: EditPostValidation) => void,
+  setSnackAlert: (snackAlert: SnackAlert) => void
 }) => {
 
-  const { editMode, setEditMode, newContent, newPostData, setValidation } = props;
+  const { editMode, setEditMode, newContent, newPostData, setValidation, setSnackAlert } = props;
 
   const history = useHistory();
   const [open, setOpen] = useState(false);
+  //const [snackAlert, setSnackAlert] = useState<SnackAlert>(defaultSnackAlert);
   const classes = useStyles();
 
   const gitContext = useContext(GitContext);
@@ -60,6 +62,23 @@ export const AppSpeedDial = (props: {
   const readOnly = gitState.currentRef !== gitState.latestRef;
 
   let dialButtonRef;
+
+  const discardConfirm = () => {
+    setSnackAlert({
+      open: true,
+      msg: "Do you want to discard all the changes",
+      severity: "warning",
+      action: <Button onClick={() => {
+        setEditMode(false);
+        setSnackAlert({
+          open: true,
+          msg: "Changes discarded",
+          severity: "success",
+          hideDuration: 6000,
+        })
+      }}> Yes </Button>
+    });
+  };
 
   const validate = (): boolean => {
     const invalidSlug = /[^a-z0-9-]/;
@@ -136,7 +155,14 @@ export const AppSpeedDial = (props: {
 
   const createNew = async (as: "drafts" | "posts") => {
     // create new index.json entry
-    if (!validate()) return;
+    if (!validate()) {
+      setSnackAlert({
+        open: true,
+        msg: "Please enter post details",
+        severity: "error"
+      });
+      return;
+    }
     const newIndex = JSON.parse(JSON.stringify(gitState?.index));
 
     const path = getPath(newPostData);
@@ -225,7 +251,7 @@ export const AppSpeedDial = (props: {
               FabProps={{id: "fab-discard"}}
               icon={<Delete />}
               key="fab-discard"
-              onClick={() => setEditMode(false)}
+              onClick={discardConfirm}
               tooltipTitle="Discard changes"
             />,
             <SpeedDialAction

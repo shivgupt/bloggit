@@ -1,11 +1,13 @@
 import {
   Container,
   CssBaseline,
+  Snackbar,
   Theme,
   createStyles,
   makeStyles,
   ThemeProvider,
 } from "@material-ui/core";
+import { Alert } from "@material-ui/lab";
 import React, { useEffect, useState } from "react";
 import { Route, Switch, useRouteMatch} from "react-router-dom";
 import axios from "axios";
@@ -28,8 +30,8 @@ import { AdminMode, GitState } from "./types";
 import { EditPost } from "./components/EditPost";
 import { AppSpeedDial } from "./components/AppSpeedDial";
 
-import { EditPostValidation } from "./types";
-import  { defaultValidation } from "./utils/constants";
+import { EditPostValidation, SnackAlert } from "./types";
+import  { defaultSnackAlert, defaultValidation } from "./utils/constants";
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
   appBarSpacer: theme.mixins.toolbar,
@@ -60,6 +62,7 @@ const App: React.FC = () => {
   const [newContent, setNewContent] = useState("");
   const [editMode, setEditMode] = useState(false);
   const [validation, setValidation] = React.useState<EditPostValidation>(defaultValidation);
+  const [snackAlert, setSnackAlert] = useState<SnackAlert>(defaultSnackAlert);
 
   const slugMatch = useRouteMatch("/:slug");
   const refMatch = useRouteMatch("/:ref/:slug");
@@ -83,12 +86,24 @@ const App: React.FC = () => {
       // Auth is valid, update localStorage, axios header and adminMode
       store.save("authToken", authToken);
       axios.defaults.headers.common["authorization"] = `Basic ${btoa(`admin:${authToken}`)}`;
+      setSnackAlert({
+        open: true,
+        msg: "Auth token registered",
+        severity: "success",
+        hideDuration: 6000,
+      });
       setAdminMode("enabled");
     } catch (e) {
       // Auth is invalid, update localStorage, axios header and adminMode
       console.error(`Auth token is not valid: ${e.message}`);
       store.save("authToken", "");
       axios.defaults.headers.common["authorization"] = `Basic ${btoa(`admin:`)}`;
+      setSnackAlert({
+        open: true,
+        msg: "Invalid Auth Token",
+        severity: "error",
+        hideDuration: 6000,
+      });
       setAdminMode("invalid");
     }
   }
@@ -214,11 +229,20 @@ const App: React.FC = () => {
                 editMode={editMode}
                 setEditMode={setEditMode}
                 setValidation={setValidation}
+                setSnackAlert={setSnackAlert}
               />
             : null}
           </Container>
         </main>
       </GitContext.Provider>
+      <Snackbar
+        open={snackAlert.open}
+        autoHideDuration={snackAlert.hideDuration}
+        onClose={() => setSnackAlert(defaultSnackAlert)}
+      >
+        <Alert severity={snackAlert.severity} action={snackAlert.action}>
+          {snackAlert.msg}</Alert>
+      </Snackbar>
     </ThemeProvider>
   );
 };
