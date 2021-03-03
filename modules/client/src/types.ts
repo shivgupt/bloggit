@@ -2,6 +2,10 @@ import { BlogIndex, PostData } from "@blog/types";
 
 export type AdminMode = "invalid" | "enabled" | "disabled";
 
+export type EditData = PostData & {
+  slug: string | null;
+}
+
 export type GitState = {
   currentContent: string;
   currentRef: string;

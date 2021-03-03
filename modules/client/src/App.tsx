@@ -16,6 +16,7 @@ import { NavBar } from "./components/NavBar";
 import { PostPage } from "./components/Posts";
 import {
   emptyEntry,
+  emptyEdit,
   fetchContent,
   fetchIndex,
   fetchRef,
@@ -56,7 +57,7 @@ const App: React.FC = () => {
   const [theme, setTheme] = useState(lightTheme);
   const [adminMode, setAdminMode] = useState<AdminMode>("invalid");
 
-  const [newPostData, setNewPostData] = useState(emptyEntry);
+  const [newPostData, setNewPostData] = useState(emptyEdit);
   const [newContent, setNewContent] = useState("");
   const [editMode, setEditMode] = useState(false);
   const [validation, setValidation] = React.useState<EditPostValidation>(defaultValidation);

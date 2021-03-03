@@ -93,7 +93,10 @@ export const EditPost = (props: {
     <Paper variant="outlined" className={classes.paper}>
       <div className={classes.root}>
         {["title", "category", "slug", "tldr"].map(name => {
-          // TODO: if slug is null (not "") then replace with sluggified title
+          let value = postData?.[name] || "";
+          if (name === "slug" && postData?.[name] === null) {
+            value = slugify(postData?.title || "");
+          }
           return (
             <TextField
               key={`post_${name}`}
@@ -102,7 +105,7 @@ export const EditPost = (props: {
               id={`post_${name}`}
               label={name}
               name={name}
-              value={postData?.[name] || ""}
+              value={value}
               required={required.includes(name)}
               fullWidth={fullWidth.includes(name)}
               onChange={handleChange}

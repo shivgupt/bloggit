@@ -1,7 +1,7 @@
 import { PostData, BlogIndex } from "@blog/types";
 import { EditPostValidation } from "../types";
 
-import { GitState } from "../types";
+import { EditData, GitState } from "../types";
 
 export const emptyIndex: BlogIndex = {
   posts: {},
@@ -19,6 +19,11 @@ export const emptyEntry: PostData = {
   tldr: "",
   title: "",
 };
+
+export const emptyEdit = {
+  ...(emptyEntry as any),
+  slug: null,
+} as EditData;
 
 export const initialGitState: GitState = {
   currentContent: "Loading..",
