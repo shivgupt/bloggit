@@ -82,7 +82,7 @@ const App: React.FC = () => {
       // Auth is valid, update localStorage, axios header and adminMode
       store.save("authToken", authToken);
       axios.defaults.headers.common["authorization"] = `Basic ${btoa(`admin:${authToken}`)}`;
-      setAdminMode("disabled");
+      setAdminMode("enabled");
     } catch (e) {
       // Auth is invalid, update localStorage, axios header and adminMode
       console.error(`Auth token is not valid: ${e.message}`);
@@ -213,6 +213,8 @@ const App: React.FC = () => {
                 newPostData={newPostData}
                 editMode={editMode}
                 setEditMode={setEditMode}
+                validation={validation}
+                setValidation={setValidation}
               />
             : null}
           </Container>
