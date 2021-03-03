@@ -7,20 +7,14 @@ const my = {};
 
 my.authenticate = () => {
   cy.visit(`${Cypress.env("baseUrl")}/admin`);
-  cy.get(`input[type="text"]`).clear().type("abc123");
-  cy.contains("button", /register/i).click();
+  cy.get(`input#auth-token`).clear().type("abc123");
+  cy.get("button#register-auth-token").click();
   cy.contains("div", /registered for admin access/i).should("exist")
   cy.get(`a[href="/"]`).click();
 };
 
-my.enableAdmin = () => {
-  cy.get(`button[aria-label="open drawer"]`).click();
-  cy.get(`input[type="checkbox"]`).click();
-  cy.get(`div[role="presentation"]`).first().click(10, 10);
-};
-
 my.enterPostData = (data) => {
-  for (const key of ["category", "path", "slug", "tags", "title", "tldr"]) {
+  for (const key of ["title", "category", "slug", "tldr"]) {
     if (typeof data[key] === "string") {
       if (data[key].length > 0) {
         cy.get(`input[name="${key}"]`).clear().type(data[key]);

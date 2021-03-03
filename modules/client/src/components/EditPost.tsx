@@ -72,7 +72,6 @@ export const EditPost = (props: {
   };
 
   const save: SaveImageHandler = async function*(data: ArrayBuffer) {
-
     let res = await axios({
       method: "POST",
       url: "ipfs",
@@ -94,16 +93,7 @@ export const EditPost = (props: {
     <Paper variant="outlined" className={classes.paper}>
       <div className={classes.root}>
         {["title", "category", "slug", "tldr"].map(name => {
-          let value;
-          if (name === "slug" && postData.slug === "") {
-            console.log("if")
-            value = slugify(postData?.title || "");
-          }
-          else {
-            console.log("else")
-            value = postData?.[name] || "";
-          }
-
+          // TODO: if slug is null (not "") then replace with sluggified title
           return (
             <TextField
               key={`post_${name}`}
@@ -112,7 +102,7 @@ export const EditPost = (props: {
               id={`post_${name}`}
               label={name}
               name={name}
-              value={value}
+              value={postData?.[name] || ""}
               required={required.includes(name)}
               fullWidth={fullWidth.includes(name)}
               onChange={handleChange}
