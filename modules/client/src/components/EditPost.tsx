@@ -40,21 +40,25 @@ import { ImageUploader } from "./ImageUploader";
 
 type EditData = PostData & {
   slug: string | null;
-  displaySlug: string
+  displaySlug: string;
+  content: string;
 }
 const emptyEdit = {
   ...(emptyEntry as any),
   slug: null,
   displaySlug: "",
+  content: "",
 } as EditData;
 
 type EditPostValidation = {
   hasError: boolean;
+  hasChanged: boolean;
   errs: { [entry: string]: string; }
 }
 
 const defaultValidation: EditPostValidation = {
   hasError: false,
+  hasChanged: false,
   errs: {
     title: "",
     slug: "",
@@ -106,8 +110,8 @@ export const EditPost = (props: {
   const { setEditMode, setSnackAlert } = props;
 
   const [validation, setValidation] = useState<EditPostValidation>(defaultValidation);
-  const [newPostData, setNewPostData] = useState<EditData>(emptyEdit);
-  const [newContent, setNewContent] = useState("");
+  const [editData, setEditData] = useState<EditData>(emptyEdit);
+  const [originalEditData, setOriginalEditData] = useState<EditData>(emptyEdit);
   const [selectedTab, setSelectedTab] = useState<"write" | "preview">("write");
   const [open, setOpen] = useState(false);
   const classes = useStyles();
@@ -116,44 +120,48 @@ export const EditPost = (props: {
   const { gitState, syncGitState } = gitContext;
   const { currentContent, slug } = gitState;
 
-  // This should only run once before this component is unmounted
+  // This should only run once when this component is unmounted
   useEffect(() => {
     // On mount, set initial data to edit
     if (gitState.slug) {
-      setNewContent(gitState.currentContent);
-      setNewPostData({ ...gitState.indexEntry, displaySlug: "" });
+      setOriginalEditData({
+        ...gitState.indexEntry,
+        content: gitState.currentContent,
+        displaySlug: "",
+      });
     }
+    // Start w/out any validation errors
     setValidation(defaultValidation);
     // On unmount, clear edit data
     return () => {
-      setNewContent("");
-      setNewPostData(emptyEdit);
+      setOriginalEditData(emptyEdit);
     };
   }, [gitState]); // gitState will only be updated after turning editMode off
 
-  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const updatedPostData = { ...newPostData, [e.target.name]: e.target.value } as EditData;
-    updatedPostData.displaySlug = updatedPostData.slug === null
-      ? slugify(updatedPostData?.title || "")
-      : updatedPostData.slug;
+  // This should only run once when the original data is recorded after mounting
+  useEffect(() => setEditData(originalEditData), [originalEditData]);
+
+  const syncEditData = (newEditData: EditData) => {
+    newEditData.displaySlug = newEditData.slug === null
+      ? slugify(newEditData?.title || "")
+      : newEditData.slug;
     const titleErr =
-      !updatedPostData.title ? "Title is required"
+      !newEditData.title ? "Title is required"
       : "";
     const slugErr =
-      !updatedPostData.displaySlug ? "Slug is required"
-      : updatedPostData.displaySlug.match(/[^a-z0-9-]/) ? "Slug should only contain a-z, 0-9 and -"
+      !newEditData.displaySlug ? "Slug is required"
+      : newEditData.displaySlug.match(/[^a-z0-9-]/) ? "Slug should only contain a-z, 0-9 and -"
       : "";
     const hasError = !!(slugErr || titleErr);
-    setValidation({ errs: { title: titleErr, slug: slugErr }, hasError});
-    setNewPostData(updatedPostData);
+    const hasChanged = originalEditData.title !== newEditData.title
+      || originalEditData.slug !== newEditData.slug
+      || originalEditData.category !== newEditData.category
+      || originalEditData.tldr !== newEditData.tldr
+      || originalEditData.img !== newEditData.img
+      || originalEditData.content !== newEditData.content;
+    setValidation({ errs: { title: titleErr, slug: slugErr }, hasError, hasChanged });
+    setEditData(newEditData);
   }
-
-  const handleImageUpload = (value: string) => {
-    setNewPostData({
-      ...newPostData,
-      img: value,
-    });
-  };
 
   const saveImage: SaveImageHandler = async function*(data: ArrayBuffer) {
     let res = await axios({
@@ -173,11 +181,11 @@ export const EditPost = (props: {
 
   const update = async () => {
     if (validation.hasError) {
-      setSnackAlert({
-        open: true,
-        msg: "Please enter valid post details",
-        severity: "error"
-      });
+      setSnackAlert({ open: true, msg: "Please enter valid post details", severity: "error" });
+      return;
+    }
+    if (!validation.hasChanged) {
+      setSnackAlert({ open: true, msg: "No changes to save", severity: "warning" });
       return;
     }
     const oldIndex = gitState?.index;
@@ -189,23 +197,23 @@ export const EditPost = (props: {
     } else {
       key = "drafts";
     }
-    const newPath = getPath(newPostData);
-    const oldPath = getPath(oldIndex[key][slug]);
     newIndex[key][slug] = {
-      ...newPostData,
+      ...editData,
       displaySlug: undefined,
       lastEdit: (new Date()).toLocaleDateString("en-in"),
     } as PostData;
-    if (currentContent === newContent
+    if (currentContent === editData.content
       && JSON.stringify(newIndex[key][slug]) === JSON.stringify(oldIndex[key][slug])
     ) {
       console.warn(`Nothing to update`);
       return;
     }
+    const newPath = getPath(editData);
+    const oldPath = getPath(oldIndex[key][slug]);
     if (oldPath !== newPath) {
       data.push({ path: oldPath, content: "" });
     }
-    data.push({ path: newPath, content: newContent });
+    data.push({ path: newPath, content: editData.content });
     data.push({ path: "index.json", content: JSON.stringify(newIndex, null, 2)});
     const res = await axios({
       data,
@@ -223,20 +231,20 @@ export const EditPost = (props: {
 
   const createNew = async (as: "drafts" | "posts") => {
     if (validation.hasError) {
-      setSnackAlert({
-        open: true,
-        msg: "Please enter valid post details",
-        severity: "error"
-      });
+      setSnackAlert({ open: true, msg: "Please enter valid post details", severity: "error" });
+      return;
+    }
+    if (!validation.hasChanged) {
+      setSnackAlert({ open: true, msg: "No changes to publish", severity: "warning" });
       return;
     }
     const newIndex = JSON.parse(JSON.stringify(gitState?.index));
-    const path = getPath(newPostData);
-    const newPostSlug = newPostData.slug || newPostData.displaySlug;
+    const path = getPath(editData);
+    const newPostSlug = editData.slug || editData.displaySlug;
     if (as === "drafts") {
       if (!newIndex.drafts) newIndex.drafts = {};
       newIndex.drafts[newPostSlug] = {
-        ...newPostData,
+        ...editData,
         displaySlug: undefined,
         lastEdit: (new Date()).toLocaleDateString("en-in"),
         slug: newPostSlug,
@@ -244,7 +252,7 @@ export const EditPost = (props: {
     } else {
       if (!newIndex.posts) newIndex.posts = {};
       newIndex.posts[newPostSlug] = {
-        ...newPostData,
+        ...editData,
         displaySlug: undefined,
         lastEdit: (new Date()).toLocaleDateString("en-in"),
         publishedOn: (new Date()).toLocaleDateString("en-in"),
@@ -258,7 +266,7 @@ export const EditPost = (props: {
       data: [
       {
         path: path,
-        content: newContent,
+        content: editData.content,
       },
       {
         path: "index.json",
@@ -279,29 +287,33 @@ export const EditPost = (props: {
   // let dialButtonRef;
 
   const discardConfirm = () => {
-    setSnackAlert({
-      open: true,
-      msg: "Do you want to discard all the changes",
-      severity: "warning",
-      action: <Button onClick={() => {
-        setEditMode(false);
-        setSnackAlert({
-          open: true,
-          msg: "Changes discarded",
-          severity: "success",
-          hideDuration: 6000,
-        })
-      }}> Yes </Button>
-    });
+    if (!validation.hasChanged) {
+      setEditMode(false);
+    } else {
+      setSnackAlert({
+        open: true,
+        msg: "Do you want to discard all the changes",
+        severity: "warning",
+        action: <Button onClick={() => {
+          setEditMode(false);
+          setSnackAlert({
+            open: true,
+            msg: "Changes discarded",
+            severity: "success",
+            hideDuration: 6000,
+          })
+        }}> Yes </Button>
+      });
+    }
   };
 
   return (<>
     <Paper variant="outlined" className={classes.paper}>
       <div className={classes.root}>
         {["title", "category", "slug", "tldr"].map(name => {
-          let value = newPostData?.[name] || "";
-          if (name === "slug" && newPostData?.[name] === null) {
-            value = newPostData.displaySlug;
+          let value = editData?.[name] || "";
+          if (name === "slug" && editData?.[name] === null) {
+            value = editData.displaySlug;
           }
           return (
             <TextField
@@ -313,7 +325,7 @@ export const EditPost = (props: {
               key={`edit_${name}`}
               label={name}
               name={name}
-              onChange={handleChange}
+              onChange={event => syncEditData({ ...editData, [event.target.name]: event.target.value })}
               required={["title"].includes(name)}
               value={value}
             />
@@ -321,13 +333,13 @@ export const EditPost = (props: {
         })}
         <Input
           id="edit_img"
-          value={newPostData?.img || ""}
-          endAdornment={ <ImageUploader setImageHash={handleImageUpload} /> }
+          value={editData?.img || ""}
+          endAdornment={ <ImageUploader setImageHash={img => syncEditData({ ...editData, img })} /> }
         />
       </div>
       <ReactMde
-        value={newContent}
-        onChange={setNewContent}
+        value={editData.content}
+        onChange={content => syncEditData({ ...editData, content })}
         selectedTab={selectedTab}
         onTabChange={setSelectedTab}
         minEditorHeight={400}
