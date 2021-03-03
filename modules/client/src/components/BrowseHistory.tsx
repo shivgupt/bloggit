@@ -41,14 +41,6 @@ export const BrowseHistory = (props: {
   const [editHistory, setEditHistory] = useState([] as HistoryResponse);
   const [isHistorical, setIsHistorical] = useState(false);
 
-  const handleOpen = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
   useEffect(() => {
     if (latestRef !== currentRef) {
       setIsHistorical(true);
@@ -93,11 +85,10 @@ export const BrowseHistory = (props: {
           aria-haspopup="true"
           variant="contained"
           color="primary"
-          onClick={handleOpen}
+          onClick={(event: any) => { setAnchorEl(event.currentTarget); }}
         >
           History
         </Button>
-
         <Menu
           elevation={0}
           PaperProps={{ className: classes.paper }}
@@ -107,7 +98,7 @@ export const BrowseHistory = (props: {
           anchorEl={anchorEl}
           keepMounted
           open={!!anchorEl}
-          onClose={handleClose}
+          onClose={() => setAnchorEl(null)}
         >
           {
             editHistory.filter(entry => !entry.commit.startsWith(latestRef)).map(entry => {
@@ -116,7 +107,7 @@ export const BrowseHistory = (props: {
                 <MenuItem
                   component={Link}
                   key={commit}
-                  onClick={handleClose}
+                  onClick={() => setAnchorEl(null)}
                   selected={commit === currentRef}
                   to={`/${commit}/${slug}`}
                 >
