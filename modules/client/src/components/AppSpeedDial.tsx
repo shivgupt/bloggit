@@ -159,8 +159,8 @@ export const AppSpeedDial = (props: {
           className={classes.speedDial}
           color="primary"
           onClick={() => {
-            handleRedirect("/");
             setEditMode(true);
+            handleRedirect("/");
           }}
         ><Add/></Fab>
       );

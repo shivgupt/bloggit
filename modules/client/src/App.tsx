@@ -135,7 +135,9 @@ const App: React.FC = () => {
   // Fetch index & post content any time the url changes
   useEffect(() => {
     setNewContent("");
-    setEditMode(false);
+    if (slugParam) {
+      setEditMode(false);
+    }
     syncGitState(refParam || gitState.latestRef, slugParam);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refParam, slugParam]);
@@ -164,24 +166,22 @@ const App: React.FC = () => {
             <Switch>
               <Route exact
                 path="/"
-                render={() => {
-                  return editMode
-                  ? <EditPost
-                    postData={newPostData}
-                    content={newContent}
-                    setPostData={setNewPostData}
-                    setContent={setNewContent}
-                  />
-                  : <Home />
-                }}
+                render={() => (
+                  editMode
+                    ? <EditPost
+                      postData={newPostData}
+                      content={newContent}
+                      setPostData={setNewPostData}
+                      setContent={setNewContent}
+                    />
+                    : <Home />
+                )}
               />
               <Route exact
                 path="/admin"
-                render={() => {
-                  return (
-                    <AdminHome adminMode={adminMode} validateAuthToken={validateAuthToken} />
-                  );
-                }}
+                render={() => (
+                  <AdminHome adminMode={adminMode} validateAuthToken={validateAuthToken} />
+                )}
               />
               <Route
                 path="/:ref/:slug"
