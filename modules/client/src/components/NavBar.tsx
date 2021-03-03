@@ -56,7 +56,7 @@ const useStyles = makeStyles(theme => ({
   grow: {
     borderBottom: `5px solid ${theme.palette.divider}`,
   },
-  homeButton: {
+  icon: {
     marginRight: theme.spacing(0.5),
     width: "20px",
     height: "20px",
@@ -171,29 +171,29 @@ export const NavBar = (props: any) => {
         <Toolbar>
           <Breadcrumbs aria-label="breadcrumb" separator={<NextIcon fontSize="small"/>} className={classes.title}>
             <Link className={classes.link} color="inherit" onClick={() => setEditMode(false)} href="/">
-              <HomeIcon className={classes.homeButton} />
+              <HomeIcon className={classes.icon} />
               Home
             </Link>
             {categoryMatch
             ? <Link className={classes.link} color="inherit" onClick={() => setEditMode(false)} href={`/category/${categoryMatch.params.slug}`}>
-                <CategoryIcon className={classes.homeButton} />
+                <CategoryIcon className={classes.icon} />
                 {categoryMatch.params.slug}
               </Link>
             : null
             }
             {slug
             ? slug === "admin"
-              ? <Typography className={classes.title} align={"center"} >
-                  <Person className={classes.homeButton} />
+              ? <Typography>
+                  <Person className={classes.icon} />
                   Admin
                 </Typography>
               : [ <Link className={classes.link} color="inherit" onClick={() => setEditMode(false)} href={`/category/${post?.category}`}>
-                    <CategoryIcon className={classes.homeButton} />
+                    <CategoryIcon className={classes.icon} />
                     {post?.category}
                   </Link>,
-                  <Typography className={classes.title} align={"center"} >
-                    <DocIcon className={classes.homeButton} />
-                    {pageTitle.substr(0,30)}...
+                  <Typography>
+                    <DocIcon className={classes.icon} />
+                    {pageTitle.substr(0,10)}..
                   </Typography>
                 ]
             : null
