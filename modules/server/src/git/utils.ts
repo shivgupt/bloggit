@@ -5,9 +5,24 @@ import git from "isomorphic-git";
 
 import { env } from "../env";
 
-import { GitCommit } from "./types";
-
 const gitdir = path.normalize(env.contentDir);
+
+type GitAuthor = {
+  name: string;
+  email: string;
+  timestamp: number;
+  timezoneOffset: number;
+};
+
+export type GitCommit = {
+  author: GitAuthor;
+  committer: GitAuthor;
+  gpgsig?: string;
+  message: string;
+  oid: string; // not standard
+  parent: string[];
+  tree: string;
+};
 
 export const gitOpts = { fs, dir: gitdir, gitdir };
 

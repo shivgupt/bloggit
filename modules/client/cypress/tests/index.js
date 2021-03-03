@@ -8,8 +8,16 @@ describe("Blog Client", () => {
     my.enableAdmin();
   });
 
+  it(`should reject an invalid auth token`, () => {
+    cy.visit(`${Cypress.env("baseUrl")}/admin`);
+    cy.get(`input[type="text"]`).clear().type("invalid");
+    cy.contains("button", /register/i).click();
+    cy.contains("div", /NOT registered for admin access/i).should("exist")
+    cy.get(`div#fab > button`).should("not.exist");
+  });
+
   it(`should create, edit, and delete a new post`, () => {
-    const slug = "test";
+    const slug = "test-edit";
     my.createPost({
       content: "Keep calm, this is only a test",
       title: "Test Title",
@@ -30,7 +38,7 @@ describe("Blog Client", () => {
   });
 
   it(`should browse post history`, () => {
-    const slug = "test2";
+    const slug = "test-history";
     const firstContent = "First content";
     const secondContent = "Second content";
     my.createPost({
@@ -53,6 +61,25 @@ describe("Blog Client", () => {
     cy.location(`pathname`).should(`match`, /\/[a-f0-9]{8}\/[a-zA-Z0-0-]{1,}/)
     cy.contains(`a`, /present/i).should("exist");
     cy.contains(`p`, firstContent).should("exist");
+  });
+
+  it(`should open a ToC that displays an outline of the current post's headings`, () => {
+    const slug = "test-toc";
+    const innerTitle = "Inner Title"
+    const innerSubtitle = "Inner Subtitle"
+    const innerTitleSlug = "inner-title"
+    const innerSubtitleSlug = "inner-subtitle"
+    my.createPost({
+      content: `# ${innerTitle}\n## ${innerSubtitle}\nKeep calm, this is the content for ${slug}`,
+      title: `Title for ${slug}`,
+      tldr: `tldr for ${slug}`,
+      category: "test",
+      slug
+    });
+    cy.visit(`${Cypress.env("baseUrl")}/${slug}`);
+    cy.get(`button[aria-label="open drawer"]`).click();
+    cy.get(`a[href="/#${innerTitleSlug}"]`).should("exist");
+    cy.get(`a[href="/#${innerSubtitleSlug}"]`).should("exist");
   });
 
 });

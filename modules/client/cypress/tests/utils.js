@@ -1,5 +1,8 @@
 /* global Cypress, cy */
 
+const getUnformattedLine = (content) =>
+  content.split(`\n`).find(line => line && !line.startsWith("#"));
+
 const my = {};
 
 my.authenticate = () => {
@@ -7,7 +10,6 @@ my.authenticate = () => {
   cy.get(`input[type="text"]`).clear().type("abc123");
   cy.contains("button", /register/i).click();
   cy.contains("div", /registered for admin access/i).should("exist")
-  cy.contains("button", /register/i).click();
   cy.get(`a[href="/"]`).click();
 };
 
@@ -41,7 +43,7 @@ my.createPost = (data) => {
   my.enterPostData(data);
   cy.get(`div#fab > button`).click();
   cy.get(`button#fab-publish`).click();
-  cy.contains(`p`, data.content).should("exist");
+  cy.contains(`p`, getUnformattedLine(data.content)).should("exist");
   cy.contains(`h2`, data.title).should("exist");
   cy.location(`pathname`).should(`eq`, `/${data.slug}`)
   cy.get(`a[href="/"]`).click();
@@ -57,7 +59,7 @@ my.editPost = (data) => {
   my.enterPostData(data);
   cy.get(`div#fab > button`).click();
   cy.get(`button#fab-save`).click();
-  cy.contains(`p`, data.content).should("exist");
+  cy.contains(`p`, getUnformattedLine(data.content)).should("exist");
   cy.contains(`h2`, data.title).should("exist");
   cy.location(`pathname`).should(`eq`, `/${data.slug}`)
   cy.get(`a[href="/"]`).click();

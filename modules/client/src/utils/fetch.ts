@@ -16,7 +16,6 @@ export const fetchRef = async (): Promise<string> => {
   return response.data.commit.substring(0, 8);
 }
 
-// TODO: instead of throwing, save null to cache so we never re-fetch invalid paths
 let fileCache: { [ref: string]: { [path: string]: string; } } = {};
 export const fetchFile = async (path: string, _ref?: string): Promise<string> => {
   const ref = _ref || await fetchRef();
@@ -60,12 +59,39 @@ export const fetchIndex = async (_ref?: string): Promise<BlogIndex> => {
   }
 };
 
+let historyCache: { [slug: string]: HistoryResponse } = {};
+export const fetchHistory = async (slug: string, force?: boolean): Promise<HistoryResponse> => {
+  if (!slug) return [];
+  if (!force && historyCache[slug]) {
+    return historyCache[slug];
+  }
+  const url = `/git/history/${slug}`;
+  console.log(`Fetching history from ${url}`);
+  const response = await axios(url);
+  if (!response || !response.data) {
+    console.warn(`Failed to retrieve data from ${url}`);
+    return [];
+  }
+  if (!response.data.length) {
+    console.warn(`Failed to retrieve valid history entries for ${slug}`, response.data);
+    return [];
+  }
+  historyCache[slug] = response.data as HistoryResponse;
+  return historyCache[slug];
+};
+
 const slugToPath = async (slug: string, ref: string): Promise<string> => {
-  if (!slug) return "";
+  if (!slug || !ref) return "";
+  if (historyCache[slug]) {
+    const history = historyCache[slug].find(entry => entry.commit?.startsWith(ref));
+    if (history?.path) {
+      console.log(`Found path for ${ref}/${slug} in history: ${history.path}`);
+      return history.path
+    }
+  }
+  console.log(`Path for ${ref}/${slug} is not available via git history`);
   const index = await fetchIndex(ref);
-  const entry = (index.posts && index.posts[slug]) ? index.posts[slug]
-    : (index.drafts && index.drafts[slug]) ? index.drafts[slug]
-    : {} as PostData;
+  const entry = (index?.posts?.[slug] || index?.drafts?.[slug] || {}) as PostData;
   let path;
   if (entry.path) {
     path = entry.path;
@@ -102,19 +128,4 @@ export const fetchContent = async(
   const ref = _ref || await fetchRef();
   const path = await slugToPath(slug, ref);
   return await fetchFile(path, ref)
-};
-
-export const fetchHistory = async (slug: string): Promise<HistoryResponse> => {
-  if (!slug) return [];
-  const url = `/git/history/${slug}`;
-  const response = await axios(url);
-  if (!response || !response.data) {
-    console.warn(`Failed to retrieve data from ${url}`);
-    return [];
-  }
-  if (!response.data.length) {
-    console.warn(`Failed to retrieve valid history entries for ${slug}`, response.data);
-    return [];
-  }
-  return response.data as HistoryResponse;
 };

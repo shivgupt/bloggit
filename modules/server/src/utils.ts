@@ -51,7 +51,9 @@ export const getContentType = (content: Buffer): string => {
       fmtSig("00 00 00 20 66 74 79 70 69 73 6F 6D"),
     ]
   })) {
-    if (val.some(sig => content.compare(sig, 0, sig.length, 0, sig.length) === 0)) {
+    if (val.some(sig =>
+      content.length >= sig.length && content.compare(sig, 0, sig.length, 0, sig.length) === 0
+    )) {
       return key;
     }
   }

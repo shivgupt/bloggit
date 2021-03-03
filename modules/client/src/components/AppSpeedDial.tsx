@@ -120,7 +120,6 @@ export const AppSpeedDial = (props: {
     data.push({ path: newPath, content: newContent });
     data.push({ path: "index.json", content: JSON.stringify(newIndex, null, 2)});
 
-    console.log("Lets push it to git");
     const res = await axios({
       data,
       headers: { "content-type": "application/json" },
@@ -129,7 +128,7 @@ export const AppSpeedDial = (props: {
     });
     if (res && res.status === 200 && res.data) {
       setEditMode(false);
-      await syncGitState(res.data.commit?.substring(0, 8), slug);
+      await syncGitState(res.data.commit?.substring(0, 8), slug, true);
     } else {
       console.error(`Something went wrong`, res);
     }
@@ -177,7 +176,7 @@ export const AppSpeedDial = (props: {
     });
     if (res && res.status === 200 && res.data) {
       setEditMode(false);
-      await syncGitState(res.data.commit?.substring(0, 8), newPostSlug);
+      await syncGitState(res.data.commit?.substring(0, 8), newPostSlug, true);
       handleRedirect(`/${newPostSlug}`)
     } else {
       console.error(`Something went wrong`, res);
@@ -186,21 +185,19 @@ export const AppSpeedDial = (props: {
 
   if (!editMode) {
     if (!slug || slug === "admin" || readOnly) {
-      console.log("edit mode is OFF and we have no slug");
       return (
         <Fab
           id={"fab"}
           className={classes.speedDial}
           color="primary"
           onClick={() => {
-            handleRedirect("/");
             setEditMode(true);
             setValidation(defaultValidation);
+            handleRedirect("/");
           }}
         ><Add/></Fab>
       );
     } else {
-      console.log("edit mode is OFF and we got slug");
       return (
         <Fab
           id={"fab"}
@@ -211,7 +208,6 @@ export const AppSpeedDial = (props: {
       );
     }
   } else {
-    console.log("edit mode is ON");
     return (
       <SpeedDial
         id={"fab"}

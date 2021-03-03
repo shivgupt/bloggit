@@ -19,6 +19,7 @@ import {
   fetchContent,
   fetchIndex,
   fetchRef,
+  initialGitState,
 } from "./utils";
 import { darkTheme, lightTheme } from "./style";
 import { store } from "./utils/cache";
@@ -51,7 +52,7 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
 const App: React.FC = () => {
   const classes = useStyles();
 
-  const [gitState, setGitState] = useState({} as GitState);
+  const [gitState, setGitState] = useState(initialGitState);
   const [theme, setTheme] = useState(lightTheme);
   const [adminMode, setAdminMode] = useState<AdminMode>("invalid");
 
@@ -77,7 +78,7 @@ const App: React.FC = () => {
           "authorization": `Basic ${btoa(`admin:${authToken}`)}`,
         },
         method: "post",
-        url: "git",
+        url: "/git",
       });
       // Auth is valid, update localStorage, axios header and adminMode
       store.save("authToken", authToken);
@@ -103,8 +104,8 @@ const App: React.FC = () => {
     }
   };
 
-  const syncGitState = async (ref?: string, slug?: string) => {
-    const latestRef = await fetchRef();
+  const syncGitState = async (ref?: string, slug?: string, getLatest?: boolean) => {
+    const latestRef = (getLatest ? null : gitState.latestRef) || await fetchRef();
     const currentRef = ref || latestRef;
     const index = await fetchIndex(currentRef);
     const newGitState = {
@@ -118,11 +119,10 @@ const App: React.FC = () => {
       newGitState.currentContent = await fetchContent(slug, currentRef)
       newGitState.indexEntry = index.posts?.[slug] || index.drafts?.[slug];
     } else {
-      newGitState.currentContent = "Does Not Exist";
+      newGitState.currentContent = "";
       newGitState.indexEntry = emptyEntry;
     }
     setGitState(newGitState);
-
   }
 
   // Run this effect exactly once when the page initially loads
@@ -139,8 +139,9 @@ const App: React.FC = () => {
   // Fetch index & post content any time the url changes
   useEffect(() => {
     setNewContent("");
-    setEditMode(false);
-    setValidation(defaultValidation);
+    if (slugParam) {
+      setEditMode(false);
+    }
     syncGitState(refParam || gitState.latestRef, slugParam);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refParam, slugParam]);
@@ -169,25 +170,23 @@ const App: React.FC = () => {
             <Switch>
               <Route exact
                 path="/"
-                render={() => {
-                  return editMode
-                  ? <EditPost
-                    postData={newPostData}
-                    content={newContent}
-                    setPostData={setNewPostData}
-                    setContent={setNewContent}
-                    validation={validation}
-                  />
-                  : <Home />
-                }}
+                render={() => (
+                  editMode
+                    ? <EditPost
+                      postData={newPostData}
+                      content={newContent}
+                      setPostData={setNewPostData}
+                      setContent={setNewContent}
+                      validation={validation}
+                    />
+                    : <Home />
+                )}
               />
               <Route exact
                 path="/admin"
-                render={() => {
-                  return (
-                    <AdminHome adminMode={adminMode} validateAuthToken={validateAuthToken} />
-                  );
-                }}
+                render={() => (
+                  <AdminHome adminMode={adminMode} validateAuthToken={validateAuthToken} />
+                )}
               />
               <Route
                 path="/:ref/:slug"
