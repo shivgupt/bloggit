@@ -194,6 +194,7 @@ export const AppSpeedDial = (props: {
           onClick={() => {
             handleRedirect("/");
             setEditMode(true);
+            setValidation(defaultValidation);
           }}
         ><Add/></Fab>
       );
@@ -204,7 +205,7 @@ export const AppSpeedDial = (props: {
           id={"fab"}
           className={classes.speedDial}
           color="primary"
-          onClick={() => setEditMode(true)}
+          onClick={() => { setEditMode(true); setValidation(defaultValidation)}}
         ><Edit/></Fab>
       );
     }
