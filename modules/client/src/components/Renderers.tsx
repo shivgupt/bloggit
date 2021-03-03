@@ -32,7 +32,7 @@ export const TextRenderer = (props: any) => {
 }
 
 export  const LinkRenderer = (props: any) => {
-  return (<Link color="secondary" href={props.href}> {props.children[0].props.value} </Link>);
+  return (<Link color="secondary" underline="hover" href={props.href}> {props.children[0].props.value} </Link>);
 };
 
 export  const ImageRenderer = (props: any) => {

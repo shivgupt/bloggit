@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { HistoryResponse } from "@blog/types";
 import { makeStyles } from "@material-ui/core";
-import { withStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 import Menu from "@material-ui/core/Menu";
@@ -24,28 +23,11 @@ const useStyles = makeStyles((theme) => ({
     marginTop: theme.spacing(-1),
     marginLeft: theme.spacing(1),
   },
-}));
-
-const StyledMenu = withStyles({
   paper: {
     border: "1px solid #d3d4d5",
     maxHeight: "50%",
   },
-})((props: any) => (
-  <Menu
-    elevation={0}
-    getContentAnchorEl={null}
-    anchorOrigin={{
-      vertical: "bottom",
-      horizontal: "center",
-    }}
-    transformOrigin={{
-      vertical: "top",
-      horizontal: "center",
-    }}
-    {...props}
-  />
-));
+}));
 
 export const BrowseHistory = (props: {
   currentRef: string;
@@ -94,6 +76,7 @@ export const BrowseHistory = (props: {
 
     <div className={classes.buttonBar}>
       <Copyable
+        id={"copy-permalink"}
         className={classes.button}
         color={"primary"}
         text={"Permalink"}
@@ -103,6 +86,7 @@ export const BrowseHistory = (props: {
 
       <div>
         <Button
+          id={"browse-history"}
           className={classes.button}
           startIcon={<ExpandIcon/>}
           aria-controls="customized-menu"
@@ -113,8 +97,13 @@ export const BrowseHistory = (props: {
         >
           History
         </Button>
-        <StyledMenu
-          id="customized-menu"
+
+        <Menu
+          elevation={0}
+          PaperProps={{ className: classes.paper }}
+          getContentAnchorEl={null}
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+          transformOrigin={{ vertical: "top", horizontal: "center" }}
           anchorEl={anchorEl}
           keepMounted
           open={!!anchorEl}
@@ -136,11 +125,12 @@ export const BrowseHistory = (props: {
               );
             })
           }
-        </StyledMenu>
+        </Menu>
       </div>
 
       {isHistorical
         ? <Button
+            id={"jump-to-present"}
             className={classes.button}
             startIcon={<FastForwardIcon/>}
             component={Link}
