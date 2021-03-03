@@ -1,4 +1,4 @@
-import { ReadResponse } from "@blog/types";
+import { ReadResponse, RefResponse } from "@blog/types";
 import express from "express";
 
 import { env } from "../env";
@@ -10,7 +10,7 @@ export const gitRouter = express.Router();
 
 const log = logger.child({ module: "GitRead" });
 
-export const getRef = async (): Promise<{ branch: string; commit: string; }> => ({
+export const getRef = async (): Promise<RefResponse> => ({
   branch: env.branch,
   commit: await resolveRef(env.branch),
 });

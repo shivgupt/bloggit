@@ -1,4 +1,5 @@
 import React, { useContext, useState } from "react";
+import { PostData } from "@blog/types";
 import { makeStyles, Fab, Theme } from "@material-ui/core"
 import {
   SpeedDial,
@@ -15,7 +16,6 @@ import { useHistory } from "react-router-dom";
 import axios from "axios";
 
 import { GitContext } from "../GitContext";
-import { PostData } from "../types";
 
 const getPath = (post: PostData) => {
   if (post?.path) return post.path;

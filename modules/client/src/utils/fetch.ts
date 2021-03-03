@@ -1,7 +1,5 @@
-import { HistoryResponse } from "@blog/types";
+import { BlogIndex, HistoryResponse, PostData } from "@blog/types";
 import axios from "axios";
-
-import { PostData, PostIndex } from "../types";
 
 import { emptyIndex } from "./constants";
 
@@ -43,7 +41,7 @@ export const fetchFile = async (path: string, _ref?: string): Promise<string> =>
   return fileCache[ref][path];
 };
 
-export const fetchIndex = async (_ref?: string): Promise<PostIndex> => {
+export const fetchIndex = async (_ref?: string): Promise<BlogIndex> => {
   try {
     const ref = _ref || await fetchRef();
     const indexContent = await fetchFile("index.json", ref);

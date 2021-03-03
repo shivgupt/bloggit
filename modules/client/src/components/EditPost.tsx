@@ -1,3 +1,4 @@
+import { PostData } from "@blog/types";
 import {
   Input,
   makeStyles,
@@ -18,7 +19,6 @@ import {
   LinkRenderer
 } from "./Renderers";
 import { ImageUploader } from "./ImageUploader";
-import { PostData } from "../types";
 
 const useStyles = makeStyles((theme) => ({
   root: {

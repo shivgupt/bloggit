@@ -1,4 +1,4 @@
-import { PostData } from "../types";
+import { PostData } from "@blog/types";
 import emoji from "emoji-dictionary";
 
 export const replaceEmojiString = (s: string) =>
@@ -64,7 +64,7 @@ export const getPostsByCategories = (posts: { [slug: string]: PostData }) => {
       } else {
         return ({
           ...categories,
-          ["top-level"]: [ ...(categories["top-level"] || []), post ]
+          "top-level": [ ...(categories["top-level"] || []), post ]
         })
       }
     }, {})

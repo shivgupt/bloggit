@@ -1,9 +1,8 @@
-import { PostData, PostIndex } from "../types";
+import { PostData, BlogIndex } from "@blog/types";
 
-export const emptyIndex: PostIndex = {
+export const emptyIndex: BlogIndex = {
   posts: {},
   drafts: {},
-  about: "",
   title: "My Personal Website",
 };
 
