@@ -157,7 +157,14 @@ export const EditPost = (props: {
   };
 
   const update = async () => {
-    if (!validate()) return;
+    if (!validate()) {
+      setSnackAlert({
+        open: true,
+        msg: "Please enter valid post details",
+        severity: "error"
+      });
+      return;
+    }
     const oldIndex = gitState?.index;
     const newIndex = JSON.parse(JSON.stringify(oldIndex))
     const data = [] as Array<{path: string, content: string}>;
@@ -203,7 +210,7 @@ export const EditPost = (props: {
     if (!validate()) {
       setSnackAlert({
         open: true,
-        msg: "Please enter post details",
+        msg: "Please enter valid post details",
         severity: "error"
       });
       return;
@@ -365,7 +372,7 @@ export const EditPost = (props: {
             FabProps={{id: "fab-discard"}}
             icon={<Delete />}
             key="fab-discard"
-            onClick={() => setEditMode(false)}
+            onClick={discardConfirm}
             tooltipTitle="Discard changes"
           />,
           <SpeedDialAction
