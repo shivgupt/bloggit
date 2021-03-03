@@ -32,6 +32,7 @@ import {
   store,
 } from "./utils";
 
+
 const useStyles = makeStyles((theme: Theme) => createStyles({
   appBarSpacer: theme.mixins.toolbar,
   root: {
@@ -70,13 +71,15 @@ const App: React.FC = () => {
   const [snackAlert, setSnackAlert] = useState<SnackAlert>(defaultSnackAlert);
 
   const history = useHistory();
+  const categoryMatch = useRouteMatch("/category/:slug");
   const slugMatch = useRouteMatch("/:slug");
   const refMatch = useRouteMatch("/:ref/:slug");
-  const refParam = refMatch ? refMatch.params.ref : "";
-  const slugParam = refMatch ? refMatch.params.slug
+  const refParam = categoryMatch ? null : refMatch ? refMatch.params.ref : "";
+  const slugParam = categoryMatch ? null : refMatch ? refMatch.params.slug
     : slugMatch ? slugMatch.params.slug
     : "";
 
+  console.log(categoryMatch, slugMatch, refMatch)
   // console.log(`Rendering App with refParam=${refParam} and slugParam=${slugParam}`);
 
   const validateAuthToken = async (_authToken?: string) => {
@@ -188,6 +191,10 @@ const App: React.FC = () => {
                     ? <EditPost setEditMode={setEditMode} setSnackAlert={setSnackAlert} />
                     : <Home />
                 )}
+              />
+              <Route exact
+                path="/category/:slug"
+                render={() => <Home filter="category" by={categoryMatch.params.slug} />}
               />
               <Route exact
                 path="/admin"
