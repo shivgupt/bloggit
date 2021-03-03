@@ -3,7 +3,6 @@ import {
   CardActionArea,
   CardContent,
   CardMedia,
-  Chip,
   Grid,
   Typography,
   makeStyles,
@@ -64,13 +63,9 @@ export const Home = () => {
                 <CardContent>
                   <Typography variant="h5" gutterBottom>{title}</Typography>
                   <Typography variant="caption" gutterBottom display="block">
-                    {posts[slug].lastEdit ? prettyDateString(posts[slug].lastEdit!) : ""}
+                    {posts[slug].publishedOn ? prettyDateString(posts[slug].publishedOn!) : ""}
                     &nbsp;
                     &nbsp;
-                    {posts[slug].tags
-                      ? <> Tags: {posts[slug].tags?.map(tag => <Chip key={tag} label={tag} />)} </>
-                      : null
-                    }
                   </Typography>
                   <br />
                   <Typography variant="subtitle1" component="p" gutterBottom>

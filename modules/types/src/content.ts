@@ -6,7 +6,6 @@ export type PostData = {
   path?: string;
   publishedOn: string;
   slug: string;
-  tags?: string[];
   title: string;
   tldr?: string;
 };

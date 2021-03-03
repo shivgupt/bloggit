@@ -15,7 +15,6 @@ export const emptyEntry: PostData = {
   lastEdit: "",
   slug: "",
   path: "",
-  tags: [],
   tldr: "",
   title: "",
 };
