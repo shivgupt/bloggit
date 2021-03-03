@@ -1,13 +1,15 @@
 import {
   Container,
-  CssBaseline,
-  Theme,
   createStyles,
+  CssBaseline,
+  Fab,
   makeStyles,
+  Theme,
   ThemeProvider,
 } from "@material-ui/core";
+import { Add, Edit } from "@material-ui/icons";
 import React, { useEffect, useState } from "react";
-import { Route, Switch, useRouteMatch} from "react-router-dom";
+import { Route, Switch, useRouteMatch, useHistory } from "react-router-dom";
 import axios from "axios";
 
 import { Home } from "./components/Home";
@@ -27,7 +29,6 @@ import { store } from "./utils/cache";
 import { GitContext } from "./GitContext";
 import { AdminMode, GitState } from "./types";
 import { EditPost } from "./components/EditPost";
-import { AppSpeedDial } from "./components/AppSpeedDial";
 
 import { EditPostValidation } from "./types";
 import  { defaultValidation } from "./utils/constants";
@@ -48,6 +49,16 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
     marginTop: theme.spacing(2),
     padding: theme.spacing(0.25),
   },
+  fab: {
+    position: "fixed",
+    bottom: theme.spacing(2),
+    [theme.breakpoints.up("md")]: {
+      right: "23%",
+    },
+    [theme.breakpoints.down("sm")]: {
+      right: theme.spacing(2),
+    },
+  },
 }));
 
 const App: React.FC = () => {
@@ -61,6 +72,8 @@ const App: React.FC = () => {
   const [newContent, setNewContent] = useState("");
   const [editMode, setEditMode] = useState(false);
   const [validation, setValidation] = React.useState<EditPostValidation>(defaultValidation);
+
+  const history = useHistory();
 
   const slugMatch = useRouteMatch("/:slug");
   const refMatch = useRouteMatch("/:ref/:slug");
@@ -174,12 +187,16 @@ const App: React.FC = () => {
                 render={() => (
                   editMode
                     ? <EditPost
-                      postData={newPostData}
-                      content={newContent}
-                      setPostData={setNewPostData}
-                      setContent={setNewContent}
-                      validation={validation}
-                    />
+                        postData={newPostData}
+                        setEditMode={setEditMode}
+                        newPostData={newPostData}
+                        content={newContent}
+                        newContent={newContent}
+                        setPostData={setNewPostData}
+                        setContent={setNewContent}
+                        validation={validation}
+                        setValidation={setValidation}
+                      />
                     : <Home />
                 )}
               />
@@ -198,25 +215,45 @@ const App: React.FC = () => {
                 render={() => {
                   return editMode
                   ? <EditPost
+                      setEditMode={setEditMode}
                       postData={newPostData}
+                      newPostData={newPostData}
                       content={newContent}
+                      newContent={newContent}
                       setPostData={setNewPostData}
                       setContent={setNewContent}
                       validation={validation}
+                      setValidation={setValidation}
                     /> 
                   : <PostPage />
                 }}
               />
             </Switch>
-            {(adminMode === "enabled")
-            ? <AppSpeedDial
-                newContent={newContent}
-                newPostData={newPostData}
-                editMode={editMode}
-                setEditMode={setEditMode}
-                setValidation={setValidation}
-              />
-            : null}
+            {(adminMode === "enabled" && !editMode)
+              ? (
+                  !gitState.slug
+                  || gitState.slug === "admin"
+                  || gitState.currentRef !== gitState.latestRef
+                )
+                  ? <Fab
+                      id={"fab"}
+                      className={classes.fab}
+                      color="primary"
+                      onClick={() => {
+                        setEditMode(true);
+                        setValidation(defaultValidation);
+                        history.push("/");
+                      }}
+                    ><Add/></Fab>
+
+                  : <Fab
+                      id={"fab"}
+                      className={classes.fab}
+                      color="primary"
+                      onClick={() => { setEditMode(true); setValidation(defaultValidation)}}
+                    ><Edit/></Fab>
+
+               : null}
           </Container>
         </main>
       </GitContext.Provider>
