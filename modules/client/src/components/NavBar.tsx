@@ -24,6 +24,7 @@ import {
   NavigateNext as NextIcon,
   Person,
   Description as DocIcon,
+  Close,
 } from "@material-ui/icons";
 import React, { useState, useContext } from "react";
 import { Link as RouterLink, useRouteMatch } from "react-router-dom";
@@ -73,7 +74,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const DrawerContent = (props: any) => {
-  const { siteTitle, node, setNode, toggleTheme, theme, adminMode, setAdminMode } = props;
+  const { siteTitle, node, setNode, toggleTheme, toggleDrawer, theme, adminMode, setAdminMode } = props;
 
   const gitContext = useContext(GitContext);
   const { index } = gitContext.gitState;
@@ -81,6 +82,9 @@ const DrawerContent = (props: any) => {
 
   return (
     <>
+      <IconButton
+        onClick={toggleDrawer}
+      ><Close /></IconButton>
       <ThemeProvider theme={siteTitleFont}>
         <Typography variant="h4" component="div" >
           <Box textAlign="center" m={2} p={2}>
@@ -215,7 +219,7 @@ export const NavBar = (props: any) => {
             onClose={toggleDrawer}
             classes={{ paper: classes.hiddenDrawer }}
           >
-            <DrawerContent siteTitle={siteTitle} {...props} />
+            <DrawerContent siteTitle={siteTitle} toggleDrawer={toggleDrawer} {...props} />
           </Drawer>
         </Hidden>
         <Hidden smDown>
