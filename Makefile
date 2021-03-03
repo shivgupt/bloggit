@@ -99,10 +99,13 @@ node-modules: builder package.json $(shell ls modules/**/package.json)
 ########################################
 # Compile/Transpile src
 
-server-js: node-modules $(shell find modules/server/src $(find_options))
+types: node-modules $(shell find modules/types/src $(find_options))
 	bash ops/maketh.sh $@
 
-client-js: node-modules $(shell find modules/client/src $(find_options))
+server-js: types $(shell find modules/server/src $(find_options))
+	bash ops/maketh.sh $@
+
+client-js: types $(shell find modules/client/src $(find_options))
 	bash ops/maketh.sh $@
 
 ########################################

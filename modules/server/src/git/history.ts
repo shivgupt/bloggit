@@ -1,8 +1,10 @@
+import { HistoryResponse } from "@blog/types";
+
 import { env } from "../env";
 import { logger } from "../utils";
 
 import { getCommit, getPrevCommits, getFileOid, slugToPath } from "./utils";
-import { HistoryResponse, DateString } from "./types";
+import { DateString } from "./types";
 
 const log = logger.child({ module: "GitHistory" });
 

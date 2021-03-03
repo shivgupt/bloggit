@@ -1,6 +1,7 @@
+import { HistoryResponse } from "@blog/types";
 import axios from "axios";
 
-import { PostData, PostIndex, PostHistory } from "../types";
+import { PostData, PostIndex } from "../types";
 
 import { emptyIndex } from "./constants";
 
@@ -105,7 +106,7 @@ export const fetchContent = async(
   return await fetchFile(path, ref)
 };
 
-export const fetchHistory = async (slug: string): Promise<PostHistory> => {
+export const fetchHistory = async (slug: string): Promise<HistoryResponse> => {
   if (!slug) return [];
   const url = `/git/history/${slug}`;
   const response = await axios(url);
@@ -117,5 +118,5 @@ export const fetchHistory = async (slug: string): Promise<PostHistory> => {
     console.warn(`Failed to retrieve valid history entries for ${slug}`, response.data);
     return [];
   }
-  return response.data as PostHistory;
+  return response.data as HistoryResponse;
 };

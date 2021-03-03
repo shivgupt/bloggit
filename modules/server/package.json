@@ -19,6 +19,7 @@
     "pino-pretty": "4.5.0"
   },
   "devDependencies": {
+    "@blog/types": "1.0.0",
     "@types/chai": "4.2.15",
     "@types/express": "4.17.11",
     "@types/mocha": "8.2.1",

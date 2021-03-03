@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { HistoryResponse } from "@blog/types";
 import { makeStyles } from "@material-ui/core";
 import { withStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
@@ -10,7 +11,6 @@ import { Link } from "react-router-dom";
 import ExpandIcon from '@material-ui/icons/ExpandMore';
 import FastForwardIcon from '@material-ui/icons/FastForward';
 
-import { PostHistory } from "../types";
 import { fetchHistory } from "../utils";
 
 import { Copyable } from "./Copyable";
@@ -56,7 +56,7 @@ export const BrowseHistory = (props: {
   const classes = useStyles();
 
   const [anchorEl, setAnchorEl] = useState(null);
-  const [editHistory, setEditHistory] = useState([] as PostHistory);
+  const [editHistory, setEditHistory] = useState([] as HistoryResponse);
   const [isHistorical, setIsHistorical] = useState(false);
 
   const handleOpen = (event) => {

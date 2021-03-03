@@ -1,9 +1,9 @@
+import { ReadResponse } from "@blog/types";
 import express from "express";
 
 import { env } from "../env";
 import { logger } from "../utils";
 
-import { ReadResponse } from "./types";
 import { getCommit, readFile, resolveRef } from "./utils";
 
 export const gitRouter = express.Router();

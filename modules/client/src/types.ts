@@ -30,11 +30,6 @@ export type PostIndex = {
   title: string;
 };
 
-export type PostHistory = Array<{
-  commit: string;
-  timestamp: string;
-}>;
-
 export type SidebarNode = {
   parent: string,
   current: string,
