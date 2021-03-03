@@ -64,15 +64,15 @@ const App: React.FC = () => {
   const [validation, setValidation] = React.useState<EditPostValidation>(defaultValidation);
   const [snackAlert, setSnackAlert] = useState<SnackAlert>(defaultSnackAlert);
 
-  const category = useRouteMatch("/category/:slug");
+  const categoryMatch = useRouteMatch("/category/:slug");
   const slugMatch = useRouteMatch("/:slug");
   const refMatch = useRouteMatch("/:ref/:slug");
-  const refParam = category ? null : refMatch ? refMatch.params.ref : "";
-  const slugParam = category ? null : refMatch ? refMatch.params.slug
+  const refParam = categoryMatch ? null : refMatch ? refMatch.params.ref : "";
+  const slugParam = categoryMatch ? null : refMatch ? refMatch.params.slug
     : slugMatch ? slugMatch.params.slug
     : "";
 
-  console.log(category, slugMatch, refMatch)
+  console.log(categoryMatch, slugMatch, refMatch)
   // console.log(`Rendering App with refParam=${refParam} and slugParam=${slugParam}`);
 
   const validateAuthToken = async (_authToken?: string) => {
@@ -201,7 +201,7 @@ const App: React.FC = () => {
               />
               <Route exact
                 path="/category/:slug"
-                render={() => <Home filter="category" by={category.params.slug} />}
+                render={() => <Home filter="category" by={categoryMatch.params.slug} />}
               />
               <Route exact
                 path="/admin"
