@@ -71,7 +71,12 @@ export const Home = (props: { filter?: string, by?: string }) => {
                   <Typography variant="caption" gutterBottom display="block">
                     {posts[slug].publishedOn ? prettyDateString(posts[slug].publishedOn!) : ""}
                     &nbsp;
-                    <Chip label={posts[slug].category} />
+                    <Chip
+                      label={posts[slug].category}
+                      component={Link}
+                      to={`/category/${posts[slug].category}`}
+                      clickable
+                    />
                   </Typography>
                   <br />
                   <Typography variant="subtitle1" component="p" gutterBottom>
