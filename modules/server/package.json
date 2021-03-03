@@ -6,21 +6,30 @@
   "author": "",
   "license": "ISC",
   "scripts": {
-    "build": "tsc -p tsconfig.json"
+    "build": "tsc -p tsconfig.json",
+    "test": "ts-mocha --check-leaks --exit --timeout 60000 'src/**/*.test.ts'"
   },
   "dependencies": {
     "body-parser": "1.19.0",
     "express": "4.17.1",
-    "isomorphic-git": "1.8.1",
     "ipfs-client": "0.3.2",
+    "isomorphic-git": "1.8.1",
+    "it-all": "1.0.5",
     "node-fetch": "2.6.1",
     "pino": "6.11.1",
     "pino-pretty": "4.5.0"
   },
   "devDependencies": {
+    "@blog/types": "1.0.0",
+    "@types/chai": "4.2.15",
     "@types/express": "4.17.11",
+    "@types/mocha": "8.2.1",
+    "chai": "4.3.0",
+    "chai-as-promised": "7.1.1",
+    "mocha": "8.3.0",
     "nodemon": "2.0.7",
+    "ts-mocha": "8.0.0",
     "ts-node": "9.1.1",
-    "typescript": "4.1.5"
+    "typescript": "4.2.2"
   }
 }

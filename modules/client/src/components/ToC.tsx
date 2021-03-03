@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Markdown from "react-markdown";
 import { Link } from "react-router-dom";
 import {
@@ -9,15 +9,15 @@ import {
   ListItem,
 } from "@material-ui/core";
 import {
-  Toc as TocIcon,
   NavigateNext as NavigateNextIcon,
   ArrowBackIos as NavigateBackIcon,
 } from "@material-ui/icons";
-import emoji from "emoji-dictionary";
 
-import { getChildValue } from "../utils";
+import { GitContext } from "../GitContext";
+import { getChildValue, replaceEmojiString } from "../utils";
 
 import { HashLink } from "./HashLink";
+import { SidebarNode } from "../types";
 
 const useStyles = makeStyles(theme => ({
   list: { width: "100%" },
@@ -43,7 +43,7 @@ const TocGenerator = (props: any) => {
     return null;
   }
   const headingSlug = value.toLowerCase().replace(/[^a-z0-9 ]/g, "").replace(/\W+/g, "-");
-  const heading = value.replace(/:\w+:/gi, name => emoji.getUnicode(name) || name);
+  const heading = replaceEmojiString(value);
 
   const marginStyle = classes[`list${props.level || 1}`];
   return (
@@ -63,8 +63,22 @@ const TocGenerator = (props: any) => {
 };
 
 export const Toc = (props: any) => {
-  const { node, allContent, posts, currentRef: ref, setNode } = props;
+  const [node, setNode] = useState({} as SidebarNode);
+  const gitContext = useContext(GitContext);
+  const { currentContent, slug, index } = gitContext.gitState
+
+  const { posts} = props;
+
   const classes = useStyles();
+
+  useEffect(() => {
+    // Update sidebar node
+    if (slug !== "" && index?.posts?.[slug || ""]){
+      setNode({ parent: "posts", current: "toc", child: index?.posts?.[slug || ""] });
+    } else {
+      setNode({ parent: "", current: "categories", child: "posts" });
+    }
+  }, [slug, index]);
 
   switch(node.current) {
   case "categories": 
@@ -92,6 +106,8 @@ export const Toc = (props: any) => {
                   <Divider />
                 </div>
               );
+            } else {
+              return null;
             }
           })}
         </List>
@@ -103,7 +119,7 @@ export const Toc = (props: any) => {
       <div className={classes.list}>
         <IconButton
           onClick={() => setNode({ 
-            parent: null,
+            parent: "",
             current: "categories",
             child: "posts",
           })}
@@ -116,17 +132,12 @@ export const Toc = (props: any) => {
             return (
               <div key={p.slug}>
                 <ListItem button key={p.title} component={Link} to={`/${p.slug}`} onClick={() =>
-                  setNode({
-                    parent: "posts",
-                    current: "toc",
-                    child: p,
-                  })}
-                >
-                  {p.title}
-                  {allContent && allContent[ref] && allContent[ref][p.slug]
-                    ? <TocIcon className={classes.tocIcon} />
+                  (slug === p.slug)
+                    ? setNode({ parent: "posts", current: "toc", child: p })
                     : null
                   }
+                >
+                  {p.title}
                 </ListItem>
                 <Divider />
               </div>
@@ -144,7 +155,7 @@ export const Toc = (props: any) => {
             if (node.child.category) {
               setNode({ parent: "categories", current: "posts", child: node.child.category })
             } else {
-              setNode({ parent: null, current: "categories", child: "posts" })
+              setNode({ parent: "", current: "categories", child: "posts" })
             }
           }}
         >
@@ -154,7 +165,7 @@ export const Toc = (props: any) => {
         <List component="nav" className={classes.list}>
           <Markdown
             allowedTypes={["text", "heading"]}
-            source={allContent[ref] ? allContent[ref][node.child.slug] : ""}
+            source={currentContent}
             renderers={{ heading: TocGenerator }}
             className={classes.list}
           />

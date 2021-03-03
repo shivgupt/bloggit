@@ -15,6 +15,7 @@ echo "- BLOG_DOMAINNAME=$BLOG_DOMAINNAME"
 echo "- BLOG_EMAIL=$BLOG_EMAIL"
 echo "- BLOG_INTERNAL_CONTENT_DIR=$BLOG_INTERNAL_CONTENT_DIR"
 echo "- BLOG_LOG_LEVEL=$BLOG_LOG_LEVEL"
+echo "- BLOG_MAX_UPLOAD_SIZE=$BLOG_MAX_UPLOAD_SIZE"
 echo "- BLOG_MIRROR_KEY=$BLOG_MIRROR_KEY"
 echo "- BLOG_MIRROR_REF=$BLOG_MIRROR_REF"
 echo "- BLOG_MIRROR_URL=$BLOG_MIRROR_URL"
@@ -54,6 +55,24 @@ then
     then git branch "$BLOG_BRANCH" "$BLOG_MIRROR_REF/$BLOG_BRANCH"
     fi
   )
+
+elif [[ ! -f "$BLOG_INTERNAL_CONTENT_DIR/refs/heads/$BLOG_BRANCH" ]]
+then
+  echo "Creating the first commit on branch $BLOG_BRANCH in $BLOG_INTERNAL_CONTENT_DIR"
+  test_temp_repo="/tmp/tmp.git"
+  rm -rf "$test_temp_repo"
+  git init --quiet "$test_temp_repo"
+  echo "ref: refs/heads/$BLOG_BRANCH" > "$test_temp_repo/.git/HEAD"
+  (
+    cd "$test_temp_repo"
+    git config user.email "test@localhost"
+    git config user.name "test"
+    echo '{"title":"Test","post":[]}' > index.json
+    git add index.json
+    git commit --message "initial commit"
+    git push "$BLOG_INTERNAL_CONTENT_DIR" "$BLOG_BRANCH"
+  )
+  rm -rf "$test_temp_repo"
 fi
 
 ########################################

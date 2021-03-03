@@ -1,14 +1,19 @@
 # Cache
-**/.cache
-**/.config
-**/.docker-compose.yml
-**/.node-gyp
-**/.npm
+.cache
+.config
+.docker-compose.yml
+.node-gyp
+.npm
+.rpt2_cache
 modules/*/package-lock.json
 
 # Local storage
-.media
+!modules/client/.env
+**/*.local
 .blog-content.git
+.env
+.test-content
+.test-content.git
 
 # Compiled output
 .flags
@@ -30,10 +35,7 @@ node_modules/
 # Logs
 *.log*
 package.json.lerna_backup
-
-# Misc
-**/.env
-.rpt2_cache
+modules/client/cypress/screenshots
 
 # OS
 .bash_history

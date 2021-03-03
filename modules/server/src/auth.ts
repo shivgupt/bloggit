@@ -11,7 +11,7 @@ const authHeader = "authorization";
 const authType = "Basic";
 const encodedToken = Buffer.from(`${env.authUsername}:${env.authPassword}`).toString("base64");
 
-const restrictedMethods = ["POST", "PUT"];
+const restrictedMethods = ["DELETE", "POST", "PUT"];
 const restrictedPaths = ["/git/edit", "/git/git-receive-pack", "/ipfs"];
 
 authRouter.use((req, res, next) => {

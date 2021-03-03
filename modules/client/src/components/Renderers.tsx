@@ -1,18 +1,39 @@
+import { useTheme } from "@material-ui/core/styles";
 import { IconButton, Link } from "@material-ui/core";
 import { Link as LinkIcon } from "@material-ui/icons";
 import React from "react";
-import emoji from "emoji-dictionary";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { atomDark, vs } from "react-syntax-highlighter/dist/esm/styles/prism";
 
-import { getChildValue } from "../utils";
+import { getChildValue, replaceEmojiString, slugify } from "../utils";
 
 import { HashLink } from "./HashLink";
 
-export const EmojiRenderer = text => text.value.replace(/:\w+:/gi, name =>
-      emoji.getUnicode(name) || name);
+export const CodeBlockRenderer = (props: any) => {
+  const theme = useTheme();
+
+  if (theme.palette.type === "dark") {
+    return (
+      <SyntaxHighlighter showLineNumbers language={props.language} style={atomDark}>
+        {props.value}
+      </SyntaxHighlighter>
+    );
+  }
+
+  return (
+    <SyntaxHighlighter showLineNumbers language={props.language} style={vs}>
+      {props.value}
+    </SyntaxHighlighter>
+  );
+};
+
+export const TextRenderer = (props: any) => {
+  return <> {replaceEmojiString(props.value)} </>
+}
 
 export  const LinkRenderer = (props: any) => {
-    return (<Link color="secondary" href={props.href}> {props.children[0].props.value} </Link>);
-  };
+  return (<Link color="secondary" underline="hover" href={props.href}> {props.children[0].props.value} </Link>);
+};
 
 export  const ImageRenderer = (props: any) => {
     return <img
@@ -39,7 +60,7 @@ export const HeadingRenderer = (props: any) => {
     return null;
   }
 
-  const slug = value.toLowerCase().replace(/[^a-z0-9 ]/g, "").replace(/\W+/g, "-");
+  const slug = slugify(value)
 
   return React.createElement(
     `h${props.level}`,

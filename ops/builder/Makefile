@@ -26,6 +26,12 @@ node-modules: package.json $(shell ls modules/**/package.json)
 	$(log_finish) && mv -f $(totalTime) .flags/$@
 
 # TODO: generalize below so we can build any module with `npm run build`
+# It'd be nice to derive the dependency graph from package.json deps
+
+types: node-modules $(shell find modules/server/src $(find_options))
+	$(log_start)
+	cd modules/types && npm run build
+	$(log_finish) && mv -f $(totalTime) .flags/$@
 
 server-js: node-modules $(shell find modules/server/src $(find_options))
 	$(log_start)

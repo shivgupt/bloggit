@@ -8,7 +8,8 @@ RUN curl https://raw.githubusercontent.com/vishnubob/wait-for-it/ed77b63706ea721
 
 RUN npm install -g lerna@3.22.1
 
-COPY entry.sh /entry.sh
 COPY Makefile /Makefile
+COPY test.sh /test.sh
+COPY entry.sh /entry.sh
 
 ENTRYPOINT ["bash", "/entry.sh"]
