@@ -3,6 +3,7 @@ import {
   CardActionArea,
   CardContent,
   CardMedia,
+  Chip,
   Grid,
   Typography,
   makeStyles,
@@ -35,15 +36,20 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export const Home = () => {
+export const Home = (props: { filter?: string, by?: string }) => {
+  const { filter, by } = props;
   const classes = useStyles();
   const gitContext = useContext(GitContext);
-  const posts = gitContext.gitState?.index?.posts || [];
+
+  const posts = gitContext.gitState?.index?.posts || {};
 
   return (
     <Grid container spacing={3} justify={"space-around"} alignItems={"center"}>
       {Object.keys(posts).map(slug => {
         if (!posts[slug].category) return null;
+        if (filter && by && posts[slug][filter] !== by) {
+          return null;
+        }
 
         const title = replaceEmojiString(posts[slug].title);
         const tldr = replaceEmojiString(posts[slug].tldr!);
@@ -65,6 +71,7 @@ export const Home = () => {
                   <Typography variant="caption" gutterBottom display="block">
                     {posts[slug].publishedOn ? prettyDateString(posts[slug].publishedOn!) : ""}
                     &nbsp;
+                    <Chip label={posts[slug].category} />
                   </Typography>
                   <br />
                   <Typography variant="subtitle1" component="p" gutterBottom>

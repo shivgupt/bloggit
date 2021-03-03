@@ -75,7 +75,7 @@ export const AppSpeedDial = (props: {
           msg: "Changes discarded",
           severity: "success",
           hideDuration: 6000,
-        })
+        });
       }}> Yes </Button>
     });
   };
