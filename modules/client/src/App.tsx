@@ -19,6 +19,7 @@ import {
   fetchContent,
   fetchIndex,
   fetchRef,
+  initialGitState,
 } from "./utils";
 import { darkTheme, lightTheme } from "./style";
 import { store } from "./utils/cache";
@@ -48,7 +49,7 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
 const App: React.FC = () => {
   const classes = useStyles();
 
-  const [gitState, setGitState] = useState({} as GitState);
+  const [gitState, setGitState] = useState(initialGitState);
   const [theme, setTheme] = useState(lightTheme);
   const [adminMode, setAdminMode] = useState<AdminMode>("invalid");
 
@@ -114,7 +115,7 @@ const App: React.FC = () => {
       newGitState.currentContent = await fetchContent(slug, currentRef)
       newGitState.indexEntry = index.posts?.[slug] || index.drafts?.[slug];
     } else {
-      newGitState.currentContent = "Does Not Exist";
+      newGitState.currentContent = "";
       newGitState.indexEntry = emptyEntry;
     }
     setGitState(newGitState);
