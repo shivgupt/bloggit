@@ -13,7 +13,7 @@ import { Link } from "react-router-dom";
 import { prettyDateString, replaceEmojiString } from "../utils";
 import { GitContext } from "../GitContext";
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
     alignContent: "center",
@@ -21,7 +21,7 @@ const useStyles = makeStyles(() => ({
   },
   card: {
     width: "100%",
-    height: "300px",
+    height: "420px",
   },
   wrapper: {
     width: "100%",
@@ -65,11 +65,10 @@ export const Home = () => {
                   <Typography variant="caption" gutterBottom display="block">
                     {posts[slug].publishedOn ? prettyDateString(posts[slug].publishedOn!) : ""}
                     &nbsp;
-                    &nbsp;
                   </Typography>
                   <br />
                   <Typography variant="subtitle1" component="p" gutterBottom>
-                    {tldr}
+                    {tldr.substr(0,140)}...
                   </Typography>
                 </CardContent>
               </CardActionArea>
