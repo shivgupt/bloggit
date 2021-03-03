@@ -79,7 +79,7 @@ export const BrowseHistory = (props: {
     if (!slug || slug === "admin") return;
     (async () => {
       try {
-        console.log(`Fetching history bc slug changed to "${slug}"`);
+        console.log(`Refreshing history bc slug changed to "${slug}"`);
         setEditHistory(await fetchHistory(slug));
       } catch (e) {
         console.warn(e.message);

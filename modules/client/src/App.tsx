@@ -74,7 +74,7 @@ const App: React.FC = () => {
           "authorization": `Basic ${btoa(`admin:${authToken}`)}`,
         },
         method: "post",
-        url: "git",
+        url: "/git",
       });
       // Auth is valid, update localStorage, axios header and adminMode
       store.save("authToken", authToken);
