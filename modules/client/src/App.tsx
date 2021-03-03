@@ -8,29 +8,26 @@ import {
   ThemeProvider,
 } from "@material-ui/core";
 import { Add, Edit } from "@material-ui/icons";
+import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Route, Switch, useRouteMatch, useHistory } from "react-router-dom";
-import axios from "axios";
 
-import { Home } from "./components/Home";
 import { AdminHome } from "./components/AdminHome";
+import { EditPost } from "./components/EditPost";
+import { Home } from "./components/Home";
 import { NavBar } from "./components/NavBar";
 import { PostPage } from "./components/Posts";
+import { GitContext } from "./GitContext";
+import { darkTheme, lightTheme } from "./style";
+import { AdminMode, GitState } from "./types";
 import {
   emptyEntry,
   fetchContent,
   fetchIndex,
   fetchRef,
   initialGitState,
+  store,
 } from "./utils";
-import { darkTheme, lightTheme } from "./style";
-import { store } from "./utils/cache";
-import { GitContext } from "./GitContext";
-import { AdminMode, GitState } from "./types";
-import { EditPost } from "./components/EditPost";
-
-import { EditPostValidation } from "./types";
-import  { defaultValidation } from "./utils/constants";
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
   appBarSpacer: theme.mixins.toolbar,
@@ -66,9 +63,7 @@ const App: React.FC = () => {
   const [gitState, setGitState] = useState(initialGitState);
   const [theme, setTheme] = useState(lightTheme);
   const [adminMode, setAdminMode] = useState<AdminMode>("invalid");
-
   const [editMode, setEditMode] = useState(false);
-  const [validation, setValidation] = React.useState<EditPostValidation>(defaultValidation);
 
   const history = useHistory();
 
@@ -175,11 +170,7 @@ const App: React.FC = () => {
                 path="/"
                 render={() => (
                   editMode
-                    ? <EditPost
-                        setEditMode={setEditMode}
-                        setValidation={setValidation}
-                        validation={validation}
-                      />
+                    ? <EditPost setEditMode={setEditMode} />
                     : <Home />
                 )}
               />
@@ -197,11 +188,7 @@ const App: React.FC = () => {
                 path="/:slug"
                 render={() => {
                   return editMode
-                  ? <EditPost
-                      setEditMode={setEditMode}
-                      setValidation={setValidation}
-                      validation={validation}
-                    /> 
+                  ? <EditPost setEditMode={setEditMode} />
                   : <PostPage />
                 }}
               />
@@ -218,7 +205,6 @@ const App: React.FC = () => {
                       color="primary"
                       onClick={() => {
                         setEditMode(true);
-                        setValidation(defaultValidation);
                         history.push("/");
                       }}
                     ><Add/></Fab>
@@ -227,10 +213,7 @@ const App: React.FC = () => {
                       id={"fab"}
                       className={classes.fab}
                       color="primary"
-                      onClick={() => {
-                        setEditMode(true);
-                        setValidation(defaultValidation);
-                      }}
+                      onClick={() => { setEditMode(true); }}
                     ><Edit/></Fab>
 
                : null}

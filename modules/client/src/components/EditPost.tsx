@@ -1,3 +1,5 @@
+import "react-mde/lib/styles/css/react-mde-all.css";
+
 import { PostData } from "@blog/types";
 import {
   Input,
@@ -6,25 +8,25 @@ import {
   TextField,
 } from "@material-ui/core";
 import {
-  SpeedDial,
-  SpeedDialAction
-} from "@material-ui/lab";
-import {
   Add,
   Edit,
   Delete,
   Drafts,
   Public,
 } from "@material-ui/icons";
+import {
+  SpeedDial,
+  SpeedDialAction
+} from "@material-ui/lab";
+import axios from "axios";
 import React, { useContext, useEffect, useState } from "react";
 import Markdown from "react-markdown";
 import ReactMde, { SaveImageHandler } from "react-mde";
-import "react-mde/lib/styles/css/react-mde-all.css";
-import axios from "axios";
 import { useHistory } from "react-router-dom";
 
 import { GitContext } from "../GitContext";
 import { EditPostValidation } from "../types";
+import { defaultValidation, emptyEdit, slugify } from "../utils";
 
 import {
   CodeBlockRenderer,
@@ -34,7 +36,6 @@ import {
   LinkRenderer
 } from "./Renderers";
 import { ImageUploader } from "./ImageUploader";
-import { defaultValidation, emptyEdit, slugify } from "../utils";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -75,14 +76,11 @@ const getPath = (post: PostData) => {
 };
 
 export const EditPost = (props: {
-  validation: EditPostValidation;
-  setValidation: any;
   setEditMode: any;
 }) => {
-  const {
-    validation, setValidation, setEditMode,
-  } = props;
+  const { setEditMode } = props;
 
+  const [validation, setValidation] = React.useState<EditPostValidation>(defaultValidation);
   const [newPostData, setNewPostData] = useState(emptyEdit);
   const [newContent, setNewContent] = useState("");
   const [selectedTab, setSelectedTab] = React.useState<"write" | "preview">("write");
@@ -94,11 +92,18 @@ export const EditPost = (props: {
   const { currentContent, slug } = gitState;
 
   useEffect(() => {
-    setNewContent(gitState.currentContent);
-    setNewPostData(gitState.indexEntry);
+    // On mount, set initial data to edit
+    setValidation(defaultValidation);
+    if (gitState.slug) {
+      setNewContent(gitState.currentContent);
+      setNewPostData(gitState.indexEntry);
+    }
     // On unmount, clear edit data
-    return () => setNewContent("");
-  }, [gitState]);
+    return () => {
+      setNewContent("");
+      setNewPostData(emptyEdit);
+    };
+  }, [gitState]); // gitState will only be updated after turning editMode off
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setNewPostData({
@@ -249,6 +254,7 @@ export const EditPost = (props: {
           let value = newPostData?.[name] || "";
           if (name === "slug" && newPostData?.[name] === null) {
             value = slugify(newPostData?.title || "");
+            console.log(`Using slugified title: ${value}`);
           }
           return (
             <TextField
