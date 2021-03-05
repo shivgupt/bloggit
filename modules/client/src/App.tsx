@@ -95,24 +95,28 @@ const App: React.FC = () => {
       // Auth is valid, update localStorage, axios header and adminMode
       store.save("authToken", authToken);
       axios.defaults.headers.common["authorization"] = `Basic ${btoa(`admin:${authToken}`)}`;
-      setSnackAlert({
-        open: true,
-        msg: "Auth token registered",
-        severity: "success",
-        hideDuration: 6000,
-      });
+      if (_authToken) {
+        setSnackAlert({
+          open: true,
+          msg: "Auth token registered",
+          severity: "success",
+          hideDuration: 6000,
+        });
+      }
       setAdminMode("enabled");
     } catch (e) {
       // Auth is invalid, update localStorage, axios header and adminMode
       console.error(`Auth token is not valid: ${e.message}`);
       store.save("authToken", "");
       axios.defaults.headers.common["authorization"] = `Basic ${btoa(`admin:`)}`;
-      setSnackAlert({
-        open: true,
-        msg: "Invalid Auth Token",
-        severity: "error",
-        hideDuration: 6000,
-      });
+      if (_authToken) {
+        setSnackAlert({
+          open: true,
+          msg: "Invalid Auth Token",
+          severity: "error",
+          hideDuration: 6000,
+        });
+      }
       setAdminMode("invalid");
     }
   }
@@ -175,7 +179,6 @@ const App: React.FC = () => {
         <CssBaseline />
         <NavBar
           adminMode={adminMode}
-          setAdminMode={setAdminMode}
           theme={theme}
           toggleTheme={toggleTheme}
           setEditMode={setEditMode}
@@ -199,7 +202,7 @@ const App: React.FC = () => {
               <Route exact
                 path="/admin"
                 render={() => (
-                  <AdminHome adminMode={adminMode} validateAuthToken={validateAuthToken} />
+                  <AdminHome adminMode={adminMode} setAdminMode={setAdminMode} validateAuthToken={validateAuthToken} />
                 )}
               />
               <Route

@@ -3,11 +3,9 @@ import {
   Box,
   Button,
   Drawer,
-  FormControlLabel,
   Hidden,
   IconButton,
   Link,
-  Switch,
   ThemeProvider,
   Toolbar,
   Typography,
@@ -15,7 +13,7 @@ import {
   Breadcrumbs,
 } from "@material-ui/core";
 import {
-  AccountCircle as AdminAccount,
+  Tune as AdminAccount,
   Brightness4 as DarkIcon,
   BrightnessHigh as LightIcon,
   Home as HomeIcon,
@@ -72,16 +70,15 @@ const useStyles = makeStyles(theme => ({
     marginBottom: theme.spacing(-4),
     marginLeft: "75%",
   },
-  title: {
+  breadcrumb: {
     flex: 1,
     marginLeft: theme.spacing(1),
   },
 }));
 
 const DrawerContent = (props: any) => {
-  const { siteTitle, node, setNode, toggleTheme, toggleDrawer, theme, adminMode, setAdminMode } = props;
+  const { siteTitle, node, setNode, toggleTheme, toggleDrawer, theme, adminMode } = props;
   const classes = useStyles();
-
   const gitContext = useContext(GitContext);
   const { index } = gitContext.gitState;
   const posts = getPostsByCategories(index?.posts || []);
@@ -109,6 +106,21 @@ const DrawerContent = (props: any) => {
       >
         {theme.palette.type === "dark" ? <LightIcon /> : <DarkIcon />}
       </IconButton>
+      <Toc posts={posts} node={node} setNode={setNode}/>
+      {posts["top-level"]
+        ? posts["top-level"].map((p) => {
+          return (
+            <Box key={p.slug} textAlign="center" m={1}>
+              <Button
+                size="small"
+                disableFocusRipple={false}
+                component={RouterLink}
+                to={`/${p.slug}`}
+              > {p.title} </Button>
+            </Box>
+          )})
+        : null
+      }
       { adminMode !== "invalid" ?
         <>
           <Box textAlign="center" m={1}>
@@ -123,39 +135,8 @@ const DrawerContent = (props: any) => {
               <AdminAccount />
             </IconButton>
 
-            <FormControlLabel
-              id="toggle-admin-mode"
-              control={
-                <Switch
-                  size="small"
-                  checked={adminMode === "enabled"}
-                  onChange={() => {
-                    if (adminMode === "enabled") setAdminMode("disabled");
-                    else setAdminMode("enabled");
-                  }}
-                />
-              }
-              label="Admin Mode"
-              labelPlacement="start"
-            />
-
           </Box>
         </>
-        : null
-      }
-      <Toc posts={posts} node={node} setNode={setNode}/>
-      {posts["top-level"]
-        ? posts["top-level"].map((p) => {
-          return (
-            <Box key={p.slug} textAlign="center" m={1}>
-              <Button
-                size="small"
-                disableFocusRipple={false}
-                component={RouterLink}
-                to={`/${p.slug}`}
-              > {p.title} </Button>
-            </Box>
-          )})
         : null
       }
     </>
@@ -181,13 +162,25 @@ export const NavBar = (props: any) => {
     <>
       <AppBar position="fixed" className={classes.appBar}>
         <Toolbar>
-          <Breadcrumbs aria-label="breadcrumb" separator={<NextIcon fontSize="small"/>} className={classes.title}>
-            <Link id="go-home" className={classes.link} color="inherit" onClick={() => setEditMode(false)} href="/">
+          <Breadcrumbs aria-label="breadcrumb" separator={<NextIcon fontSize="small"/>} className={classes.breadcrumb}>
+            <Link
+              id="go-home"
+              className={classes.link}
+              component={RouterLink}
+              color="inherit"
+              onClick={() => setEditMode(false)}
+              to="/"
+            >
               <HomeIcon className={classes.icon} />
-              Home
             </Link>
             {categoryMatch
-            ? <Link className={classes.link} color="inherit" onClick={() => setEditMode(false)} href={`/category/${categoryMatch.params.slug}`}>
+            ? <Link
+                className={classes.link}
+                color="inherit"
+                component={RouterLink}
+                onClick={() => setEditMode(false)}
+                to={`/category/${categoryMatch.params.slug}`}
+              >
                 <CategoryIcon className={classes.icon} />
                 {categoryMatch.params.slug}
               </Link>
@@ -199,13 +192,19 @@ export const NavBar = (props: any) => {
                   <Person className={classes.icon} />
                   Admin
                 </Typography>
-              : [ <Link className={classes.link} color="inherit" onClick={() => setEditMode(false)} href={`/category/${post?.category}`}>
+              : [ <Link
+                    className={classes.link}
+                    color="inherit"
+                    component={RouterLink}
+                    onClick={() => setEditMode(false)}
+                    to={`/category/${post?.category}`}
+                  >
                     <CategoryIcon className={classes.icon} />
                     {post?.category}
                   </Link>,
                   <Typography>
                     <DocIcon className={classes.icon} />
-                    {pageTitle.substr(0,10)}..
+                    {pageTitle}
                   </Typography>
                 ]
             : null

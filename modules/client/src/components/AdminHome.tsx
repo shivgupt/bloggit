@@ -2,10 +2,12 @@ import React, { useState } from "react";
 import { 
   Button,
   Divider,
-  makeStyles,
+  FormControlLabel,
+  Switch,
   TextField,
   Theme,
   Typography,
+  makeStyles,
 } from "@material-ui/core";
 
 import { IndexEditor } from "./IndexEditor";
@@ -25,10 +27,11 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 export const AdminHome = (props: {
   adminMode: AdminMode,
+  setAdminMode: (val: AdminMode) => void,
   validateAuthToken: (_authToken?: string) => Promise<void>
 }) => {
 
-  const { adminMode, validateAuthToken } = props;
+  const { adminMode, setAdminMode, validateAuthToken } = props;
   const classes = useStyles();
 
   const [authToken, setAuthToken] = useState("");
@@ -56,7 +59,7 @@ export const AdminHome = (props: {
       <div className={classes.section}>
         <TextField
           autoComplete={"off"}
-          helperText="Register device by providing the admin token"
+          helperText="Register for admin mode"
           id="admin-token"
           label="Admin Token"
           onChange={(e) => setAuthToken(e.target.value)}
@@ -68,6 +71,7 @@ export const AdminHome = (props: {
         <Button
           className={classes.button}
           id="register-admin-token"
+          size="small"
           onClick={() => validateAuthToken(authToken)}
           variant="contained"
         >
@@ -77,10 +81,29 @@ export const AdminHome = (props: {
 
       <Divider variant="middle" />
       { adminMode !== "invalid"
-        ? (<div className={classes.section}>
-          <IndexEditor />
-        </div>)
+        ? <FormControlLabel
+            id="toggle-admin-mode"
+            control={
+              <Switch
+                size="small"
+                checked={adminMode === "enabled"}
+                onChange={() => {
+                  if (adminMode === "enabled") setAdminMode("disabled");
+                  else setAdminMode("enabled");
+                }}
+              />
+            }
+            label="Admin Mode"
+            labelPlacement="start"
+            className={classes.section}
+          />
         : <>Supply a valid admin token to activate admin mode</>
+      }
+      { adminMode === "enabled"
+          ? <div className={classes.section}>
+            <IndexEditor />
+          </div>
+        : null
       }
     </div>
   );

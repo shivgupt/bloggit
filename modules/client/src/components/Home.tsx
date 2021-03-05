@@ -34,6 +34,12 @@ const useStyles = makeStyles((theme) => ({
     maxWidth: "100%",
     marginTop: "-40%",
   },
+  section: {
+    margin: theme.spacing(1, 1),
+    "& > *": {
+      margin: theme.spacing(1),
+    }
+  },
 }));
 
 export const Home = (props: { filter?: string, by?: string }) => {
@@ -54,11 +60,12 @@ export const Home = (props: { filter?: string, by?: string }) => {
 
         const title = replaceEmojiString(posts[slug].title);
         const tldr = replaceEmojiString(posts[slug].tldr!);
+        const cutoff = posts[slug].img ? 140 : 280;
 
         return (
           <Grid className={classes.root} item xs={12} md={6} lg={4} key={slug}>
             <Card className={classes.card}>
-              <CardActionArea className={classes.card} component={Link} to={`/${slug}`}>
+              <CardActionArea disableRipple className={classes.card} component={Link} to={`/${slug}`}>
                 {posts[slug].img
                   ? <div className={classes.wrapper}><CardMedia
                       className={classes.media}
@@ -68,20 +75,23 @@ export const Home = (props: { filter?: string, by?: string }) => {
                     /></div>
                   : null}
                 <CardContent>
-                  <Typography variant="h5" gutterBottom>{title}</Typography>
-                  <Typography variant="caption" gutterBottom display="block">
-                    {posts[slug].publishedOn ? prettyDateString(posts[slug].publishedOn!) : ""}
-                    &nbsp;
-                    <Chip
-                      label={posts[slug].category}
-                      component={Link}
-                      to={`/category/${posts[slug].category}`}
-                      clickable
-                    />
-                  </Typography>
-                  <br />
-                  <Typography variant="subtitle1" component="p" gutterBottom>
-                    {tldr.substr(0,140)}...
+                  <Typography variant="h5" gutterBottom display="block">{title}</Typography>
+                  {posts[slug].publishedOn
+                    ? <Typography variant="caption" gutterBottom display="inline">
+                        {prettyDateString(posts[slug].publishedOn!)}
+                      </Typography>
+                    : ""
+                  }
+                  &nbsp;
+                  <Chip
+                    label={posts[slug].category}
+                    component={Link}
+                    to={`/category/${posts[slug].category}`}
+                    clickable
+                    disableRipple
+                  />
+                  <Typography variant="subtitle1" component="p" gutterBottom className={classes.section}>
+                    {tldr.substr(0,cutoff)} {tldr.length > cutoff ? "..." : null}
                   </Typography>
                 </CardContent>
               </CardActionArea>
