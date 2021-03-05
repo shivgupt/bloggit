@@ -1,3 +1,4 @@
+import { BlogIndex, PostData } from "@blog/types";
 import React, { useContext, useEffect, useState } from "react";
 import { 
   Divider,
@@ -5,6 +6,7 @@ import {
   TableRow,
   TableCell,
   TableHead,
+  TableBody,
   IconButton,
   Fab,
   makeStyles,
@@ -34,13 +36,20 @@ const useStyles = makeStyles((theme: Theme) => ({
   fab: getFabStyle(theme),
 }));
 
+type EditIndex = BlogIndex & {
+  posts: {
+    [slug: string] : PostData & {
+      removed?: boolean;
+    };
+  };
+};
 
 export const IndexEditor = (props: {
   setEditMode: (editMode: boolean) => void;
 }) => {
   const { setEditMode } = props;
   const [diff, setDiff] = useState(false);
-  const [newIndex, setNewIndex] = useState(emptyIndex);
+  const [newIndex, setNewIndex] = useState(emptyIndex as EditIndex);
   const classes = useStyles();
   const gitContext = useContext(GitContext);
   const history = useHistory();
@@ -48,20 +57,28 @@ export const IndexEditor = (props: {
   const oldIndex = gitContext.gitState?.index;
 
   const toggleFeatured = (slug: string): void => {
-    const nextIndex = JSON.parse(JSON.stringify(newIndex));
+    const nextIndex = JSON.parse(JSON.stringify(newIndex)) as EditIndex;
     nextIndex.posts[slug].featured = !nextIndex.posts[slug].draft && !newIndex.posts[slug].featured;
     setNewIndex(nextIndex);
   }
 
   const toggleDraft = (slug: string): void => {
-    const nextIndex = JSON.parse(JSON.stringify(newIndex));
-    nextIndex.posts[slug].draft = !newIndex.posts[slug].draft;
+    const nextIndex = JSON.parse(JSON.stringify(newIndex)) as EditIndex;
+    nextIndex.posts[slug].draft = !newIndex.posts[slug].removed && !newIndex.posts[slug].draft;
     nextIndex.posts[slug].featured = !nextIndex.posts[slug].draft && newIndex.posts[slug].featured;
     setNewIndex(nextIndex);
   }
 
+  const toggleRemoved = (slug: string): void => {
+    const nextIndex = JSON.parse(JSON.stringify(newIndex)) as EditIndex;
+    nextIndex.posts[slug].removed = !newIndex.posts[slug].removed;
+    nextIndex.posts[slug].draft = false;
+    nextIndex.posts[slug].featured = false;
+    setNewIndex(nextIndex);
+  }
+
   useEffect(() => {
-    setNewIndex(oldIndex);
+    setNewIndex(oldIndex as EditIndex);
   }, [oldIndex]);
 
   useEffect(() => {
@@ -70,7 +87,9 @@ export const IndexEditor = (props: {
       oldIndex.title !== newIndex.title ||
       Object.values(newIndex.posts).some(post => {
         const oldEntry = oldIndex.posts[post.slug];
-        return !!post.featured !== !!oldEntry.featured || !!post.draft !== !!oldEntry.draft;
+        return !!post.removed
+          || !!post.featured !== !!oldEntry.featured
+          || !!post.draft !== !!oldEntry.draft;
       })
     ) {
       setDiff(true);
@@ -88,11 +107,18 @@ export const IndexEditor = (props: {
       console.warn(`Invalid index`);
       return;
     }
+    const indexToSave = JSON.parse(JSON.stringify(newIndex)) as EditIndex;
+    Object.keys(indexToSave.posts).forEach(slug => {
+      if (indexToSave.posts[slug].removed) {
+        console.log(`Removing ${slug} from index`);
+        delete indexToSave.posts[slug];
+      }
+    });
     await axios({
       method: "post",
       url: "git/edit",
       headers: { "content-type": "application/json" },
-      data: [{ path: "index.json", content: JSON.stringify(newIndex, null, 2) }],
+      data: [{ path: "index.json", content: JSON.stringify(indexToSave, null, 2) }],
     });
     await gitContext.syncGitState(undefined, undefined, true);
   };
@@ -123,56 +149,69 @@ export const IndexEditor = (props: {
           <TableCell padding="none">Title</TableCell>
           <TableCell padding="checkbox">Featured</TableCell>
           <TableCell padding="checkbox">Draft</TableCell>
+          <TableCell padding="checkbox">Remove</TableCell>
         </TableRow> 
       </TableHead>
-      {newIndex?.posts
-        ? Object.values(newIndex?.posts || {}).map((post) => {
-          const slug = post?.slug || "";
-          const title = post?.title || "";
-          const draft = !!post?.draft;
-          const featured = !!post?.featured;
-          return (
-            <TableRow>
+      <TableBody>
+        {newIndex?.posts
+          ? Object.values(newIndex?.posts || {}).map((post) => {
+            const slug = post?.slug || "";
+            const title = post?.title || "";
+            const draft = !!post?.draft;
+            const featured = !!post?.featured;
+            const removed = !!post?.removed;
+            return (
+              <TableRow key={`table-row-${slug}`}>
 
-              <TableCell padding="none" className={classes.editColumn}>
-                <IconButton
-                  id={`edit-${slug}`}
-                  onClick={() => {
-                    setEditMode(true);
-                    history.push(`/${slug}`);
-                  }}
-                  color="secondary"
-                  size="small"
-                ><Edit/></IconButton>
-              </TableCell>
+                <TableCell padding="none" className={classes.editColumn}>
+                  <IconButton
+                    id={`edit-${slug}`}
+                    onClick={() => {
+                      setEditMode(true);
+                      history.push(`/${slug}`);
+                    }}
+                    color="secondary"
+                    size="small"
+                  ><Edit/></IconButton>
+                </TableCell>
 
-              <TableCell align="left" padding="none">
-                {title}
-              </TableCell>
+                <TableCell align="left" padding="none">
+                  {title}
+                </TableCell>
 
-              <TableCell align="center" padding="checkbox">
-                <Switch
-                  id={`toggle-featured-${slug}`}
-                  size="small"
-                  checked={featured}
-                  onChange={() => toggleFeatured(slug)}
-                />
-              </TableCell>
+                <TableCell align="center" padding="checkbox">
+                  <Switch
+                    id={`toggle-featured-${slug}`}
+                    size="small"
+                    checked={featured}
+                    onChange={() => toggleFeatured(slug)}
+                  />
+                </TableCell>
 
-              <TableCell align="center" padding="checkbox">
-                <Switch
-                  id={`toggle-draft-${slug}`}
-                  size="small"
-                  checked={draft}
-                  onChange={() => toggleDraft(slug)}
-                />
-              </TableCell>
+                <TableCell align="center" padding="checkbox">
+                  <Switch
+                    id={`toggle-draft-${slug}`}
+                    size="small"
+                    checked={draft}
+                    onChange={() => toggleDraft(slug)}
+                  />
+                </TableCell>
 
-            </TableRow>
-          )
-        })
-        : null
-      }
+                <TableCell align="center" padding="checkbox">
+                  <Switch
+                    id={`toggle-remove-${slug}`}
+                    size="small"
+                    checked={removed}
+                    onChange={() => toggleRemoved(slug)}
+                  />
+                </TableCell>
+
+              </TableRow>
+            )
+          })
+          : null
+        }
+      </TableBody>
     </Table>
     <div className={classes.bottomSpace}/>
     <Fab
