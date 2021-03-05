@@ -26,6 +26,7 @@ import ReactMde, { SaveImageHandler } from "react-mde";
 import { useHistory } from "react-router-dom";
 
 import { GitContext } from "../GitContext";
+import { getFabStyle } from "../style";
 import { SnackAlert } from "../types";
 import { emptyEntry, slugify } from "../utils";
 
@@ -57,16 +58,7 @@ const useStyles = makeStyles((theme) => ({
     textAlign: "justify",
     fontVariant: "discretionary-ligatures",
   },
-  speedDial: {
-    position: "fixed",
-    bottom: theme.spacing(2),
-    [theme.breakpoints.up("md")]: {
-      right: "23%",
-    },
-    [theme.breakpoints.down("sm")]: {
-      right: theme.spacing(2),
-    },
-  },
+  speedDial: getFabStyle(theme),
 }));
 
 type EditData = PostData & {
@@ -188,22 +180,18 @@ export const EditPost = (props: {
     }
     const oldIndex = gitState?.index;
     const newIndex = JSON.parse(JSON.stringify(oldIndex))
-    let key;
-    if (oldIndex?.posts?.[gitState.slug]) {
-      key = "posts";
-    } else {
-      key = "drafts";
-    }
-    newIndex[key][gitState.slug] = {
+    newIndex.posts[gitState.slug] = {
+      // TODO: be more selective in old keys that we carry forward
+      ...oldIndex.posts[gitState.slug],
+      slug: editData.slug,
+      title: editData.title,
       category: editData.category,
       img: editData.img,
       lastEdit: (new Date()).toLocaleDateString("en-in"),
-      slug: editData.slug,
-      title: editData.title,
       tldr: editData.tldr,
     } as PostData;
     const newPath = getPath(editData);
-    const oldPath = getPath(oldIndex[key][gitState.slug]);
+    const oldPath = getPath(oldIndex.posts[gitState.slug]);
     const data = [] as Array<{path: string, content: string}>;
     if (oldPath !== newPath) {
       data.push({ path: oldPath, content: "" });
@@ -241,21 +229,16 @@ export const EditPost = (props: {
     const newIndexEntry = {
       ...gitState.indexEntry,
       category: editData.category,
+      draft: asDraft,
       img: editData.img,
       lastEdit: now,
       slug: editData.slug,
       title: editData.title,
       tldr: editData.tldr,
     } as PostData;
-    if (asDraft === true) {
-      if (!newIndex.drafts) newIndex.drafts = {};
-      newIndex.drafts[newPostSlug] = newIndexEntry;
-      if (newIndex.posts?.[newPostSlug]) delete newIndex.posts[newPostSlug];
-    } else {
-      if (!newIndex.posts) newIndex.posts = {};
-      newIndex.posts[newPostSlug] = newIndexEntry;
+    newIndex.posts[newPostSlug] = newIndexEntry;
+    if (!asDraft) {
       newIndex.posts[newPostSlug].publishedOn = newIndexEntry.publishedOn || now;
-      if (newIndex.drafts?.[newPostSlug]) delete newIndex.drafts[newPostSlug];
     }
     // Send request to update index.json and create new file
     let res = await axios({
@@ -351,7 +334,7 @@ export const EditPost = (props: {
       />
     </Paper>
     <SpeedDial
-      id={"fab"}
+      FabProps={{ id: "fab" }}
       ariaLabel="fab"
       onClose={() => setOpen(false)}
       onOpen={() => setOpen(true)}

@@ -9,7 +9,7 @@ describe("git read endpoint", () => {
   beforeEach(async () => {
     await edit([{
       path: "index.json",
-      content: JSON.stringify({ title: "Test Blog", posts: [], drafts: [] }, null, 2),
+      content: JSON.stringify({ title: "Test Blog", posts: [] }, null, 2),
     }]);
   });
 
@@ -22,6 +22,3 @@ describe("git read endpoint", () => {
     await expect(getFile("main", "index.json")).to.eventually.be.ok;
   });
 });
-
-
-

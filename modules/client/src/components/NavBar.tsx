@@ -3,11 +3,9 @@ import {
   Box,
   Button,
   Drawer,
-  FormControlLabel,
   Hidden,
   IconButton,
   Link,
-  Switch,
   ThemeProvider,
   Toolbar,
   Typography,
@@ -15,7 +13,7 @@ import {
   Breadcrumbs,
 } from "@material-ui/core";
 import {
-  AccountCircle as AdminAccount,
+  Tune as AdminAccount,
   Brightness4 as DarkIcon,
   BrightnessHigh as LightIcon,
   Home as HomeIcon,
@@ -67,24 +65,42 @@ const useStyles = makeStyles(theme => ({
   hiddenDrawer: {
     width: "60%",
   },
-  title: {
+  closeDrawer: {
+    height: theme.spacing(8),
+    marginBottom: theme.spacing(-4),
+    marginLeft: "75%",
+  },
+  breadcrumb: {
     flex: 1,
     marginLeft: theme.spacing(1),
+  },
+  postTitle: {
+    [theme.breakpoints.between(0,500)]: {
+      maxWidth: "100px"
+    },
+    [theme.breakpoints.between(500,800)]: {
+      maxWidth: "200px"
+    },
   },
 }));
 
 const DrawerContent = (props: any) => {
-  const { siteTitle, node, setNode, toggleTheme, toggleDrawer, theme, adminMode, setAdminMode } = props;
-
+  const { siteTitle, node, setNode, toggleTheme, toggleDrawer, theme, adminMode } = props;
+  const classes = useStyles();
   const gitContext = useContext(GitContext);
   const { index } = gitContext.gitState;
   const posts = getPostsByCategories(index?.posts || []);
 
   return (
     <>
-      <IconButton
-        onClick={toggleDrawer}
-      ><Close /></IconButton>
+      <Hidden mdUp>
+        <IconButton
+          id="close-drawer"
+          className={classes.closeDrawer}
+          onClick={() => toggleDrawer()}
+          size="small"
+        ><Close/></IconButton>
+      </Hidden>
       <ThemeProvider theme={siteTitleFont}>
         <Typography variant="h4" component="div" >
           <Box textAlign="center" m={2} p={2}>
@@ -99,40 +115,6 @@ const DrawerContent = (props: any) => {
       >
         {theme.palette.type === "dark" ? <LightIcon /> : <DarkIcon />}
       </IconButton>
-      { adminMode !== "invalid" ?
-        <>
-          <Box textAlign="center" m={1}>
-
-            <IconButton
-              id="go-to-admin-page"
-              component={RouterLink}
-              edge="start"
-              to={"/admin"}
-              color="inherit"
-            >
-              <AdminAccount />
-            </IconButton>
-
-            <FormControlLabel
-              id="toggle-admin-mode"
-              control={
-                <Switch
-                  size="small"
-                  checked={adminMode === "enabled"}
-                  onChange={() => {
-                    if (adminMode === "enabled") setAdminMode("disabled");
-                    else setAdminMode("enabled");
-                  }}
-                />
-              }
-              label="Admin Mode"
-              labelPlacement="start"
-            />
-
-          </Box>
-        </>
-        : null
-      }
       <Toc posts={posts} node={node} setNode={setNode}/>
       {posts["top-level"]
         ? posts["top-level"].map((p) => {
@@ -146,6 +128,25 @@ const DrawerContent = (props: any) => {
               > {p.title} </Button>
             </Box>
           )})
+        : null
+      }
+      { adminMode !== "invalid" ?
+        <>
+          <Box textAlign="center" m={1}>
+
+            <IconButton
+              id="go-to-admin-page"
+              component={RouterLink}
+              edge="start"
+              to={"/admin"}
+              color="inherit"
+              onClick={() => toggleDrawer()}
+            >
+              <AdminAccount />
+            </IconButton>
+
+          </Box>
+        </>
         : null
       }
     </>
@@ -164,23 +165,32 @@ export const NavBar = (props: any) => {
   const { index, slug } = gitContext.gitState;
   const siteTitle = index?.title || "My Blog";
   const pageTitle = index?.posts?.[slug || ""]?.title || "";
-  const post = slug ? index?.posts?.[slug] || index?.drafts?.[slug] : null;
+  const post = slug ? index?.posts?.[slug] : null;
   document.title = pageTitle ? `${pageTitle} | ${siteTitle}` : siteTitle;
-
-  console.log(categoryMatch)
-  console.log(slug)
 
   return (
     <>
       <AppBar position="fixed" className={classes.appBar}>
         <Toolbar>
-          <Breadcrumbs aria-label="breadcrumb" separator={<NextIcon fontSize="small"/>} className={classes.title}>
-            <Link id="go-home" className={classes.link} color="inherit" onClick={() => setEditMode(false)} href="/">
+          <Breadcrumbs aria-label="breadcrumb" separator={<NextIcon fontSize="small"/>} className={classes.breadcrumb}>
+            <Link
+              id="go-home"
+              className={classes.link}
+              component={RouterLink}
+              color="inherit"
+              onClick={() => setEditMode(false)}
+              to="/"
+            >
               <HomeIcon className={classes.icon} />
-              Home
             </Link>
             {categoryMatch
-            ? <Link className={classes.link} color="inherit" onClick={() => setEditMode(false)} href={`/category/${categoryMatch.params.slug}`}>
+            ? <Link
+                className={classes.link}
+                color="inherit"
+                component={RouterLink}
+                onClick={() => setEditMode(false)}
+                to={`/category/${categoryMatch.params.slug}`}
+              >
                 <CategoryIcon className={classes.icon} />
                 {categoryMatch.params.slug}
               </Link>
@@ -192,13 +202,20 @@ export const NavBar = (props: any) => {
                   <Person className={classes.icon} />
                   Admin
                 </Typography>
-              : [ <Link className={classes.link} color="inherit" onClick={() => setEditMode(false)} href={`/category/${post?.category}`}>
+              : [ <Link
+                    key="navbar-category"
+                    className={classes.link}
+                    color="inherit"
+                    component={RouterLink}
+                    onClick={() => setEditMode(false)}
+                    to={`/category/${post?.category}`}
+                  >
                     <CategoryIcon className={classes.icon} />
                     {post?.category}
                   </Link>,
-                  <Typography>
+                  <Typography key="navbar-category-icon" noWrap className={classes.postTitle}>
                     <DocIcon className={classes.icon} />
-                    {pageTitle.substr(0,10)}..
+                    {pageTitle}
                   </Typography>
                 ]
             : null
@@ -235,7 +252,7 @@ export const NavBar = (props: any) => {
             variant="permanent"
             open
           >
-            <DrawerContent siteTitle={siteTitle} {...props} />
+            <DrawerContent siteTitle={siteTitle} toggleDrawer={toggleDrawer} {...props} />
           </Drawer>
         </Hidden>
       </nav>
