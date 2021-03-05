@@ -71,6 +71,17 @@ const App: React.FC = () => {
   console.log(`Rendering App with refParam=${refParam} and slugParam=${slugParam} and categoryParam=${categoryParam}`);
 
   const validateAuthToken = async (_authToken?: string) => {
+    if (_authToken === "") {
+      store.save("authToken", _authToken);
+      setSnackAlert({
+        open: true,
+        msg: "Auth token removed",
+        severity: "success",
+        hideDuration: 4000,
+      });
+      setAdminMode("invalid");
+      return;
+    }
     const authToken = _authToken || store.load("authToken");
     try {
       await axios({
@@ -88,7 +99,7 @@ const App: React.FC = () => {
           open: true,
           msg: "Auth token registered",
           severity: "success",
-          hideDuration: 6000,
+          hideDuration: 4000,
         });
       }
       setAdminMode("enabled");
@@ -102,7 +113,7 @@ const App: React.FC = () => {
           open: true,
           msg: "Invalid Auth Token",
           severity: "error",
-          hideDuration: 6000,
+          hideDuration: 4000,
         });
       }
       setAdminMode("invalid");

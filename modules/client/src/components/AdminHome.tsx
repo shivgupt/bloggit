@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
 import { 
   Button,
   Divider,
@@ -41,9 +42,20 @@ export const AdminHome = (props: {
       {adminMode !== "invalid"
         ? (
           <div className={classes.section}>
-            <Typography variant="subtitle1">
+            <Typography display="inline" variant="body1">
               This device is registered for Admin access
             </Typography>
+            <Button
+              id="unregister-admin-token"
+              variant="outlined"
+              onClick={() => {
+                setAuthToken("");
+                validateAuthToken("");
+              }}
+              startIcon={<RemoveCircleIcon/>}
+            >
+              Unregister
+            </Button>
           </div>
         )
         : (
