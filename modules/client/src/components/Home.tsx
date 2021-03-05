@@ -4,10 +4,12 @@ import {
   CardContent,
   CardMedia,
   Chip,
+  Divider,
   Grid,
   Typography,
   makeStyles,
 } from "@material-ui/core";
+import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 import Carousel from 'react-material-ui-carousel';
@@ -45,15 +47,16 @@ const useStyles = makeStyles((theme) => ({
   },
   section: {
     margin: theme.spacing(1, 1),
-    "& > *": {
-      margin: theme.spacing(1),
-    }
+    maxWidth: "600px",
+    alignContent: "center",
+    alignItems: "center",
   },
 }));
 
 export const PostCard = (props: { post: PostData }) => {
   const classes = useStyles();
   const post = props.post;
+  console.log(post);
   const slug = post.slug;
 
   const title = replaceEmojiString(post.title);
@@ -105,21 +108,57 @@ export const Home = (props: { filter?: string, by?: string }) => {
   const gitContext = useContext(GitContext);
 
   const posts = gitContext.gitState?.index?.posts || {};
+  if (Object.keys(posts).length === 0) return <> Loading </>;
 
   return (
-    <Grid container spacing={3} justify={"space-around"} alignItems={"center"}>
-      {Object.keys(posts).map(slug => {
-        if (!posts[slug].category) return null;
-        if (posts[slug].draft) return null;
-        if (filter && by && posts[slug][filter] !== by) {
-          return null;
-        }
-        return (
-          <Grid className={classes.root} item xs={12} md={6} lg={4} key={slug}>
-            <PostCard post={posts[slug]} />
-          </Grid>
-        );
-      })}
-    </Grid>
+    <>
+      {! (filter && by)
+        ? <>
+            <Carousel className={classes.section}
+              fullHeightHover={false}
+              navButtonsWrapperProps={{
+                className: "string",
+                style: {
+                  top: "calc(70%)",
+                }
+              }}
+              navButtonsProps={{
+                className: "string",
+                style: {
+                  top: "calc(70%)",
+                },
+              }}
+            >
+            {
+            [
+              <PostCard key="1" post={posts["deplatformed"]} />,
+              <PostCard key="2" post={posts["malai-kofta"]} />
+            ]
+            }
+            </Carousel>
+            <Divider variant="middle" />
+            <Typography variant="h4" className={classes.section}>
+              Archives
+            </Typography>
+          </>
+        : <Typography variant="h4" className={classes.section}>
+            All '{by}' posts
+          </Typography>
+      }
+      <Grid container spacing={3} justify={"space-around"} alignItems={"center"}>
+        {Object.keys(posts).map(slug => {
+          if (!posts[slug].category) return null;
+          if (posts[slug].draft) return null;
+          if (filter && by && posts[slug][filter] !== by) {
+            return null;
+          }
+          return (
+            <Grid className={classes.root} item xs={12} md={6} lg={4} key={slug}>
+              <PostCard post={posts[slug]} />
+            </Grid>
+          );
+        })}
+      </Grid>
+    </>
   );
 };

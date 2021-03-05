@@ -43,6 +43,9 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
       width: "80%",
       marginRight: "20%",
     },
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
   },
   main: {
     flexGrow: 1,
