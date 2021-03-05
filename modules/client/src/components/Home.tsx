@@ -56,7 +56,6 @@ const useStyles = makeStyles((theme) => ({
 export const PostCard = (props: { post: PostData }) => {
   const classes = useStyles();
   const post = props.post;
-  console.log(post);
   const slug = post.slug;
 
   const title = replaceEmojiString(post.title);
@@ -108,6 +107,9 @@ export const Home = (props: { filterBy?: string }) => {
   const gitContext = useContext(GitContext);
 
   const posts = (gitContext.gitState?.index?.posts || {}) as {[slug: string]: PostData};
+
+  const featured = Object.values(posts).filter((post) => post.featured)
+
   if (Object.keys(posts).length === 0) return <> Loading </>;
 
   return (
@@ -129,12 +131,9 @@ export const Home = (props: { filterBy?: string }) => {
                 },
               }}
             >
-            {
-            [
-              <PostCard key="1" post={posts["deplatformed"]} />,
-              <PostCard key="2" post={posts["malai-kofta"]} />
-            ]
-            }
+            {featured.map((post: PostData) => 
+              <PostCard key={post.slug} post={post} />,
+            )}
             </Carousel>
             <Divider variant="middle" />
             <Typography variant="h4" className={classes.section}>
@@ -149,6 +148,7 @@ export const Home = (props: { filterBy?: string }) => {
         {Object.values(posts).map((post: PostData) => {
           if (!post.category) return null;
           if (post.draft) return null;
+          if (!filterBy && post.featured) return null;
           if (filterBy && post.category !== filterBy) {
             return null;
           }
