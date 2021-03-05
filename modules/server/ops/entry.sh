@@ -67,7 +67,7 @@ then
     cd "$test_temp_repo"
     git config user.email "test@localhost"
     git config user.name "test"
-    echo '{"title":"Test","posts":[]}' > index.json
+    echo '{"title":"Test","posts":{}}' > index.json
     git add index.json
     git commit --message "initial commit"
     git push "$BLOG_INTERNAL_CONTENT_DIR" "$BLOG_BRANCH"
