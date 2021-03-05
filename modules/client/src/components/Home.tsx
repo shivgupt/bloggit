@@ -118,8 +118,6 @@ export const Home = (props: {
 
   const featured = Object.values(posts).filter((post) => post.featured)
 
-  if (Object.keys(posts).length === 0) return <> Loading </>;
-
   return (
     <>
       {!filterBy
