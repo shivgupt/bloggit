@@ -71,7 +71,7 @@ const App: React.FC = () => {
     : slugMatch ? slugMatch.params.slug
     : "";
 
-  // console.log(`Rendering App with refParam=${refParam} and slugParam=${slugParam} and categoryParam=${categoryParam}`);
+  console.log(`Rendering App with refParam=${refParam} and slugParam=${slugParam} and categoryParam=${categoryParam}`);
 
   const validateAuthToken = async (_authToken?: string) => {
     if (_authToken === "") {
@@ -175,6 +175,10 @@ const App: React.FC = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [categoryParam])
+
+  useEffect(() => {
+    console.log(`Admin mode set to "${adminMode}"`);
+  }, [adminMode])
 
   return (
     <ThemeProvider theme={theme}>
