@@ -88,7 +88,7 @@ const DrawerContent = (props: any) => {
       <Hidden mdUp>
         <IconButton
           className={classes.closeDrawer}
-          onClick={toggleDrawer}
+          onClick={() => toggleDrawer()}
           size="small"
         ><Close/></IconButton>
       </Hidden>
@@ -131,6 +131,7 @@ const DrawerContent = (props: any) => {
               edge="start"
               to={"/admin"}
               color="inherit"
+              onClick={() => toggleDrawer()}
             >
               <AdminAccount />
             </IconButton>
@@ -242,7 +243,7 @@ export const NavBar = (props: any) => {
             variant="permanent"
             open
           >
-            <DrawerContent siteTitle={siteTitle} {...props} />
+            <DrawerContent siteTitle={siteTitle} toggleDrawer={toggleDrawer} {...props} />
           </Drawer>
         </Hidden>
       </nav>

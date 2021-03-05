@@ -1,13 +1,12 @@
 import React, { useContext, useEffect, useState } from "react";
 import { 
   Divider,
+  Table,
+  TableRow,
+  TableCell,
+  TableHead,
   IconButton,
   Fab,
-  FormControlLabel,
-  List,
-  ListItem,
-  ListItemSecondaryAction,
-  ListItemText,
   makeStyles,
   Switch,
   TextField,
@@ -26,8 +25,11 @@ const useStyles = makeStyles((theme: Theme) => ({
     width: '100%',
     backgroundColor: theme.palette.background.paper,
   },
-  listText: {
-    maxWidth: "60%"
+  table: {
+    marginBottom: theme.spacing(12),
+  },
+  editColumn: {
+    width: "36px",
   },
   section: {
     margin: theme.spacing(1, 1),
@@ -105,28 +107,32 @@ export const IndexEditor = (props: {
 
   const title = newIndex?.title;
   return (<>
-    <List className={classes.root}>
-      <ListItem key="index_title">
-        <TextField
-          autoComplete={"off"}
-          error={!title}
-          helperText={!title ? "Please provide a title" : ""}
-          id="input-index-title"
-          key="index-title"
-          label="index-title"
-          name="index-title"
-          onChange={(event) => {
-            setNewIndex(prevIndex => ({ ...prevIndex, title: event.target.value }));
-          }}
-          required={true}
-          value={title}
-        />
-      </ListItem>
-      <Divider variant="middle"/>
-      <List>
-      <ListItem key="index-titles" alignItems="flex-start">
-      title featured drafts edit
-      </ListItem>
+    <TextField
+      autoComplete={"off"}
+      error={!title}
+      helperText={!title ? "Please provide a title" : ""}
+      id="input-index-title"
+      key="index-title"
+      label="index-title"
+      name="index-title"
+      onChange={(event) => {
+        setNewIndex(prevIndex => ({ ...prevIndex, title: event.target.value }));
+      }}
+      required={true}
+      value={title}
+    />
+
+    <Divider variant="middle"/>
+
+    <Table size="small" className={classes.table}>
+      <TableHead>
+        <TableRow> 
+          <TableCell padding="none" className={classes.editColumn}></TableCell>
+          <TableCell padding="none">Title</TableCell>
+          <TableCell padding="checkbox">Featured</TableCell>
+          <TableCell padding="checkbox">Draft</TableCell>
+        </TableRow> 
+      </TableHead>
       {newIndex?.posts
         ? Object.values(newIndex?.posts || {}).map((post) => {
           const slug = post?.slug || "";
@@ -134,52 +140,45 @@ export const IndexEditor = (props: {
           const draft = !!post?.draft;
           const featured = !!post?.featured;
           return (
-            <ListItem key={slug} alignItems="flex-start">
-              <ListItemText primary={title} className={classes.listText} />
+            <TableRow>
 
-              <FormControlLabel
-                id={`toggle-${slug}-featured`}
-                control={
-                  <Switch
-                    size="small"
-                    checked={featured}
-                    onChange={() => toggleFeatured(slug)}
-                  />
-                }
-                label="Featured"
-                labelPlacement="top"
-              />
-
-              <FormControlLabel
-                id={`toggle-${slug}-draft`}
-                control={
-                  <Switch
-                    size="small"
-                    checked={draft}
-                    onChange={() => toggleDraft(slug)}
-                  />
-                }
-                label="Draft"
-                labelPlacement="top"
-              />
-
-              <ListItemSecondaryAction>
-                <IconButton size="small"
+              <TableCell padding="none" className={classes.editColumn}>
+                <IconButton
                   onClick={() => {
                     setEditMode(true);
                     history.push(`/${slug}`);
                   }}
                   color="secondary"
+                  size="small"
                 ><Edit/></IconButton>
-              </ListItemSecondaryAction>
+              </TableCell>
 
-            </ListItem>
+              <TableCell align="left" padding="none">
+                {title}
+              </TableCell>
+
+              <TableCell align="center" padding="checkbox">
+                <Switch
+                  size="small"
+                  checked={featured}
+                  onChange={() => toggleFeatured(slug)}
+                />
+              </TableCell>
+
+              <TableCell align="center" padding="checkbox">
+                <Switch
+                  size="small"
+                  checked={draft}
+                  onChange={() => toggleDraft(slug)}
+                />
+              </TableCell>
+
+            </TableRow>
           )
         })
         : null
       }
-      </List>
-    </List>
+    </Table>
     <Fab
       id={"fab"}
       className={classes.fab}
