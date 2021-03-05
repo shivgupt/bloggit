@@ -169,6 +169,7 @@ const App: React.FC = () => {
 
   // Fetch index & post content any time the url changes
   useEffect(() => {
+    window.scrollTo(0, 0);
     if (slugParam) {
       setEditMode(false);
     }
