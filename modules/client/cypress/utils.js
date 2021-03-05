@@ -61,7 +61,7 @@ my.createPost = (data) => {
 
 my.editPost = (data) => {
   my.goHome();
-  cy.get(`a[href="/${data.slug}"]`).click();
+  cy.get(`a[href="/${data.slug}"]`).last().click();
   cy.get(`button#fab`).dblclick(); // TODO: why do we need to dblclick here?
   my.enterPostData(data);
   my.saveChanges();

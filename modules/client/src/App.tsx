@@ -168,10 +168,13 @@ const App: React.FC = () => {
 
   // Fetch index & post content any time the url changes
   useEffect(() => {
-    window.scrollTo(0, 0);
     syncGitState(refParam || gitState.latestRef, slugParam);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refParam, slugParam]);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [categoryParam])
 
   return (
     <ThemeProvider theme={theme}>
