@@ -1,19 +1,20 @@
 import React, { useContext, useEffect, useState } from "react";
 import { 
-  Button,
   Divider,
+  IconButton,
+  Fab,
+  FormControlLabel,
   List,
   ListItem,
   ListItemSecondaryAction,
   ListItemText,
   makeStyles,
+  Switch,
   TextField,
   Theme,
-  Fab,
 } from "@material-ui/core";
-import { Add, Save } from "@material-ui/icons";
-import { Link, useHistory } from "react-router-dom";
-import { Drafts, Public } from "@material-ui/icons";
+import { Add, Edit, Save } from "@material-ui/icons";
+import { useHistory } from "react-router-dom";
 import axios from "axios";
 
 import { GitContext } from "../GitContext";
@@ -48,28 +49,41 @@ export const IndexEditor = (props: {
   const gitContext = useContext(GitContext);
   const history = useHistory();
 
-  const index = gitContext.gitState?.index;
+  const oldIndex = gitContext.gitState?.index;
 
-  const handleChange = (key: string, val: boolean | string, slug?: string): void => {
-    if (slug) {
-      const oldEntry = newIndex[slug] || {}
-      setNewIndex(oldIndex => ({ ...oldIndex, slug: { ...oldEntry, [key]: val } }));
-    } else {
-      setNewIndex(oldIndex => ({ ...oldIndex, [key]: val }));
-    }
-  };
+  const toggleFeatured = (slug: string): void => {
+    const nextIndex = JSON.parse(JSON.stringify(newIndex));
+    nextIndex.posts[slug].featured = !nextIndex.posts[slug].draft && !newIndex.posts[slug].featured;
+    setNewIndex(nextIndex);
+  }
+
+  const toggleDraft = (slug: string): void => {
+    const nextIndex = JSON.parse(JSON.stringify(newIndex));
+    nextIndex.posts[slug].draft = !newIndex.posts[slug].draft;
+    nextIndex.posts[slug].featured = !nextIndex.posts[slug].draft && newIndex.posts[slug].featured;
+    setNewIndex(nextIndex);
+  }
 
   useEffect(() => {
-    setNewIndex(index);
-  }, [index]);
+    setNewIndex(oldIndex);
+  }, [oldIndex]);
 
   useEffect(() => {
-    if (!index?.title || !newIndex?.title) return;
-    if (JSON.stringify(index) !== JSON.stringify(newIndex)) {
+    if (!oldIndex?.title || !newIndex?.title) return;
+    if (
+      oldIndex.title !== newIndex.title ||
+      Object.values(newIndex.posts).some(post => {
+        const oldEntry = oldIndex.posts[post.slug];
+        return !!post.featured !== !!oldEntry.featured || !!post.draft !== !!oldEntry.draft;
+      })
+    ) {
       console.log(`The new index is different than the old one`);
       setDiff(true);
+    } else {
+      console.log(`The new index is the same as the old one`);
+      setDiff(false);
     }
-  }, [newIndex, index]);
+  }, [newIndex, oldIndex]);
 
   const saveChanges = async (): Promise<void> => {
     if (!diff) {
@@ -101,39 +115,64 @@ export const IndexEditor = (props: {
           key="index-title"
           label="index-title"
           name="index-title"
-          onChange={(event) => handleChange("title", event.target.value)}
+          onChange={(event) => {
+            setNewIndex(prevIndex => ({ ...prevIndex, title: event.target.value }));
+          }}
           required={true}
           value={title}
         />
       </ListItem>
       <Divider variant="middle"/>
       <List>
-      {index?.posts
-        ? Object.values(index?.posts || []).map((post) => {
+      <ListItem key="index-titles" alignItems="flex-start">
+      title featured drafts edit
+      </ListItem>
+      {newIndex?.posts
+        ? Object.values(newIndex?.posts || {}).map((post) => {
+          const slug = post?.slug || "";
+          const title = post?.title || "";
+          const draft = !!post?.draft;
+          const featured = !!post?.featured;
           return (
-            <ListItem button component={Link} to={`/${post.slug}`} key={post.slug} alignItems="flex-start">
-              <ListItemText primary={post.title} className={classes.listText} />
-              <ListItemSecondaryAction>
-                {post.draft
-                  ? <Button size="small"
-                      onClick={() => handleChange("draft", false, post.slug)}
-                      color="primary"
-                      variant="contained"
-                      startIcon={<Public />}
-                    >
-                      Publish
-                    </Button>
-                  : <Button
-                      onClick={() => handleChange("draft", true, post.slug)}
-                      size="small"
-                      color="primary"
-                      variant="contained"
-                      startIcon={<Drafts />}
-                    >
-                      Archive
-                    </Button>
+            <ListItem key={slug} alignItems="flex-start">
+              <ListItemText primary={title} className={classes.listText} />
+
+              <FormControlLabel
+                id={`toggle-${slug}-featured`}
+                control={
+                  <Switch
+                    size="small"
+                    checked={featured}
+                    onChange={() => toggleFeatured(slug)}
+                  />
                 }
+                label="Featured"
+                labelPlacement="top"
+              />
+
+              <FormControlLabel
+                id={`toggle-${slug}-draft`}
+                control={
+                  <Switch
+                    size="small"
+                    checked={draft}
+                    onChange={() => toggleDraft(slug)}
+                  />
+                }
+                label="Draft"
+                labelPlacement="top"
+              />
+
+              <ListItemSecondaryAction>
+                <IconButton size="small"
+                  onClick={() => {
+                    setEditMode(true);
+                    history.push(`/${slug}`);
+                  }}
+                  color="secondary"
+                ><Edit/></IconButton>
               </ListItemSecondaryAction>
+
             </ListItem>
           )
         })
