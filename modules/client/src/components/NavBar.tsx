@@ -175,12 +175,25 @@ export const NavBar = (props: any) => {
       <AppBar position="fixed" className={classes.appBar}>
         <Toolbar>
           <Breadcrumbs aria-label="breadcrumb" separator={<NextIcon fontSize="small"/>} className={classes.title}>
-            <Link id="go-home" className={classes.link} color="inherit" onClick={() => setEditMode(false)} href="/">
+            <Link
+              id="go-home"
+              className={classes.link}
+              component={RouterLink}
+              color="inherit"
+              onClick={() => setEditMode(false)}
+              to="/"
+            >
               <HomeIcon className={classes.icon} />
               Home
             </Link>
             {categoryMatch
-            ? <Link className={classes.link} color="inherit" onClick={() => setEditMode(false)} href={`/category/${categoryMatch.params.slug}`}>
+            ? <Link
+                className={classes.link}
+                color="inherit"
+                component={RouterLink}
+                onClick={() => setEditMode(false)}
+                to={`/category/${categoryMatch.params.slug}`}
+              >
                 <CategoryIcon className={classes.icon} />
                 {categoryMatch.params.slug}
               </Link>
@@ -192,7 +205,13 @@ export const NavBar = (props: any) => {
                   <Person className={classes.icon} />
                   Admin
                 </Typography>
-              : [ <Link className={classes.link} color="inherit" onClick={() => setEditMode(false)} href={`/category/${post?.category}`}>
+              : [ <Link
+                    className={classes.link}
+                    color="inherit"
+                    component={RouterLink}
+                    onClick={() => setEditMode(false)}
+                    to={`/category/${post?.category}`}
+                  >
                     <CategoryIcon className={classes.icon} />
                     {post?.category}
                   </Link>,
