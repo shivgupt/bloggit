@@ -8,6 +8,7 @@ import {
   Typography,
   makeStyles,
 } from "@material-ui/core";
+import EventIcon from "@material-ui/icons/Event";
 import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 
@@ -53,11 +54,12 @@ export const Home = (props: { filter?: string, by?: string }) => {
 
         const title = replaceEmojiString(posts[slug].title);
         const tldr = replaceEmojiString(posts[slug].tldr!);
+        const cutoff = posts[slug].img ? 140 : 280;
 
         return (
           <Grid className={classes.root} item xs={12} md={6} lg={4} key={slug}>
             <Card className={classes.card}>
-              <CardActionArea className={classes.card} component={Link} to={`/${slug}`}>
+              <CardActionArea disableRipple className={classes.card} component={Link} to={`/${slug}`}>
                 {posts[slug].img
                   ? <div className={classes.wrapper}><CardMedia
                       className={classes.media}
@@ -68,19 +70,23 @@ export const Home = (props: { filter?: string, by?: string }) => {
                   : null}
                 <CardContent>
                   <Typography variant="h5" gutterBottom>{title}</Typography>
-                  <Typography variant="caption" gutterBottom display="block">
-                    {posts[slug].publishedOn ? prettyDateString(posts[slug].publishedOn!) : ""}
-                    &nbsp;
-                    <Chip
-                      label={posts[slug].category}
-                      component={Link}
-                      to={`/category/${posts[slug].category}`}
-                      clickable
-                    />
-                  </Typography>
+                  <Chip
+                    label={posts[slug].category}
+                    component={Link}
+                    to={`/category/${posts[slug].category}`}
+                    clickable
+                    disableRipple
+                  />
+                  {posts[slug].publishedOn
+                    ? <Typography variant="caption" gutterBottom display="inline">
+                        <EventIcon />
+                        prettyDateString(posts[slug].publishedOn!)
+                      </Typography>
+                    : ""
+                  }
                   <br />
                   <Typography variant="subtitle1" component="p" gutterBottom>
-                    {tldr.substr(0,140)}...
+                    {tldr.substr(0,cutoff)} {tldr.length > cutoff ? "..." : null}
                   </Typography>
                 </CardContent>
               </CardActionArea>
