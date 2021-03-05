@@ -25,17 +25,11 @@ const useStyles = makeStyles((theme: Theme) => ({
     width: '100%',
     backgroundColor: theme.palette.background.paper,
   },
-  table: {
-    marginBottom: theme.spacing(12),
-  },
   editColumn: {
     width: "36px",
   },
-  section: {
-    margin: theme.spacing(1, 1),
-    "& > *": {
-      margin: theme.spacing(1),
-    }
+  bottomSpace: {
+    height: theme.spacing(10),
   },
   fab: getFabStyle(theme),
 }));
@@ -124,7 +118,7 @@ export const IndexEditor = (props: {
 
     <Divider variant="middle"/>
 
-    <Table size="small" className={classes.table}>
+    <Table size="small">
       <TableHead>
         <TableRow> 
           <TableCell padding="none" className={classes.editColumn}></TableCell>
@@ -179,6 +173,7 @@ export const IndexEditor = (props: {
         : null
       }
     </Table>
+    <div className={classes.bottomSpace}/>
     <Fab
       id={"fab"}
       className={classes.fab}
