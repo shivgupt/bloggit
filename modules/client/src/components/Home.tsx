@@ -8,7 +8,6 @@ import {
   Typography,
   makeStyles,
 } from "@material-ui/core";
-import EventIcon from "@material-ui/icons/Event";
 import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 
@@ -34,6 +33,12 @@ const useStyles = makeStyles((theme) => ({
     height: "auto",
     maxWidth: "100%",
     marginTop: "-40%",
+  },
+  section: {
+    margin: theme.spacing(1, 1),
+    "& > *": {
+      margin: theme.spacing(1),
+    }
   },
 }));
 
@@ -69,7 +74,14 @@ export const Home = (props: { filter?: string, by?: string }) => {
                     /></div>
                   : null}
                 <CardContent>
-                  <Typography variant="h5" gutterBottom>{title}</Typography>
+                  <Typography variant="h5" gutterBottom display="block">{title}</Typography>
+                  {posts[slug].publishedOn
+                    ? <Typography variant="caption" gutterBottom display="inline">
+                        {prettyDateString(posts[slug].publishedOn!)}
+                      </Typography>
+                    : ""
+                  }
+                  &nbsp;
                   <Chip
                     label={posts[slug].category}
                     component={Link}
@@ -77,15 +89,7 @@ export const Home = (props: { filter?: string, by?: string }) => {
                     clickable
                     disableRipple
                   />
-                  {posts[slug].publishedOn
-                    ? <Typography variant="caption" gutterBottom display="inline">
-                        <EventIcon />
-                        prettyDateString(posts[slug].publishedOn!)
-                      </Typography>
-                    : ""
-                  }
-                  <br />
-                  <Typography variant="subtitle1" component="p" gutterBottom>
+                  <Typography variant="subtitle1" component="p" gutterBottom className={classes.section}>
                     {tldr.substr(0,cutoff)} {tldr.length > cutoff ? "..." : null}
                   </Typography>
                 </CardContent>
