@@ -67,4 +67,18 @@ my.editPost = (data) => {
   my.saveChanges();
 };
 
+my.removePost = (slug) => {
+  my.openDrawer();
+  cy.get(`a#go-to-admin-page`).click();
+  cy.get(`tbody`).then((tbody) => {
+    if (tbody.find(`#table-row-${slug}`).length) {
+      cy.log(`Deleting post w slug ${slug}`);
+      cy.get(`input#toggle-remove-${slug}`).click();
+      cy.get(`button#fab`).click();
+    }
+  });
+  cy.get(`tr#table-row-${slug}`).should("not.exist");
+  my.goHome();
+};
+
 module.exports = my
