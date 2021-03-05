@@ -47,37 +47,31 @@ export const AdminHome = (props: {
           </div>
         )
         : (
+
           <div className={classes.section}>
-            <Typography variant="subtitle1">
-              This device is NOT registered for Admin access
-            </Typography>
+            <TextField
+              autoComplete={"off"}
+              helperText="Register for admin mode"
+              id="admin-token"
+              label="Admin Token"
+              onChange={(e) => setAuthToken(e.target.value)}
+              placeholder="Admin Token"
+              value={authToken}
+              variant="outlined"
+            />
+            <Button
+              className={classes.button}
+              id="register-admin-token"
+              size="small"
+              onClick={() => validateAuthToken(authToken)}
+              variant="contained"
+            >
+              Register
+            </Button>
           </div>
+
         )
       }
-
-      <Divider variant="middle" />
-      <div className={classes.section}>
-        <TextField
-          autoComplete={"off"}
-          helperText="Register for admin mode"
-          id="admin-token"
-          label="Admin Token"
-          onChange={(e) => setAuthToken(e.target.value)}
-          placeholder="Admin Token"
-          value={authToken}
-          variant="outlined"
-        />
-
-        <Button
-          className={classes.button}
-          id="register-admin-token"
-          size="small"
-          onClick={() => validateAuthToken(authToken)}
-          variant="contained"
-        >
-          Register
-        </Button>
-      </div>
 
       <Divider variant="middle" />
       { adminMode !== "invalid"
@@ -97,7 +91,11 @@ export const AdminHome = (props: {
             labelPlacement="start"
             className={classes.section}
           />
-        : <>Supply a valid admin token to activate admin mode</>
+        : <div className={classes.section}>
+            <Typography className={classes.section}>
+              Supply a valid admin token to activate admin mode
+            </Typography>
+          </div>
       }
       {adminMode === "enabled"
         ? <div className={classes.section}>
