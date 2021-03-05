@@ -4,7 +4,7 @@ const my = {};
 
 my.goHome = () => cy.get(`a#go-home`).click()
 my.openDrawer = () => cy.get(`button#open-drawer`).click();
-my.closeDrawer = () => cy.get(`div[role="presentation"]`).first().click(10, 10);
+my.closeDrawer = () => cy.get(`button#close-drawer`).click();
 my.toggleAdminMode = () => cy.get(`label#toggle-admin-mode `).click();
 
 my.authenticate = () => {
@@ -35,8 +35,21 @@ my.enterPostData = (data) => {
 };
 
 my.publishPost = () => {
-  cy.get(`div#fab > button`).click();
-  cy.get(`button#fab-publish`).click();
+  cy.get(`button#fab`).click();
+  cy.get(`button#fab-publish`).click(10, 10);
+  cy.get(`button#copy-permalink`).should("exist");
+};
+
+my.discard = () => {
+  cy.get(`button#fab`).click();
+  cy.get(`button#fab-discard`).click(10, 10);
+  cy.get(`button#copy-permalink`).should("exist");
+};
+
+my.saveChanges = () => {
+  cy.get(`button#fab`).click();
+  cy.get(`button#fab-save`).click(10, 10);
+  cy.get(`button#copy-permalink`).should("exist");
 };
 
 my.createPost = (data) => {
@@ -46,33 +59,26 @@ my.createPost = (data) => {
   my.publishPost();
 };
 
-my.discard = () => {
-  cy.get(`div#fab > button`).click();
-  cy.get(`button#fab-discard`).click();
-};
-
-my.saveChanges = () => {
-  cy.get(`div#fab > button`).click();
-  cy.get(`button#fab-save`).click(10, 10);
-};
-
 my.editPost = (data) => {
   my.goHome();
-  cy.get(`a[href="/${data.slug}"]`).click();
+  cy.get(`a[href="/${data.slug}"]`).last().click();
   cy.get(`button#fab`).dblclick(); // TODO: why do we need to dblclick here?
   my.enterPostData(data);
   my.saveChanges();
-  my.goHome();
 };
 
-my.archivePost = (slug) => {
-  cy.visit(`${Cypress.env("baseUrl")}/admin`);
-  cy.contains(`span`, /posts/i).click();
-  cy.contains(`a[href="/${slug}"] ~ div > button`, /archive/i).click();
-  cy.contains(`span`, /posts/i).click();
-  cy.contains(`span`, /drafts/i).click();
-  cy.contains(`a[href="/${slug}"] ~ div > button`, /publish/i).should("exist");
-  cy.visit(Cypress.env("baseUrl"));
+my.removePost = (slug) => {
+  my.openDrawer();
+  cy.get(`a#go-to-admin-page`).click();
+  cy.get(`tbody`).then((tbody) => {
+    if (tbody.find(`#table-row-${slug}`).length) {
+      cy.log(`Deleting post w slug ${slug}`);
+      cy.get(`input#toggle-remove-${slug}`).click();
+      cy.get(`button#fab`).click();
+    }
+  });
+  cy.get(`tr#table-row-${slug}`).should("not.exist");
+  my.goHome();
 };
 
 module.exports = my

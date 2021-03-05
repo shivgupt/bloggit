@@ -1,7 +1,18 @@
-import { createMuiTheme } from "@material-ui/core";
+import { createMuiTheme, Theme } from "@material-ui/core";
 import "@fontsource/monsieur-la-doulaise";
 
 import { env } from "./env";
+
+export const getFabStyle = (theme: Theme): any => ({
+  position: "fixed",
+  bottom: theme.spacing(2),
+  [theme.breakpoints.up("md")]: {
+    right: "23%",
+  },
+  [theme.breakpoints.down("sm")]: {
+    right: theme.spacing(2),
+  },
+});
 
 export const siteTitleFont = createMuiTheme({
   typography: {

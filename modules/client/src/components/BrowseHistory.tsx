@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { HistoryResponse } from "@blog/types";
 import { makeStyles } from "@material-ui/core";
+import Grid from '@material-ui/core/Grid';
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
+import Tooltip from "@material-ui/core/Tooltip";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 import ListItemText from "@material-ui/core/ListItemText";
@@ -16,12 +18,8 @@ import { Copyable } from "./Copyable";
 
 const useStyles = makeStyles((theme) => ({
   buttonBar: {
-    display: "flex",
-  },
-  button: {
-    marginBottom: theme.spacing(1),
-    marginTop: theme.spacing(-1),
-    marginLeft: theme.spacing(1),
+    marginTop: theme.spacing(-1.75),
+    paddingLeft: theme.spacing(1),
   },
   paper: {
     border: "1px solid #d3d4d5",
@@ -65,78 +63,84 @@ export const BrowseHistory = (props: {
   }, [slug]);
 
   return (
+    <Grid container spacing={1} className={classes.buttonBar}>
 
-    <div className={classes.buttonBar}>
-      <Copyable
-        id={"copy-permalink"}
-        className={classes.button}
-        color={"primary"}
-        text={"Permalink"}
-        tooltip={"Snapshot of this page that will never change or disappear"}
-        value={`${window.location.origin}/${currentRef}/${slug}`}
-      />
+      <Grid item>
+        <Copyable
+          id="copy-permalink"
+          color="primary"
+          size={"medium"}
+          text="Permalink"
+          tooltip="Snapshot of this page that will never change or disappear"
+          value={`${window.location.origin}/${currentRef}/${slug}`}
+        />
+      </Grid>
 
-      <div>
+      <Grid item>
         <Button
-          id={"browse-history"}
-          className={classes.button}
+          id="open-history"
           startIcon={<ExpandIcon/>}
-          aria-controls="customized-menu"
           aria-haspopup="true"
           variant="contained"
+          size={"medium"}
           color="primary"
           onClick={(event: any) => { setAnchorEl(event.currentTarget); }}
         >
-          History
+          <Typography noWrap variant="button">
+            History
+          </Typography>
         </Button>
-        <Menu
-          elevation={0}
-          PaperProps={{ className: classes.paper }}
-          getContentAnchorEl={null}
-          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-          transformOrigin={{ vertical: "top", horizontal: "center" }}
-          anchorEl={anchorEl}
-          keepMounted
-          open={!!anchorEl}
-          onClose={() => setAnchorEl(null)}
-        >
-          {
-            editHistory.filter(entry => !entry.commit.startsWith(latestRef)).map(entry => {
-              const commit = entry.commit.substring(0,8);
-              return (
-                <MenuItem
-                  component={Link}
-                  key={commit}
-                  onClick={() => setAnchorEl(null)}
-                  selected={commit === currentRef}
-                  to={`/${commit}/${slug}`}
-                >
-                  <ListItemText primary={(new Date(entry.timestamp)).toLocaleString()} />
-                </MenuItem>
-              );
-            })
-          }
-        </Menu>
-      </div>
+      </Grid>
 
       {isHistorical
-        ? <Button
-            id={"jump-to-present"}
-            className={classes.button}
-            startIcon={<FastForwardIcon/>}
-            component={Link}
-            color={"primary"}
-            variant={"contained"}
-            to={`/${slug}`}
-          >
-            <Typography noWrap variant="body1">
-              Jump To Present
-            </Typography>
-          </Button>
+        ? <Grid item>
+            <Tooltip arrow placement="bottom" title="Go to latest version">
+              <Button
+                color="primary"
+                component={Link}
+                id="jump-to-present"
+                size={"medium"}
+                to={`/${slug}`}
+                variant="contained"
+              >
+                <FastForwardIcon/>
+              </Button>
+            </Tooltip>
+          </Grid>
         : null
       }
-    </div>
-    
 
+      <Menu
+        elevation={0}
+        PaperProps={{ id: "history-menu", className: classes.paper }}
+        getContentAnchorEl={null}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        transformOrigin={{ vertical: "top", horizontal: "center" }}
+        anchorEl={anchorEl}
+        keepMounted
+        open={!!anchorEl}
+        onClose={() => setAnchorEl(null)}
+      >
+        {
+          editHistory.filter(entry => !entry.commit.startsWith(latestRef)).map((entry, i) => {
+            const commit = entry.commit.substring(0,8);
+            const key = `history-entry-${i+1}`;
+            return (
+              <MenuItem
+                component={Link}
+                id={key}
+                key={key}
+                onClick={() => setAnchorEl(null)}
+                selected={commit === currentRef}
+                to={`/${commit}/${slug}`}
+              >
+                <ListItemText primary={(new Date(entry.timestamp)).toLocaleString()} />
+              </MenuItem>
+            );
+          })
+        }
+      </Menu>
+
+    </Grid>
   );
 }
