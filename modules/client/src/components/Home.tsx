@@ -47,6 +47,7 @@ export const Home = (props: { filter?: string, by?: string }) => {
     <Grid container spacing={3} justify={"space-around"} alignItems={"center"}>
       {Object.keys(posts).map(slug => {
         if (!posts[slug].category) return null;
+        if (posts[slug].draft) return null;
         if (filter && by && posts[slug][filter] !== by) {
           return null;
         }
