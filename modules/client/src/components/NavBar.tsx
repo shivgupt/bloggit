@@ -3,11 +3,9 @@ import {
   Box,
   Button,
   Drawer,
-  FormControlLabel,
   Hidden,
   IconButton,
   Link,
-  Switch,
   ThemeProvider,
   Toolbar,
   Typography,
@@ -15,7 +13,7 @@ import {
   Breadcrumbs,
 } from "@material-ui/core";
 import {
-  AccountCircle as AdminAccount,
+  Tune as AdminAccount,
   Brightness4 as DarkIcon,
   BrightnessHigh as LightIcon,
   Home as HomeIcon,
@@ -74,7 +72,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const DrawerContent = (props: any) => {
-  const { siteTitle, node, setNode, toggleTheme, toggleDrawer, theme, adminMode, setAdminMode } = props;
+  const { siteTitle, node, setNode, toggleTheme, toggleDrawer, theme, adminMode } = props;
 
   const gitContext = useContext(GitContext);
   const { index } = gitContext.gitState;
@@ -99,6 +97,21 @@ const DrawerContent = (props: any) => {
       >
         {theme.palette.type === "dark" ? <LightIcon /> : <DarkIcon />}
       </IconButton>
+      <Toc posts={posts} node={node} setNode={setNode}/>
+      {posts["top-level"]
+        ? posts["top-level"].map((p) => {
+          return (
+            <Box key={p.slug} textAlign="center" m={1}>
+              <Button
+                size="small"
+                disableFocusRipple={false}
+                component={RouterLink}
+                to={`/${p.slug}`}
+              > {p.title} </Button>
+            </Box>
+          )})
+        : null
+      }
       { adminMode !== "invalid" ?
         <>
           <Box textAlign="center" m={1}>
@@ -113,39 +126,8 @@ const DrawerContent = (props: any) => {
               <AdminAccount />
             </IconButton>
 
-            <FormControlLabel
-              id="toggle-admin-mode"
-              control={
-                <Switch
-                  size="small"
-                  checked={adminMode === "enabled"}
-                  onChange={() => {
-                    if (adminMode === "enabled") setAdminMode("disabled");
-                    else setAdminMode("enabled");
-                  }}
-                />
-              }
-              label="Admin Mode"
-              labelPlacement="start"
-            />
-
           </Box>
         </>
-        : null
-      }
-      <Toc posts={posts} node={node} setNode={setNode}/>
-      {posts["top-level"]
-        ? posts["top-level"].map((p) => {
-          return (
-            <Box key={p.slug} textAlign="center" m={1}>
-              <Button
-                size="small"
-                disableFocusRipple={false}
-                component={RouterLink}
-                to={`/${p.slug}`}
-              > {p.title} </Button>
-            </Box>
-          )})
         : null
       }
     </>

@@ -175,7 +175,6 @@ const App: React.FC = () => {
         <CssBaseline />
         <NavBar
           adminMode={adminMode}
-          setAdminMode={setAdminMode}
           theme={theme}
           toggleTheme={toggleTheme}
           setEditMode={setEditMode}
@@ -199,7 +198,7 @@ const App: React.FC = () => {
               <Route exact
                 path="/admin"
                 render={() => (
-                  <AdminHome adminMode={adminMode} validateAuthToken={validateAuthToken} />
+                  <AdminHome adminMode={adminMode} setAdminMode={setAdminMode} validateAuthToken={validateAuthToken} />
                 )}
               />
               <Route
