@@ -200,7 +200,7 @@ const App: React.FC = () => {
               />
               <Route exact
                 path="/category/:slug"
-                render={() => <Home filter="category" by={categoryMatch.params.slug} />}
+                render={() => <Home filterBy={categoryMatch.params.slug} />}
               />
               <Route exact
                 path="/admin"

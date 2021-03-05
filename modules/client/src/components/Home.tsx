@@ -102,17 +102,17 @@ export const PostCard = (props: { post: PostData }) => {
   )
 }
 
-export const Home = (props: { filter?: string, by?: string }) => {
-  const { filter, by } = props;
+export const Home = (props: { filterBy?: string }) => {
+  const filterBy = props.filterBy;
   const classes = useStyles();
   const gitContext = useContext(GitContext);
 
-  const posts = gitContext.gitState?.index?.posts || {};
+  const posts = (gitContext.gitState?.index?.posts || {}) as {[slug: string]: PostData};
   if (Object.keys(posts).length === 0) return <> Loading </>;
 
   return (
     <>
-      {! (filter && by)
+      {!filterBy
         ? <>
             <Carousel className={classes.section}
               fullHeightHover={false}
@@ -142,19 +142,19 @@ export const Home = (props: { filter?: string, by?: string }) => {
             </Typography>
           </>
         : <Typography variant="h4" className={classes.section}>
-            All '{by}' posts
+            All '{filterBy}' posts
           </Typography>
       }
       <Grid container spacing={3} justify={"space-around"} alignItems={"center"}>
-        {Object.keys(posts).map(slug => {
-          if (!posts[slug].category) return null;
-          if (posts[slug].draft) return null;
-          if (filter && by && posts[slug][filter] !== by) {
+        {Object.values(posts).map((post: PostData) => {
+          if (!post.category) return null;
+          if (post.draft) return null;
+          if (filterBy && post.category !== filterBy) {
             return null;
           }
           return (
-            <Grid className={classes.root} item xs={12} md={6} lg={4} key={slug}>
-              <PostCard post={posts[slug]} />
+            <Grid className={classes.root} item xs={12} md={6} lg={4} key={post.slug}>
+              <PostCard post={post} />
             </Grid>
           );
         })}
