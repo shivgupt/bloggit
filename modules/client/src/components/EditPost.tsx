@@ -26,6 +26,7 @@ import ReactMde, { SaveImageHandler } from "react-mde";
 import { useHistory } from "react-router-dom";
 
 import { GitContext } from "../GitContext";
+import { getFabStyle } from "../style";
 import { SnackAlert } from "../types";
 import { emptyEntry, slugify } from "../utils";
 
@@ -57,16 +58,7 @@ const useStyles = makeStyles((theme) => ({
     textAlign: "justify",
     fontVariant: "discretionary-ligatures",
   },
-  speedDial: {
-    position: "fixed",
-    bottom: theme.spacing(2),
-    [theme.breakpoints.up("md")]: {
-      right: "23%",
-    },
-    [theme.breakpoints.down("sm")]: {
-      right: theme.spacing(2),
-    },
-  },
+  speedDial: getFabStyle(theme),
 }));
 
 type EditData = PostData & {

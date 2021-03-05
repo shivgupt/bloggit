@@ -1,5 +1,6 @@
 import {
   Card,
+  Fab,
   CardActionArea,
   CardContent,
   CardMedia,
@@ -8,9 +9,11 @@ import {
   Typography,
   makeStyles,
 } from "@material-ui/core";
+import { Add } from "@material-ui/icons";
 import React, { useContext } from "react";
-import { Link } from "react-router-dom";
+import { useHistory, Link } from "react-router-dom";
 
+import { getFabStyle } from "../style";
 import { prettyDateString, replaceEmojiString } from "../utils";
 import { GitContext } from "../GitContext";
 
@@ -40,21 +43,27 @@ const useStyles = makeStyles((theme) => ({
       margin: theme.spacing(1),
     }
   },
+  fab: getFabStyle(theme),
 }));
 
-export const Home = (props: { filter?: string, by?: string }) => {
-  const { filter, by } = props;
+export const Home = (props: {
+  adminMode: string;
+  category?: string;
+  setEditMode: (editMode: boolean) => void;
+}) => {
+  const { adminMode, category, setEditMode } = props;
   const classes = useStyles();
   const gitContext = useContext(GitContext);
+  const history = useHistory();
 
   const posts = gitContext.gitState?.index?.posts || {};
 
-  return (
+  return (<>
     <Grid container spacing={3} justify={"space-around"} alignItems={"center"}>
       {Object.keys(posts).map(slug => {
         if (!posts[slug].category) return null;
         if (posts[slug].draft) return null;
-        if (filter && by && posts[slug][filter] !== by) {
+        if (category && posts[slug].category !== category) {
           return null;
         }
 
@@ -99,5 +108,17 @@ export const Home = (props: { filter?: string, by?: string }) => {
         );
       })}
     </Grid>
-  );
+    {adminMode === "enabled"
+      ? <Fab
+          id={"fab"}
+          className={classes.fab}
+          color="primary"
+          onClick={() => {
+            setEditMode(true);
+            history.push("/");
+          }}
+        ><Add/></Fab>
+      : null
+    }
+  </>);
 };

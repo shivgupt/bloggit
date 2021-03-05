@@ -1,7 +1,7 @@
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 import { 
   Button,
-  Collapse,
+  Divider,
   List,
   ListItem,
   ListItemSecondaryAction,
@@ -11,7 +11,7 @@ import {
   Theme,
 } from "@material-ui/core";
 import { Link } from "react-router-dom";
-import { Drafts, ExpandLess, ExpandMore, Public } from "@material-ui/icons";
+import { Drafts, Public } from "@material-ui/icons";
 import axios from "axios";
 
 import { GitContext } from "../GitContext";
@@ -35,12 +35,10 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 export const IndexEditor = () => {
 
-  const [openPosts, setOpenPosts] = useState(false);
   const gitContext = useContext(GitContext);
   const index = gitContext.gitState?.index;
 
   const classes = useStyles();
-  const togglePosts = () => setOpenPosts(!openPosts);
 
   const handleArchive = async (slug: string) => {
     if (!index) return;
@@ -83,45 +81,40 @@ export const IndexEditor = () => {
       <ListItem key="index_title">
         <TextField id="index_title" label="title" defaultValue={index?.title} />
       </ListItem>
-      <ListItem key="index_posts">
-        <ListItemText primary="Posts" onClick={togglePosts} />
-        {openPosts ? <ExpandLess /> : <ExpandMore />}
-      </ListItem>
-      <Collapse in={openPosts} timeout="auto" unmountOnExit>
-        <List>
-        {index?.posts
-          ? Object.values(index?.posts || []).map((post) => {
-            return (
-              <ListItem button component={Link} to={`/${post.slug}`} key={post.slug} alignItems="flex-start">
-                <ListItemText primary={post.title} className={classes.listText} />
-                <ListItemSecondaryAction>
-                  {post.draft
-                    ? <Button size="small"
-                        onClick={() => handlePublish(post.slug)}
-                        color="primary"
-                        variant="contained"
-                        startIcon={<Public />}
-                      >
-                        Publish
-                      </Button>
-                    : <Button
-                        onClick={() => handleArchive(post.slug)}
-                        size="small"
-                        color="primary"
-                        variant="contained"
-                        startIcon={<Drafts />}
-                      >
-                        Archive
-                      </Button>
-                  }
-                </ListItemSecondaryAction>
-              </ListItem>
-            )
-          })
-          : null
-        }
-        </List>
-      </Collapse> 
+      <Divider variant="middle"/>
+      <List>
+      {index?.posts
+        ? Object.values(index?.posts || []).map((post) => {
+          return (
+            <ListItem button component={Link} to={`/${post.slug}`} key={post.slug} alignItems="flex-start">
+              <ListItemText primary={post.title} className={classes.listText} />
+              <ListItemSecondaryAction>
+                {post.draft
+                  ? <Button size="small"
+                      onClick={() => handlePublish(post.slug)}
+                      color="primary"
+                      variant="contained"
+                      startIcon={<Public />}
+                    >
+                      Publish
+                    </Button>
+                  : <Button
+                      onClick={() => handleArchive(post.slug)}
+                      size="small"
+                      color="primary"
+                      variant="contained"
+                      startIcon={<Drafts />}
+                    >
+                      Archive
+                    </Button>
+                }
+              </ListItemSecondaryAction>
+            </ListItem>
+          )
+        })
+        : null
+      }
+      </List>
     </List>
   );
 };

@@ -1,13 +1,16 @@
 import {
   CardMedia,
   makeStyles,
+  Fab,
   Paper,
 } from "@material-ui/core";
+import { Edit } from "@material-ui/icons";
 import React, { useContext, useEffect } from "react";
 import Markdown from "react-markdown";
 import "react-mde/lib/styles/css/react-mde-all.css";
 
 import { GitContext } from "../GitContext";
+import { getFabStyle } from "../style";
 
 import { BrowseHistory } from "./BrowseHistory";
 import {
@@ -16,7 +19,7 @@ import {
   HeadingRenderer,
   ImageRenderer,
   LinkRenderer
-  } from "./Renderers";
+} from "./Renderers";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -38,10 +41,15 @@ const useStyles = makeStyles((theme) => ({
     [theme.breakpoints.down("sm")]: {
       height: 300,
     }
-  }
+  },
+  fab: getFabStyle(theme),
 }));
 
-export const PostPage = () => {
+export const PostPage = (props: {
+  adminMode: string;
+  setEditMode: (editMode: boolean) => void;
+}) => {
+  const { adminMode, setEditMode } = props;
   const gitContext = useContext(GitContext);
   const { currentRef, latestRef, slug, currentContent, indexEntry } = gitContext.gitState;
   const classes = useStyles();
@@ -79,6 +87,17 @@ export const PostPage = () => {
         }}
       />
     </Paper>
+    {adminMode === "enabled"
+      ? <Fab
+          id={"fab"}
+          className={classes.fab}
+          color="primary"
+          onClick={() => {
+            setEditMode(true);
+          }}
+        ><Edit/></Fab>
+      : null
+    }
   </>
   );
 };

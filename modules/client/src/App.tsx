@@ -2,17 +2,15 @@ import {
   Container,
   createStyles,
   CssBaseline,
-  Fab,
   makeStyles,
   Snackbar,
   Theme,
   ThemeProvider,
 } from "@material-ui/core";
-import { Add, Edit } from "@material-ui/icons";
 import { Alert } from "@material-ui/lab";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { Route, Switch, useRouteMatch, useHistory } from "react-router-dom";
+import { Route, Switch, useRouteMatch } from "react-router-dom";
 
 import { AdminHome } from "./components/AdminHome";
 import { EditPost } from "./components/EditPost";
@@ -20,7 +18,7 @@ import { Home } from "./components/Home";
 import { NavBar } from "./components/NavBar";
 import { PostPage } from "./components/Posts";
 import { GitContext } from "./GitContext";
-import { darkTheme, lightTheme } from "./style";
+import { darkTheme, lightTheme, getFabStyle } from "./style";
 import { AdminMode, GitState, SnackAlert } from "./types";
 import {
   defaultSnackAlert, 
@@ -49,16 +47,7 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
     marginTop: theme.spacing(2),
     padding: theme.spacing(0.25),
   },
-  fab: {
-    position: "fixed",
-    bottom: theme.spacing(2),
-    [theme.breakpoints.up("md")]: {
-      right: "23%",
-    },
-    [theme.breakpoints.down("sm")]: {
-      right: theme.spacing(2),
-    },
-  },
+  fab: getFabStyle(theme),
 }));
 
 const App: React.FC = () => {
@@ -70,7 +59,6 @@ const App: React.FC = () => {
   const [editMode, setEditMode] = useState(false);
   const [snackAlert, setSnackAlert] = useState<SnackAlert>(defaultSnackAlert);
 
-  const history = useHistory();
   const categoryMatch = useRouteMatch("/category/:category");
   const slugMatch = useRouteMatch("/:slug");
   const refMatch = useRouteMatch("/:ref/:slug");
@@ -189,59 +177,39 @@ const App: React.FC = () => {
             <Switch>
               <Route exact
                 path="/"
-                render={() => (
-                  editMode
-                    ? <EditPost setEditMode={setEditMode} setSnackAlert={setSnackAlert} />
-                    : <Home />
+                render={() => (editMode
+                  ? <EditPost setEditMode={setEditMode} setSnackAlert={setSnackAlert} />
+                  : <Home adminMode={adminMode} setEditMode={setEditMode} />
                 )}
               />
               <Route exact
                 path="/category/:slug"
-                render={() => <Home filter="category" by={categoryParam} />}
+                render={() => (<Home
+                  adminMode={adminMode}
+                  category={categoryParam}
+                  setEditMode={setEditMode}
+                />)}
               />
               <Route exact
                 path="/admin"
-                render={() => (
-                  <AdminHome adminMode={adminMode} setAdminMode={setAdminMode} validateAuthToken={validateAuthToken} />
-                )}
+                render={() => (<AdminHome
+                  adminMode={adminMode}
+                  setAdminMode={setAdminMode}
+                  validateAuthToken={validateAuthToken}
+                />)}
               />
               <Route
                 path="/:ref/:slug"
-                render={() => <PostPage />}
+                render={() => <PostPage adminMode={adminMode} setEditMode={setEditMode} />}
               />
               <Route
                 path="/:slug"
-                render={() => {
-                  return editMode
+                render={() => (editMode
                   ? <EditPost setEditMode={setEditMode} setSnackAlert={setSnackAlert} />
-                  : <PostPage />
-                }}
+                  : <PostPage adminMode={adminMode} setEditMode={setEditMode} />
+                )}
               />
             </Switch>
-            {(adminMode === "enabled" && !editMode)
-              ? (
-                  !gitState.slug
-                  || gitState.slug === "admin"
-                  || gitState.currentRef !== gitState.latestRef
-                )
-                  ? <Fab
-                      id={"fab"}
-                      className={classes.fab}
-                      color="primary"
-                      onClick={() => {
-                        setEditMode(true);
-                        history.push("/");
-                      }}
-                    ><Add/></Fab>
-
-                  : <Fab
-                      id={"fab"}
-                      className={classes.fab}
-                      color="primary"
-                      onClick={() => { setEditMode(true); }}
-                    ><Edit/></Fab>
-
-               : null}
           </Container>
         </main>
       </GitContext.Provider>
