@@ -67,7 +67,7 @@ const useStyles = makeStyles(theme => ({
   hiddenDrawer: {
     width: "60%",
   },
-  title: {
+  breadcrumb: {
     flex: 1,
     marginLeft: theme.spacing(1),
   },
@@ -174,7 +174,7 @@ export const NavBar = (props: any) => {
     <>
       <AppBar position="fixed" className={classes.appBar}>
         <Toolbar>
-          <Breadcrumbs aria-label="breadcrumb" separator={<NextIcon fontSize="small"/>} className={classes.title}>
+          <Breadcrumbs aria-label="breadcrumb" separator={<NextIcon fontSize="small"/>} className={classes.breadcrumb}>
             <Link
               id="go-home"
               className={classes.link}
@@ -184,7 +184,6 @@ export const NavBar = (props: any) => {
               to="/"
             >
               <HomeIcon className={classes.icon} />
-              Home
             </Link>
             {categoryMatch
             ? <Link
@@ -217,7 +216,7 @@ export const NavBar = (props: any) => {
                   </Link>,
                   <Typography>
                     <DocIcon className={classes.icon} />
-                    {pageTitle.substr(0,10)}..
+                    {pageTitle}
                   </Typography>
                 ]
             : null
