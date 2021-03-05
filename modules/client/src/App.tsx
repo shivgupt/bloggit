@@ -195,6 +195,7 @@ const App: React.FC = () => {
                 render={() => (<AdminHome
                   adminMode={adminMode}
                   setAdminMode={setAdminMode}
+                  setEditMode={setEditMode}
                   validateAuthToken={validateAuthToken}
                 />)}
               />

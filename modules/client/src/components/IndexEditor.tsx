@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { 
   Button,
   Divider,
@@ -9,12 +9,16 @@ import {
   makeStyles,
   TextField,
   Theme,
+  Fab,
 } from "@material-ui/core";
-import { Link } from "react-router-dom";
+import { Add, Save } from "@material-ui/icons";
+import { Link, useHistory } from "react-router-dom";
 import { Drafts, Public } from "@material-ui/icons";
 import axios from "axios";
 
 import { GitContext } from "../GitContext";
+import { getFabStyle } from "../style";
+import { emptyIndex } from "../utils";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -30,56 +34,77 @@ const useStyles = makeStyles((theme: Theme) => ({
       margin: theme.spacing(1),
     }
   },
+  fab: getFabStyle(theme),
 }));
 
 
-export const IndexEditor = () => {
-
+export const IndexEditor = (props: {
+  setEditMode: (editMode: boolean) => void;
+}) => {
+  const { setEditMode } = props;
+  const [diff, setDiff] = useState(false);
+  const [newIndex, setNewIndex] = useState(emptyIndex);
+  const classes = useStyles();
   const gitContext = useContext(GitContext);
+  const history = useHistory();
+
   const index = gitContext.gitState?.index;
 
-  const classes = useStyles();
+  const handleChange = (key: string, val: boolean | string, slug?: string): void => {
+    if (slug) {
+      const oldEntry = newIndex[slug] || {}
+      setNewIndex(oldIndex => ({ ...oldIndex, slug: { ...oldEntry, [key]: val } }));
+    } else {
+      setNewIndex(oldIndex => ({ ...oldIndex, [key]: val }));
+    }
+  };
 
-  const handleArchive = async (slug: string) => {
-    if (!index) return;
-    const newIndex = JSON.parse(JSON.stringify(index));
-    newIndex.posts[slug].draft = true;
+  useEffect(() => {
+    setNewIndex(index);
+  }, [index]);
+
+  useEffect(() => {
+    if (!index?.title || !newIndex?.title) return;
+    if (JSON.stringify(index) !== JSON.stringify(newIndex)) {
+      console.log(`The new index is different than the old one`);
+      setDiff(true);
+    }
+  }, [newIndex, index]);
+
+  const saveChanges = async (): Promise<void> => {
+    if (!diff) {
+      console.warn(`No changes to save`);
+      return;
+    }
+    if (!newIndex?.title) {
+      console.warn(`Invalid index`);
+      return;
+    }
     await axios({
       method: "post",
       url: "git/edit",
-      data: [
-      {
-        path: "index.json",
-        content: JSON.stringify(newIndex, null, 2),
-      }
-    ],
-      headers: { "content-type": "application/json" }
+      headers: { "content-type": "application/json" },
+      data: [{ path: "index.json", content: JSON.stringify(newIndex, null, 2) }],
     });
     await gitContext.syncGitState(undefined, undefined, true);
   };
 
-  const handlePublish = async (slug: string) => {
-    if (!index) return;
-    const newIndex = JSON.parse(JSON.stringify(index));
-    newIndex.posts[slug].draft = false;
-    await axios({
-      method: "post",
-      url: "git/edit",
-      data: [
-      {
-        path: "index.json",
-        content: JSON.stringify(newIndex, null, 2),
-      }
-    ],
-      headers: { "content-type": "application/json" }
-    });
-    await gitContext.syncGitState(undefined, undefined, true);
-  };
-
-  return (
+  const title = newIndex?.title;
+  return (<>
     <List className={classes.root}>
       <ListItem key="index_title">
-        <TextField id="index_title" label="title" defaultValue={index?.title} />
+        <TextField
+          autoComplete={"off"}
+          error={!title}
+          helperText={!title ? "Please provide a title" : ""}
+          id="input-index-title"
+          key="index-title"
+          label="index-title"
+          name="index-title"
+          onChange={(event) => handleChange("title", event.target.value)}
+          required={true}
+          value={title}
+        />
       </ListItem>
       <Divider variant="middle"/>
       <List>
@@ -91,7 +116,7 @@ export const IndexEditor = () => {
               <ListItemSecondaryAction>
                 {post.draft
                   ? <Button size="small"
-                      onClick={() => handlePublish(post.slug)}
+                      onClick={() => handleChange("draft", false, post.slug)}
                       color="primary"
                       variant="contained"
                       startIcon={<Public />}
@@ -99,7 +124,7 @@ export const IndexEditor = () => {
                       Publish
                     </Button>
                   : <Button
-                      onClick={() => handleArchive(post.slug)}
+                      onClick={() => handleChange("draft", true, post.slug)}
                       size="small"
                       color="primary"
                       variant="contained"
@@ -116,5 +141,21 @@ export const IndexEditor = () => {
       }
       </List>
     </List>
-  );
+    <Fab
+      id={"fab"}
+      className={classes.fab}
+      color="primary"
+      onClick={() => {
+        if (diff) {
+          console.log("Saving changes..");
+          saveChanges();
+        } else {
+          console.log("Creating new post..");
+          setEditMode(true);
+          history.push("/");
+        }
+      }}
+    >{(diff ? <Save/> : <Add/>)}</Fab>
+
+  </>);
 };

@@ -7,7 +7,7 @@ import {
 
 export const emptyIndex: BlogIndex = {
   posts: {},
-  title: "My Personal Website",
+  title: "",
 };
 
 export const emptyEntry: PostData = {

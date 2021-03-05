@@ -26,15 +26,15 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 export const AdminHome = (props: {
-  adminMode: AdminMode,
-  setAdminMode: (val: AdminMode) => void,
-  validateAuthToken: (_authToken?: string) => Promise<void>
+  adminMode: AdminMode;
+  setAdminMode: (val: AdminMode) => void;
+  setEditMode: (val: boolean) => void;
+  validateAuthToken: (_authToken?: string) => Promise<void>;
 }) => {
-
-  const { adminMode, setAdminMode, validateAuthToken } = props;
-  const classes = useStyles();
+  const { adminMode, setAdminMode, setEditMode, validateAuthToken } = props;
 
   const [authToken, setAuthToken] = useState("");
+  const classes = useStyles();
 
   return (
     <div>
@@ -99,9 +99,9 @@ export const AdminHome = (props: {
           />
         : <>Supply a valid admin token to activate admin mode</>
       }
-      { adminMode === "enabled"
-          ? <div className={classes.section}>
-            <IndexEditor />
+      {adminMode === "enabled"
+        ? <div className={classes.section}>
+            <IndexEditor setEditMode={setEditMode} />
           </div>
         : null
       }
