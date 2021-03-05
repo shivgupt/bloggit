@@ -89,6 +89,7 @@ describe("Blog Client", () => {
       slug
     });
     my.archivePost(slug);
+    my.goHome();
     cy.get(`a[href="${slug}"]`).should("not.exist");
   })
 

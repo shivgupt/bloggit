@@ -69,10 +69,7 @@ my.archivePost = (slug) => {
   cy.visit(`${Cypress.env("baseUrl")}/admin`);
   cy.contains(`span`, /posts/i).click();
   cy.contains(`a[href="/${slug}"] ~ div > button`, /archive/i).click();
-  cy.contains(`span`, /posts/i).click();
-  cy.contains(`span`, /drafts/i).click();
   cy.contains(`a[href="/${slug}"] ~ div > button`, /publish/i).should("exist");
-  cy.visit(Cypress.env("baseUrl"));
 };
 
 module.exports = my
