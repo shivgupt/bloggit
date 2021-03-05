@@ -229,13 +229,14 @@ export const EditPost = (props: {
     const path = getPath(editData);
     const newPostSlug = editData.slug || editData.displaySlug;
     const now = (new Date()).toLocaleDateString("en-in");
+    newIndex.posts = newIndex.posts || {};
     const newIndexEntry = {
       ...gitState.indexEntry,
       category: editData.category,
       draft: asDraft,
       img: editData.img,
       lastEdit: now,
-      slug: editData.slug,
+      slug: newPostSlug,
       title: editData.title,
       tldr: editData.tldr,
     } as PostData;
