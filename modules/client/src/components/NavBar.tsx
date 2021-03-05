@@ -164,7 +164,7 @@ export const NavBar = (props: any) => {
   const { index, slug } = gitContext.gitState;
   const siteTitle = index?.title || "My Blog";
   const pageTitle = index?.posts?.[slug || ""]?.title || "";
-  const post = slug ? index?.posts?.[slug] || index?.drafts?.[slug] : null;
+  const post = slug ? index?.posts?.[slug] : null;
   document.title = pageTitle ? `${pageTitle} | ${siteTitle}` : siteTitle;
 
   console.log(categoryMatch)

@@ -36,19 +36,16 @@ const useStyles = makeStyles((theme: Theme) => ({
 export const IndexEditor = () => {
 
   const [openPosts, setOpenPosts] = useState(false);
-  const [openDrafts, setOpenDrafts] = useState(false);
   const gitContext = useContext(GitContext);
   const index = gitContext.gitState?.index;
 
   const classes = useStyles();
   const togglePosts = () => setOpenPosts(!openPosts);
-  const toggleDrafts = () => setOpenDrafts(!openDrafts);
 
   const handleArchive = async (slug: string) => {
     if (!index) return;
     const newIndex = JSON.parse(JSON.stringify(index));
-    newIndex.drafts[slug] = index.posts[slug];
-    delete newIndex.posts[slug];
+    newIndex.posts[slug].draft = true;
     await axios({
       method: "post",
       url: "git/edit",
@@ -66,8 +63,7 @@ export const IndexEditor = () => {
   const handlePublish = async (slug: string) => {
     if (!index) return;
     const newIndex = JSON.parse(JSON.stringify(index));
-    newIndex.posts[slug] = index.drafts![slug];
-    delete newIndex.drafts[slug];
+    newIndex.posts[slug].draft = false;
     await axios({
       method: "post",
       url: "git/edit",
@@ -99,43 +95,25 @@ export const IndexEditor = () => {
               <ListItem button component={Link} to={`/${post.slug}`} key={post.slug} alignItems="flex-start">
                 <ListItemText primary={post.title} className={classes.listText} />
                 <ListItemSecondaryAction>
-                  <Button
-                    onClick={() => handleArchive(post.slug)}
-                    size="small"
-                    color="primary"
-                    variant="contained"
-                    startIcon={<Drafts />}
-                  >
-                    Archive
-                  </Button>
-                </ListItemSecondaryAction>
-              </ListItem>
-            )
-          })
-          : null
-        }
-        </List>
-      </Collapse> 
-      <ListItem key="index_drafts">
-        <ListItemText primary="Drafts" onClick={toggleDrafts} />
-        {openDrafts ? <ExpandLess /> : <ExpandMore />}
-      </ListItem>
-      <Collapse in={openDrafts} timeout="auto" unmountOnExit>
-        <List>
-        {index?.drafts
-         ? Object.values(index?.drafts).map((draft) => {
-            return (
-              <ListItem button component={Link} to={`/${draft.slug}`} key={draft.slug} alignItems="flex-start">
-                <ListItemText primary={draft.title} className={classes.listText} />
-                <ListItemSecondaryAction>
-                  <Button size="small"
-                    onClick={() => handlePublish(draft.slug)}
-                    color="primary"
-                    variant="contained"
-                    startIcon={<Public />}
-                  >
-                    Publish
-                  </Button>
+                  {post.draft
+                    ? <Button size="small"
+                        onClick={() => handlePublish(post.slug)}
+                        color="primary"
+                        variant="contained"
+                        startIcon={<Public />}
+                      >
+                        Publish
+                      </Button>
+                    : <Button
+                        onClick={() => handleArchive(post.slug)}
+                        size="small"
+                        color="primary"
+                        variant="contained"
+                        startIcon={<Drafts />}
+                      >
+                        Archive
+                      </Button>
+                  }
                 </ListItemSecondaryAction>
               </ListItem>
             )

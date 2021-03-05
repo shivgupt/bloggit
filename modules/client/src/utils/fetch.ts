@@ -91,7 +91,7 @@ const slugToPath = async (slug: string, ref: string): Promise<string> => {
   }
   console.log(`Path for ${ref}/${slug} is not available via git history`);
   const index = await fetchIndex(ref);
-  const entry = (index?.posts?.[slug] || index?.drafts?.[slug] || {}) as PostData;
+  const entry = (index?.posts?.[slug] || {}) as PostData;
   let path;
   if (entry.path) {
     path = entry.path;

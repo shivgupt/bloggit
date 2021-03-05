@@ -1,17 +1,17 @@
 export type PostData = {
+  slug: string;
+  title: string;
   category?: string;
-  featured?: string;
+  draft?: boolean;
+  featured?: boolean;
   img?: string;
   lastEdit?: string;
   path?: string;
-  publishedOn: string;
-  slug: string;
-  title: string;
+  publishedOn?: string;
   tldr?: string;
 };
 
 export type BlogIndex = {
-  drafts: { [slug: string]: PostData };
   posts: { [slug: string]: PostData };
   title: string;
 };
