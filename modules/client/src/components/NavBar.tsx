@@ -95,8 +95,9 @@ const DrawerContent = (props: any) => {
     <>
       <Hidden mdUp>
         <IconButton
+          id="close-drawer"
           className={classes.closeDrawer}
-          onClick={toggleDrawer}
+          onClick={() => toggleDrawer()}
           size="small"
         ><Close/></IconButton>
       </Hidden>
@@ -139,6 +140,7 @@ const DrawerContent = (props: any) => {
               edge="start"
               to={"/admin"}
               color="inherit"
+              onClick={() => toggleDrawer()}
             >
               <AdminAccount />
             </IconButton>
@@ -201,7 +203,7 @@ export const NavBar = (props: any) => {
                   Admin
                 </Typography>
               : [ <Link
-                    key="category"
+                    key="navbar-category"
                     className={classes.link}
                     color="inherit"
                     component={RouterLink}
@@ -211,7 +213,7 @@ export const NavBar = (props: any) => {
                     <CategoryIcon className={classes.icon} />
                     {post?.category}
                   </Link>,
-                  <Typography key="post" noWrap className={classes.postTitle}>
+                  <Typography key="navbar-category-icon" noWrap className={classes.postTitle}>
                     <DocIcon className={classes.icon} />
                     {pageTitle}
                   </Typography>
@@ -250,7 +252,7 @@ export const NavBar = (props: any) => {
             variant="permanent"
             open
           >
-            <DrawerContent siteTitle={siteTitle} {...props} />
+            <DrawerContent siteTitle={siteTitle} toggleDrawer={toggleDrawer} {...props} />
           </Drawer>
         </Hidden>
       </nav>

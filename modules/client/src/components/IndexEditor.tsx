@@ -1,127 +1,195 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { 
-  Button,
-  Collapse,
-  List,
-  ListItem,
-  ListItemSecondaryAction,
-  ListItemText,
+  Divider,
+  Table,
+  TableRow,
+  TableCell,
+  TableHead,
+  IconButton,
+  Fab,
   makeStyles,
+  Switch,
   TextField,
   Theme,
 } from "@material-ui/core";
-import { Link } from "react-router-dom";
-import { Drafts, ExpandLess, ExpandMore, Public } from "@material-ui/icons";
+import { Add, Edit, Save } from "@material-ui/icons";
+import { useHistory } from "react-router-dom";
 import axios from "axios";
 
 import { GitContext } from "../GitContext";
+import { getFabStyle } from "../style";
+import { emptyIndex } from "../utils";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
     width: '100%',
     backgroundColor: theme.palette.background.paper,
   },
-  listText: {
-    maxWidth: "60%"
+  editColumn: {
+    width: "36px",
   },
-  section: {
-    margin: theme.spacing(1, 1),
-    "& > *": {
-      margin: theme.spacing(1),
-    }
+  bottomSpace: {
+    height: theme.spacing(10),
   },
+  fab: getFabStyle(theme),
 }));
 
 
-export const IndexEditor = () => {
-
-  const [openPosts, setOpenPosts] = useState(false);
-  const gitContext = useContext(GitContext);
-  const index = gitContext.gitState?.index;
-
+export const IndexEditor = (props: {
+  setEditMode: (editMode: boolean) => void;
+}) => {
+  const { setEditMode } = props;
+  const [diff, setDiff] = useState(false);
+  const [newIndex, setNewIndex] = useState(emptyIndex);
   const classes = useStyles();
-  const togglePosts = () => setOpenPosts(!openPosts);
+  const gitContext = useContext(GitContext);
+  const history = useHistory();
 
-  const handleArchive = async (slug: string) => {
-    if (!index) return;
-    const newIndex = JSON.parse(JSON.stringify(index));
-    newIndex.posts[slug].draft = true;
+  const oldIndex = gitContext.gitState?.index;
+
+  const toggleFeatured = (slug: string): void => {
+    const nextIndex = JSON.parse(JSON.stringify(newIndex));
+    nextIndex.posts[slug].featured = !nextIndex.posts[slug].draft && !newIndex.posts[slug].featured;
+    setNewIndex(nextIndex);
+  }
+
+  const toggleDraft = (slug: string): void => {
+    const nextIndex = JSON.parse(JSON.stringify(newIndex));
+    nextIndex.posts[slug].draft = !newIndex.posts[slug].draft;
+    nextIndex.posts[slug].featured = !nextIndex.posts[slug].draft && newIndex.posts[slug].featured;
+    setNewIndex(nextIndex);
+  }
+
+  useEffect(() => {
+    setNewIndex(oldIndex);
+  }, [oldIndex]);
+
+  useEffect(() => {
+    if (!oldIndex?.title || !newIndex?.title) return;
+    if (
+      oldIndex.title !== newIndex.title ||
+      Object.values(newIndex.posts).some(post => {
+        const oldEntry = oldIndex.posts[post.slug];
+        return !!post.featured !== !!oldEntry.featured || !!post.draft !== !!oldEntry.draft;
+      })
+    ) {
+      setDiff(true);
+    } else {
+      setDiff(false);
+    }
+  }, [newIndex, oldIndex]);
+
+  const saveChanges = async (): Promise<void> => {
+    if (!diff) {
+      console.warn(`No changes to save`);
+      return;
+    }
+    if (!newIndex?.title) {
+      console.warn(`Invalid index`);
+      return;
+    }
     await axios({
       method: "post",
       url: "git/edit",
-      data: [
-      {
-        path: "index.json",
-        content: JSON.stringify(newIndex, null, 2),
-      }
-    ],
-      headers: { "content-type": "application/json" }
+      headers: { "content-type": "application/json" },
+      data: [{ path: "index.json", content: JSON.stringify(newIndex, null, 2) }],
     });
     await gitContext.syncGitState(undefined, undefined, true);
   };
 
-  const handlePublish = async (slug: string) => {
-    if (!index) return;
-    const newIndex = JSON.parse(JSON.stringify(index));
-    newIndex.posts[slug].draft = false;
-    await axios({
-      method: "post",
-      url: "git/edit",
-      data: [
-      {
-        path: "index.json",
-        content: JSON.stringify(newIndex, null, 2),
-      }
-    ],
-      headers: { "content-type": "application/json" }
-    });
-    await gitContext.syncGitState(undefined, undefined, true);
-  };
+  const title = newIndex?.title;
+  return (<>
+    <TextField
+      autoComplete={"off"}
+      error={!title}
+      helperText={!title ? "Please provide a title" : ""}
+      id="edit-index-title"
+      key="index-title"
+      label="index-title"
+      name="index-title"
+      onChange={(event) => {
+        setNewIndex(prevIndex => ({ ...prevIndex, title: event.target.value }));
+      }}
+      required={true}
+      value={title}
+    />
 
-  return (
-    <List className={classes.root}>
-      <ListItem key="index_title">
-        <TextField id="index_title" label="title" defaultValue={index?.title} />
-      </ListItem>
-      <ListItem key="index_posts">
-        <ListItemText primary="Posts" onClick={togglePosts} />
-        {openPosts ? <ExpandLess /> : <ExpandMore />}
-      </ListItem>
-      <Collapse in={openPosts} timeout="auto" unmountOnExit>
-        <List>
-        {index?.posts
-          ? Object.values(index?.posts || []).map((post) => {
-            return (
-              <ListItem button component={Link} to={`/${post.slug}`} key={post.slug} alignItems="flex-start">
-                <ListItemText primary={post.title} className={classes.listText} />
-                <ListItemSecondaryAction>
-                  {post.draft
-                    ? <Button size="small"
-                        onClick={() => handlePublish(post.slug)}
-                        color="primary"
-                        variant="contained"
-                        startIcon={<Public />}
-                      >
-                        Publish
-                      </Button>
-                    : <Button
-                        onClick={() => handleArchive(post.slug)}
-                        size="small"
-                        color="primary"
-                        variant="contained"
-                        startIcon={<Drafts />}
-                      >
-                        Archive
-                      </Button>
-                  }
-                </ListItemSecondaryAction>
-              </ListItem>
-            )
-          })
-          : null
+    <Divider variant="middle"/>
+
+    <Table size="small">
+      <TableHead>
+        <TableRow> 
+          <TableCell padding="none" className={classes.editColumn}></TableCell>
+          <TableCell padding="none">Title</TableCell>
+          <TableCell padding="checkbox">Featured</TableCell>
+          <TableCell padding="checkbox">Draft</TableCell>
+        </TableRow> 
+      </TableHead>
+      {newIndex?.posts
+        ? Object.values(newIndex?.posts || {}).map((post) => {
+          const slug = post?.slug || "";
+          const title = post?.title || "";
+          const draft = !!post?.draft;
+          const featured = !!post?.featured;
+          return (
+            <TableRow>
+
+              <TableCell padding="none" className={classes.editColumn}>
+                <IconButton
+                  id={`edit-${slug}`}
+                  onClick={() => {
+                    setEditMode(true);
+                    history.push(`/${slug}`);
+                  }}
+                  color="secondary"
+                  size="small"
+                ><Edit/></IconButton>
+              </TableCell>
+
+              <TableCell align="left" padding="none">
+                {title}
+              </TableCell>
+
+              <TableCell align="center" padding="checkbox">
+                <Switch
+                  id={`toggle-featured-${slug}`}
+                  size="small"
+                  checked={featured}
+                  onChange={() => toggleFeatured(slug)}
+                />
+              </TableCell>
+
+              <TableCell align="center" padding="checkbox">
+                <Switch
+                  id={`toggle-draft-${slug}`}
+                  size="small"
+                  checked={draft}
+                  onChange={() => toggleDraft(slug)}
+                />
+              </TableCell>
+
+            </TableRow>
+          )
+        })
+        : null
+      }
+    </Table>
+    <div className={classes.bottomSpace}/>
+    <Fab
+      id={"fab"}
+      className={classes.fab}
+      color="primary"
+      onClick={() => {
+        if (diff) {
+          console.log("Saving changes..");
+          saveChanges();
+        } else {
+          console.log("Creating new post..");
+          setEditMode(true);
+          history.push("/");
         }
-        </List>
-      </Collapse> 
-    </List>
-  );
+      }}
+    >{(diff ? <Save/> : <Add/>)}</Fab>
+
+  </>);
 };

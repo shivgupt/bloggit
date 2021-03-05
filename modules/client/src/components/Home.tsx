@@ -1,5 +1,6 @@
 import {
   Card,
+  Fab,
   CardActionArea,
   CardContent,
   CardMedia,
@@ -9,12 +10,13 @@ import {
   Typography,
   makeStyles,
 } from "@material-ui/core";
-import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
-import React, { useContext } from "react";
-import { Link } from "react-router-dom";
 import Carousel from 'react-material-ui-carousel';
 import { PostData } from "@blog/types";
+import { Add } from "@material-ui/icons";
+import React, { useContext } from "react";
+import { useHistory, Link } from "react-router-dom";
 
+import { getFabStyle } from "../style";
 import { prettyDateString, replaceEmojiString } from "../utils";
 import { GitContext } from "../GitContext";
 
@@ -51,6 +53,7 @@ const useStyles = makeStyles((theme) => ({
     alignContent: "center",
     alignItems: "center",
   },
+  fab: getFabStyle(theme),
 }));
 
 export const PostCard = (props: { post: PostData }) => {
@@ -101,10 +104,15 @@ export const PostCard = (props: { post: PostData }) => {
   )
 }
 
-export const Home = (props: { filterBy?: string }) => {
-  const filterBy = props.filterBy;
+export const Home = (props: {
+  filterBy?: string,
+  adminMode: string;
+  setEditMode: (editMode: boolean) => void;
+ }) => {
+  const { adminMode, filterBy, setEditMode } = props;
   const classes = useStyles();
   const gitContext = useContext(GitContext);
+  const history = useHistory();
 
   const posts = (gitContext.gitState?.index?.posts || {}) as {[slug: string]: PostData};
 
@@ -159,6 +167,18 @@ export const Home = (props: { filterBy?: string }) => {
           );
         })}
       </Grid>
+      {adminMode === "enabled"
+        ? <Fab
+            id={"fab"}
+            className={classes.fab}
+            color="primary"
+            onClick={() => {
+              setEditMode(true);
+              history.push("/");
+            }}
+          ><Add/></Fab>
+        : null
+      }
     </>
   );
 };

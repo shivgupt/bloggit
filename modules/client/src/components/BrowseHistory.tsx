@@ -78,7 +78,7 @@ export const BrowseHistory = (props: {
 
       <Grid item>
         <Button
-          id="browse-history"
+          id="open-history"
           startIcon={<ExpandIcon/>}
           aria-haspopup="true"
           variant="contained"
@@ -112,7 +112,7 @@ export const BrowseHistory = (props: {
 
       <Menu
         elevation={0}
-        PaperProps={{ className: classes.paper }}
+        PaperProps={{ id: "history-menu", className: classes.paper }}
         getContentAnchorEl={null}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
         transformOrigin={{ vertical: "top", horizontal: "center" }}
@@ -122,12 +122,14 @@ export const BrowseHistory = (props: {
         onClose={() => setAnchorEl(null)}
       >
         {
-          editHistory.filter(entry => !entry.commit.startsWith(latestRef)).map(entry => {
+          editHistory.filter(entry => !entry.commit.startsWith(latestRef)).map((entry, i) => {
             const commit = entry.commit.substring(0,8);
+            const key = `history-entry-${i+1}`;
             return (
               <MenuItem
                 component={Link}
-                key={commit}
+                id={key}
+                key={key}
                 onClick={() => setAnchorEl(null)}
                 selected={commit === currentRef}
                 to={`/${commit}/${slug}`}

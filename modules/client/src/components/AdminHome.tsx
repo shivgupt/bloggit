@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
 import { 
   Button,
   Divider,
@@ -26,58 +27,63 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 export const AdminHome = (props: {
-  adminMode: AdminMode,
-  setAdminMode: (val: AdminMode) => void,
-  validateAuthToken: (_authToken?: string) => Promise<void>
+  adminMode: AdminMode;
+  setAdminMode: (val: AdminMode) => void;
+  setEditMode: (val: boolean) => void;
+  validateAuthToken: (_authToken?: string) => Promise<void>;
 }) => {
-
-  const { adminMode, setAdminMode, validateAuthToken } = props;
-  const classes = useStyles();
+  const { adminMode, setAdminMode, setEditMode, validateAuthToken } = props;
 
   const [authToken, setAuthToken] = useState("");
+  const classes = useStyles();
 
   return (
     <div>
       {adminMode !== "invalid"
         ? (
           <div className={classes.section}>
-            <Typography variant="subtitle1">
+            <Typography display="inline" variant="body1">
               This device is registered for Admin access
             </Typography>
+            <Button
+              id="unregister-admin-token"
+              variant="outlined"
+              onClick={() => {
+                setAuthToken("");
+                validateAuthToken("");
+              }}
+              startIcon={<RemoveCircleIcon/>}
+            >
+              Unregister
+            </Button>
           </div>
         )
         : (
+
           <div className={classes.section}>
-            <Typography variant="subtitle1">
-              This device is NOT registered for Admin access
-            </Typography>
+            <TextField
+              autoComplete={"off"}
+              helperText="Register for admin mode"
+              id="admin-token"
+              label="Admin Token"
+              onChange={(e) => setAuthToken(e.target.value)}
+              placeholder="Admin Token"
+              value={authToken}
+              variant="outlined"
+            />
+            <Button
+              className={classes.button}
+              id="register-admin-token"
+              size="small"
+              onClick={() => validateAuthToken(authToken)}
+              variant="contained"
+            >
+              Register
+            </Button>
           </div>
+
         )
       }
-
-      <Divider variant="middle" />
-      <div className={classes.section}>
-        <TextField
-          autoComplete={"off"}
-          helperText="Register for admin mode"
-          id="admin-token"
-          label="Admin Token"
-          onChange={(e) => setAuthToken(e.target.value)}
-          placeholder="Admin Token"
-          value={authToken}
-          variant="outlined"
-        />
-
-        <Button
-          className={classes.button}
-          id="register-admin-token"
-          size="small"
-          onClick={() => validateAuthToken(authToken)}
-          variant="contained"
-        >
-          Register
-        </Button>
-      </div>
 
       <Divider variant="middle" />
       { adminMode !== "invalid"
@@ -97,11 +103,15 @@ export const AdminHome = (props: {
             labelPlacement="start"
             className={classes.section}
           />
-        : <>Supply a valid admin token to activate admin mode</>
+        : <div className={classes.section}>
+            <Typography className={classes.section}>
+              Supply a valid admin token to activate admin mode
+            </Typography>
+          </div>
       }
-      { adminMode === "enabled"
-          ? <div className={classes.section}>
-            <IndexEditor />
+      {adminMode === "enabled"
+        ? <div className={classes.section}>
+            <IndexEditor setEditMode={setEditMode} />
           </div>
         : null
       }

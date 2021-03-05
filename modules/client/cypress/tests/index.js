@@ -9,14 +9,13 @@ describe("Blog Client", () => {
 
   it(`should reject an invalid admin token`, () => {
     cy.visit(`${Cypress.env("baseUrl")}/admin`);
-    cy.contains("div", /NOT registered for admin access/i).should("exist");
+    cy.get(`button#unregister-admin-token`).click();
+    cy.get(`button#register-admin-token`).should("exist");
     cy.get(`input#admin-token`).clear().type("invalid");
     cy.get("button#register-admin-token").click();
-    cy.contains("div", /NOT registered for admin access/i).should("exist");
-    my.openDrawer();
+    cy.get(`button#unregister-admin-token`).should("not.exist");
     cy.get(`label#toggle-admin-mode`).should("not.exist");
-    my.closeDrawer();
-    cy.get(`div#fab > button`).should("not.exist");
+    cy.get(`button#fab`).should("not.exist");
   });
 
   it(`should create a new post`, () => {
@@ -79,18 +78,46 @@ describe("Blog Client", () => {
     cy.contains(`p`, newData.tldr).should("exist");
   });
 
-  it(`should archive a post`, () => {
-    const slug = "test-archive";
+  it(`should edit the index`, () => {
+    const slug = "test-index-editor";
     my.createPost({
-      content: "This test should archive a post",
-      title: "Archive a Post",
-      tldr: "test-archive tldr",
+      content: "This test will be used to test editing the index",
+      title: "Index Editor",
+      tldr: "index editor tldr",
       category: "test",
       slug
     });
-    my.archivePost(slug);
+    my.openDrawer();
+    cy.get(`a#go-to-admin-page`).click();
+    cy.get(`input#edit-index-title`).should("exist");
+    cy.get(`button#edit-${slug}`).should("exist");
+    cy.get(`button#edit-${slug}`).should("exist");
+    cy.get(`input#toggle-featured-${slug}`).should("exist");
+    cy.get(`input#toggle-draft-${slug}`).should("exist");
+    // Edit the site title
+    const oldTitle = "My Personal Blog"
+    const newTitle = "My New Site Title"
+    cy.get(`input#edit-index-title`).clear().type(newTitle);
+    cy.get(`button#fab`).click();
+    my.openDrawer();
+    cy.contains(`div`, newTitle).should("exist");
+    my.closeDrawer();
+    cy.get(`input#edit-index-title`).clear().type(oldTitle);
+    cy.get(`button#fab`).click();
+    my.openDrawer();
+    cy.contains(`div`, oldTitle).should("exist");
+    my.closeDrawer();
+    // Save a post as a draft
+    cy.get(`input#toggle-draft-${slug}`).click();
+    cy.get(`button#fab`).click();
     my.goHome();
-    cy.get(`a[href="${slug}"]`).should("not.exist");
+    cy.get(`a[href="/${slug}"]`).should("not.exist");
+    my.openDrawer();
+    cy.get(`a#go-to-admin-page`).click();
+    cy.get(`input#toggle-draft-${slug}`).click();
+    cy.get(`button#fab`).click();
+    my.goHome();
+    cy.get(`a[href="/${slug}"]`).should("exist");
   })
 
 
@@ -113,10 +140,11 @@ describe("Blog Client", () => {
       slug,
     });
     cy.visit(`${Cypress.env("baseUrl")}/${slug}`);
-    cy.contains(`button`, /history/i).click();
-    cy.get(`ul > a`).first().click();
+    cy.get(`button#open-history`).click();
+    cy.get(`a#history-entry-1`).first().click();
     cy.location(`pathname`).should(`match`, /\/[a-f0-9]{8}\/[a-zA-Z0-0-]{1,}/)
-    cy.contains(`a`, /present/i).should("exist");
+    cy.get(`div#history-menu`).should("exist");
+    cy.get(`a#jump-to-present`).should("exist");
     cy.contains(`p`, firstContent).should("exist");
   });
 
