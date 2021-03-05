@@ -89,7 +89,7 @@ const defaultValidation: EditPostValidation = {
 
 const getPath = (post: PostData) => {
   if (post?.path) return post.path;
-  if (post?.category) return `${post.category}/${post.slug}.md`;
+  if (post?.category && post?.slug) return `${post.category}/${post.slug}.md`;
   if (post?.slug) return `${post.slug}.md`;
   return `${slugify(post?.title)}.md`;
 };
@@ -186,14 +186,14 @@ export const EditPost = (props: {
     newIndex.posts[gitState.slug] = {
       // TODO: be more selective in old keys that we carry forward
       ...oldIndex.posts[gitState.slug],
-      slug: editData.slug,
+      slug: editData.slug || editData.displaySlug,
       title: editData.title,
       category: editData.category,
       img: editData.img,
       lastEdit: (new Date()).toLocaleDateString("en-in"),
       tldr: editData.tldr,
     } as PostData;
-    const newPath = getPath(editData);
+    const newPath = getPath(newIndex.posts[gitState.slug]);
     const oldPath = getPath(oldIndex.posts[gitState.slug]);
     const data = [] as Array<{path: string, content: string}>;
     if (oldPath !== newPath) {
@@ -364,7 +364,7 @@ export const EditPost = (props: {
             FabProps={{id: "fab-publish"}}
             icon={<Public />}
             key="fab-publish"
-            onClick={() => saveChanges()}
+            onClick={() => saveChanges(false)}
             tooltipTitle="Publish"
           />])
         : ([<SpeedDialAction
