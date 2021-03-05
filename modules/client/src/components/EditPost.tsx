@@ -189,6 +189,7 @@ export const EditPost = (props: {
     const oldIndex = gitState?.index;
     const newIndex = JSON.parse(JSON.stringify(oldIndex))
     newIndex.posts[gitState.slug] = {
+      // TODO: be more selective in old keys that we carry forward
       ...oldIndex.posts[gitState.slug],
       slug: editData.slug,
       title: editData.title,
@@ -341,7 +342,7 @@ export const EditPost = (props: {
       />
     </Paper>
     <SpeedDial
-      id={"fab"}
+      FabProps={{ id: "fab" }}
       ariaLabel="fab"
       onClose={() => setOpen(false)}
       onOpen={() => setOpen(true)}

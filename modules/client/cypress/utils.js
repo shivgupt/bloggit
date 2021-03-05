@@ -35,8 +35,21 @@ my.enterPostData = (data) => {
 };
 
 my.publishPost = () => {
-  cy.get(`div#fab > button`).click();
-  cy.get(`button#fab-publish`).click();
+  cy.get(`button#fab`).click();
+  cy.get(`button#fab-publish`).click(10, 10);
+  cy.get(`button#copy-permalink`).should("exist");
+};
+
+my.discard = () => {
+  cy.get(`button#fab`).click();
+  cy.get(`button#fab-discard`).click(10, 10);
+  cy.get(`button#copy-permalink`).should("exist");
+};
+
+my.saveChanges = () => {
+  cy.get(`button#fab`).click();
+  cy.get(`button#fab-save`).click(10, 10);
+  cy.get(`button#copy-permalink`).should("exist");
 };
 
 my.createPost = (data) => {
@@ -46,23 +59,12 @@ my.createPost = (data) => {
   my.publishPost();
 };
 
-my.discard = () => {
-  cy.get(`div#fab > button`).click();
-  cy.get(`button#fab-discard`).click();
-};
-
-my.saveChanges = () => {
-  cy.get(`div#fab > button`).click();
-  cy.get(`button#fab-save`).click(10, 10);
-};
-
 my.editPost = (data) => {
   my.goHome();
   cy.get(`a[href="/${data.slug}"]`).click();
   cy.get(`button#fab`).dblclick(); // TODO: why do we need to dblclick here?
   my.enterPostData(data);
   my.saveChanges();
-  my.goHome();
 };
 
 my.archivePost = (slug) => {

@@ -193,6 +193,7 @@ export const NavBar = (props: any) => {
                   Admin
                 </Typography>
               : [ <Link
+                    key="navbar-category"
                     className={classes.link}
                     color="inherit"
                     component={RouterLink}
@@ -202,7 +203,7 @@ export const NavBar = (props: any) => {
                     <CategoryIcon className={classes.icon} />
                     {post?.category}
                   </Link>,
-                  <Typography>
+                  <Typography key="navbar-category-icon">
                     <DocIcon className={classes.icon} />
                     {pageTitle}
                   </Typography>

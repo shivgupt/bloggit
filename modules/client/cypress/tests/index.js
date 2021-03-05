@@ -113,10 +113,11 @@ describe("Blog Client", () => {
       slug,
     });
     cy.visit(`${Cypress.env("baseUrl")}/${slug}`);
-    cy.contains(`button`, /history/i).click();
-    cy.get(`ul > a`).first().click();
+    cy.get(`button#open-history`).click();
+    cy.get(`a#history-entry-1`).first().click();
     cy.location(`pathname`).should(`match`, /\/[a-f0-9]{8}\/[a-zA-Z0-0-]{1,}/)
-    cy.contains(`a`, /present/i).should("exist");
+    cy.get(`div#history-menu`).should("exist");
+    cy.get(`a#jump-to-present`).should("exist");
     cy.contains(`p`, firstContent).should("exist");
   });
 

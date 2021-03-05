@@ -88,7 +88,6 @@ export const Home = (props: { filter?: string, by?: string }) => {
                     component={Link}
                     to={`/category/${posts[slug].category}`}
                     clickable
-                    disableRipple
                   />
                   <Typography variant="subtitle1" component="p" gutterBottom className={classes.section}>
                     {tldr.substr(0,cutoff)} {tldr.length > cutoff ? "..." : null}

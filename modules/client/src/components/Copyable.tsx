@@ -12,16 +12,20 @@ const style = withStyles(theme => ({
 
 export const Copyable = style((props: any) => {
   const [copied, setCopied] = useState(false);
-  const { className, color, size, tooltip, text, value } = props;
+  const { className, color, id, size, tooltip, text, value } = props;
   return (
-    <CopyToClipboard onCopy={() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }} text={value}>
+    <CopyToClipboard
+      onCopy={() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      }}
+      text={value}
+    >
       <Tooltip arrow title={tooltip || text}>
         <Button
           className={className}
           color={color || "inherit"}
+          id={id}
           size={size || "medium"}
           variant="contained"
         >
