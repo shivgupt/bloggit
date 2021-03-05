@@ -74,6 +74,14 @@ const useStyles = makeStyles(theme => ({
     flex: 1,
     marginLeft: theme.spacing(1),
   },
+  postTitle: {
+    [theme.breakpoints.between(0,500)]: {
+      maxWidth: "100px"
+    },
+    [theme.breakpoints.between(500,800)]: {
+      maxWidth: "200px"
+    },
+  },
 }));
 
 const DrawerContent = (props: any) => {
@@ -203,7 +211,7 @@ export const NavBar = (props: any) => {
                     <CategoryIcon className={classes.icon} />
                     {post?.category}
                   </Link>,
-                  <Typography key="post">
+                  <Typography key="post" noWrap className={classes.postTitle}>
                     <DocIcon className={classes.icon} />
                     {pageTitle}
                   </Typography>
