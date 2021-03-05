@@ -67,6 +67,11 @@ const useStyles = makeStyles(theme => ({
   hiddenDrawer: {
     width: "60%",
   },
+  closeDrawer: {
+    height: theme.spacing(8),
+    marginBottom: theme.spacing(-4),
+    marginLeft: "75%",
+  },
   title: {
     flex: 1,
     marginLeft: theme.spacing(1),
@@ -75,6 +80,7 @@ const useStyles = makeStyles(theme => ({
 
 const DrawerContent = (props: any) => {
   const { siteTitle, node, setNode, toggleTheme, toggleDrawer, theme, adminMode, setAdminMode } = props;
+  const classes = useStyles();
 
   const gitContext = useContext(GitContext);
   const { index } = gitContext.gitState;
@@ -82,9 +88,13 @@ const DrawerContent = (props: any) => {
 
   return (
     <>
-      <IconButton
-        onClick={toggleDrawer}
-      ><Close /></IconButton>
+      <Hidden mdUp>
+        <IconButton
+          className={classes.closeDrawer}
+          onClick={toggleDrawer}
+          size="small"
+        ><Close/></IconButton>
+      </Hidden>
       <ThemeProvider theme={siteTitleFont}>
         <Typography variant="h4" component="div" >
           <Box textAlign="center" m={2} p={2}>
@@ -166,9 +176,6 @@ export const NavBar = (props: any) => {
   const pageTitle = index?.posts?.[slug || ""]?.title || "";
   const post = slug ? index?.posts?.[slug] : null;
   document.title = pageTitle ? `${pageTitle} | ${siteTitle}` : siteTitle;
-
-  console.log(categoryMatch)
-  console.log(slug)
 
   return (
     <>
