@@ -10,6 +10,8 @@ import {
 } from "@material-ui/core";
 import React, { useContext } from "react";
 import { Link } from "react-router-dom";
+import Carousel from 'react-material-ui-carousel';
+import { PostData } from "@blog/types";
 
 import { prettyDateString, replaceEmojiString } from "../utils";
 import { GitContext } from "../GitContext";
@@ -21,6 +23,13 @@ const useStyles = makeStyles((theme) => ({
     alignItems: "center",
   },
   card: {
+    width: "100%",
+    height: "420px",
+  },
+  actionArea: {
+    width: "100%",
+  },
+  contentActionArea: {
     width: "100%",
     height: "420px",
   },
@@ -42,6 +51,54 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+export const PostCard = (props: { post: PostData }) => {
+  const classes = useStyles();
+  const post = props.post;
+  const slug = post.slug;
+
+  const title = replaceEmojiString(post.title);
+  const tldr = replaceEmojiString(post.tldr!);
+  const cutoff = post.img ? 140 : 280;
+
+  return (
+    <Card className={classes.card}>
+      <CardActionArea disableRipple className={classes.actionArea} component={Link} to={`/${slug}`}>
+        {post.img
+          ? <div className={classes.wrapper}><CardMedia
+              className={classes.media}
+              component="img"
+              image={post.img}
+              title={slug}
+            /></div>
+          : null}
+      </CardActionArea>
+      <CardContent>
+        <CardActionArea disableRipple className={classes.actionArea} component={Link} to={`/${slug}`}>
+          <Typography variant="h5" gutterBottom display="block">{title}</Typography>
+          {post.publishedOn
+            ? <Typography variant="button" gutterBottom display="inline">
+                {prettyDateString(post.publishedOn!)}
+              </Typography>
+            : ""
+          }
+        </CardActionArea>
+          &nbsp;
+          <Chip
+            label={post.category}
+            component={Link}
+            to={`/category/${post.category}`}
+            clickable
+          />
+        <CardActionArea disableRipple className={classes.contentActionArea} component={Link} to={`/${slug}`}>
+          <Typography variant="caption" component="p" gutterBottom className={classes.section}>
+            {tldr.substr(0,cutoff)} {tldr.length > cutoff ? "..." : null}
+          </Typography>
+        </CardActionArea>
+      </CardContent>
+    </Card>
+  )
+}
+
 export const Home = (props: { filter?: string, by?: string }) => {
   const { filter, by } = props;
   const classes = useStyles();
@@ -57,45 +114,9 @@ export const Home = (props: { filter?: string, by?: string }) => {
         if (filter && by && posts[slug][filter] !== by) {
           return null;
         }
-
-        const title = replaceEmojiString(posts[slug].title);
-        const tldr = replaceEmojiString(posts[slug].tldr!);
-        const cutoff = posts[slug].img ? 140 : 280;
-
         return (
           <Grid className={classes.root} item xs={12} md={6} lg={4} key={slug}>
-            <Card className={classes.card}>
-              <CardActionArea disableRipple className={classes.card} component={Link} to={`/${slug}`}>
-                {posts[slug].img
-                  ? <div className={classes.wrapper}><CardMedia
-                      className={classes.media}
-                      component="img"
-                      image={posts[slug].img}
-                      title={slug}
-                    /></div>
-                  : null}
-                <CardContent>
-                  <Typography variant="h5" gutterBottom display="block">{title}</Typography>
-                  {posts[slug].publishedOn
-                    ? <Typography variant="caption" gutterBottom display="inline">
-                        {prettyDateString(posts[slug].publishedOn!)}
-                      </Typography>
-                    : ""
-                  }
-                  &nbsp;
-                  <Chip
-                    label={posts[slug].category}
-                    component={Link}
-                    to={`/category/${posts[slug].category}`}
-                    clickable
-                    disableRipple
-                  />
-                  <Typography variant="subtitle1" component="p" gutterBottom className={classes.section}>
-                    {tldr.substr(0,cutoff)} {tldr.length > cutoff ? "..." : null}
-                  </Typography>
-                </CardContent>
-              </CardActionArea>
-            </Card>
+            <PostCard post={posts[slug]} />
           </Grid>
         );
       })}
