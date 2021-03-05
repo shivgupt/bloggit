@@ -40,7 +40,7 @@ else
     --name="${project}_${cmd}_client" \
     --network "$project" \
     --rm \
-    --volume="$root/modules/client:/client" \
-    --workdir="/client" \
+    --volume="$root:/home/$project" \
+    --workdir="/home/$project/modules/client" \
     "$cypress_image" run --spec "cypress/tests/index.js" --env "baseUrl=http://proxy"
 fi

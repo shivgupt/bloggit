@@ -1,4 +1,4 @@
-/* global Cypress, cy, before */
+/* global Cypress */
 // ***********************************************************
 // This example support/index.js is processed and
 // loaded automatically before your test files.
@@ -17,35 +17,4 @@
 // Import commands.js using ES2015 syntax:
 import './commands'
 
-// store logs
-let logs = "";
-
-Cypress.on("window:before:load", window => {
-  // Overwrite all of the console methods.
-  ["log", "info", "error", "warn", "debug"].forEach(consoleProperty => {
-    const oldConsole = window.console[consoleProperty];
-    window.console[consoleProperty] = function(...args) {
-      oldConsole(...args); // Still console log everything
-      logs += args.join(" ") + "\n"; // Also save copy of all logs to dump if tests fail
-    };
-  });
-});
-
-// Cypress doesn't have a each test event
-// so I'm using mochas events to clear log state after every test.
-Cypress.mocha.getRunner().on("test", () => {
-  // Every test reset your logs to be empty
-  // This will make sure only logs from that test suite will be logged if a error happens
-  logs = "";
-});
-
-// On a cypress fail. I add the console logs, from the start of test or after the last test fail to the
-// current fail, to the end of the error.stack property.
-Cypress.on("fail", error => {
-  error.stack += "\nConsole Logs:\n========================\n\n";
-  error.stack += logs;
-  // clear logs after fail so we dont see duplicate logs
-  logs = "";
-  // still need to throw the error so tests wont be marked as a pass
-  throw error;
-});
+require('cypress-terminal-report/src/installLogsCollector')();
