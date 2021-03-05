@@ -141,6 +141,9 @@ export const EditPost = (props: {
     const slugErr =
       !newEditData.displaySlug ? "Slug is required"
       : newEditData.displaySlug.match(/[^a-z0-9-]/) ? "Slug should only contain a-z, 0-9 and -"
+      : Object.keys(gitState.index.posts).some(
+          s => s !== gitState.slug && s === newEditData.displaySlug
+        ) ? "This slug is already in use"
       : "";
     const hasError = !!(slugErr || titleErr);
     const hasChanged = originalEditData.title !== newEditData.title

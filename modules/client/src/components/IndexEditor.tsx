@@ -3,6 +3,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { 
   Divider,
   Table,
+  Checkbox,
   TableRow,
   TableCell,
   TableHead,
@@ -161,7 +162,7 @@ export const IndexEditor = (props: {
             const featured = !!post?.featured;
             const removed = !!post?.removed;
             return (
-              <TableRow key={`table-row-${slug}`}>
+              <TableRow id={`table-row-${slug}`} key={`table-row-${slug}`}>
 
                 <TableCell padding="none" className={classes.editColumn}>
                   <IconButton
@@ -198,7 +199,7 @@ export const IndexEditor = (props: {
                 </TableCell>
 
                 <TableCell align="center" padding="checkbox">
-                  <Switch
+                  <Checkbox
                     id={`toggle-remove-${slug}`}
                     size="small"
                     checked={removed}
