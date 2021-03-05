@@ -73,10 +73,8 @@ export const IndexEditor = (props: {
         return !!post.featured !== !!oldEntry.featured || !!post.draft !== !!oldEntry.draft;
       })
     ) {
-      console.log(`The new index is different than the old one`);
       setDiff(true);
     } else {
-      console.log(`The new index is the same as the old one`);
       setDiff(false);
     }
   }, [newIndex, oldIndex]);
@@ -105,7 +103,7 @@ export const IndexEditor = (props: {
       autoComplete={"off"}
       error={!title}
       helperText={!title ? "Please provide a title" : ""}
-      id="input-index-title"
+      id="edit-index-title"
       key="index-title"
       label="index-title"
       name="index-title"
@@ -138,6 +136,7 @@ export const IndexEditor = (props: {
 
               <TableCell padding="none" className={classes.editColumn}>
                 <IconButton
+                  id={`edit-${slug}`}
                   onClick={() => {
                     setEditMode(true);
                     history.push(`/${slug}`);
@@ -153,6 +152,7 @@ export const IndexEditor = (props: {
 
               <TableCell align="center" padding="checkbox">
                 <Switch
+                  id={`toggle-featured-${slug}`}
                   size="small"
                   checked={featured}
                   onChange={() => toggleFeatured(slug)}
@@ -161,6 +161,7 @@ export const IndexEditor = (props: {
 
               <TableCell align="center" padding="checkbox">
                 <Switch
+                  id={`toggle-draft-${slug}`}
                   size="small"
                   checked={draft}
                   onChange={() => toggleDraft(slug)}

@@ -87,6 +87,7 @@ const DrawerContent = (props: any) => {
     <>
       <Hidden mdUp>
         <IconButton
+          id="close-drawer"
           className={classes.closeDrawer}
           onClick={() => toggleDrawer()}
           size="small"

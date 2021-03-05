@@ -68,7 +68,7 @@ const App: React.FC = () => {
     : slugMatch ? slugMatch.params.slug
     : "";
 
-  console.log(`Rendering App with refParam=${refParam} and slugParam=${slugParam} and categoryParam=${categoryParam}`);
+  // console.log(`Rendering App with refParam=${refParam} and slugParam=${slugParam} and categoryParam=${categoryParam}`);
 
   const validateAuthToken = async (_authToken?: string) => {
     if (_authToken === "") {

@@ -4,7 +4,7 @@ const my = {};
 
 my.goHome = () => cy.get(`a#go-home`).click()
 my.openDrawer = () => cy.get(`button#open-drawer`).click();
-my.closeDrawer = () => cy.get(`div[role="presentation"]`).first().click(10, 10);
+my.closeDrawer = () => cy.get(`button#close-drawer`).click();
 my.toggleAdminMode = () => cy.get(`label#toggle-admin-mode `).click();
 
 my.authenticate = () => {
@@ -65,13 +65,6 @@ my.editPost = (data) => {
   cy.get(`button#fab`).dblclick(); // TODO: why do we need to dblclick here?
   my.enterPostData(data);
   my.saveChanges();
-};
-
-my.archivePost = (slug) => {
-  cy.visit(`${Cypress.env("baseUrl")}/admin`);
-  cy.contains(`span`, /posts/i).click();
-  cy.contains(`a[href="/${slug}"] ~ div > button`, /archive/i).click();
-  cy.contains(`a[href="/${slug}"] ~ div > button`, /publish/i).should("exist");
 };
 
 module.exports = my
