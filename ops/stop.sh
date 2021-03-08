@@ -27,7 +27,7 @@ then
   exit
 fi
 
-# If any container names match, stop all of them
+# If some container names matches, stop them
 container_ids=$(docker container ls --filter 'status=running' --format '{{.ID}} {{.Names}}' |\
   cut -d "." -f 1 |\
   grep "$target" |\

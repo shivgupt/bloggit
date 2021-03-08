@@ -14,7 +14,7 @@ export const pushToMirror = async (): Promise<void> => {
     return;
   }
 
-  // Manually check whether there's anything we need to push
+  // Manually check whether we need to push
   // a la https://github.com/isomorphic-git/isomorphic-git/issues/398#issuecomment-742798499
   const remote = `refs/remotes/${mirrorRef}/${branch}`;
   const remoteHash = await resolveRef(remote);
@@ -33,21 +33,18 @@ export const pushToMirror = async (): Promise<void> => {
     http,
     remote: mirrorRef,
     url: mirrorUrl,
-    onAuth: (url?: string, other?: any) => {
-      log.info(`Auth triggered for ${mirrorRef} at ${url} & other=${JSON.stringify(other)}`);
+    onAuth: (url?: string) => {
+      log.info(`Auth triggered for ${mirrorRef} at ${url}`);
       return({ password: mirrorKey });
     },
-    onAuthFailure: (url?: string, other?: any) => {
-      log.warn(`Failed to auth w ${mirrorRef} at ${url} & creds ${JSON.stringify(other)}`);
+    onAuthFailure: (url?: string) => {
+      log.warn(`Failed to auth w ${mirrorRef} at ${url}`);
     },
     onAuthSuccess: (url?: string) => {
       log.info(`Successfully authenticated w ${mirrorRef} at ${url}`);
     },
     onMessage: (msg: string) => {
       log.info(`Received message from ${mirrorRef} at ${mirrorUrl}: ${msg}`);
-    },
-    onProgress: (progress: any) => {
-      log.info(`Progress pushing to ${mirrorUrl}: ${JSON.stringify(progress)}`);
     },
   }).catch(e => log.error(e.message));
 };

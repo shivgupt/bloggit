@@ -20,19 +20,18 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-export const ImageUploader = (props: any) => {
-  const { setImageHash } = props;
+export const ImageUploader = ({
+  setImageHash,
+}: {
+  setImageHash: (val: string) => void;
+}) => {
   const classes = useStyles();
 
   const handleImageUpload = (event) => {
-
     console.log(event);
     const reader = new FileReader();
-
     let file = event.target.files[0];
-
     reader.readAsArrayBuffer(file);
-
     reader.onloadend = async () => {
       let res = await axios({
         method: "POST",
@@ -46,7 +45,6 @@ export const ImageUploader = (props: any) => {
         console.log(res);
       }
     }
-
   }
 
   return (

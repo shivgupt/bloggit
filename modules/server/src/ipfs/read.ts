@@ -14,7 +14,7 @@ const log = logger.child({ module: "IpfsRouter" });
 export const read = async (path: string): Promise<IpfsRead> => {
 
   // ls the given path to get some info about it
-  const lsRes = [];
+  const lsRes: string[] = [];
   let contentSize = 0;
   for await (const chunk of ipfs.ls(path, { timeout: 10000 })) {
     log.debug(`ls got a ${chunk.type} (size ${chunk.size}): "${chunk.name}" at path ${chunk.path}`);
@@ -25,7 +25,7 @@ export const read = async (path: string): Promise<IpfsRead> => {
       }
     }
   }
-  lsRes.sort((a,b) => a.localeCompare(b));
+  lsRes.sort((a: string, b: string): number => a.localeCompare(b));
 
   // If the given path resolves to a dir, return a list of the files it includes
   if (lsRes.length) {

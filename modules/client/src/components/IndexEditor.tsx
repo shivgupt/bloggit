@@ -1,4 +1,4 @@
-import { BlogIndex, PostData } from "@blog/types";
+import { BlogIndex, EditRequest, PostData } from "@blog/types";
 import React, { useContext, useEffect, useState } from "react";
 import { 
   Divider,
@@ -14,6 +14,8 @@ import {
   Switch,
   TextField,
   Theme,
+  Backdrop,
+  CircularProgress,
 } from "@material-ui/core";
 import { Add, Edit, Save } from "@material-ui/icons";
 import { useHistory } from "react-router-dom";
@@ -21,7 +23,7 @@ import axios from "axios";
 
 import { GitContext } from "../GitContext";
 import { getFabStyle } from "../style";
-import { emptyIndex } from "../utils";
+import { emptyIndex, getPath } from "../utils";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -34,6 +36,10 @@ const useStyles = makeStyles((theme: Theme) => ({
   bottomSpace: {
     height: theme.spacing(10),
   },
+  backdrop: {
+    zIndex: theme.zIndex.drawer + 1,
+    color: '#fff',
+  },
   fab: getFabStyle(theme),
 }));
 
@@ -45,17 +51,20 @@ type EditIndex = BlogIndex & {
   };
 };
 
-export const IndexEditor = (props: {
+export const IndexEditor = ({
+  setEditMode,
+}: {
   setEditMode: (editMode: boolean) => void;
 }) => {
-  const { setEditMode } = props;
-  const [diff, setDiff] = useState(false);
-  const [newIndex, setNewIndex] = useState(emptyIndex as EditIndex);
-  const classes = useStyles();
+  const [diff, setDiff] = useState<boolean>(false);
+  const [saving, setSaving] = useState<boolean>(false);
+  const [newIndex, setNewIndex] = useState<EditIndex>(emptyIndex);
   const gitContext = useContext(GitContext);
   const history = useHistory();
+  const classes = useStyles();
 
   const oldIndex = gitContext.gitState?.index;
+  const title = newIndex?.title;
 
   const toggleFeatured = (slug: string): void => {
     const nextIndex = JSON.parse(JSON.stringify(newIndex)) as EditIndex;
@@ -89,8 +98,8 @@ export const IndexEditor = (props: {
       Object.values(newIndex.posts).some(post => {
         const oldEntry = oldIndex.posts[post.slug];
         return !!post.removed
-          || !!post.featured !== !!oldEntry.featured
-          || !!post.draft !== !!oldEntry.draft;
+          || !!post?.featured !== !!oldEntry?.featured
+          || !!post?.draft !== !!oldEntry?.draft;
       })
     ) {
       setDiff(true);
@@ -108,23 +117,31 @@ export const IndexEditor = (props: {
       console.warn(`Invalid index`);
       return;
     }
+    setSaving(true);
     const indexToSave = JSON.parse(JSON.stringify(newIndex)) as EditIndex;
+    const editRequest = [] as EditRequest;
     Object.keys(indexToSave.posts).forEach(slug => {
       if (indexToSave.posts[slug].removed) {
+        const oldPath = getPath(indexToSave.posts[slug])
+        if (oldPath) {
+          console.log(`Removing ${oldPath} from git repo`);
+          editRequest.push({ path: oldPath!, content: "" });
+        }
         console.log(`Removing ${slug} from index`);
         delete indexToSave.posts[slug];
       }
     });
+    editRequest.push({ path: "index.json", content: JSON.stringify(indexToSave, null, 2) });
     await axios({
       method: "post",
       url: "git/edit",
       headers: { "content-type": "application/json" },
-      data: [{ path: "index.json", content: JSON.stringify(indexToSave, null, 2) }],
+      data: editRequest,
     });
     await gitContext.syncGitState(undefined, undefined, true);
+    setSaving(false);
   };
 
-  const title = newIndex?.title;
   return (<>
     <TextField
       autoComplete={"off"}
@@ -215,6 +232,7 @@ export const IndexEditor = (props: {
       </TableBody>
     </Table>
     <div className={classes.bottomSpace}/>
+
     <Fab
       id={"fab"}
       className={classes.fab}
@@ -230,6 +248,8 @@ export const IndexEditor = (props: {
         }
       }}
     >{(diff ? <Save/> : <Add/>)}</Fab>
-
+    <Backdrop className={classes.backdrop} open={saving}>
+      <CircularProgress color="inherit" />
+    </Backdrop>
   </>);
 };

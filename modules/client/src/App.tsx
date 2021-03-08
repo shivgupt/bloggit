@@ -124,11 +124,10 @@ const App: React.FC = () => {
   }
 
   const toggleTheme = () => {
-    if ( theme.palette.type === "dark") {
+    if (theme.palette.type === "dark") {
       store.save("theme", "light");
       setTheme(lightTheme);
-    }
-    else {
+    } else {
       store.save("theme", "dark");
       setTheme(darkTheme);
     }
@@ -137,17 +136,16 @@ const App: React.FC = () => {
   const syncGitState = async (ref?: string, slug?: string, getLatest?: boolean) => {
     const latestRef = (getLatest ? null : gitState.latestRef) || await fetchRef();
     const currentRef = ref || latestRef;
-    const index = await fetchIndex(currentRef);
     const newGitState = {
       latestRef,
       currentRef,
       slug: slug || "",
-      index: index,
+      index: await fetchIndex(latestRef),
     } as GitState;
     // console.log(`Syncing ref ${currentRef}${slug ? ` and slug ${slug}` : ""}`);
     if (slug && !["admin", "create-new-post"].includes(slug)) {
       newGitState.currentContent = await fetchContent(slug, currentRef)
-      newGitState.indexEntry = index.posts?.[slug];
+      newGitState.indexEntry = (await fetchIndex(currentRef))?.posts?.[slug] || emptyEntry;
     } else {
       newGitState.currentContent = "";
       newGitState.indexEntry = emptyEntry;
@@ -166,7 +164,7 @@ const App: React.FC = () => {
     validateAuthToken();
   }, []);
 
-  // Fetch index & post content any time the url changes
+  // Fetch index & post content whenever the url changes
   useEffect(() => {
     syncGitState(refParam || gitState.latestRef, slugParam);
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -186,9 +184,9 @@ const App: React.FC = () => {
         <CssBaseline />
         <NavBar
           adminMode={adminMode}
+          setEditMode={setEditMode}
           theme={theme}
           toggleTheme={toggleTheme}
-          setEditMode={setEditMode}
         />
         <main className={classes.main}>
           <div className={classes.appBarSpacer} />

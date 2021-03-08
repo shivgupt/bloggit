@@ -17,7 +17,7 @@ import React, { useContext } from "react";
 import { useHistory, Link } from "react-router-dom";
 
 import { getFabStyle } from "../style";
-import { prettyDateString, replaceEmojiString } from "../utils";
+import { replaceEmojiString } from "../utils";
 import { GitContext } from "../GitContext";
 
 const useStyles = makeStyles((theme) => ({
@@ -49,6 +49,7 @@ const useStyles = makeStyles((theme) => ({
   },
   section: {
     margin: theme.spacing(1, 1),
+    minWidth: "250px",
     maxWidth: "600px",
     alignContent: "center",
     alignItems: "center",
@@ -56,14 +57,20 @@ const useStyles = makeStyles((theme) => ({
   fab: getFabStyle(theme),
 }));
 
-export const PostCard = (props: { post: PostData }) => {
+export const PostCard = ({ post }: { post: PostData }) => {
   const classes = useStyles();
-  const post = props.post;
-  const slug = post.slug;
 
+  const slug = post.slug;
   const title = replaceEmojiString(post.title);
   const tldr = replaceEmojiString(post.tldr!);
   const cutoff = post.img ? 140 : 280;
+  const publishedOn = post.publishedOn
+    ? new Date(post.publishedOn).toLocaleDateString('en', {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })
+    : "";
 
   return (
     <Card className={classes.card}>
@@ -80,9 +87,9 @@ export const PostCard = (props: { post: PostData }) => {
       <CardContent>
         <CardActionArea disableRipple className={classes.actionArea} component={Link} to={`/${slug}`}>
           <Typography variant="h5" gutterBottom display="block">{title}</Typography>
-          {post.publishedOn
-            ? <Typography variant="button" gutterBottom display="inline">
-                {prettyDateString(post.publishedOn!)}
+          {publishedOn
+            ? <Typography variant="subtitle1" gutterBottom display="inline">
+                {`Published on ${publishedOn}`}
               </Typography>
             : ""
           }
@@ -104,18 +111,20 @@ export const PostCard = (props: { post: PostData }) => {
   )
 }
 
-export const Home = (props: {
-  filterBy?: string,
+export const Home = ({
+  adminMode,
+  filterBy,
+  setEditMode,
+}: {
   adminMode: string;
+  filterBy?: string,
   setEditMode: (editMode: boolean) => void;
  }) => {
-  const { adminMode, filterBy, setEditMode } = props;
-  const classes = useStyles();
   const gitContext = useContext(GitContext);
   const history = useHistory();
+  const classes = useStyles();
 
   const posts = (gitContext.gitState?.index?.posts || {}) as {[slug: string]: PostData};
-
   const featured = Object.values(posts).filter((post) => post.featured)
 
   return (
@@ -127,13 +136,13 @@ export const Home = (props: {
               navButtonsWrapperProps={{
                 className: "string",
                 style: {
-                  top: "calc(70%)",
+                  top: "calc(75%)",
                 }
               }}
               navButtonsProps={{
                 className: "string",
                 style: {
-                  top: "calc(70%)",
+                  top: "calc(75%)",
                 },
               }}
             >

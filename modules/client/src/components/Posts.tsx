@@ -5,7 +5,7 @@ import {
   Paper,
 } from "@material-ui/core";
 import { Edit } from "@material-ui/icons";
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Markdown from "react-markdown";
 import "react-mde/lib/styles/css/react-mde-all.css";
 
@@ -45,14 +45,18 @@ const useStyles = makeStyles((theme) => ({
   fab: getFabStyle(theme),
 }));
 
-export const PostPage = (props: {
+export const PostPage = ({
+  adminMode,
+  setEditMode,
+}: {
   adminMode: string;
   setEditMode: (editMode: boolean) => void;
 }) => {
-  const { adminMode, setEditMode } = props;
+  const [isHistorical, setIsHistorical] = useState<boolean>(false);
   const gitContext = useContext(GitContext);
-  const { currentRef, latestRef, slug, currentContent, indexEntry } = gitContext.gitState;
   const classes = useStyles();
+
+  const { currentRef, latestRef, slug, currentContent, indexEntry } = gitContext.gitState;
 
   useEffect(() => {
     const hash = window.location.hash;
@@ -60,13 +64,15 @@ export const PostPage = (props: {
       const anchor = document.getElementById(hash.substr(1));
       if (anchor) anchor.scrollIntoView();
     }
-  },[indexEntry]);
+  },[slug]);
 
   return (
   <>
     <BrowseHistory
       currentRef={currentRef}
       latestRef={latestRef}
+      isHistorical={isHistorical}
+      setIsHistorical={setIsHistorical}
       slug={slug}
     />
 
@@ -87,7 +93,7 @@ export const PostPage = (props: {
         }}
       />
     </Paper>
-    {adminMode === "enabled"
+    {adminMode === "enabled" && !isHistorical
       ? <Fab
           id={"fab"}
           className={classes.fab}

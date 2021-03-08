@@ -35,7 +35,7 @@ then
   echo "Error: merging main into prod would result in the above merge conflicts."
   echo "To deploy:"
   echo " 1. Merge prod into main ie: git checkout main && git merge prod"
-  echo " 2. Take care of any merge conflicts & do post-merge testing if needed"
+  echo " 2. Take care of merge conflicts & do post-merge testing if needed"
   echo " 3. Re-run this script"
   echo
   exit 0

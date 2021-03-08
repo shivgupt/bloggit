@@ -27,17 +27,22 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export const BrowseHistory = (props: {
+export const BrowseHistory = ({
+  currentRef,
+  isHistorical,
+  latestRef,
+  setIsHistorical,
+  slug,
+}: {
   currentRef: string;
+  isHistorical: boolean;
   latestRef: string;
+  setIsHistorical: (val: boolean) => void;
   slug: string;
 }) => {
-  const { currentRef, latestRef, slug } = props;
+  const [anchorEl, setAnchorEl] = useState<any>(null); // TODO: provide type?
+  const [editHistory, setEditHistory] = useState<HistoryResponse>([]);
   const classes = useStyles();
-
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [editHistory, setEditHistory] = useState([] as HistoryResponse);
-  const [isHistorical, setIsHistorical] = useState(false);
 
   useEffect(() => {
     if (latestRef !== currentRef) {
@@ -45,6 +50,8 @@ export const BrowseHistory = (props: {
     } else {
       setIsHistorical(false);
     }
+  // I don't think state setters (ie setIsHistorical) should be included as a dep
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [latestRef, currentRef]);
 
   useEffect(() => {
@@ -84,7 +91,9 @@ export const BrowseHistory = (props: {
           variant="contained"
           size={"medium"}
           color="primary"
-          onClick={(event: any) => { setAnchorEl(event.currentTarget); }}
+          onClick={(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
+            setAnchorEl(event.currentTarget);
+          }}
         >
           <Typography noWrap variant="button">
             History
@@ -143,4 +152,4 @@ export const BrowseHistory = (props: {
 
     </Grid>
   );
-}
+};

@@ -59,10 +59,12 @@ if [[ "$BLOG_HOST_CONTENT_DIR" == "/"* ]]
 then mkdir -p "$BLOG_HOST_CONTENT_DIR"
 fi
 
+commit=$(git rev-parse HEAD | head -c 8)
+semver="v$(grep -m 1 '"version":' "$root/package.json" | cut -d '"' -f 4)"
 if [[ "$BLOG_SEMVER" == "true" ]]
-then version=v$(grep -m 1 '"version":' "$root/package.json" | cut -d '"' -f 4)
+then version="$semver"
 elif [[ "$BLOG_PROD" == "true" ]]
-then version=$(git rev-parse HEAD | head -c 8)
+then version="$commit"
 else version="latest"
 fi
 
@@ -227,9 +229,23 @@ do
   if [[ -z "$res" || "$res" == *"Waiting for proxy to wake up"* ]]
   then
     if [[ "$(date +%s)" -gt "$timeout" ]]
-    then echo "Timed out waiting for $public_url to respond.." && exit
+    then echo "Timed out waiting for $public_url to respond.." && exit 1
     else sleep 2
     fi
-  else echo "Good Morning!" && exit;
+  else echo "Good Morning!"; break;
   fi
 done
+
+# Delete old blog images in prod to prevent the disk from filling up
+if [[ "$BLOG_PROD" == "true" ]]
+then
+  docker container prune --force;
+  docker image ls \
+    | grep "${project}_" \
+    | grep -v "$commit" \
+    | grep -v "$semver" \
+    | grep -v "latest" \
+    | awk '{print $3}' \
+    | sort -u \
+    | xargs docker image rm --force
+fi

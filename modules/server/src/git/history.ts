@@ -46,12 +46,12 @@ export const history = async (slug: string): Promise<HistoryResponse> => {
     }
     // If the contents at this path have changed, record an update
     const newOid = await getFileOid(newCommit.oid, newPath);
-    if (prevOid && !newOid) {
+    if (prevPath && prevOid && !newOid) {
       log.info(`${prevPath} was published on ${prevCommit}`);
       output.push({ path: prevPath, commit: prevCommit, timestamp: toISO(prevTimestamp) });
     } else if (!prevOid && newOid) {
       log.info(`${newPath} was removed on ${prevCommit}`);
-    } else if (newOid !== prevOid) {
+    } else if (prevPath && newOid !== prevOid) {
       log.info(`${newPath} was updated on ${prevCommit}`);
       output.push({ path: prevPath, commit: prevCommit, timestamp: toISO(prevTimestamp) });
     }

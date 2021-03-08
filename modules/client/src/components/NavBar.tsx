@@ -1,7 +1,6 @@
 import {
   AppBar,
   Box,
-  Button,
   Drawer,
   Hidden,
   IconButton,
@@ -11,6 +10,7 @@ import {
   Typography,
   makeStyles,
   Breadcrumbs,
+  Theme,
 } from "@material-ui/core";
 import {
   Tune as AdminAccount,
@@ -27,9 +27,9 @@ import {
 import React, { useState, useContext } from "react";
 import { Link as RouterLink, useRouteMatch } from "react-router-dom";
 
+import { GitContext } from "../GitContext";
 import { siteTitleFont } from "../style";
 import { getPostsByCategories } from "../utils";
-import { GitContext } from "../GitContext";
 
 import { Toc } from "./ToC";
 
@@ -84,10 +84,22 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const DrawerContent = (props: any) => {
-  const { siteTitle, node, setNode, toggleTheme, toggleDrawer, theme, adminMode } = props;
+const DrawerContent = ({
+  adminMode,
+  siteTitle,
+  theme,
+  toggleDrawer,
+  toggleTheme,
+}: {
+  adminMode: string;
+  siteTitle: string,
+  theme: Theme;
+  toggleDrawer: () => void;
+  toggleTheme: () => void;
+}) => {
   const classes = useStyles();
   const gitContext = useContext(GitContext);
+
   const { index } = gitContext.gitState;
   const posts = getPostsByCategories(index?.posts || []);
 
@@ -115,21 +127,7 @@ const DrawerContent = (props: any) => {
       >
         {theme.palette.type === "dark" ? <LightIcon /> : <DarkIcon />}
       </IconButton>
-      <Toc posts={posts} node={node} setNode={setNode}/>
-      {posts["top-level"]
-        ? posts["top-level"].map((p) => {
-          return (
-            <Box key={p.slug} textAlign="center" m={1}>
-              <Button
-                size="small"
-                disableFocusRipple={false}
-                component={RouterLink}
-                to={`/${p.slug}`}
-              > {p.title} </Button>
-            </Box>
-          )})
-        : null
-      }
+      <Toc posts={posts}/>
       { adminMode !== "invalid" ?
         <>
           <Box textAlign="center" m={1}>
@@ -153,12 +151,21 @@ const DrawerContent = (props: any) => {
   );
 };
 
-export const NavBar = (props: any) => {
-  const { setEditMode } = props;
+export const NavBar = ({
+  adminMode,
+  setEditMode,
+  theme,
+  toggleTheme,
+}: {
+  adminMode: string;
+  setEditMode: (val: boolean) => void;
+  theme: Theme,
+  toggleTheme: () => void;
+}) => {
+  const [drawer, setDrawer] = useState<boolean>(false);
   const gitContext = useContext(GitContext);
   const categoryMatch = useRouteMatch("/category/:slug");
   const classes = useStyles();
-  const [drawer, setDrawer] = useState(false);
 
   const toggleDrawer = () => setDrawer(!drawer);
 
@@ -202,7 +209,8 @@ export const NavBar = (props: any) => {
                   <Person className={classes.icon} />
                   Admin
                 </Typography>
-              : [ <Link
+              : post?.category
+                ? [ <Link
                     key="navbar-category"
                     className={classes.link}
                     color="inherit"
@@ -218,6 +226,10 @@ export const NavBar = (props: any) => {
                     {pageTitle}
                   </Typography>
                 ]
+              : <Typography key="navbar-category-icon" noWrap className={classes.postTitle}>
+                    <DocIcon className={classes.icon} />
+                    {pageTitle}
+                  </Typography>
             : null
             }
           </Breadcrumbs>
@@ -242,7 +254,13 @@ export const NavBar = (props: any) => {
             onClose={toggleDrawer}
             classes={{ paper: classes.hiddenDrawer }}
           >
-            <DrawerContent siteTitle={siteTitle} toggleDrawer={toggleDrawer} {...props} />
+            <DrawerContent
+              adminMode={adminMode}
+              siteTitle={siteTitle}
+              theme={theme}
+              toggleDrawer={toggleDrawer}
+              toggleTheme={toggleTheme}
+            />
           </Drawer>
         </Hidden>
         <Hidden smDown>
@@ -252,7 +270,13 @@ export const NavBar = (props: any) => {
             variant="permanent"
             open
           >
-            <DrawerContent siteTitle={siteTitle} toggleDrawer={toggleDrawer} {...props} />
+            <DrawerContent
+              adminMode={adminMode}
+              siteTitle={siteTitle}
+              theme={theme}
+              toggleDrawer={toggleDrawer}
+              toggleTheme={toggleTheme}
+            />
           </Drawer>
         </Hidden>
       </nav>

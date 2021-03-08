@@ -1,15 +1,11 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "baseUrl": "./",
-    "incremental": true,
-    "noUnusedLocals": false,
     "outDir": "dist",
-    "resolveJsonModule": true,
-    "strict": false,
+    "lib": ["es2017", "esnext.asynciterable"],
     "module": "commonjs",
     "target": "es6"
   },
-  "exclude": ["dist", "node_modules", "src/**/*.test.ts"],
-  "include": [ "src/**/*.ts" ]
+  "exclude": ["src/**/*.test.ts"],
+  "include": ["src/**/*.ts"]
 }

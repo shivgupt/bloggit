@@ -25,7 +25,7 @@ node-modules: package.json $(shell ls modules/**/package.json)
 	lerna bootstrap --hoist --no-progress
 	$(log_finish) && mv -f $(totalTime) .flags/$@
 
-# TODO: generalize below so we can build any module with `npm run build`
+# TODO: generalize below so we can build modules which support `npm run build`
 # It'd be nice to derive the dependency graph from package.json deps
 
 types: node-modules $(shell find modules/server/src $(find_options))
