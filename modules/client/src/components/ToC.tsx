@@ -1,20 +1,24 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Markdown from "react-markdown";
 import { Link } from "react-router-dom";
 import {
   makeStyles,
+  Box,
+  Button,
   Divider,
   IconButton,
   List,
   ListItem,
+  Typography,
 } from "@material-ui/core";
 import {
   NavigateNext as NavigateNextIcon,
-  ArrowBackIos as NavigateBackIcon,
+  NavigateBefore as NavigateBackIcon,
 } from "@material-ui/icons";
+import { Link as RouterLink } from "react-router-dom";
 
 import { GitContext } from "../GitContext";
-import { getChildValue, replaceEmojiString } from "../utils";
+import { getChildValue, replaceEmojiString, emptySidebarNode } from "../utils";
 
 import { HashLink } from "./HashLink";
 import { PostsByCategory, SidebarNode } from "../types";
@@ -64,24 +68,21 @@ const TocGenerator = ({
       >
         {heading}
       </ListItem>
-      <Divider />
     </>
   );
 };
 
 export const Toc = ({
-  node,
   posts,
-  setNode,
 }: {
-  node: SidebarNode;
   posts: PostsByCategory;
-  setNode: (val: SidebarNode) => void;
 }) => {
+  const [node, setNode] = useState<SidebarNode>(emptySidebarNode);
   const gitContext = useContext(GitContext);
   const classes = useStyles();
 
   const { currentContent, slug, index } = gitContext.gitState
+  console.log(posts);
 
   useEffect(() => {
     // Update sidebar node
@@ -98,6 +99,11 @@ export const Toc = ({
   case "categories": 
     return (
       <div className={classes.list}>
+        <Box key={"categories"} textAlign="center" m={1}>
+          <Typography>
+            CATEGORIES
+          </Typography>
+        </Box>
         <List component="nav" className={classes.list}>
           {Object.keys(posts).map((c) => {
             if (c !== "top-level") {
@@ -125,6 +131,20 @@ export const Toc = ({
             }
           })}
         </List>
+        {posts["top-level"]
+          ? posts["top-level"].map((p) => {
+            return (
+              <Box key={p.slug} textAlign="center" m={1}>
+                <Button
+                  size="small"
+                  disableFocusRipple={false}
+                  component={RouterLink}
+                  to={`/${p.slug}`}
+                > {p.title} </Button>
+              </Box>
+            )})
+          : null
+        }
       </div>
     );
 
@@ -138,6 +158,11 @@ export const Toc = ({
         >
           <NavigateBackIcon />
         </IconButton>
+        <Box key={`post_category_${node.value}`} textAlign="center" m={1}>
+          <Typography>
+            {node.value.toUpperCase()} POSTS
+          </Typography>
+        </Box>
         <Divider />
         <List component="nav" className={classes.list}>
           {posts[node.value].map((p) => {
@@ -156,6 +181,20 @@ export const Toc = ({
             );
           })}
         </List>
+        {posts["top-level"]
+          ? posts["top-level"].map((p) => {
+            return (
+              <Box key={p.slug} textAlign="center" m={1}>
+                <Button
+                  size="small"
+                  disableFocusRipple={false}
+                  component={RouterLink}
+                  to={`/${p.slug}`}
+                > {p.title} </Button>
+              </Box>
+            )})
+          : null
+        }
       </div>
     );
 
@@ -173,6 +212,11 @@ export const Toc = ({
         >
           <NavigateBackIcon />
         </IconButton>
+        <Box key={`post_${node.value.slug}`} textAlign="center" m={1}>
+          <Typography>
+            TABLE OF CONTENTS
+          </Typography>
+        </Box>
         <Divider />
         <List component="nav" className={classes.list}>
           <Markdown
@@ -182,9 +226,10 @@ export const Toc = ({
             className={classes.list}
           />
         </List>
+        <Divider />
       </div>
     );
   default:
-    return <div> Hello </div>;
+    return null;
   }
 };

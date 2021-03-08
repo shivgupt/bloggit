@@ -14,6 +14,8 @@ import {
   Switch,
   TextField,
   Theme,
+  Backdrop,
+  CircularProgress,
 } from "@material-ui/core";
 import { Add, Edit, Save } from "@material-ui/icons";
 import { useHistory } from "react-router-dom";
@@ -34,6 +36,10 @@ const useStyles = makeStyles((theme: Theme) => ({
   bottomSpace: {
     height: theme.spacing(10),
   },
+  backdrop: {
+    zIndex: theme.zIndex.drawer + 1,
+    color: '#fff',
+  },
   fab: getFabStyle(theme),
 }));
 
@@ -51,6 +57,7 @@ export const IndexEditor = ({
   setEditMode: (editMode: boolean) => void;
 }) => {
   const [diff, setDiff] = useState<boolean>(false);
+  const [saving, setSaving] = useState<boolean>(false);
   const [newIndex, setNewIndex] = useState<EditIndex>(emptyIndex);
   const gitContext = useContext(GitContext);
   const history = useHistory();
@@ -110,6 +117,7 @@ export const IndexEditor = ({
       console.warn(`Invalid index`);
       return;
     }
+    setSaving(true);
     const indexToSave = JSON.parse(JSON.stringify(newIndex)) as EditIndex;
     const editRequest = [] as EditRequest;
     Object.keys(indexToSave.posts).forEach(slug => {
@@ -129,6 +137,7 @@ export const IndexEditor = ({
       data: editRequest,
     });
     await gitContext.syncGitState(undefined, undefined, true);
+    setSaving(false);
   };
 
   return (<>
@@ -237,6 +246,8 @@ export const IndexEditor = ({
         }
       }}
     >{(diff ? <Save/> : <Add/>)}</Fab>
-
+    <Backdrop className={classes.backdrop} open={saving}>
+      <CircularProgress color="inherit" />
+    </Backdrop>
   </>);
 };

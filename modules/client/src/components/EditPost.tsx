@@ -2,18 +2,19 @@ import "react-mde/lib/styles/css/react-mde-all.css";
 
 import { EditRequest, EditResponse, PostData } from "@blog/types";
 import {
+  Backdrop,
   Button,
+  CircularProgress,
   Input,
   makeStyles,
   Paper,
   TextField,
 } from "@material-ui/core";
 import {
-  Add,
-  Edit,
   Delete,
   Drafts,
   Public,
+  ArrowDropUp,
 } from "@material-ui/icons";
 import {
   SpeedDial,
@@ -58,6 +59,10 @@ const useStyles = makeStyles((theme) => ({
     textAlign: "justify",
     fontVariant: "discretionary-ligatures",
   },
+  backdrop: {
+    zIndex: theme.zIndex.drawer + 1,
+    color: '#fff',
+  },
   speedDial: getFabStyle(theme),
 }));
 
@@ -99,6 +104,7 @@ export const EditPost = ({
   const [originalEditData, setOriginalEditData] = useState<EditData>(emptyEdit);
   const [selectedTab, setSelectedTab] = useState<"write" | "preview">("write");
   const [open, setOpen] = useState<boolean>(false);
+  const [saving, setSaving] = useState<boolean>(false);
 
   const classes = useStyles();
   const history = useHistory();
@@ -175,6 +181,8 @@ export const EditPost = ({
       setSnackAlert({ open: true, msg: "No changes to publish", severity: "warning" });
       return;
     }
+    setSaving(true);
+
     const newIndex = JSON.parse(JSON.stringify(gitState?.index));
     const newSlug = editData.slug || editData.displaySlug;
     const now = (new Date()).toISOString()
@@ -224,6 +232,7 @@ export const EditPost = ({
         console.warn(`Edit request yielded no change, still on commit ${editRes.commit}`);
       }
       setEditMode(false);
+      setSaving(false);
     } else {
       console.error(`Something went wrong`, res);
     }
@@ -303,6 +312,9 @@ export const EditPost = ({
         paste={{ saveImage }}
       />
     </Paper>
+    <Backdrop className={classes.backdrop} open={saving}>
+      <CircularProgress color="inherit" />
+    </Backdrop>
     <SpeedDial
       FabProps={{ id: "fab" }}
       ariaLabel="fab"
@@ -310,7 +322,7 @@ export const EditPost = ({
       onOpen={() => setOpen(true)}
       open={open}
       className={classes.speedDial}
-      icon={gitState.slug ? <Edit/> : <Add/>}
+      icon={<ArrowDropUp fontSize="large" />}
     >
       {gitState.slug === ""
         ?  ([<SpeedDialAction

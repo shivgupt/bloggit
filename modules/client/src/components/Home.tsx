@@ -49,6 +49,7 @@ const useStyles = makeStyles((theme) => ({
   },
   section: {
     margin: theme.spacing(1, 1),
+    minWidth: "250px",
     maxWidth: "600px",
     alignContent: "center",
     alignItems: "center",
@@ -135,13 +136,13 @@ export const Home = ({
               navButtonsWrapperProps={{
                 className: "string",
                 style: {
-                  top: "calc(70%)",
+                  top: "calc(75%)",
                 }
               }}
               navButtonsProps={{
                 className: "string",
                 style: {
-                  top: "calc(70%)",
+                  top: "calc(75%)",
                 },
               }}
             >
