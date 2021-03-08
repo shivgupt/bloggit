@@ -29,15 +29,16 @@ const useStyles = makeStyles((theme) => ({
 
 export const BrowseHistory = (props: {
   currentRef: string;
+  isHistorical: boolean;
+  setIsHistorical: (val: boolean) => void;
   latestRef: string;
   slug: string;
 }) => {
-  const { currentRef, latestRef, slug } = props;
+  const { isHistorical, setIsHistorical, currentRef, latestRef, slug } = props;
   const classes = useStyles();
 
   const [anchorEl, setAnchorEl] = useState(null);
   const [editHistory, setEditHistory] = useState([] as HistoryResponse);
-  const [isHistorical, setIsHistorical] = useState(false);
 
   useEffect(() => {
     if (latestRef !== currentRef) {
@@ -45,6 +46,8 @@ export const BrowseHistory = (props: {
     } else {
       setIsHistorical(false);
     }
+  // I don't think state setters (ie setIsHistorical) should be included as a dep
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [latestRef, currentRef]);
 
   useEffect(() => {

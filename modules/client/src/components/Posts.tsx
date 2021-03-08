@@ -5,7 +5,7 @@ import {
   Paper,
 } from "@material-ui/core";
 import { Edit } from "@material-ui/icons";
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Markdown from "react-markdown";
 import "react-mde/lib/styles/css/react-mde-all.css";
 
@@ -50,6 +50,7 @@ export const PostPage = (props: {
   setEditMode: (editMode: boolean) => void;
 }) => {
   const { adminMode, setEditMode } = props;
+  const [isHistorical, setIsHistorical] = useState(false);
   const gitContext = useContext(GitContext);
   const { currentRef, latestRef, slug, currentContent, indexEntry } = gitContext.gitState;
   const classes = useStyles();
@@ -67,6 +68,8 @@ export const PostPage = (props: {
     <BrowseHistory
       currentRef={currentRef}
       latestRef={latestRef}
+      isHistorical={isHistorical}
+      setIsHistorical={setIsHistorical}
       slug={slug}
     />
 
@@ -87,7 +90,7 @@ export const PostPage = (props: {
         }}
       />
     </Paper>
-    {adminMode === "enabled"
+    {adminMode === "enabled" && !isHistorical
       ? <Fab
           id={"fab"}
           className={classes.fab}
