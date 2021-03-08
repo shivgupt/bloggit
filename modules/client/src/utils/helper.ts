@@ -22,7 +22,8 @@ export const getChildValue = (child) => {
 export const getPostsByCategories = (posts: Posts): PostsByCategory => {
   return (
     Object.values(posts).reduce((categories, post) => {
-      if (post.category && !post.draft) {
+      if (post.category) {
+        if (post.draft) return ({...categories});
         return ({
           ...categories,
           [post.category.toLocaleLowerCase()]: [
