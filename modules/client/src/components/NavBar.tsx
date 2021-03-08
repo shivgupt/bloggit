@@ -104,7 +104,7 @@ const DrawerContent = ({
   const gitContext = useContext(GitContext);
 
   const { index } = gitContext.gitState;
-  const posts = getPostsByCategories(index?.posts || {});
+  const posts = getPostsByCategories(index?.posts || []);
 
   return (
     <>

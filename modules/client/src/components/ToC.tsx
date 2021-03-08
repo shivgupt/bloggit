@@ -140,7 +140,7 @@ export const Toc = ({
         </IconButton>
         <Divider />
         <List component="nav" className={classes.list}>
-          {posts[node.value || ""].map((p) => {
+          {posts[node.value].map((p) => {
             return (
               <div key={p.slug}>
                 <ListItem button key={p.title} component={Link} to={`/${p.slug}`} onClick={() =>

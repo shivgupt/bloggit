@@ -8,11 +8,11 @@ export type PostsByCategory = {
 
 export type GitState = {
   currentContent: string;
+  indexEntry: PostData; // always synced w latestContent
   currentRef: string;
-  index: BlogIndex;
-  indexEntry: PostData;
+  index: BlogIndex; // always latest
   latestRef: string;
-  slug: string;
+  slug: string; // according to current url
 };
 
 type CategoryNode = { current: "categories"; };

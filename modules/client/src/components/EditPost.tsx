@@ -184,10 +184,10 @@ export const EditPost = ({
       title: editData.title,
       category: editData.category,
       draft: asDraft,
-      featured: gitState.indexEntry?.featured || false,
+      featured: editData?.featured || false,
       img: editData.img,
       lastEdit: now,
-      path: gitState.indexEntry?.path,
+      path: editData?.path || undefined,
       tldr: editData.tldr,
     } as PostData;
     newIndex.posts[newSlug] = newIndexEntry;

@@ -136,17 +136,16 @@ const App: React.FC = () => {
   const syncGitState = async (ref?: string, slug?: string, getLatest?: boolean) => {
     const latestRef = (getLatest ? null : gitState.latestRef) || await fetchRef();
     const currentRef = ref || latestRef;
-    const index = await fetchIndex(currentRef);
     const newGitState = {
       latestRef,
       currentRef,
       slug: slug || "",
-      index: index,
+      index: await fetchIndex(latestRef),
     } as GitState;
     // console.log(`Syncing ref ${currentRef}${slug ? ` and slug ${slug}` : ""}`);
     if (slug && !["admin", "create-new-post"].includes(slug)) {
       newGitState.currentContent = await fetchContent(slug, currentRef)
-      newGitState.indexEntry = index.posts?.[slug];
+      newGitState.indexEntry = (await fetchIndex(currentRef))?.posts?.[slug] || emptyEntry;
     } else {
       newGitState.currentContent = "";
       newGitState.indexEntry = emptyEntry;

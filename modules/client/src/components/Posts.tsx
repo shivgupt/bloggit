@@ -64,7 +64,7 @@ export const PostPage = ({
       const anchor = document.getElementById(hash.substr(1));
       if (anchor) anchor.scrollIntoView();
     }
-  },[indexEntry]);
+  },[slug]);
 
   return (
   <>
