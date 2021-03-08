@@ -14,6 +14,7 @@ import {
   Delete,
   Drafts,
   Public,
+  ArrowDropUp,
 } from "@material-ui/icons";
 import {
   SpeedDial,
@@ -317,7 +318,7 @@ export const EditPost = ({
       onOpen={() => setOpen(true)}
       open={open}
       className={classes.speedDial}
-      icon={gitState.slug ? <Edit/> : <Add/>}
+      icon={<ArrowDropUp fontSize="large" />}
     >
       {gitState.slug === ""
         ?  ([<SpeedDialAction
