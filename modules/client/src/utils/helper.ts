@@ -1,7 +1,15 @@
-import { Posts } from "@blog/types";
+import { PostData, Posts } from "@blog/types";
 import emoji from "emoji-dictionary";
 
 import { PostsByCategory } from "../types";
+
+export const getPath = (post: PostData | undefined): string | undefined => {
+  if (!post) return undefined;
+  if (post.path) return post.path;
+  if (post.category && post?.slug) return `${post.category}/${post.slug}.md`;
+  if (post.slug) return `${post.slug}.md`;
+  return undefined;
+};
 
 export const slugify = (s: string) => s
   .toLocaleLowerCase()

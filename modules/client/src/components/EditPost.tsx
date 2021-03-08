@@ -28,7 +28,7 @@ import { useHistory } from "react-router-dom";
 import { GitContext } from "../GitContext";
 import { getFabStyle } from "../style";
 import { SnackAlert } from "../types";
-import { emptyEntry, slugify } from "../utils";
+import { emptyEntry, fetchHistory, getPath, slugify } from "../utils";
 
 import {
   CodeBlockRenderer,
@@ -85,14 +85,6 @@ const defaultValidation: EditPostValidation = {
     title: "",
     slug: "",
   }
-};
-
-const getPath = (post: PostData | undefined): string | undefined => {
-  if (!post) return undefined;
-  if (post.path) return post.path;
-  if (post.category && post?.slug) return `${post.category}/${post.slug}.md`;
-  if (post.slug) return `${post.slug}.md`;
-  return undefined;
 };
 
 export const EditPost = ({
@@ -192,10 +184,10 @@ export const EditPost = ({
       title: editData.title,
       category: editData.category,
       draft: asDraft,
-      featured: gitState.indexEntry.featured || false,
+      featured: gitState.indexEntry?.featured || false,
       img: editData.img,
       lastEdit: now,
-      path: gitState.indexEntry.path,
+      path: gitState.indexEntry?.path,
       tldr: editData.tldr,
     } as PostData;
     newIndex.posts[newSlug] = newIndexEntry;
@@ -224,6 +216,7 @@ export const EditPost = ({
     if (res && res.status === 200) {
       if (editRes?.status === "success") {
         await syncGitState(editRes.commit.substring(0, 8), newSlug, true);
+        await fetchHistory(newSlug, true);
         if (gitState.slug !== newSlug) {
           history.push(`/${newSlug}`)
         }

@@ -1,4 +1,4 @@
-import { BlogIndex, PostData } from "@blog/types";
+import { BlogIndex, EditRequest, PostData } from "@blog/types";
 import React, { useContext, useEffect, useState } from "react";
 import { 
   Divider,
@@ -21,7 +21,7 @@ import axios from "axios";
 
 import { GitContext } from "../GitContext";
 import { getFabStyle } from "../style";
-import { emptyIndex } from "../utils";
+import { emptyIndex, getPath } from "../utils";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -111,17 +111,22 @@ export const IndexEditor = ({
       return;
     }
     const indexToSave = JSON.parse(JSON.stringify(newIndex)) as EditIndex;
+    const editRequest = [] as EditRequest;
     Object.keys(indexToSave.posts).forEach(slug => {
       if (indexToSave.posts[slug].removed) {
+        const oldPath = getPath(indexToSave.posts[slug])
+        console.log(`Removing ${oldPath} from git repo`);
+        editRequest.push({ path: oldPath, content: "" });
         console.log(`Removing ${slug} from index`);
         delete indexToSave.posts[slug];
       }
     });
+    editRequest.push({ path: "index.json", content: JSON.stringify(indexToSave, null, 2) });
     await axios({
       method: "post",
       url: "git/edit",
       headers: { "content-type": "application/json" },
-      data: [{ path: "index.json", content: JSON.stringify(indexToSave, null, 2) }],
+      data: editRequest,
     });
     await gitContext.syncGitState(undefined, undefined, true);
   };
