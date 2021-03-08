@@ -228,7 +228,7 @@ export const EditPost = (props: {
     const newIndex = JSON.parse(JSON.stringify(gitState?.index));
     const path = getPath(editData);
     const newPostSlug = editData.slug || editData.displaySlug;
-    const now = (new Date()).toLocaleDateString("en-in");
+    const now = (new Date()).toISOString()
     newIndex.posts = newIndex.posts || {};
     const newIndexEntry = {
       ...gitState.indexEntry,
@@ -242,7 +242,9 @@ export const EditPost = (props: {
     } as PostData;
     newIndex.posts[newPostSlug] = newIndexEntry;
     if (!asDraft) {
-      newIndex.posts[newPostSlug].publishedOn = newIndexEntry.publishedOn || now;
+      newIndex.posts[newPostSlug].publishedOn = newIndexEntry.publishedOn
+        ? new Date(newIndexEntry.publishedOn).toISOString()
+        : now;
     }
     // Send request to update index.json and create new file
     let res = await axios({

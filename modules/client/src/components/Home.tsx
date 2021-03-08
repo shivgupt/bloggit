@@ -17,7 +17,7 @@ import React, { useContext } from "react";
 import { useHistory, Link } from "react-router-dom";
 
 import { getFabStyle } from "../style";
-import { prettyDateString, replaceEmojiString } from "../utils";
+import { replaceEmojiString } from "../utils";
 import { GitContext } from "../GitContext";
 
 const useStyles = makeStyles((theme) => ({
@@ -64,6 +64,13 @@ export const PostCard = (props: { post: PostData }) => {
   const title = replaceEmojiString(post.title);
   const tldr = replaceEmojiString(post.tldr!);
   const cutoff = post.img ? 140 : 280;
+  const publishedOn = post.publishedOn
+    ? new Date(post.publishedOn).toLocaleDateString('en', {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })
+    : "";
 
   return (
     <Card className={classes.card}>
@@ -80,9 +87,9 @@ export const PostCard = (props: { post: PostData }) => {
       <CardContent>
         <CardActionArea disableRipple className={classes.actionArea} component={Link} to={`/${slug}`}>
           <Typography variant="h5" gutterBottom display="block">{title}</Typography>
-          {post.publishedOn
-            ? <Typography variant="button" gutterBottom display="inline">
-                {prettyDateString(post.publishedOn!)}
+          {publishedOn
+            ? <Typography variant="subtitle1" gutterBottom display="inline">
+                {`Published on ${publishedOn}`}
               </Typography>
             : ""
           }
