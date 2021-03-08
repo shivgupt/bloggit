@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Markdown from "react-markdown";
 import { Link } from "react-router-dom";
 import {
@@ -14,7 +14,7 @@ import {
 } from "@material-ui/icons";
 
 import { GitContext } from "../GitContext";
-import { getChildValue, replaceEmojiString } from "../utils";
+import { getChildValue, replaceEmojiString, emptySidebarNode } from "../utils";
 
 import { HashLink } from "./HashLink";
 import { PostsByCategory, SidebarNode } from "../types";
@@ -70,14 +70,11 @@ const TocGenerator = ({
 };
 
 export const Toc = ({
-  node,
   posts,
-  setNode,
 }: {
-  node: SidebarNode;
   posts: PostsByCategory;
-  setNode: (val: SidebarNode) => void;
 }) => {
+  const [node, setNode] = useState<SidebarNode>(emptySidebarNode);
   const gitContext = useContext(GitContext);
   const classes = useStyles();
 

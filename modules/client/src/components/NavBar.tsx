@@ -30,8 +30,7 @@ import { Link as RouterLink, useRouteMatch } from "react-router-dom";
 
 import { GitContext } from "../GitContext";
 import { siteTitleFont } from "../style";
-import { SidebarNode } from "../types";
-import { emptySidebarNode, getPostsByCategories } from "../utils";
+import { getPostsByCategories } from "../utils";
 
 import { Toc } from "./ToC";
 
@@ -99,7 +98,6 @@ const DrawerContent = ({
   toggleDrawer: () => void;
   toggleTheme: () => void;
 }) => {
-  const [node, setNode] = useState<SidebarNode>(emptySidebarNode);
   const classes = useStyles();
   const gitContext = useContext(GitContext);
 
@@ -130,7 +128,7 @@ const DrawerContent = ({
       >
         {theme.palette.type === "dark" ? <LightIcon /> : <DarkIcon />}
       </IconButton>
-      <Toc posts={posts} node={node} setNode={setNode}/>
+      <Toc posts={posts}/>
       {posts["top-level"]
         ? posts["top-level"].map((p) => {
           return (
@@ -226,7 +224,8 @@ export const NavBar = ({
                   <Person className={classes.icon} />
                   Admin
                 </Typography>
-              : [ <Link
+              : post?.category
+                ? [ <Link
                     key="navbar-category"
                     className={classes.link}
                     color="inherit"
@@ -242,6 +241,10 @@ export const NavBar = ({
                     {pageTitle}
                   </Typography>
                 ]
+              : <Typography key="navbar-category-icon" noWrap className={classes.postTitle}>
+                    <DocIcon className={classes.icon} />
+                    {pageTitle}
+                  </Typography>
             : null
             }
           </Breadcrumbs>
