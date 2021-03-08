@@ -166,7 +166,6 @@ export const Toc = ({
         <Divider />
         <List component="nav" className={classes.list}>
           {posts[node.value].map((p) => {
-            if (p.draft) return null;
             return (
               <div key={p.slug}>
                 <ListItem button key={p.title} component={Link} to={`/${p.slug}`} onClick={() =>
