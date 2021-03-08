@@ -1,6 +1,6 @@
 import "react-mde/lib/styles/css/react-mde-all.css";
 
-import { PostData } from "@blog/types";
+import { EditRequest, EditResponse, PostData } from "@blog/types";
 import {
   Button,
   Input,
@@ -87,11 +87,12 @@ const defaultValidation: EditPostValidation = {
   }
 };
 
-const getPath = (post: PostData) => {
-  if (post?.path) return post.path;
-  if (post?.category && post?.slug) return `${post.category}/${post.slug}.md`;
-  if (post?.slug) return `${post.slug}.md`;
-  return `${slugify(post?.title)}.md`;
+const getPath = (post: PostData | undefined): string | undefined => {
+  if (!post) return undefined;
+  if (post.path) return post.path;
+  if (post.category && post?.slug) return `${post.category}/${post.slug}.md`;
+  if (post.slug) return `${post.slug}.md`;
+  return undefined;
 };
 
 export const EditPost = (props: {
@@ -172,50 +173,6 @@ export const EditPost = (props: {
     return true;
   };
 
-  const update = async () => {
-    if (validation.hasError) {
-      setSnackAlert({ open: true, msg: "Please enter valid post details", severity: "error" });
-      return;
-    }
-    if (!validation.hasChanged) {
-      setSnackAlert({ open: true, msg: "No changes to save", severity: "warning" });
-      return;
-    }
-    const oldIndex = gitState?.index;
-    const newIndex = JSON.parse(JSON.stringify(oldIndex))
-    newIndex.posts[gitState.slug] = {
-      // TODO: be more selective in old keys that we carry forward
-      ...oldIndex.posts[gitState.slug],
-      slug: editData.slug || editData.displaySlug,
-      title: editData.title,
-      category: editData.category,
-      img: editData.img,
-      lastEdit: (new Date()).toLocaleDateString("en-in"),
-      tldr: editData.tldr,
-    } as PostData;
-    const newPath = getPath(newIndex.posts[gitState.slug]);
-    const oldPath = getPath(oldIndex.posts[gitState.slug]);
-    const data = [] as Array<{path: string, content: string}>;
-    if (oldPath !== newPath) {
-      data.push({ path: oldPath, content: "" });
-    }
-    data.push({ path: newPath, content: editData.content });
-    data.push({ path: "index.json", content: JSON.stringify(newIndex, null, 2)});
-    const res = await axios({
-      data,
-      headers: { "content-type": "application/json" },
-      method: "post",
-      url: "git/edit",
-    });
-    if (res && res.status === 200 && res.data) {
-      await syncGitState(res.data.commit?.substring(0, 8), gitState.slug, true);
-      setEditMode(false);
-      // TODO: redirect to new slug if it changed
-    } else {
-      console.error(`Something went wrong`, res);
-    }
-  }
-
   const saveChanges = async (asDraft?: boolean) => {
     if (validation.hasError) {
       setSnackAlert({ open: true, msg: "Please enter valid post details", severity: "error" });
@@ -226,40 +183,53 @@ export const EditPost = (props: {
       return;
     }
     const newIndex = JSON.parse(JSON.stringify(gitState?.index));
-    const path = getPath(editData);
-    const newPostSlug = editData.slug || editData.displaySlug;
+    const newSlug = editData.slug || editData.displaySlug;
     const now = (new Date()).toISOString()
     newIndex.posts = newIndex.posts || {};
     const newIndexEntry = {
-      ...gitState.indexEntry,
+      slug: newSlug,
+      title: editData.title,
       category: editData.category,
       draft: asDraft,
+      featured: gitState.indexEntry.featured || false,
       img: editData.img,
       lastEdit: now,
-      slug: newPostSlug,
-      title: editData.title,
+      path: gitState.indexEntry.path,
       tldr: editData.tldr,
     } as PostData;
-    newIndex.posts[newPostSlug] = newIndexEntry;
+    newIndex.posts[newSlug] = newIndexEntry;
     if (!asDraft) {
-      newIndex.posts[newPostSlug].publishedOn = newIndexEntry.publishedOn
+      newIndex.posts[newSlug].publishedOn = newIndexEntry.publishedOn
         ? new Date(newIndexEntry.publishedOn).toISOString()
         : now;
+    }
+    const newPath = getPath(newIndexEntry);
+    const oldPath = getPath(gitState.index.posts[gitState.slug]);
+    const editRequest = [
+      { path: newPath, content: editData.content, },
+      { path: "index.json", content: JSON.stringify(newIndex, null, 2), }
+    ] as EditRequest;
+    if (oldPath && oldPath !== newPath) {
+      editRequest.push({ path: oldPath, content: "" });
     }
     // Send request to update index.json and create new file
     let res = await axios({
       method: "post",
       url: "git/edit",
-      data: [
-        { path: path, content: editData.content, },
-        { path: "index.json", content: JSON.stringify(newIndex, null, 2), }
-      ],
+      data: editRequest,
       headers: { "content-type": "application/json" }
     });
-    if (res && res.status === 200 && res.data) {
-      await syncGitState(res.data.commit?.substring(0, 8), newPostSlug, true);
+    const editRes = res.data as EditResponse;
+    if (res && res.status === 200) {
+      if (editRes?.status === "success") {
+        await syncGitState(editRes.commit.substring(0, 8), newSlug, true);
+        if (gitState.slug !== newSlug) {
+          history.push(`/${newSlug}`)
+        }
+      } else if (editRes?.status === "no change") {
+        console.warn(`Edit request yielded no change, still on commit ${editRes.commit}`);
+      }
       setEditMode(false);
-      history.push(`/${newPostSlug}`)
     } else {
       console.error(`Something went wrong`, res);
     }
@@ -381,7 +351,7 @@ export const EditPost = (props: {
             FabProps={{id: "fab-save"}}
             icon={<Drafts />}
             key="fab-save"
-            onClick={update}
+            onClick={() => saveChanges(false)}
             tooltipTitle="Save"
           />])
       }
