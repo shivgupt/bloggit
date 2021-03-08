@@ -1,7 +1,6 @@
 import {
   AppBar,
   Box,
-  Button,
   Drawer,
   Hidden,
   IconButton,
@@ -129,20 +128,6 @@ const DrawerContent = ({
         {theme.palette.type === "dark" ? <LightIcon /> : <DarkIcon />}
       </IconButton>
       <Toc posts={posts}/>
-      {posts["top-level"]
-        ? posts["top-level"].map((p) => {
-          return (
-            <Box key={p.slug} textAlign="center" m={1}>
-              <Button
-                size="small"
-                disableFocusRipple={false}
-                component={RouterLink}
-                to={`/${p.slug}`}
-              > {p.title} </Button>
-            </Box>
-          )})
-        : null
-      }
       { adminMode !== "invalid" ?
         <>
           <Box textAlign="center" m={1}>

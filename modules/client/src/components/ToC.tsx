@@ -3,6 +3,8 @@ import Markdown from "react-markdown";
 import { Link } from "react-router-dom";
 import {
   makeStyles,
+  Box,
+  Button,
   Divider,
   IconButton,
   List,
@@ -12,6 +14,7 @@ import {
   NavigateNext as NavigateNextIcon,
   ArrowBackIos as NavigateBackIcon,
 } from "@material-ui/icons";
+import { Link as RouterLink } from "react-router-dom";
 
 import { GitContext } from "../GitContext";
 import { getChildValue, replaceEmojiString, emptySidebarNode } from "../utils";
@@ -122,6 +125,20 @@ export const Toc = ({
             }
           })}
         </List>
+        {posts["top-level"]
+          ? posts["top-level"].map((p) => {
+            return (
+              <Box key={p.slug} textAlign="center" m={1}>
+                <Button
+                  size="small"
+                  disableFocusRipple={false}
+                  component={RouterLink}
+                  to={`/${p.slug}`}
+                > {p.title} </Button>
+              </Box>
+            )})
+          : null
+        }
       </div>
     );
 
@@ -137,7 +154,8 @@ export const Toc = ({
         </IconButton>
         <Divider />
         <List component="nav" className={classes.list}>
-          {posts[node.value || ""].map((p) => {
+          {posts[node.value].map((p) => {
+            if (p.draft) return null;
             return (
               <div key={p.slug}>
                 <ListItem button key={p.title} component={Link} to={`/${p.slug}`} onClick={() =>
@@ -153,6 +171,20 @@ export const Toc = ({
             );
           })}
         </List>
+        {posts["top-level"]
+          ? posts["top-level"].map((p) => {
+            return (
+              <Box key={p.slug} textAlign="center" m={1}>
+                <Button
+                  size="small"
+                  disableFocusRipple={false}
+                  component={RouterLink}
+                  to={`/${p.slug}`}
+                > {p.title} </Button>
+              </Box>
+            )})
+          : null
+        }
       </div>
     );
 
@@ -182,6 +214,6 @@ export const Toc = ({
       </div>
     );
   default:
-    return <div> Hello </div>;
+    return null;
   }
 };
