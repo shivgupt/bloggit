@@ -86,9 +86,9 @@ export const Toc = ({
   useEffect(() => {
     // Update sidebar node
     if (slug !== "" && index?.posts?.[slug || ""]){
-      setNode({ parent: "posts", current: "toc", child: index?.posts?.[slug || ""] });
+      setNode({ parent: "posts", current: "toc", value: index?.posts?.[slug || ""] });
     } else {
-      setNode({ parent: "", current: "categories", child: "posts" });
+      setNode({ current: "categories" });
     }
   // ignore setNode dep
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -105,13 +105,13 @@ export const Toc = ({
                 <div key={c}>
                   <ListItem
                     button
-                    onClick={() => setNode({ parent: "categories", current: "posts", child: c })}
+                    onClick={() => setNode({ parent: "categories", current: "posts", value: c })}
                   >
                     {c}
                     <IconButton
                       onClick={() => setNode({
                         parent: "categories",
-                        current: "posts", child: c
+                        current: "posts", value: c
                       })}
                     >
                       <NavigateNextIcon />
@@ -133,21 +133,19 @@ export const Toc = ({
       <div className={classes.list}>
         <IconButton
           onClick={() => setNode({ 
-            parent: "",
             current: "categories",
-            child: "posts",
           })}
         >
           <NavigateBackIcon />
         </IconButton>
         <Divider />
         <List component="nav" className={classes.list}>
-          {posts[node.child || ""].map((p) => {
+          {posts[node.value || ""].map((p) => {
             return (
               <div key={p.slug}>
                 <ListItem button key={p.title} component={Link} to={`/${p.slug}`} onClick={() =>
                   (slug === p.slug)
-                    ? setNode({ parent: "posts", current: "toc", child: p })
+                    ? setNode({ parent: "posts", current: "toc", value: p })
                     : null
                   }
                 >
@@ -166,10 +164,10 @@ export const Toc = ({
       <div className={classes.list}>
         <IconButton
           onClick={() => {
-            if (node.child.category) {
-              setNode({ parent: "categories", current: "posts", child: node.child.category })
+            if (node.value.category) {
+              setNode({ parent: "categories", current: "posts", value: node.value.category })
             } else {
-              setNode({ parent: "", current: "categories", child: "posts" })
+              setNode({ current: "categories" })
             }
           }}
         >

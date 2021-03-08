@@ -7,9 +7,7 @@ import {
 } from "../types";
 
 export const emptySidebarNode: SidebarNode = {
-  parent: "",
-  current: "",
-  child: "",
+  current: "categories",
 };
 
 export const emptyIndex: BlogIndex = {

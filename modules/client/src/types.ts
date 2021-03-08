@@ -15,11 +15,10 @@ export type GitState = {
   slug: string;
 };
 
-export type SidebarNode = {
-  parent: string,
-  current: string,
-  child?: any,
-}
+type CategoryNode = { current: "categories"; };
+type PostNode = { parent: "categories"; current: "posts"; value: string; };
+type TocNode = { parent: "posts"; current: "toc"; value: PostData; };
+export type SidebarNode = CategoryNode | PostNode | TocNode;
 
 export type SnackAlert = {
   open: boolean,
