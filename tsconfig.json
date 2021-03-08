@@ -9,8 +9,8 @@
     "experimentalDecorators": true,
     "forceConsistentCasingInFileNames": true,
     "lib": ["es2017", "dom", "esnext.asynciterable"],
-    "module": "esnext",
     "moduleResolution": "node",
+    "noFallthroughCasesInSwitch": true,
     "noImplicitAny": false,
     "noImplicitReturns": true,
     "noLib": false,
@@ -21,9 +21,6 @@
     "skipLibCheck": true,
     "sourceMap": true,
     "strict": true,
-    "target": "es2017",
-    "typeRoots": [
-      "./node_modules/@types"
-    ]
+    "typeRoots": ["./node_modules/@types"]
   }
 }
