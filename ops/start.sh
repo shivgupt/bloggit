@@ -229,7 +229,7 @@ do
   if [[ -z "$res" || "$res" == *"Waiting for proxy to wake up"* ]]
   then
     if [[ "$(date +%s)" -gt "$timeout" ]]
-    then echo "Timed out waiting for $public_url to respond.." && exit 1
+    then echo "Timed out waiting for $public_url to respond.." && exit
     else sleep 2
     fi
   else echo "Good Morning!"; break;
