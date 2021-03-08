@@ -98,8 +98,8 @@ export const IndexEditor = ({
       Object.values(newIndex.posts).some(post => {
         const oldEntry = oldIndex.posts[post.slug];
         return !!post.removed
-          || !!post.featured !== !!oldEntry.featured
-          || !!post.draft !== !!oldEntry.draft;
+          || !!post?.featured !== !!oldEntry?.featured
+          || !!post?.draft !== !!oldEntry?.draft;
       })
     ) {
       setDiff(true);
@@ -123,11 +123,12 @@ export const IndexEditor = ({
     Object.keys(indexToSave.posts).forEach(slug => {
       if (indexToSave.posts[slug].removed) {
         const oldPath = getPath(indexToSave.posts[slug])
-        console.log(`Removing ${oldPath} from git repo`);
-        editRequest.push({ path: oldPath, content: "" });
+        if (oldPath)
+          console.log(`Removing ${oldPath} from git repo`);
+          editRequest.push({ path: oldPath!, content: "" });
+        }
         console.log(`Removing ${slug} from index`);
         delete indexToSave.posts[slug];
-      }
     });
     editRequest.push({ path: "index.json", content: JSON.stringify(indexToSave, null, 2) });
     await axios({
