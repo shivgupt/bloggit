@@ -71,6 +71,4 @@ deploy:
           make pull-commit;
           make pull-semver;
           make restart;
-          docker container prune --force;
-          docker image ls -q | xargs docker image rm --force 2> /dev/null || true;
         '

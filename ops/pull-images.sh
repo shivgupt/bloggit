@@ -21,6 +21,7 @@ if [[ -n "$1" && "$1" == *:* ]]
 then
   versions="${1#*:}"
   images="${1%:*}"
+
 # Else parse first arg as versions and second as image names
 else
   versions="${1:-latest $commit $release}"
