@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 
-import git from "isomorphic-git";
+import git, { WalkerEntry } from "isomorphic-git";
 
 import { env } from "../env";
 
@@ -37,13 +37,15 @@ export const resolveRef = async (givenRef: string): Promise<string> => {
   return ref;
 };
 
-export const getFileOid = async (ref: string, target: string): Promise<string | null> => {
-  if (!ref || !target) return null;
+export const getFileOid = async (ref?: string, target?: string): Promise<string | undefined> => {
+  if (!ref || !target) return undefined;
   let doneFlag = false;
   return await git.walk({
     ...gitOpts,
     trees: [git.TREE({ ref })],
-    map: async (path: string, [entry]): Promise<string | null> => {
+    map: async (path: string, entries: WalkerEntry[] | null): Promise<string | null> => {
+      if (!entries) return null;
+      const entry = entries[0];
       if (doneFlag || (path !== "." && !target.startsWith(path))) {
         return null; // Short-circuit walk to skip checking entry's children
       } else if (path === target) {
@@ -54,11 +56,12 @@ export const getFileOid = async (ref: string, target: string): Promise<string | 
         return ""; // Don't short-circuit subdir walking but still get filtered out by reduce
       }
     },
-    reduce: async (acc, cur) => acc || cur.find(e => !!e) || null,
+    reduce: async (acc, cur) => acc || cur.find(e => !!e) || undefined,
   });
 };
 
-export const slugToPath = async (ref: string, slug: string): Promise<string | null> => {
+export const slugToPath = async (ref?: string, slug?: string): Promise<string | undefined> => {
+  if (!ref || !slug) return undefined;
   try {
     const index = JSON.parse(await readFile(ref, "index.json"));
     const postData = index?.posts?.[slug];
@@ -71,7 +74,7 @@ export const slugToPath = async (ref: string, slug: string): Promise<string | nu
   if (await getFileOid(ref, `${slug}.md`)) {
     return `${slug}.md`;
   }
-  return null;
+  return undefined;
 };
 
 export const getCommit = async (ref: string): Promise<GitCommit> => {

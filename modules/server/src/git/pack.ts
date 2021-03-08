@@ -13,7 +13,7 @@ const regex = {
 
 const bufferToStream = (buf: Buffer): Readable => Readable.from(buf);
 const streamToBuffer = (stream: Readable): Promise<Buffer> => {
-  const chunks = [];
+  const chunks: Buffer[] = [];
   return new Promise((resolve, reject) => {
     stream.on("data", chunk => chunks.push(chunk));
     stream.on("error", reject);

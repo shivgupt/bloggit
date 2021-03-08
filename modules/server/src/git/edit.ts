@@ -49,7 +49,7 @@ export const edit = async (editReq: EditRequest): Promise<EditResponse> => {
           const obj = await git.readObject({ ...gitOpts, oid: rootTreeOid, filepath });
           return { path: filepath, oid: obj.oid, val: obj.object };
         }
-        return null;
+        return undefined;
       },
     });
     log.info(`${treePath.map(entry => `${entry.path}:${entry.oid.substring(0, 8)}`).join(", ")}`);
@@ -69,14 +69,14 @@ export const edit = async (editReq: EditRequest): Promise<EditResponse> => {
         if (rmIndex >= 0) {
           log.info(`Removing ${dir}[${rmIndex}]`);
           tree.splice(rmIndex, 1);
-          toRemove = null;
+          toRemove = undefined;
         }
         if (tree.length > 0) {
           const syncIndex = tree.findIndex(e => newEntry?.path && e.path === newEntry.path);
           if (syncIndex >= 0) {
             log.info(`Replacing ${dir}[${syncIndex}] with entry ${JSON.stringify(newEntry)}`);
             tree[syncIndex] = newEntry;
-            toRemove = null;
+            toRemove = undefined;
           }
           newEntry = {
             mode: "040000",
@@ -84,7 +84,7 @@ export const edit = async (editReq: EditRequest): Promise<EditResponse> => {
             type: "tree",
             path: dir,
           };
-          toRemove = null;
+          toRemove = undefined;
         } else {
           log.info(`Nothing left in ${dir}, flagging it for deletion`);
           toRemove = dir;

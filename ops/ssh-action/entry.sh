@@ -18,7 +18,7 @@ rm -f "$KEY_FILE" "$SSH_DIR/known_hosts"
 touch "$KEY_FILE" "$SSH_DIR/known_hosts"
 
 # Env vars strip out newlines so a naively loaded ssh key will be improperly formatted
-# Replace any existing header/footers with manually added ones that include proper newlines
+# Replace existing header/footers with manually added ones that include proper newlines
 {
   echo "$KEY_HEADER"
   echo "$SSH_KEY" | sed "s/$KEY_HEADER//" | sed "s/$KEY_FOOTER//" | tr -d '\n '

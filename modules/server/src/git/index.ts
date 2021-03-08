@@ -26,7 +26,7 @@ gitRouter.get("/info/refs", async (req, res) => {
 });
 
 gitRouter.post(["/git-receive-pack", "/git-upload-pack"], async (req, res) => {
-  const service = req.path.split("/").pop();
+  const service = req.path.split("/").pop() || "";
   try {
     const response = await execPackService(service, req.body);
     log.info(`Sending ${response.length} bytes of pack response`);
