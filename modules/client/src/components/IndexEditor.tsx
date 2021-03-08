@@ -123,12 +123,13 @@ export const IndexEditor = ({
     Object.keys(indexToSave.posts).forEach(slug => {
       if (indexToSave.posts[slug].removed) {
         const oldPath = getPath(indexToSave.posts[slug])
-        if (oldPath)
+        if (oldPath) {
           console.log(`Removing ${oldPath} from git repo`);
           editRequest.push({ path: oldPath!, content: "" });
         }
         console.log(`Removing ${slug} from index`);
         delete indexToSave.posts[slug];
+      }
     });
     editRequest.push({ path: "index.json", content: JSON.stringify(indexToSave, null, 2) });
     await axios({
