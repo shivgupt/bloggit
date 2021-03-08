@@ -45,17 +45,19 @@ type EditIndex = BlogIndex & {
   };
 };
 
-export const IndexEditor = (props: {
+export const IndexEditor = ({
+  setEditMode,
+}: {
   setEditMode: (editMode: boolean) => void;
 }) => {
-  const { setEditMode } = props;
-  const [diff, setDiff] = useState(false);
-  const [newIndex, setNewIndex] = useState(emptyIndex as EditIndex);
-  const classes = useStyles();
+  const [diff, setDiff] = useState<boolean>(false);
+  const [newIndex, setNewIndex] = useState<EditIndex>(emptyIndex);
   const gitContext = useContext(GitContext);
   const history = useHistory();
+  const classes = useStyles();
 
   const oldIndex = gitContext.gitState?.index;
+  const title = newIndex?.title;
 
   const toggleFeatured = (slug: string): void => {
     const nextIndex = JSON.parse(JSON.stringify(newIndex)) as EditIndex;
@@ -124,7 +126,6 @@ export const IndexEditor = (props: {
     await gitContext.syncGitState(undefined, undefined, true);
   };
 
-  const title = newIndex?.title;
   return (<>
     <TextField
       autoComplete={"off"}
@@ -215,6 +216,7 @@ export const IndexEditor = (props: {
       </TableBody>
     </Table>
     <div className={classes.bottomSpace}/>
+
     <Fab
       id={"fab"}
       className={classes.fab}

@@ -1,8 +1,13 @@
-const emptyStore: any = {
+type Store = {
+  theme: string;
+  authToken?: string;
+}
+
+const emptyStore: Store = {
   theme: "light"
 };
 
-const load = (key: string): any => {
+const load = (key: string): string => {
   try {
     const data = localStorage.getItem(key);
     if (data) {
@@ -14,7 +19,7 @@ const load = (key: string): any => {
   }
 };
 
-const save = (key: string, value?: any): void => {
+const save = (key: string, value?: string): void => {
   localStorage.setItem(key, JSON.stringify(value || emptyStore[key]));
 };
 

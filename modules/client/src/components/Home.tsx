@@ -56,11 +56,10 @@ const useStyles = makeStyles((theme) => ({
   fab: getFabStyle(theme),
 }));
 
-export const PostCard = (props: { post: PostData }) => {
+export const PostCard = ({ post }: { post: PostData }) => {
   const classes = useStyles();
-  const post = props.post;
-  const slug = post.slug;
 
+  const slug = post.slug;
   const title = replaceEmojiString(post.title);
   const tldr = replaceEmojiString(post.tldr!);
   const cutoff = post.img ? 140 : 280;
@@ -111,18 +110,20 @@ export const PostCard = (props: { post: PostData }) => {
   )
 }
 
-export const Home = (props: {
-  filterBy?: string,
+export const Home = ({
+  adminMode,
+  filterBy,
+  setEditMode,
+}: {
   adminMode: string;
+  filterBy?: string,
   setEditMode: (editMode: boolean) => void;
  }) => {
-  const { adminMode, filterBy, setEditMode } = props;
-  const classes = useStyles();
   const gitContext = useContext(GitContext);
   const history = useHistory();
+  const classes = useStyles();
 
   const posts = (gitContext.gitState?.index?.posts || {}) as {[slug: string]: PostData};
-
   const featured = Object.values(posts).filter((post) => post.featured)
 
   return (

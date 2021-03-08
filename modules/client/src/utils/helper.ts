@@ -1,5 +1,7 @@
-import { PostData } from "@blog/types";
+import { Posts } from "@blog/types";
 import emoji from "emoji-dictionary";
+
+import { PostsByCategory } from "../types";
 
 export const slugify = (s: string) => s
   .toLocaleLowerCase()
@@ -11,21 +13,13 @@ export const slugify = (s: string) => s
 export const replaceEmojiString = (s: string) =>
   s.replace(/:\w+:/gi, name => emoji.getUnicode(name) || name);
 
-export const compareObj = (o1: any, o2: any) => {
-  return JSON.stringify(o1) === JSON.stringify(o2);
-};
-
-export const deepCopy = (value) => {
-  return JSON.parse(JSON.stringify(value));
-};
-
 export const getChildValue = (child) => {
   if (!child) return;
   if (child.props.value) return child.props.value;
   return getChildValue(child.props.children[0]);
 };
 
-export const getPostsByCategories = (posts: { [slug: string]: PostData }) => {
+export const getPostsByCategories = (posts: Posts): PostsByCategory => {
   return (
     Object.values(posts).reduce((categories, post) => {
       if (post.category) {

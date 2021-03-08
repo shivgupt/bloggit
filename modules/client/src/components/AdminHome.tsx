@@ -26,15 +26,18 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-export const AdminHome = (props: {
+export const AdminHome = ({
+  adminMode,
+  setAdminMode,
+  setEditMode,
+  validateAuthToken,
+}: {
   adminMode: AdminMode;
   setAdminMode: (val: AdminMode) => void;
   setEditMode: (val: boolean) => void;
   validateAuthToken: (_authToken?: string) => Promise<void>;
 }) => {
-  const { adminMode, setAdminMode, setEditMode, validateAuthToken } = props;
-
-  const [authToken, setAuthToken] = useState("");
+  const [authToken, setAuthToken] = useState<string>("");
   const classes = useStyles();
 
   return (

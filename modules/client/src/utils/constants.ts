@@ -3,7 +3,14 @@ import { PostData, BlogIndex } from "@blog/types";
 import {
   GitState,
   SnackAlert,
+  SidebarNode,
 } from "../types";
+
+export const emptySidebarNode: SidebarNode = {
+  parent: "",
+  current: "",
+  child: "",
+};
 
 export const emptyIndex: BlogIndex = {
   posts: {},

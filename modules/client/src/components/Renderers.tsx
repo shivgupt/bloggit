@@ -9,37 +9,56 @@ import { getChildValue, replaceEmojiString, slugify } from "../utils";
 
 import { HashLink } from "./HashLink";
 
-export const CodeBlockRenderer = (props: any) => {
+export const CodeBlockRenderer = ({
+  language,
+  value,
+}: {
+  language: string;
+  value: string;
+}) => {
   const theme = useTheme();
-
   if (theme.palette.type === "dark") {
     return (
-      <SyntaxHighlighter showLineNumbers language={props.language} style={atomDark}>
-        {props.value}
+      <SyntaxHighlighter showLineNumbers language={language} style={atomDark}>
+        {value}
       </SyntaxHighlighter>
     );
   }
-
   return (
-    <SyntaxHighlighter showLineNumbers language={props.language} style={vs}>
-      {props.value}
+    <SyntaxHighlighter showLineNumbers language={language} style={vs}>
+      {value}
     </SyntaxHighlighter>
   );
 };
 
-export const TextRenderer = (props: any) => {
-  return <> {replaceEmojiString(props.value)} </>
+export const TextRenderer = ({
+  value,
+}: {
+  value: string;
+}) => {
+  return <> {replaceEmojiString(value)} </>
 }
 
-export  const LinkRenderer = (props: any) => {
-  return (<Link color="secondary" underline="hover" href={props.href}> {props.children[0].props.value} </Link>);
+export const LinkRenderer = ({
+  href,
+  children,
+}: {
+  href: string;
+  children: any[];
+}) => {
+  return (<Link color="secondary" underline="hover" href={href}> {children[0].props.value} </Link>);
 };
 
-export  const ImageRenderer = (props: any) => {
+export const ImageRenderer = ({
+  src,
+  alt,
+}: {
+  src: string;
+  alt: string;
+}) => {
     return <img
-      { ...props }
-      src={props.src}
-      alt={props.alt}
+      src={src}
+      alt={alt}
       style={{
         maxWidth: "90%",
           display: "block",
@@ -49,23 +68,27 @@ export  const ImageRenderer = (props: any) => {
     />;
   };
 
-export const HeadingRenderer = (props: any) => {
-  if (props.children.length > 1) {
+export const HeadingRenderer = ({
+  children,
+  level,
+  data,
+  "data-sourcepos": dataSourcepos,
+}: {
+  children: any[];
+  level: string;
+  data: string;
+  "data-sourcepos": string;
+}) => {
+  if (children.length > 1) {
     console.warn("This heading has more than one child..?");
   }
-
-  const value = getChildValue(props.children[0]);
-
-  if (!value) {
-    return null;
-  }
-
+  const value = getChildValue(children[0]);
+  if (!value) return null;
   const slug = slugify(value)
-
   return React.createElement(
-    `h${props.level}`,
+    `h${level}`,
     {
-      "data-sourcepos": props["data-sourcepos"],
+      "data-sourcepos": dataSourcepos,
       "id": slug,
       style: {
         marginTop: "-65px",
@@ -73,7 +96,7 @@ export const HeadingRenderer = (props: any) => {
       }
     },
     [
-      props.children, 
+      children, 
       <IconButton
         color="inherit"
         component={HashLink as any}

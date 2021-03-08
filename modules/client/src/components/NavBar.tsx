@@ -11,6 +11,7 @@ import {
   Typography,
   makeStyles,
   Breadcrumbs,
+  Theme,
 } from "@material-ui/core";
 import {
   Tune as AdminAccount,
@@ -27,9 +28,10 @@ import {
 import React, { useState, useContext } from "react";
 import { Link as RouterLink, useRouteMatch } from "react-router-dom";
 
-import { siteTitleFont } from "../style";
-import { getPostsByCategories } from "../utils";
 import { GitContext } from "../GitContext";
+import { siteTitleFont } from "../style";
+import { SidebarNode } from "../types";
+import { emptySidebarNode, getPostsByCategories } from "../utils";
 
 import { Toc } from "./ToC";
 
@@ -84,12 +86,25 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const DrawerContent = (props: any) => {
-  const { siteTitle, node, setNode, toggleTheme, toggleDrawer, theme, adminMode } = props;
+const DrawerContent = ({
+  adminMode,
+  siteTitle,
+  theme,
+  toggleDrawer,
+  toggleTheme,
+}: {
+  adminMode: string;
+  siteTitle: string,
+  theme: Theme;
+  toggleDrawer: () => void;
+  toggleTheme: () => void;
+}) => {
+  const [node, setNode] = useState<SidebarNode>(emptySidebarNode);
   const classes = useStyles();
   const gitContext = useContext(GitContext);
+
   const { index } = gitContext.gitState;
-  const posts = getPostsByCategories(index?.posts || []);
+  const posts = getPostsByCategories(index?.posts || {});
 
   return (
     <>
@@ -153,12 +168,21 @@ const DrawerContent = (props: any) => {
   );
 };
 
-export const NavBar = (props: any) => {
-  const { setEditMode } = props;
+export const NavBar = ({
+  adminMode,
+  setEditMode,
+  theme,
+  toggleTheme,
+}: {
+  adminMode: string;
+  setEditMode: (val: boolean) => void;
+  theme: Theme,
+  toggleTheme: () => void;
+}) => {
+  const [drawer, setDrawer] = useState<boolean>(false);
   const gitContext = useContext(GitContext);
   const categoryMatch = useRouteMatch("/category/:slug");
   const classes = useStyles();
-  const [drawer, setDrawer] = useState(false);
 
   const toggleDrawer = () => setDrawer(!drawer);
 
@@ -242,7 +266,13 @@ export const NavBar = (props: any) => {
             onClose={toggleDrawer}
             classes={{ paper: classes.hiddenDrawer }}
           >
-            <DrawerContent siteTitle={siteTitle} toggleDrawer={toggleDrawer} {...props} />
+            <DrawerContent
+              adminMode={adminMode}
+              siteTitle={siteTitle}
+              theme={theme}
+              toggleDrawer={toggleDrawer}
+              toggleTheme={toggleTheme}
+            />
           </Drawer>
         </Hidden>
         <Hidden smDown>
@@ -252,7 +282,13 @@ export const NavBar = (props: any) => {
             variant="permanent"
             open
           >
-            <DrawerContent siteTitle={siteTitle} toggleDrawer={toggleDrawer} {...props} />
+            <DrawerContent
+              adminMode={adminMode}
+              siteTitle={siteTitle}
+              theme={theme}
+              toggleDrawer={toggleDrawer}
+              toggleTheme={toggleTheme}
+            />
           </Drawer>
         </Hidden>
       </nav>

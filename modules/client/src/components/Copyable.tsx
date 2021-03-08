@@ -1,18 +1,33 @@
-import { Button, Tooltip, Typography, withStyles } from "@material-ui/core";
+import { Button, Tooltip, Typography, makeStyles } from "@material-ui/core";
 import CopyIcon from '@material-ui/icons/Link';
 import CopiedIcon from '@material-ui/icons/AssignmentTurnedIn';
 import React, { useState } from "react";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 
-const style = withStyles(theme => ({
+const useStyles = makeStyles(theme => ({
   label: {
     textTransform: "none",
   },
 }));
 
-export const Copyable = style((props: any) => {
+export const Copyable = ({
+  color,
+  id,
+  size,
+  text,
+  tooltip,
+  value,
+}: {
+  color?: "default" | "inherit" | "primary" | "secondary",
+  id: string,
+  size: "medium" | "large" | "small",
+  text: string,
+  tooltip?: string,
+  value: string,
+}) => {
   const [copied, setCopied] = useState(false);
-  const { className, color, id, size, tooltip, text, value } = props;
+  const classes = useStyles();
+
   return (
     <CopyToClipboard
       onCopy={() => {
@@ -23,7 +38,7 @@ export const Copyable = style((props: any) => {
     >
       <Tooltip arrow title={tooltip || text}>
         <Button
-          className={className}
+          className={classes.label}
           color={color || "inherit"}
           id={id}
           size={size || "medium"}
@@ -40,4 +55,4 @@ export const Copyable = style((props: any) => {
       </Tooltip>
     </CopyToClipboard>
   );
-});
+};

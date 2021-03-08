@@ -2,6 +2,10 @@ import { BlogIndex, PostData } from "@blog/types";
 
 export type AdminMode = "invalid" | "enabled" | "disabled";
 
+export type PostsByCategory = {
+  [category: string]: PostData[];
+};
+
 export type GitState = {
   currentContent: string;
   currentRef: string;
@@ -14,7 +18,7 @@ export type GitState = {
 export type SidebarNode = {
   parent: string,
   current: string,
-  child: any,
+  child?: any,
 }
 
 export type SnackAlert = {

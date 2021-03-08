@@ -10,8 +10,11 @@ export type PostData = {
   publishedOn?: string;
   tldr?: string;
 };
+export type Posts = {
+  [slug: string]: PostData;
+};
 
 export type BlogIndex = {
-  posts: { [slug: string]: PostData };
+  posts: Posts;
   title: string;
 };

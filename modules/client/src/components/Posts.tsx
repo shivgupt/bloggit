@@ -45,15 +45,18 @@ const useStyles = makeStyles((theme) => ({
   fab: getFabStyle(theme),
 }));
 
-export const PostPage = (props: {
+export const PostPage = ({
+  adminMode,
+  setEditMode,
+}: {
   adminMode: string;
   setEditMode: (editMode: boolean) => void;
 }) => {
-  const { adminMode, setEditMode } = props;
-  const [isHistorical, setIsHistorical] = useState(false);
+  const [isHistorical, setIsHistorical] = useState<boolean>(false);
   const gitContext = useContext(GitContext);
-  const { currentRef, latestRef, slug, currentContent, indexEntry } = gitContext.gitState;
   const classes = useStyles();
+
+  const { currentRef, latestRef, slug, currentContent, indexEntry } = gitContext.gitState;
 
   useEffect(() => {
     const hash = window.location.hash;

@@ -95,21 +95,22 @@ const getPath = (post: PostData | undefined): string | undefined => {
   return undefined;
 };
 
-export const EditPost = (props: {
+export const EditPost = ({
+  setEditMode,
+  setSnackAlert,
+}: {
   setEditMode: (editMode: boolean) => void;
   setSnackAlert: (snackAlert: SnackAlert) => void;
 }) => {
-  const { setEditMode, setSnackAlert } = props;
-
-  const classes = useStyles();
-  const history = useHistory();
-  const { gitState, syncGitState } = useContext(GitContext);
-
   const [validation, setValidation] = useState<EditPostValidation>(defaultValidation);
   const [editData, setEditData] = useState<EditData>(emptyEdit);
   const [originalEditData, setOriginalEditData] = useState<EditData>(emptyEdit);
   const [selectedTab, setSelectedTab] = useState<"write" | "preview">("write");
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState<boolean>(false);
+
+  const classes = useStyles();
+  const history = useHistory();
+  const { gitState, syncGitState } = useContext(GitContext);
 
   // This should only run once when this component is unmounted
   useEffect(() => {
@@ -121,7 +122,7 @@ export const EditPost = (props: {
         displaySlug: "",
       });
     }
-    // Start w/out any validation errors
+    // Start w/out validation errors
     setValidation(defaultValidation);
     // On unmount, clear edit data
     return () => {

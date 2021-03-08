@@ -27,18 +27,22 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export const BrowseHistory = (props: {
+export const BrowseHistory = ({
+  currentRef,
+  isHistorical,
+  latestRef,
+  setIsHistorical,
+  slug,
+}: {
   currentRef: string;
   isHistorical: boolean;
-  setIsHistorical: (val: boolean) => void;
   latestRef: string;
+  setIsHistorical: (val: boolean) => void;
   slug: string;
 }) => {
-  const { isHistorical, setIsHistorical, currentRef, latestRef, slug } = props;
+  const [anchorEl, setAnchorEl] = useState<any>(null); // TODO: provide type?
+  const [editHistory, setEditHistory] = useState<HistoryResponse>([]);
   const classes = useStyles();
-
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [editHistory, setEditHistory] = useState([] as HistoryResponse);
 
   useEffect(() => {
     if (latestRef !== currentRef) {
@@ -87,7 +91,9 @@ export const BrowseHistory = (props: {
           variant="contained"
           size={"medium"}
           color="primary"
-          onClick={(event: any) => { setAnchorEl(event.currentTarget); }}
+          onClick={(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
+            setAnchorEl(event.currentTarget);
+          }}
         >
           <Typography noWrap variant="button">
             History
@@ -146,4 +152,4 @@ export const BrowseHistory = (props: {
 
     </Grid>
   );
-}
+};

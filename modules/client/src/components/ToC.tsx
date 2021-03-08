@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect } from "react";
 import Markdown from "react-markdown";
 import { Link } from "react-router-dom";
 import {
@@ -17,7 +17,7 @@ import { GitContext } from "../GitContext";
 import { getChildValue, replaceEmojiString } from "../utils";
 
 import { HashLink } from "./HashLink";
-import { SidebarNode } from "../types";
+import { PostsByCategory, SidebarNode } from "../types";
 
 const useStyles = makeStyles(theme => ({
   list: { width: "100%" },
@@ -31,21 +31,28 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const TocGenerator = (props: any) => {
+const TocGenerator = ({
+  children,
+  level
+}: {
+  children: string[];
+  level: number;
+}) => {
   const classes = useStyles();
-  if (props.children.length > 1) {
+
+  if (children.length > 1) {
     console.warn("This heading has more than one child..?");
     return null;
   }
-  const value = getChildValue(props.children[0]);
+  const value = getChildValue(children[0]);
   if (!value) {
     console.warn("This heading has no child values..?");
     return null;
   }
   const headingSlug = value.toLowerCase().replace(/[^a-z0-9 ]/g, "").replace(/\W+/g, "-");
   const heading = replaceEmojiString(value);
+  const marginStyle = classes[`list${level || 1}`];
 
-  const marginStyle = classes[`list${props.level || 1}`];
   return (
     <>
       <ListItem
@@ -62,14 +69,19 @@ const TocGenerator = (props: any) => {
   );
 };
 
-export const Toc = (props: any) => {
-  const [node, setNode] = useState({} as SidebarNode);
+export const Toc = ({
+  node,
+  posts,
+  setNode,
+}: {
+  node: SidebarNode;
+  posts: PostsByCategory;
+  setNode: (val: SidebarNode) => void;
+}) => {
   const gitContext = useContext(GitContext);
-  const { currentContent, slug, index } = gitContext.gitState
-
-  const { posts} = props;
-
   const classes = useStyles();
+
+  const { currentContent, slug, index } = gitContext.gitState
 
   useEffect(() => {
     // Update sidebar node
@@ -78,6 +90,8 @@ export const Toc = (props: any) => {
     } else {
       setNode({ parent: "", current: "categories", child: "posts" });
     }
+  // ignore setNode dep
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [slug, index]);
 
   switch(node.current) {
@@ -128,7 +142,7 @@ export const Toc = (props: any) => {
         </IconButton>
         <Divider />
         <List component="nav" className={classes.list}>
-          {posts[node.child].map((p) => {
+          {posts[node.child || ""].map((p) => {
             return (
               <div key={p.slug}>
                 <ListItem button key={p.title} component={Link} to={`/${p.slug}`} onClick={() =>
