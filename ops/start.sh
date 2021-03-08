@@ -232,7 +232,7 @@ do
     then echo "Timed out waiting for $public_url to respond.." && exit 1
     else sleep 2
     fi
-  else echo "Good Morning!"
+  else echo "Good Morning!"; break;
   fi
 done
 
