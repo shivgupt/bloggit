@@ -101,19 +101,23 @@ const App: React.FC = () => {
       }
       setAdminMode("enabled");
     } catch (e) {
-      // Auth is invalid, update localStorage, axios header and adminMode
-      console.error(`Auth token is not valid: ${e.message}`);
-      store.save("authToken", "");
-      axios.defaults.headers.common["authorization"] = `Basic ${btoa(`admin:`)}`;
-      if (_authToken) {
-        setSnackAlert({
-          open: true,
-          msg: "Invalid Auth Token",
-          severity: "error",
-          hideDuration: 4000,
-        });
+      // Got unauthorized response, update localStorage, axios header and adminMode
+      if (e?.response?.status === 401) {
+        console.error(`Auth token is not valid:`, e);
+        store.save("authToken", "");
+        axios.defaults.headers.common["authorization"] = `Basic ${btoa(`admin:`)}`;
+        if (_authToken) {
+          setSnackAlert({
+            open: true,
+            msg: "Invalid Auth Token",
+            severity: "error",
+            hideDuration: 4000,
+          });
+        }
+        setAdminMode("invalid");
+      } else {
+        console.error(`Non-auth server failure:`, e);
       }
-      setAdminMode("invalid");
     }
   }
 
