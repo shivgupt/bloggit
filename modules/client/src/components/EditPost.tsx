@@ -175,8 +175,8 @@ export const EditPost = ({
       return;
     }
     setSaving(true);
-
     const newIndex = JSON.parse(JSON.stringify(gitState?.index));
+    const oldSlug = originalEditData.slug;
     const newSlug = editData.slug || editData.displaySlug;
     const now = (new Date()).toISOString()
     newIndex.posts = newIndex.posts || {};
@@ -189,14 +189,10 @@ export const EditPost = ({
       img: editData.img,
       lastEdit: now,
       path: editData?.path || undefined,
+      publishedOn: editData?.publishedOn || (!asDraft ? now : undefined),
       tldr: editData.tldr,
     } as PostData;
     newIndex.posts[newSlug] = newIndexEntry;
-    if (!asDraft) {
-      newIndex.posts[newSlug].publishedOn = newIndexEntry.publishedOn
-        ? new Date(newIndexEntry.publishedOn).toISOString()
-        : now;
-    }
     const newPath = getPath(newIndexEntry);
     const oldPath = getPath(gitState.index.posts[gitState.slug]);
     const editRequest = [
@@ -205,6 +201,9 @@ export const EditPost = ({
     ] as EditRequest;
     if (oldPath && oldPath !== newPath) {
       editRequest.push({ path: oldPath, content: "" });
+    }
+    if (oldSlug && oldSlug !== newSlug) {
+      delete newIndex.posts[oldSlug]
     }
     // Send request to update index.json and create new file
     let res = await axios({
