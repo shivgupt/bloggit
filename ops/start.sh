@@ -240,12 +240,15 @@ done
 if [[ "$BLOG_PROD" == "true" ]]
 then
   docker container prune --force;
-  docker image ls \
+  mapfile -t imagesToRemove < <(docker image ls \
     | grep "${project}_" \
     | grep -v "$commit" \
     | grep -v "$semver" \
     | grep -v "latest" \
     | awk '{print $3}' \
-    | sort -u \
-    | xargs docker image rm --force
+    | sort -u
+  )
+  if [[ "${#imagesToRemove[@]}" -gt 0 ]]
+  then docker image rm --force "${imagesToRemove[@]}"
+  fi
 fi
