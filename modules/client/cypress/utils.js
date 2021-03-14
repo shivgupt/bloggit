@@ -34,9 +34,9 @@ my.enterPostData = (data) => {
   }
 };
 
-my.publishPost = () => {
+my.savePost = () => {
   cy.get(`button#fab`).click();
-  cy.get(`button#fab-publish`).click(10, 10);
+  cy.get(`button#fab-save`).click(10, 10);
   cy.get(`button#copy-permalink`).should("exist");
 };
 
@@ -56,7 +56,7 @@ my.createPost = (data) => {
   my.goHome();
   cy.get(`button#fab`).click();
   my.enterPostData(data);
-  my.publishPost();
+  my.savePost();
 };
 
 my.editPost = (data) => {

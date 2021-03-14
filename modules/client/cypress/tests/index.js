@@ -29,7 +29,7 @@ describe("Blog Client", () => {
     my.removePost(data.slug);
     cy.get(`button#fab`).click();
     my.enterPostData(data);
-    my.publishPost();
+    my.savePost();
     cy.location(`pathname`).should(`eq`, `/${data.slug}`)
     cy.contains(`p`, data.content).should("exist");
     // cy.contains(`h2`, data.title).should("exist");
