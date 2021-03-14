@@ -23,6 +23,10 @@ import {
 
 const useStyles = makeStyles((theme) => ({
   root: {
+    maxWidth: "700px",
+    width: "100%",
+  },
+  paper: {
     flexGrow: 1,
     margin: theme.spacing(1, 1),
     "& > *": {
@@ -75,7 +79,7 @@ export const PostPage = ({
   const publishedOn = indexEntry?.publishedOn ? getPrettyDateString(indexEntry.publishedOn) : null;
 
   return (
-  <>
+  <div className={classes.root}>
     <BrowseHistory
       currentRef={currentRef}
       latestRef={latestRef}
@@ -84,7 +88,7 @@ export const PostPage = ({
       slug={slug}
     />
 
-    <Paper variant="outlined" className={classes.root}>
+    <Paper variant="outlined" className={classes.paper}>
       { indexEntry?.img
         ? <CardMedia image={indexEntry.img} className={classes.media} />
         : null
@@ -124,6 +128,6 @@ export const PostPage = ({
         ><Edit/></Fab>
       : null
     }
-  </>
+  </div>
   );
 };
