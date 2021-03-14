@@ -10,7 +10,6 @@ import Switch from "@material-ui/core/Switch";
 import TextField from "@material-ui/core/TextField";
 import { makeStyles } from "@material-ui/core/styles";
 import Delete from "@material-ui/icons/Delete";
-import Drafts from "@material-ui/icons/Drafts";
 import Save from "@material-ui/icons/Save";
 import ArrowDropUp from "@material-ui/icons/ArrowDropUp";
 import SpeedDial from "@material-ui/lab/SpeedDial";
@@ -333,43 +332,20 @@ export const EditPost = ({
       className={classes.speedDial}
       icon={<ArrowDropUp fontSize="large" />}
     >
-      {gitState.slug === ""
-        ?  ([<SpeedDialAction
-            FabProps={{id: "fab-discard"}}
-            icon={<Delete />}
-            key="fab-discard"
-            onClick={confirmDiscard}
-            tooltipTitle="Discard changes"
-          />,
-          <SpeedDialAction
-            FabProps={{id: "fab-draft"}}
-            icon={<Drafts />}
-            key="fab-draft"
-            onClick={() => saveChanges()}
-            tooltipTitle="Save As Draft"
-          />,
-          <SpeedDialAction
-            FabProps={{id: "fab-publish"}}
-            icon={<Save />}
-            key="fab-publish"
-            onClick={() => saveChanges()}
-            tooltipTitle="Publish"
-          />])
-        : ([<SpeedDialAction
-            FabProps={{id: "fab-discard"}}
-            icon={<Delete />}
-            key="fab-discard"
-            onClick={confirmDiscard}
-            tooltipTitle="Discard changes"
-          />,
-          <SpeedDialAction
-            FabProps={{id: "fab-save"}}
-            icon={<Save />}
-            key="fab-save"
-            onClick={() => saveChanges()}
-            tooltipTitle="Save"
-          />])
-      }
+      <SpeedDialAction
+        FabProps={{id: "fab-discard"}}
+        icon={<Delete />}
+        key="fab-discard"
+        onClick={confirmDiscard}
+        tooltipTitle="Discard changes"
+      />,
+      <SpeedDialAction
+        FabProps={{id: "fab-save"}}
+        icon={<Save />}
+        key="fab-save"
+        onClick={() => saveChanges()}
+        tooltipTitle="Save"
+      />
     </SpeedDial>
   </>);
 };
