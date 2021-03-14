@@ -9,11 +9,11 @@
   },
   "dependencies": {
     "@date-io/date-fns": "2.10.8",
-    "@fontsource/monsieur-la-doulaise": "4.2.1",
+    "@fontsource/monsieur-la-doulaise": "4.2.2",
     "@material-ui/core": "4.11.3",
     "@material-ui/icons": "4.11.2",
     "@material-ui/lab": "4.0.0-alpha.57",
-    "@material-ui/pickers": "3.2.10",
+    "@material-ui/pickers": "3.3.10",
     "axios": "0.21.1",
     "emoji-dictionary": "1.0.11",
     "react": "17.0.1",
@@ -27,7 +27,7 @@
     "react-scripts": "4.0.3",
     "react-syntax-highlighter": "15.4.3",
     "react-vis": "1.11.7",
-    "web-vitals": "1.1.0"
+    "web-vitals": "1.1.1"
   },
   "devDependencies": {
     "@blog/types": "1.0.0",
@@ -39,6 +39,7 @@
     "@types/react": "17.0.3",
     "@types/react-copy-to-clipboard": "5.0.0",
     "@types/react-dom": "17.0.2",
+    "cypress": "6.6.0",
     "cypress-terminal-report": "3.0.1",
     "typescript": "4.2.3"
   },
