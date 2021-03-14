@@ -120,8 +120,16 @@ export const Home = ({
   const history = useHistory();
   const classes = useStyles();
 
-  const posts = (gitContext.gitState?.index?.posts || {}) as {[slug: string]: PostData};
-  const featured = Object.values(posts).filter((post) => post.featured)
+  if (!gitContext.gitState?.index?.posts) return null;
+
+  const sortedPosts = Object.values(gitContext.gitState?.index?.posts).sort((a,b) => {
+    if ((!a.publishedOn && !b.publishedOn) || a.publishedOn === b.publishedOn) return 0;
+    if (!a.publishedOn) return 1;
+    if (!b.publishedOn) return -1;
+    return a.publishedOn > b.publishedOn ? -1 : 1
+  })
+
+  const featured = sortedPosts.filter((post) => post.featured)
 
   return (
     <>
@@ -156,7 +164,7 @@ export const Home = ({
           </Typography>
       }
       <Grid container spacing={3} justify={"space-around"} alignItems={"center"}>
-        {Object.values(posts).map((post: PostData) => {
+        {sortedPosts.map((post: PostData) => {
           if (!post.category) return null;
           if (post.draft) return null;
           if (!filterBy && post.featured) return null;
