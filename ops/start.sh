@@ -250,5 +250,6 @@ then
   )
   if [[ "${#imagesToRemove[@]}" -gt 0 ]]
   then docker image rm --force "${imagesToRemove[@]}"
+  else echo "No unnecessary images present, skipping cleanup"
   fi
 fi

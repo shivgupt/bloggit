@@ -19,7 +19,7 @@ import MenuIcon from "@material-ui/icons/Menu";
 import NextIcon from "@material-ui/icons/NavigateNext";
 import Person from "@material-ui/icons/Person";
 import React, { useState, useContext } from "react";
-import { Link as RouterLink, useRouteMatch } from "react-router-dom";
+import { Link as RouterLink } from "react-router-dom";
 
 import { GitContext } from "../GitContext";
 import { siteTitleFont } from "../style";
@@ -147,18 +147,19 @@ const DrawerContent = ({
 
 export const NavBar = ({
   adminMode,
+  category,
   setEditMode,
   theme,
   toggleTheme,
 }: {
   adminMode: string;
+  category: string;
   setEditMode: (val: boolean) => void;
   theme: Theme,
   toggleTheme: () => void;
 }) => {
   const [drawer, setDrawer] = useState<boolean>(false);
   const gitContext = useContext(GitContext);
-  const categoryMatch = useRouteMatch("/category/:slug");
   const classes = useStyles();
 
   const toggleDrawer = () => setDrawer(!drawer);
@@ -184,16 +185,16 @@ export const NavBar = ({
             >
               <HomeIcon className={classes.icon} />
             </Link>
-            {categoryMatch
+            {category
             ? <Link
                 className={classes.link}
                 color="inherit"
                 component={RouterLink}
                 onClick={() => setEditMode(false)}
-                to={`/category/${categoryMatch.params.slug}`}
+                to={`/category/${category}`}
               >
                 <CategoryIcon className={classes.icon} />
-                {categoryMatch.params.slug}
+                {category}
               </Link>
             : null
             }

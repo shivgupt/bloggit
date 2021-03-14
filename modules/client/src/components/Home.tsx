@@ -154,7 +154,7 @@ export const Home = ({
             </Typography>
           </>
         : <Typography variant="h4" className={classes.section}>
-            All {filterBy} posts
+            All <em>{filterBy}</em> posts
           </Typography>
       }
       <Grid container spacing={3} justify={"space-around"} alignItems={"center"}>

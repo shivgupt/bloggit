@@ -59,11 +59,11 @@ const App: React.FC = () => {
   const categoryMatch = useRouteMatch("/category/:category");
   const slugMatch = useRouteMatch("/:slug");
   const refMatch = useRouteMatch("/:ref/:slug");
-  const categoryParam = categoryMatch ? categoryMatch.params.category : "";
-  const refParam = categoryParam ? "" : refMatch ? refMatch.params.ref : "";
-  const slugParam = categoryParam ? "" : refMatch ? refMatch.params.slug
+  const categoryParam = (categoryMatch ? categoryMatch.params.category : "").toLowerCase();
+  const refParam = (categoryParam ? "" : refMatch ? refMatch.params.ref : "").toLowerCase();
+  const slugParam = (categoryParam ? "" : refMatch ? refMatch.params.slug
     : slugMatch ? slugMatch.params.slug
-    : "";
+    : "").toLowerCase();
 
   console.log(`Rendering App with refParam=${refParam} and slugParam=${slugParam} and categoryParam=${categoryParam}`);
 
@@ -178,6 +178,7 @@ const App: React.FC = () => {
         <CssBaseline />
         <NavBar
           adminMode={adminMode}
+          category={categoryParam}
           setEditMode={setEditMode}
           theme={theme}
           toggleTheme={toggleTheme}
