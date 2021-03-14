@@ -77,7 +77,6 @@ export const Toc = ({
   const classes = useStyles();
 
   const { currentContent, slug, index } = gitContext.gitState
-  console.log(posts);
 
   useEffect(() => {
     // Update sidebar node

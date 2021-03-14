@@ -192,7 +192,10 @@ export const IndexEditor = ({
                   ><Edit/></IconButton>
                 </TableCell>
 
-                <TableCell align="left" padding="none">
+                <TableCell align="left" padding="none" onClick={() => {
+                  setEditMode(false);
+                  history.push(`/${slug}`)
+                }}>
                   {title}
                 </TableCell>
 
