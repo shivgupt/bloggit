@@ -23,7 +23,7 @@ authRouter.use((req, res, next) => {
       } else {
         res.setHeader("www-authenticate", authType);
       }
-      // Print a helpful error message describing why auth failed
+      // Log a description re why auth failed
       const prefix = `Failed to auth ${req.method} to ${req.path}`;
       if (!authHeader) {
         log.warn(`${prefix}, no ${authHeaderKey} header provided.`);

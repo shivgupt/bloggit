@@ -3,8 +3,10 @@ import { EditRequest, EditResponse, PostData } from "@blog/types";
 import Backdrop from "@material-ui/core/Backdrop";
 import Button from "@material-ui/core/Button";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Input from "@material-ui/core/Input";
 import Paper from "@material-ui/core/Paper";
+import Switch from "@material-ui/core/Switch";
 import TextField from "@material-ui/core/TextField";
 import { makeStyles } from "@material-ui/core/styles";
 import Delete from "@material-ui/icons/Delete";
@@ -140,6 +142,7 @@ export const EditPost = ({
       : "";
     const hasError = !!(slugErr || titleErr);
     const hasChanged = originalEditData.title !== newEditData.title
+      || !!originalEditData.draft !== !!newEditData.draft
       || originalEditData.slug !== newEditData.slug
       || originalEditData.category !== newEditData.category
       || originalEditData.tldr !== newEditData.tldr
@@ -165,7 +168,7 @@ export const EditPost = ({
     return true;
   };
 
-  const saveChanges = async (asDraft?: boolean) => {
+  const saveChanges = async () => {
     if (validation.hasError) {
       setSnackAlert({ open: true, msg: "Please enter valid post details", severity: "error" });
       return;
@@ -184,12 +187,12 @@ export const EditPost = ({
       slug: newSlug,
       title: editData.title,
       category: editData.category,
-      draft: asDraft,
+      draft: !!editData.draft,
       featured: editData?.featured || false,
       img: editData.img,
       lastEdit: now,
       path: editData?.path || undefined,
-      publishedOn: editData?.publishedOn || (!asDraft ? now : undefined),
+      publishedOn: editData?.publishedOn || (!editData.draft ? now : undefined),
       tldr: editData.tldr,
     } as PostData;
     newIndex.posts[newSlug] = newIndexEntry;
@@ -282,6 +285,18 @@ export const EditPost = ({
           onChange={event => syncEditData({ ...editData, img: event.target.value })}
           value={editData?.img || ""}
         />
+        <FormControlLabel
+          label="Draft"
+          labelPlacement="top"
+          control={
+            <Switch
+              id="toggle-draft"
+              checked={!!editData.draft}
+              inputProps={{ name: "Draft" }}
+              onChange={() => syncEditData({ ...editData, draft: !editData?.draft })}
+            />
+          }
+        />
       </div>
       <ReactMde
         value={editData.content}
@@ -330,14 +345,14 @@ export const EditPost = ({
             FabProps={{id: "fab-draft"}}
             icon={<Drafts />}
             key="fab-draft"
-            onClick={() => saveChanges(true)}
+            onClick={() => saveChanges()}
             tooltipTitle="Save As Draft"
           />,
           <SpeedDialAction
             FabProps={{id: "fab-publish"}}
             icon={<Save />}
             key="fab-publish"
-            onClick={() => saveChanges(false)}
+            onClick={() => saveChanges()}
             tooltipTitle="Publish"
           />])
         : ([<SpeedDialAction
@@ -351,7 +366,7 @@ export const EditPost = ({
             FabProps={{id: "fab-save"}}
             icon={<Save />}
             key="fab-save"
-            onClick={() => saveChanges(false)}
+            onClick={() => saveChanges()}
             tooltipTitle="Save"
           />])
       }
