@@ -9,7 +9,7 @@ import TextField from "@material-ui/core/TextField";
 import { makeStyles } from "@material-ui/core/styles";
 import Delete from "@material-ui/icons/Delete";
 import Drafts from "@material-ui/icons/Drafts";
-import Public from "@material-ui/icons/Public";
+import Save from "@material-ui/icons/Save";
 import ArrowDropUp from "@material-ui/icons/ArrowDropUp";
 import SpeedDial from "@material-ui/lab/SpeedDial";
 import SpeedDialAction from "@material-ui/lab/SpeedDialAction";
@@ -335,7 +335,7 @@ export const EditPost = ({
           />,
           <SpeedDialAction
             FabProps={{id: "fab-publish"}}
-            icon={<Public />}
+            icon={<Save />}
             key="fab-publish"
             onClick={() => saveChanges(false)}
             tooltipTitle="Publish"
@@ -349,7 +349,7 @@ export const EditPost = ({
           />,
           <SpeedDialAction
             FabProps={{id: "fab-save"}}
-            icon={<Drafts />}
+            icon={<Save />}
             key="fab-save"
             onClick={() => saveChanges(false)}
             tooltipTitle="Save"
