@@ -1,10 +1,8 @@
-import {
-  CardMedia,
-  makeStyles,
-  Fab,
-  Paper,
-} from "@material-ui/core";
-import { Edit } from "@material-ui/icons";
+import CardMedia from "@material-ui/core/CardMedia";
+import Fab from "@material-ui/core/Fab";
+import Paper from "@material-ui/core/Paper";
+import { makeStyles } from "@material-ui/core/styles";
+import Edit from "@material-ui/icons/Edit";
 import React, { useContext, useEffect, useState } from "react";
 import Markdown from "react-markdown";
 import "react-mde/lib/styles/css/react-mde-all.css";

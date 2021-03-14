@@ -1,25 +1,24 @@
 import { BlogIndex, EditRequest, PostData } from "@blog/types";
-import React, { useContext, useEffect, useState } from "react";
-import { 
-  Divider,
-  Table,
-  Checkbox,
-  TableRow,
-  TableCell,
-  TableHead,
-  TableBody,
-  IconButton,
-  Fab,
-  makeStyles,
-  Switch,
-  TextField,
-  Theme,
-  Backdrop,
-  CircularProgress,
-} from "@material-ui/core";
-import { Add, Edit, Save } from "@material-ui/icons";
-import { useHistory } from "react-router-dom";
+import Backdrop from "@material-ui/core/Backdrop";
+import Checkbox from "@material-ui/core/Checkbox";
+import CircularProgress from "@material-ui/core/CircularProgress";
+import Divider from "@material-ui/core/Divider";
+import Fab from "@material-ui/core/Fab";
+import IconButton from "@material-ui/core/IconButton";
+import Switch from "@material-ui/core/Switch";
+import Table from "@material-ui/core/Table";
+import TableBody from "@material-ui/core/TableBody";
+import TableCell from "@material-ui/core/TableCell";
+import TableHead from "@material-ui/core/TableHead";
+import TableRow from "@material-ui/core/TableRow";
+import TextField from "@material-ui/core/TextField";
+import { makeStyles, Theme } from "@material-ui/core/styles";
+import Add from "@material-ui/icons/Add";
+import Edit from "@material-ui/icons/Edit";
+import Save from "@material-ui/icons/Save";
 import axios from "axios";
+import React, { useContext, useEffect, useState } from "react";
+import { useHistory } from "react-router-dom";
 
 import { GitContext } from "../GitContext";
 import { getFabStyle } from "../style";
@@ -27,7 +26,7 @@ import { emptyIndex, getPath } from "../utils";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
-    width: '100%',
+    width: "100%",
     backgroundColor: theme.palette.background.paper,
   },
   editColumn: {
@@ -38,7 +37,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   backdrop: {
     zIndex: theme.zIndex.drawer + 1,
-    color: '#fff',
+    color: "#fff",
   },
   fab: getFabStyle(theme),
 }));

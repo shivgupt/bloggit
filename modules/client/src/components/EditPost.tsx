@@ -1,25 +1,18 @@
 import "react-mde/lib/styles/css/react-mde-all.css";
-
 import { EditRequest, EditResponse, PostData } from "@blog/types";
-import {
-  Backdrop,
-  Button,
-  CircularProgress,
-  Input,
-  makeStyles,
-  Paper,
-  TextField,
-} from "@material-ui/core";
-import {
-  Delete,
-  Drafts,
-  Public,
-  ArrowDropUp,
-} from "@material-ui/icons";
-import {
-  SpeedDial,
-  SpeedDialAction
-} from "@material-ui/lab";
+import Backdrop from "@material-ui/core/Backdrop";
+import Button from "@material-ui/core/Button";
+import CircularProgress from "@material-ui/core/CircularProgress";
+import Input from "@material-ui/core/Input";
+import Paper from "@material-ui/core/Paper";
+import TextField from "@material-ui/core/TextField";
+import { makeStyles } from "@material-ui/core/styles";
+import Delete from "@material-ui/icons/Delete";
+import Drafts from "@material-ui/icons/Drafts";
+import Public from "@material-ui/icons/Public";
+import ArrowDropUp from "@material-ui/icons/ArrowDropUp";
+import SpeedDial from "@material-ui/lab/SpeedDial";
+import SpeedDialAction from "@material-ui/lab/SpeedDialAction";
 import axios from "axios";
 import React, { useContext, useEffect, useState } from "react";
 import Markdown from "react-markdown";
@@ -61,7 +54,7 @@ const useStyles = makeStyles((theme) => ({
   },
   backdrop: {
     zIndex: theme.zIndex.drawer + 1,
-    color: '#fff',
+    color: "#fff",
   },
   speedDial: getFabStyle(theme),
 }));

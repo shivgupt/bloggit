@@ -1,19 +1,17 @@
-import {
-  Card,
-  Fab,
-  CardActionArea,
-  CardContent,
-  CardMedia,
-  Chip,
-  Divider,
-  Grid,
-  Typography,
-  makeStyles,
-} from "@material-ui/core";
-import Carousel from 'react-material-ui-carousel';
 import { PostData } from "@blog/types";
-import { Add } from "@material-ui/icons";
+import Card from "@material-ui/core/Card";
+import Fab from "@material-ui/core/Fab";
+import CardActionArea from "@material-ui/core/CardActionArea";
+import CardContent from "@material-ui/core/CardContent";
+import CardMedia from "@material-ui/core/CardMedia";
+import Chip from "@material-ui/core/Chip";
+import Divider from "@material-ui/core/Divider";
+import Grid from "@material-ui/core/Grid";
+import Typography from "@material-ui/core/Typography";
+import { makeStyles } from "@material-ui/core/styles";
+import Add from "@material-ui/icons/Add";
 import React, { useContext } from "react";
+import Carousel from "react-material-ui-carousel";
 import { useHistory, Link } from "react-router-dom";
 
 import { getFabStyle } from "../style";
@@ -65,7 +63,7 @@ export const PostCard = ({ post }: { post: PostData }) => {
   const tldr = replaceEmojiString(post.tldr!);
   const cutoff = post.img ? 140 : 280;
   const publishedOn = post.publishedOn
-    ? new Date(post.publishedOn).toLocaleDateString('en', {
+    ? new Date(post.publishedOn).toLocaleDateString("en", {
         year: "numeric",
         month: "long",
         day: "numeric",
@@ -156,7 +154,7 @@ export const Home = ({
             </Typography>
           </>
         : <Typography variant="h4" className={classes.section}>
-            All '{filterBy}' posts
+            All {filterBy} posts
           </Typography>
       }
       <Grid container spacing={3} justify={"space-around"} alignItems={"center"}>

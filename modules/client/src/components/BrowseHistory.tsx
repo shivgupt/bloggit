@@ -1,16 +1,16 @@
-import React, { useEffect, useState } from "react";
 import { HistoryResponse } from "@blog/types";
-import { makeStyles } from "@material-ui/core";
-import Grid from '@material-ui/core/Grid';
 import Button from "@material-ui/core/Button";
-import Typography from "@material-ui/core/Typography";
-import Tooltip from "@material-ui/core/Tooltip";
+import Grid from "@material-ui/core/Grid";
+import ListItemText from "@material-ui/core/ListItemText";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
-import ListItemText from "@material-ui/core/ListItemText";
+import Tooltip from "@material-ui/core/Tooltip";
+import Typography from "@material-ui/core/Typography";
+import { makeStyles } from "@material-ui/core/styles";
+import ExpandMore from "@material-ui/icons/ExpandMore";
+import FastForward from "@material-ui/icons/FastForward";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import ExpandIcon from '@material-ui/icons/ExpandMore';
-import FastForwardIcon from '@material-ui/icons/FastForward';
 
 import { fetchHistory } from "../utils";
 
@@ -86,7 +86,7 @@ export const BrowseHistory = ({
       <Grid item>
         <Button
           id="open-history"
-          startIcon={<ExpandIcon/>}
+          startIcon={<ExpandMore/>}
           aria-haspopup="true"
           variant="contained"
           size={"medium"}
@@ -112,7 +112,7 @@ export const BrowseHistory = ({
                 to={`/${slug}`}
                 variant="contained"
               >
-                <FastForwardIcon/>
+                <FastForward/>
               </Button>
             </Tooltip>
           </Grid>

@@ -1,27 +1,22 @@
+import Box from "@material-ui/core/Box";
+import Button from "@material-ui/core/Button";
+import Divider from "@material-ui/core/Divider";
+import IconButton from "@material-ui/core/IconButton";
+import List from "@material-ui/core/List";
+import ListItem from "@material-ui/core/ListItem";
+import Typography from "@material-ui/core/Typography";
+import { makeStyles } from "@material-ui/core/styles";
+import NavigateNextIcon from "@material-ui/icons/NavigateNext";
+import NavigateBackIcon from "@material-ui/icons/NavigateBefore";
 import React, { useContext, useEffect, useState } from "react";
 import Markdown from "react-markdown";
 import { Link } from "react-router-dom";
-import {
-  makeStyles,
-  Box,
-  Button,
-  Divider,
-  IconButton,
-  List,
-  ListItem,
-  Typography,
-} from "@material-ui/core";
-import {
-  NavigateNext as NavigateNextIcon,
-  NavigateBefore as NavigateBackIcon,
-} from "@material-ui/icons";
-import { Link as RouterLink } from "react-router-dom";
 
 import { GitContext } from "../GitContext";
+import { PostsByCategory, SidebarNode } from "../types";
 import { getChildValue, replaceEmojiString, emptySidebarNode } from "../utils";
 
 import { HashLink } from "./HashLink";
-import { PostsByCategory, SidebarNode } from "../types";
 
 const useStyles = makeStyles(theme => ({
   list: { width: "100%" },
@@ -138,7 +133,7 @@ export const Toc = ({
                 <Button
                   size="small"
                   disableFocusRipple={false}
-                  component={RouterLink}
+                  component={Link}
                   to={`/${p.slug}`}
                 > {p.title} </Button>
               </Box>
@@ -188,7 +183,7 @@ export const Toc = ({
                 <Button
                   size="small"
                   disableFocusRipple={false}
-                  component={RouterLink}
+                  component={Link}
                   to={`/${p.slug}`}
                 > {p.title} </Button>
               </Box>

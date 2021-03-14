@@ -1,13 +1,8 @@
-import {
-  Container,
-  createStyles,
-  CssBaseline,
-  makeStyles,
-  Snackbar,
-  Theme,
-  ThemeProvider,
-} from "@material-ui/core";
-import { Alert } from "@material-ui/lab";
+import Container from "@material-ui/core/Container";
+import CssBaseline from "@material-ui/core/CssBaseline";
+import Snackbar from "@material-ui/core/Snackbar";
+import { createStyles, makeStyles, Theme, ThemeProvider } from "@material-ui/core/styles";
+import Alert from "@material-ui/lab/Alert";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Route, Switch, useRouteMatch } from "react-router-dom";
@@ -29,7 +24,6 @@ import {
   initialGitState,
   store,
 } from "./utils";
-
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
   appBarSpacer: theme.mixins.toolbar,
