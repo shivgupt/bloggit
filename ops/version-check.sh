@@ -18,7 +18,7 @@ do
   cd "$(dirname "$package")" || exit 1
   echo "===== Package: $project/$(dirname "$package")/package.json"
   mv package.json package.json.backup
-  sed /@connext/d < package.json.backup > package.json
+  sed "/@$project/d" < package.json.backup > package.json
   npm outdated | tail -n +2 | awk '$3 != $4' | format
   echo "-----"
   npm outdated -D | tail -n +2 | awk '$3 != $4' | format
