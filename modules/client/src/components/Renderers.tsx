@@ -53,18 +53,19 @@ export const LinkRenderer = ({
 export const ImageRenderer = ({
   src,
   alt,
+  style,
 }: {
   src: string;
   alt: string;
+  style?: object;
 }) => {
     return <img
       src={src}
       alt={alt}
-      style={{
+      style={style || {
+        display: "block",
+        margin: "auto",
         maxWidth: "90%",
-          display: "block",
-          marginLeft: "auto",
-          marginRight: "auto",
       }}
     />;
   };
