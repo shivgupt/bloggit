@@ -12,12 +12,12 @@
   "dependencies": {
     "body-parser": "1.19.0",
     "express": "4.17.1",
-    "ipfs-client": "0.3.2",
+    "ipfs-client": "0.3.4",
     "isomorphic-git": "1.8.1",
     "it-all": "1.0.5",
     "node-fetch": "2.6.1",
-    "pino": "6.11.1",
-    "pino-pretty": "4.5.0"
+    "pino": "6.11.2",
+    "pino-pretty": "4.7.1"
   },
   "devDependencies": {
     "@blog/types": "1.0.0",
