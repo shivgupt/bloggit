@@ -1,6 +1,7 @@
+import IconButton from "@material-ui/core/IconButton";
+import Link from "@material-ui/core/Link";
 import { useTheme } from "@material-ui/core/styles";
-import { IconButton, Link } from "@material-ui/core";
-import { Link as LinkIcon } from "@material-ui/icons";
+import LinkIcon from "@material-ui/icons/Link";
 import React from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { atomDark, vs } from "react-syntax-highlighter/dist/esm/styles/prism";
@@ -52,18 +53,19 @@ export const LinkRenderer = ({
 export const ImageRenderer = ({
   src,
   alt,
+  style,
 }: {
   src: string;
   alt: string;
+  style?: object;
 }) => {
     return <img
       src={src}
       alt={alt}
-      style={{
+      style={style || {
+        display: "block",
+        margin: "auto",
         maxWidth: "90%",
-          display: "block",
-          marginLeft: "auto",
-          marginRight: "auto",
       }}
     />;
   };

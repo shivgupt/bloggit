@@ -3,6 +3,18 @@ import emoji from "emoji-dictionary";
 
 import { PostsByCategory } from "../types";
 
+export const getPrettyDateString = (dateString: string) => {
+  let date = new Date(dateString);
+  if (date.toString() === "Invalid Date") {
+    return null;
+  }
+  return date.toLocaleDateString('en', {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+}
+
 export const getPath = (post: PostData | undefined): string | undefined => {
   if (!post) return undefined;
   if (post.path) return post.path;

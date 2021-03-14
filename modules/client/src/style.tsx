@@ -1,4 +1,4 @@
-import { createMuiTheme, Theme } from "@material-ui/core";
+import { createMuiTheme, Theme } from "@material-ui/core/styles";
 import "@fontsource/monsieur-la-doulaise";
 
 import { env } from "./env";

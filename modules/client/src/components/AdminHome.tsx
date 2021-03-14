@@ -1,18 +1,16 @@
+import Button from "@material-ui/core/Button";
+import Divider from "@material-ui/core/Divider";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import Switch from "@material-ui/core/Switch";
+import TextField from "@material-ui/core/TextField";
+import Typography from "@material-ui/core/Typography";
+import { makeStyles, Theme } from "@material-ui/core/styles";
+import RemoveCircle from "@material-ui/icons/RemoveCircle";
 import React, { useState } from "react";
-import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
-import { 
-  Button,
-  Divider,
-  FormControlLabel,
-  Switch,
-  TextField,
-  Theme,
-  Typography,
-  makeStyles,
-} from "@material-ui/core";
+
+import { AdminMode } from "../types";
 
 import { IndexEditor } from "./IndexEditor";
-import { AdminMode } from "../types";
 
 const useStyles = makeStyles((theme: Theme) => ({
   section: {
@@ -55,7 +53,7 @@ export const AdminHome = ({
                 setAuthToken("");
                 validateAuthToken("");
               }}
-              startIcon={<RemoveCircleIcon/>}
+              startIcon={<RemoveCircle/>}
             >
               Unregister
             </Button>
@@ -89,7 +87,7 @@ export const AdminHome = ({
       }
 
       <Divider variant="middle" />
-      { adminMode !== "invalid"
+      {adminMode !== "invalid"
         ? <FormControlLabel
             id="toggle-admin-mode"
             control={

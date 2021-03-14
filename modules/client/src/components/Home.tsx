@@ -1,23 +1,21 @@
-import {
-  Card,
-  Fab,
-  CardActionArea,
-  CardContent,
-  CardMedia,
-  Chip,
-  Divider,
-  Grid,
-  Typography,
-  makeStyles,
-} from "@material-ui/core";
-import Carousel from 'react-material-ui-carousel';
 import { PostData } from "@blog/types";
-import { Add } from "@material-ui/icons";
+import Card from "@material-ui/core/Card";
+import Fab from "@material-ui/core/Fab";
+import CardActionArea from "@material-ui/core/CardActionArea";
+import CardContent from "@material-ui/core/CardContent";
+import CardMedia from "@material-ui/core/CardMedia";
+import Chip from "@material-ui/core/Chip";
+import Divider from "@material-ui/core/Divider";
+import Grid from "@material-ui/core/Grid";
+import Typography from "@material-ui/core/Typography";
+import { makeStyles } from "@material-ui/core/styles";
+import Add from "@material-ui/icons/Add";
 import React, { useContext } from "react";
+import Carousel from "react-material-ui-carousel";
 import { useHistory, Link } from "react-router-dom";
 
 import { getFabStyle } from "../style";
-import { replaceEmojiString } from "../utils";
+import { getPrettyDateString, replaceEmojiString } from "../utils";
 import { GitContext } from "../GitContext";
 
 const useStyles = makeStyles((theme) => ({
@@ -54,6 +52,9 @@ const useStyles = makeStyles((theme) => ({
     alignContent: "center",
     alignItems: "center",
   },
+  chip: {
+    marginRight: theme.spacing(1),
+  },
   fab: getFabStyle(theme),
 }));
 
@@ -64,13 +65,7 @@ export const PostCard = ({ post }: { post: PostData }) => {
   const title = replaceEmojiString(post.title);
   const tldr = replaceEmojiString(post.tldr!);
   const cutoff = post.img ? 140 : 280;
-  const publishedOn = post.publishedOn
-    ? new Date(post.publishedOn).toLocaleDateString('en', {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      })
-    : "";
+  const publishedOn = post.publishedOn ? getPrettyDateString(post.publishedOn) : null;
 
   return (
     <Card className={classes.card}>
@@ -87,12 +82,6 @@ export const PostCard = ({ post }: { post: PostData }) => {
       <CardContent>
         <CardActionArea disableRipple className={classes.actionArea} component={Link} to={`/${slug}`}>
           <Typography variant="h5" gutterBottom display="block">{title}</Typography>
-          {publishedOn
-            ? <Typography variant="subtitle1" gutterBottom display="inline">
-                {`Published on ${publishedOn}`}
-              </Typography>
-            : ""
-          }
         </CardActionArea>
           &nbsp;
           <Chip
@@ -100,7 +89,14 @@ export const PostCard = ({ post }: { post: PostData }) => {
             component={Link}
             to={`/category/${post.category}`}
             clickable
+            className={classes.chip}
           />
+          {publishedOn
+            ? <Typography variant="caption" gutterBottom display="inline">
+                {publishedOn}
+              </Typography>
+            : null
+          }
         <CardActionArea disableRipple className={classes.contentActionArea} component={Link} to={`/${slug}`}>
           <Typography variant="caption" component="p" gutterBottom className={classes.section}>
             {tldr.substr(0,cutoff)} {tldr.length > cutoff ? "..." : null}
@@ -124,8 +120,16 @@ export const Home = ({
   const history = useHistory();
   const classes = useStyles();
 
-  const posts = (gitContext.gitState?.index?.posts || {}) as {[slug: string]: PostData};
-  const featured = Object.values(posts).filter((post) => post.featured)
+  if (!gitContext.gitState?.index?.posts) return null;
+
+  const sortedPosts = Object.values(gitContext.gitState?.index?.posts).sort((a,b) => {
+    if ((!a.publishedOn && !b.publishedOn) || a.publishedOn === b.publishedOn) return 0;
+    if (!a.publishedOn) return 1;
+    if (!b.publishedOn) return -1;
+    return a.publishedOn > b.publishedOn ? -1 : 1
+  })
+
+  const featured = sortedPosts.filter((post) => post.featured)
 
   return (
     <>
@@ -156,11 +160,11 @@ export const Home = ({
             </Typography>
           </>
         : <Typography variant="h4" className={classes.section}>
-            All '{filterBy}' posts
+            All <em>{filterBy}</em> posts
           </Typography>
       }
       <Grid container spacing={3} justify={"space-around"} alignItems={"center"}>
-        {Object.values(posts).map((post: PostData) => {
+        {sortedPosts.map((post: PostData) => {
           if (!post.category) return null;
           if (post.draft) return null;
           if (!filterBy && post.featured) return null;

@@ -1,25 +1,19 @@
 import "react-mde/lib/styles/css/react-mde-all.css";
-
 import { EditRequest, EditResponse, PostData } from "@blog/types";
-import {
-  Backdrop,
-  Button,
-  CircularProgress,
-  Input,
-  makeStyles,
-  Paper,
-  TextField,
-} from "@material-ui/core";
-import {
-  Delete,
-  Drafts,
-  Public,
-  ArrowDropUp,
-} from "@material-ui/icons";
-import {
-  SpeedDial,
-  SpeedDialAction
-} from "@material-ui/lab";
+import Backdrop from "@material-ui/core/Backdrop";
+import Button from "@material-ui/core/Button";
+import CircularProgress from "@material-ui/core/CircularProgress";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import Input from "@material-ui/core/Input";
+import Paper from "@material-ui/core/Paper";
+import Switch from "@material-ui/core/Switch";
+import TextField from "@material-ui/core/TextField";
+import { makeStyles } from "@material-ui/core/styles";
+import Delete from "@material-ui/icons/Delete";
+import Save from "@material-ui/icons/Save";
+import ArrowDropUp from "@material-ui/icons/ArrowDropUp";
+import SpeedDial from "@material-ui/lab/SpeedDial";
+import SpeedDialAction from "@material-ui/lab/SpeedDialAction";
 import axios from "axios";
 import React, { useContext, useEffect, useState } from "react";
 import Markdown from "react-markdown";
@@ -61,7 +55,7 @@ const useStyles = makeStyles((theme) => ({
   },
   backdrop: {
     zIndex: theme.zIndex.drawer + 1,
-    color: '#fff',
+    color: "#fff",
   },
   speedDial: getFabStyle(theme),
 }));
@@ -147,6 +141,7 @@ export const EditPost = ({
       : "";
     const hasError = !!(slugErr || titleErr);
     const hasChanged = originalEditData.title !== newEditData.title
+      || !!originalEditData.draft !== !!newEditData.draft
       || originalEditData.slug !== newEditData.slug
       || originalEditData.category !== newEditData.category
       || originalEditData.tldr !== newEditData.tldr
@@ -172,7 +167,7 @@ export const EditPost = ({
     return true;
   };
 
-  const saveChanges = async (asDraft?: boolean) => {
+  const saveChanges = async () => {
     if (validation.hasError) {
       setSnackAlert({ open: true, msg: "Please enter valid post details", severity: "error" });
       return;
@@ -182,8 +177,8 @@ export const EditPost = ({
       return;
     }
     setSaving(true);
-
     const newIndex = JSON.parse(JSON.stringify(gitState?.index));
+    const oldSlug = originalEditData.slug;
     const newSlug = editData.slug || editData.displaySlug;
     const now = (new Date()).toISOString()
     newIndex.posts = newIndex.posts || {};
@@ -191,19 +186,15 @@ export const EditPost = ({
       slug: newSlug,
       title: editData.title,
       category: editData.category,
-      draft: asDraft,
+      draft: !!editData.draft,
       featured: editData?.featured || false,
       img: editData.img,
       lastEdit: now,
       path: editData?.path || undefined,
+      publishedOn: editData?.publishedOn || (!editData.draft ? now : undefined),
       tldr: editData.tldr,
     } as PostData;
     newIndex.posts[newSlug] = newIndexEntry;
-    if (!asDraft) {
-      newIndex.posts[newSlug].publishedOn = newIndexEntry.publishedOn
-        ? new Date(newIndexEntry.publishedOn).toISOString()
-        : now;
-    }
     const newPath = getPath(newIndexEntry);
     const oldPath = getPath(gitState.index.posts[gitState.slug]);
     const editRequest = [
@@ -212,6 +203,9 @@ export const EditPost = ({
     ] as EditRequest;
     if (oldPath && oldPath !== newPath) {
       editRequest.push({ path: oldPath, content: "" });
+    }
+    if (oldSlug && oldSlug !== newSlug) {
+      delete newIndex.posts[oldSlug]
     }
     // Send request to update index.json and create new file
     let res = await axios({
@@ -273,8 +267,8 @@ export const EditPost = ({
               error={!!validation.errs[name]}
               fullWidth={["title", "tldr"].includes(name)}
               helperText={validation.errs[name]}
-              id={`edit_${name}`}
-              key={`edit_${name}`}
+              id={`edit-${name}`}
+              key={`edit-${name}`}
               label={name}
               name={name}
               onChange={event => syncEditData({ ...editData, [event.target.name]: event.target.value })}
@@ -284,9 +278,23 @@ export const EditPost = ({
           )
         })}
         <Input
-          id="edit_img"
-          value={editData?.img || ""}
+          autoComplete={"off"}
           endAdornment={ <ImageUploader setImageHash={img => syncEditData({ ...editData, img })} /> }
+          id="edit-img"
+          onChange={event => syncEditData({ ...editData, img: event.target.value })}
+          value={editData?.img || ""}
+        />
+        <FormControlLabel
+          label="Draft"
+          labelPlacement="top"
+          control={
+            <Switch
+              id="toggle-draft"
+              checked={!!editData.draft}
+              inputProps={{ name: "Draft" }}
+              onChange={() => syncEditData({ ...editData, draft: !editData?.draft })}
+            />
+          }
         />
       </div>
       <ReactMde
@@ -324,43 +332,20 @@ export const EditPost = ({
       className={classes.speedDial}
       icon={<ArrowDropUp fontSize="large" />}
     >
-      {gitState.slug === ""
-        ?  ([<SpeedDialAction
-            FabProps={{id: "fab-discard"}}
-            icon={<Delete />}
-            key="fab-discard"
-            onClick={confirmDiscard}
-            tooltipTitle="Discard changes"
-          />,
-          <SpeedDialAction
-            FabProps={{id: "fab-draft"}}
-            icon={<Drafts />}
-            key="fab-draft"
-            onClick={() => saveChanges(true)}
-            tooltipTitle="Save As Draft"
-          />,
-          <SpeedDialAction
-            FabProps={{id: "fab-publish"}}
-            icon={<Public />}
-            key="fab-publish"
-            onClick={() => saveChanges(false)}
-            tooltipTitle="Publish"
-          />])
-        : ([<SpeedDialAction
-            FabProps={{id: "fab-discard"}}
-            icon={<Delete />}
-            key="fab-discard"
-            onClick={confirmDiscard}
-            tooltipTitle="Discard changes"
-          />,
-          <SpeedDialAction
-            FabProps={{id: "fab-save"}}
-            icon={<Drafts />}
-            key="fab-save"
-            onClick={() => saveChanges(false)}
-            tooltipTitle="Save"
-          />])
-      }
+      <SpeedDialAction
+        FabProps={{id: "fab-discard"}}
+        icon={<Delete />}
+        key="fab-discard"
+        onClick={confirmDiscard}
+        tooltipTitle="Discard changes"
+      />,
+      <SpeedDialAction
+        FabProps={{id: "fab-save"}}
+        icon={<Save />}
+        key="fab-save"
+        onClick={() => saveChanges()}
+        tooltipTitle="Save"
+      />
     </SpeedDial>
   </>);
 };

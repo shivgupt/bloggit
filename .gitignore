@@ -29,6 +29,7 @@ node_modules/
 .classpath
 .idea
 .project
+.pki
 .settings/
 .vscode
 

@@ -3,6 +3,7 @@ set -e
 
 root=$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." >/dev/null 2>&1 && pwd )
 project=$(grep -m 1 '"name":' "$root/package.json" | cut -d '"' -f 4)
+client="$root/modules/client"
 
 # make sure a network for this project has been created
 docker swarm init 2> /dev/null || true
@@ -15,8 +16,8 @@ export BLOG_HOST_CONTENT_DIR="$root/.test-content.git"
 export BLOG_MIRROR_URL=""
 make start
 
-if [[ -d "modules/client" ]]
-then cd modules/client || exit 1;
+if [[ -d "$client" ]]
+then cd "$client" || exit 1;
 fi
 
 if [[ "$cmd" == "watch" ]]
@@ -33,14 +34,14 @@ else
   then interactive=(--interactive --tty)
   else echo "Running in non-interactive mode"
   fi
-  cypress_image="cypress/included:$(grep -m 1 '"cypress":' "$root/package.json" | cut -d '"' -f 4)"
+  cypress_image="cypress/included:$(grep -m 1 '"cypress":' "$client/package.json" | cut -d '"' -f 4)"
   bash "$root/ops/pull-images.sh" "$cypress_image"
   docker run \
     "${interactive[@]}" \
     --name="${project}_${cmd}_client" \
     --network "$project" \
     --rm \
-    --volume="$root:/home/$project" \
-    --workdir="/home/$project/modules/client" \
+    --volume="$root:/root" \
+    --workdir="/root/modules/client" \
     "$cypress_image" run --spec "cypress/tests/index.js" --env "baseUrl=http://proxy"
 fi

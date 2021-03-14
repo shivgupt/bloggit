@@ -1,13 +1,8 @@
-import {
-  Container,
-  createStyles,
-  CssBaseline,
-  makeStyles,
-  Snackbar,
-  Theme,
-  ThemeProvider,
-} from "@material-ui/core";
-import { Alert } from "@material-ui/lab";
+import Container from "@material-ui/core/Container";
+import CssBaseline from "@material-ui/core/CssBaseline";
+import Snackbar from "@material-ui/core/Snackbar";
+import { createStyles, makeStyles, Theme, ThemeProvider } from "@material-ui/core/styles";
+import Alert from "@material-ui/lab/Alert";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Route, Switch, useRouteMatch } from "react-router-dom";
@@ -29,7 +24,6 @@ import {
   initialGitState,
   store,
 } from "./utils";
-
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
   appBarSpacer: theme.mixins.toolbar,
@@ -65,11 +59,11 @@ const App: React.FC = () => {
   const categoryMatch = useRouteMatch("/category/:category");
   const slugMatch = useRouteMatch("/:slug");
   const refMatch = useRouteMatch("/:ref/:slug");
-  const categoryParam = categoryMatch ? categoryMatch.params.category : "";
-  const refParam = categoryParam ? "" : refMatch ? refMatch.params.ref : "";
-  const slugParam = categoryParam ? "" : refMatch ? refMatch.params.slug
+  const categoryParam = (categoryMatch ? categoryMatch.params.category : "").toLowerCase();
+  const refParam = (categoryParam ? "" : refMatch ? refMatch.params.ref : "").toLowerCase();
+  const slugParam = (categoryParam ? "" : refMatch ? refMatch.params.slug
     : slugMatch ? slugMatch.params.slug
-    : "";
+    : "").toLowerCase();
 
   console.log(`Rendering App with refParam=${refParam} and slugParam=${slugParam} and categoryParam=${categoryParam}`);
 
@@ -107,19 +101,23 @@ const App: React.FC = () => {
       }
       setAdminMode("enabled");
     } catch (e) {
-      // Auth is invalid, update localStorage, axios header and adminMode
-      console.error(`Auth token is not valid: ${e.message}`);
-      store.save("authToken", "");
-      axios.defaults.headers.common["authorization"] = `Basic ${btoa(`admin:`)}`;
-      if (_authToken) {
-        setSnackAlert({
-          open: true,
-          msg: "Invalid Auth Token",
-          severity: "error",
-          hideDuration: 4000,
-        });
+      // Got unauthorized response, update localStorage, axios header and adminMode
+      if (e?.response?.status === 401) {
+        console.error(`Auth token is not valid:`, e);
+        store.save("authToken", "");
+        axios.defaults.headers.common["authorization"] = `Basic ${btoa(`admin:`)}`;
+        if (_authToken) {
+          setSnackAlert({
+            open: true,
+            msg: "Invalid Auth Token",
+            severity: "error",
+            hideDuration: 4000,
+          });
+        }
+        setAdminMode("invalid");
+      } else {
+        console.error(`Non-auth server failure:`, e);
       }
-      setAdminMode("invalid");
     }
   }
 
@@ -184,6 +182,7 @@ const App: React.FC = () => {
         <CssBaseline />
         <NavBar
           adminMode={adminMode}
+          category={categoryParam}
           setEditMode={setEditMode}
           theme={theme}
           toggleTheme={toggleTheme}
