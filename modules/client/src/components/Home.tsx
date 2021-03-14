@@ -15,7 +15,7 @@ import Carousel from "react-material-ui-carousel";
 import { useHistory, Link } from "react-router-dom";
 
 import { getFabStyle } from "../style";
-import { replaceEmojiString } from "../utils";
+import { getPrettyDateString, replaceEmojiString } from "../utils";
 import { GitContext } from "../GitContext";
 
 const useStyles = makeStyles((theme) => ({
@@ -52,6 +52,9 @@ const useStyles = makeStyles((theme) => ({
     alignContent: "center",
     alignItems: "center",
   },
+  chip: {
+    marginRight: theme.spacing(1),
+  },
   fab: getFabStyle(theme),
 }));
 
@@ -62,13 +65,7 @@ export const PostCard = ({ post }: { post: PostData }) => {
   const title = replaceEmojiString(post.title);
   const tldr = replaceEmojiString(post.tldr!);
   const cutoff = post.img ? 140 : 280;
-  const publishedOn = post.publishedOn
-    ? new Date(post.publishedOn).toLocaleDateString("en", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      })
-    : "";
+  const publishedOn = post.publishedOn ? getPrettyDateString(post.publishedOn) : null;
 
   return (
     <Card className={classes.card}>
@@ -85,12 +82,6 @@ export const PostCard = ({ post }: { post: PostData }) => {
       <CardContent>
         <CardActionArea disableRipple className={classes.actionArea} component={Link} to={`/${slug}`}>
           <Typography variant="h5" gutterBottom display="block">{title}</Typography>
-          {publishedOn
-            ? <Typography variant="subtitle1" gutterBottom display="inline">
-                {`Published on ${publishedOn}`}
-              </Typography>
-            : ""
-          }
         </CardActionArea>
           &nbsp;
           <Chip
@@ -98,7 +89,14 @@ export const PostCard = ({ post }: { post: PostData }) => {
             component={Link}
             to={`/category/${post.category}`}
             clickable
+            className={classes.chip}
           />
+          {publishedOn
+            ? <Typography variant="caption" gutterBottom display="inline">
+                {publishedOn}
+              </Typography>
+            : null
+          }
         <CardActionArea disableRipple className={classes.contentActionArea} component={Link} to={`/${slug}`}>
           <Typography variant="caption" component="p" gutterBottom className={classes.section}>
             {tldr.substr(0,cutoff)} {tldr.length > cutoff ? "..." : null}

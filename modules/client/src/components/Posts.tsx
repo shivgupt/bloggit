@@ -3,9 +3,11 @@ import Fab from "@material-ui/core/Fab";
 import Paper from "@material-ui/core/Paper";
 import { makeStyles } from "@material-ui/core/styles";
 import Edit from "@material-ui/icons/Edit";
+import Typography from "@material-ui/core/Typography";
 import React, { useContext, useEffect, useState } from "react";
 import Markdown from "react-markdown";
 import "react-mde/lib/styles/css/react-mde-all.css";
+import { getPrettyDateString } from "src/utils";
 
 import { GitContext } from "../GitContext";
 import { getFabStyle } from "../style";
@@ -26,6 +28,11 @@ const useStyles = makeStyles((theme) => ({
     "& > *": {
       margin: theme.spacing(1),
     }
+  },
+  date: {
+    paddingLeft: "20px",
+    textAlign: "justify",
+    fontVariant: "discretionary-ligatures",
   },
   text: {
     padding: "20px",
@@ -64,6 +71,9 @@ export const PostPage = ({
     }
   },[slug]);
 
+  const lastEdit = indexEntry?.lastEdit ? getPrettyDateString(indexEntry.lastEdit) : null;
+  const publishedOn = indexEntry?.publishedOn ? getPrettyDateString(indexEntry.publishedOn) : null;
+
   return (
   <>
     <BrowseHistory
@@ -77,6 +87,18 @@ export const PostPage = ({
     <Paper variant="outlined" className={classes.root}>
       { indexEntry?.img
         ? <CardMedia image={indexEntry.img} className={classes.media} />
+        : null
+      }
+      { publishedOn
+        ? <Typography variant="caption" display="block" className={classes.date}>
+            Published On: {publishedOn}
+          </Typography>
+        : null
+      }
+      { lastEdit
+        ? <Typography variant="caption" display="block" className={classes.date}>
+            Last Edited: {lastEdit}
+          </Typography>
         : null
       }
       <Markdown
