@@ -111,7 +111,7 @@ export const PostPage = ({
           </Typography>
         : null
       }
-      { lastEdit
+      { !isHistorical && lastEdit
         ? <Typography variant="caption" display="block" className={classes.date}>
             Last Edited: {lastEdit}
           </Typography>
