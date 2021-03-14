@@ -265,8 +265,8 @@ export const EditPost = ({
               error={!!validation.errs[name]}
               fullWidth={["title", "tldr"].includes(name)}
               helperText={validation.errs[name]}
-              id={`edit_${name}`}
-              key={`edit_${name}`}
+              id={`edit-${name}`}
+              key={`edit-${name}`}
               label={name}
               name={name}
               onChange={event => syncEditData({ ...editData, [event.target.name]: event.target.value })}
@@ -276,9 +276,11 @@ export const EditPost = ({
           )
         })}
         <Input
-          id="edit_img"
-          value={editData?.img || ""}
+          autoComplete={"off"}
           endAdornment={ <ImageUploader setImageHash={img => syncEditData({ ...editData, img })} /> }
+          id="edit-img"
+          onChange={event => syncEditData({ ...editData, img: event.target.value })}
+          value={editData?.img || ""}
         />
       </div>
       <ReactMde
