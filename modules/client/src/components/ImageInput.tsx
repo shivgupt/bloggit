@@ -68,7 +68,7 @@ export const ImageInput = ({
   const [zoom, setZoom] = useState<number>(1);
   const classes = useStyles();
 
-  const aspect = 5/3;
+  const aspect = 2/1;
 
   const handleImageUpload = (event) => {
     const reader = new FileReader();
