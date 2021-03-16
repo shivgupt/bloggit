@@ -21,8 +21,19 @@ const useStyles = makeStyles(theme => ({
   cropContainer: {
     paddingBottom: theme.spacing(2),
   },
+  previewTitle: {
+    margin: theme.spacing(2),
+  },
+  previewImage: {
+    width: "700px",
+    maxWidth: "100%",
+  },
   previewContainer: {
     marginTop: theme.spacing(8),
+    justifyContent: "center",
+    marginLeft: "auto",
+    marginRight: "auto",
+    maxWidth: "100%",
   },
   formControl: {
     margin: theme.spacing(1)
@@ -39,6 +50,8 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
+type CropArea = { x: number; y: number; width: number; height: number; };
+
 export const ImageInput = ({
   imageUrl,
   setImageUrl,
@@ -50,9 +63,9 @@ export const ImageInput = ({
 
   const [mode, setMode] = useState<"none" | "crop" | "uploading">("none");
   const [imageDataUrl, setImageDataUrl] = useState<string>("");
-  const [croppedImage, setCroppedImage] = useState<any>();
+  const [previewImage, setPreviewImage] = useState<string>("");
   const [crop, setCrop] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
-  const [cropArea, setCropArea] = useState<{ x: number; y: number; width: number; height: number }>({ x: 0, y: 0, width: 0, height: 0 });
+  const [cropArea, setCropArea] = useState<CropArea>({ x: 0, y: 0, width: 0, height: 0 });
   const [zoom, setZoom] = useState<number>(1);
 
   // Bubble all changes up via provided callback (and ignore updates to provided callback fn)
@@ -63,33 +76,25 @@ export const ImageInput = ({
     const reader = new FileReader();
     reader.readAsDataURL(event.target.files[0]);
     reader.onload = () => {
-      console.log("Image reader done loading:", reader.result);
       setImageDataUrl(reader.result as string);
       setMode("crop");
     }
   };
 
-  const onCropComplete = async (croppedArea, croppedAreaPixels) => {
-    console.log("New cropped area:", croppedArea, croppedAreaPixels)
-    setCropArea(croppedAreaPixels);
-  };
-
-  const uploadImage = async () => {
-    if (!croppedImage) return;
-    console.log(`Uploading image..`);
+  const uploadImage = async (data) => {
     setMode("uploading");
     let res = await axios({
       method: "POST",
       url: "ipfs",
-      data: croppedImage,
+      data,
       headers: { "content-type": "multipart/form-data"}
     });
     if (res.status === 200) {
       setImageUrl(res.data);
     } else {
-      console.log(res);
+      console.error(res);
     }
-    await new Promise(res => setTimeout(res, 20000)); // pause to help debug the image preview
+    await new Promise(res => setTimeout(res, 1000)); // pause to show off image preview
     setMode("none");
   };
 
@@ -104,22 +109,17 @@ export const ImageInput = ({
     })
 
   const skipCrop = async () => {
-    console.log(`Skipping Crop..`);
     const image = await createImage(imageDataUrl)
     const canvas = document.createElement('canvas')
     const ctx = canvas.getContext('2d')!;
     canvas.width = image.width
     canvas.height = image.height
     ctx.drawImage(image, 0, 0);
-    canvas.toBlob((blob) => {
-      console.log(`Got cropped image blob`);
-      setCroppedImage(blob);
-      uploadImage();
-    }, 'image/png');
+    setPreviewImage(canvas.toDataURL());
+    canvas.toBlob(uploadImage);
   };
 
   const performCrop = async () => {
-    console.log(`Performing Crop..`);
     const image = await createImage(imageDataUrl)
     const canvas = document.createElement('canvas')
     const ctx = canvas.getContext('2d')!;
@@ -136,11 +136,8 @@ export const ImageInput = ({
         canvas.width,
         canvas.height
     );
-    canvas.toBlob((blob) => {
-      console.log(`Got cropped image blob`);
-      setCroppedImage(blob);
-      uploadImage();
-    }, 'image/png')
+    setPreviewImage(canvas.toDataURL());
+    canvas.toBlob(uploadImage);
   };
 
   return (
@@ -197,13 +194,20 @@ export const ImageInput = ({
                 zoom={zoom}
                 aspect={4/3}
                 onCropChange={setCrop}
-                onCropComplete={onCropComplete}
+                onCropComplete={(area, pixels) => setCropArea(pixels)}
                 onZoomChange={setZoom}
               />
             </div>
           : <div className={classes.previewContainer}>
-              <Typography>Uploading image to IPFS..</Typography>
-              <img src={imageDataUrl} alt="preview"/>
+              <Typography align="center" display="block" variant="h6" className={classes.previewTitle}>
+                Uploading image to IPFS..
+              </Typography>
+              <img
+                alt="preview"
+                className={classes.previewImage}
+                crossOrigin="anonymous"
+                src={previewImage}
+              />
             </div>
         }
       </Dialog>
