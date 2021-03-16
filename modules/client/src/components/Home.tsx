@@ -24,6 +24,12 @@ const useStyles = makeStyles((theme) => ({
     alignContent: "center",
     alignItems: "center",
   },
+  carousel: {
+    margin: theme.spacing(1, 1),
+    width: "100%",
+    maxWidth: "420px",
+  },
+
   card: {
     width: "100%",
     maxWidth: "420px",
@@ -34,13 +40,13 @@ const useStyles = makeStyles((theme) => ({
   },
   contentActionArea: {
     width: "100%",
-    height: "420px",
+    height: "210px",
   },
   cardContent: {
     backgroundColor: theme.palette.type === "light"
       ? "rgba(256, 256, 256, 0.90)"
       : "rgba(66,  66,  66,  0.90)",
-    opacity: "0.999",
+    opacity: "0.99",
     height: "420px",
   },
   cardImageWrapper: {
@@ -51,12 +57,7 @@ const useStyles = makeStyles((theme) => ({
     height: "auto",
     maxWidth: "100%",
   },
-  carousel: {
-    margin: theme.spacing(1, 1),
-    width: "100%",
-    maxWidth: "420px",
-  },
-  section: {
+  header: {
     margin: theme.spacing(1, 1),
     alignContent: "center",
     alignItems: "center",
@@ -112,7 +113,7 @@ export const PostCard = ({
             : null
           }
         <CardActionArea disableRipple className={classes.contentActionArea} component={Link} to={`/${slug}`}>
-          <Typography variant="caption" component="p" gutterBottom className={classes.section}>
+          <Typography variant="caption" component="p" gutterBottom className={classes.header}>
             {tldr.substr(0,cutoff)} {tldr.length > cutoff ? "..." : null}
           </Typography>
         </CardActionArea>
@@ -169,11 +170,11 @@ export const Home = ({
             )}
             </Carousel>
             <Divider variant="middle" />
-            <Typography variant="h4" className={classes.section}>
+            <Typography variant="h4" className={classes.header}>
               Archives
             </Typography>
           </>
-        : <Typography variant="h4" className={classes.section}>
+        : <Typography variant="h4" className={classes.header}>
             All <em>{filterBy}</em> posts
           </Typography>
       }
