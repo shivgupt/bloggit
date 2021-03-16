@@ -29,7 +29,7 @@ import { Toc } from "./ToC";
 
 const useStyles = makeStyles(theme => ({
   appBar: {
-    [theme.breakpoints.up("md")]: {
+    [theme.breakpoints.up("lg")]: {
       width: "80%",
       marginRight: "20%",
     },
@@ -37,7 +37,7 @@ const useStyles = makeStyles(theme => ({
     justifyContent: "stretch",
   },
   drawer: {
-    [theme.breakpoints.up("md")]: {
+    [theme.breakpoints.up("lg")]: {
       width: "20%",
       flexShrink: 0,
     },
@@ -99,7 +99,7 @@ const DrawerContent = ({
 
   return (
     <>
-      <Hidden mdUp>
+      <Hidden lgUp>
         <IconButton
           id="close-drawer"
           className={classes.closeDrawer}
@@ -233,7 +233,7 @@ export const NavBar = ({
             : null
             }
           </Breadcrumbs>
-          <Hidden mdUp>
+          <Hidden lgUp>
             <IconButton
               id="open-drawer"
               edge="start"
@@ -247,7 +247,7 @@ export const NavBar = ({
         </Toolbar>
       </AppBar>
       <nav className={classes.drawer}>
-        <Hidden mdUp>
+        <Hidden lgUp>
           <Drawer
             anchor="right"
             open={drawer}
@@ -263,7 +263,7 @@ export const NavBar = ({
             />
           </Drawer>
         </Hidden>
-        <Hidden smDown>
+        <Hidden mdDown>
           <Drawer
             anchor="right"
             classes={{ paper: classes.permanentDrawer }}

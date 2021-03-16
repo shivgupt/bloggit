@@ -22,7 +22,7 @@ import {
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    maxWidth: "700px",
+    maxWidth: "864px",
     width: "100%",
   },
   paper: {

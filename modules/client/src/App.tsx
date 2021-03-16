@@ -31,7 +31,7 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
     display: "flex",
   },
   container: {
-    [theme.breakpoints.up("md")]: {
+    [theme.breakpoints.up("lg")]: {
       width: "80%",
       marginRight: "20%",
     },

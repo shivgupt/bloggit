@@ -1,6 +1,7 @@
 import { PostData } from "@blog/types";
 import Card from "@material-ui/core/Card";
 import Fab from "@material-ui/core/Fab";
+import Hidden from "@material-ui/core/Hidden";
 import CardActionArea from "@material-ui/core/CardActionArea";
 import CardContent from "@material-ui/core/CardContent";
 import Chip from "@material-ui/core/Chip";
@@ -25,6 +26,7 @@ const useStyles = makeStyles((theme) => ({
   },
   card: {
     width: "100%",
+    maxWidth: "420px",
     height: "420px",
   },
   actionArea: {
@@ -35,7 +37,9 @@ const useStyles = makeStyles((theme) => ({
     height: "420px",
   },
   cardContent: {
-    background: "rgba(66,  66,  66,  0.80)",
+    backgroundColor: theme.palette.type === "light"
+      ? "rgba(256, 256, 256, 0.90)"
+      : "rgba(66,  66,  66,  0.90)",
     opacity: "0.999",
     height: "420px",
   },
@@ -63,7 +67,11 @@ const useStyles = makeStyles((theme) => ({
   fab: getFabStyle(theme),
 }));
 
-export const PostCard = ({ post }: { post: PostData }) => {
+export const PostCard = ({
+  post,
+}: {
+  post: PostData,
+}) => {
   const classes = useStyles();
 
   const slug = post.slug;
@@ -141,7 +149,7 @@ export const Home = ({
     <>
       {!filterBy
         ? <>
-            <Carousel className={classes.section}
+            <Carousel className={classes.carousel}
               fullHeightHover={false}
               navButtonsWrapperProps={{
                 className: "string",
@@ -169,20 +177,42 @@ export const Home = ({
             All <em>{filterBy}</em> posts
           </Typography>
       }
-      <Grid container spacing={3} justify={"space-around"} alignItems={"center"}>
-        {sortedPosts.map((post: PostData) => {
-          if (!post.category) return null;
-          if (post.draft) return null;
-          if (!filterBy && post.featured) return null;
-          if (filterBy && post.category !== filterBy) {
-            return null;
-          }
-          return (
-            <Grid className={classes.root} item xs={12} md={6} lg={4} key={post.slug}>
-              <PostCard post={post} />
-            </Grid>
-          );
-        })}
+      <Grid
+        container
+        spacing={3}
+      >
+        {sortedPosts.filter((post: PostData) => {
+          if (!post.category || post.draft) return false;
+          if (!filterBy && post.featured) return false;
+          if (filterBy && post.category !== filterBy) return false;
+          return true;
+        }).map((post: PostData, idx: number) => (
+          <>
+            <Hidden mdUp>
+              <Grid
+                item
+                className={classes.root}
+                justify={"center"}
+                key={post.slug}
+                sm={12}
+                xs={12}
+              >
+                <PostCard post={post} />
+              </Grid>
+            </Hidden>
+            <Hidden smDown>
+              <Grid
+                item
+                className={classes.root}
+                justify={idx % 2 === 0 ? "flex-end" : "flex-start"}
+                key={post.slug}
+                md={6}
+              >
+                <PostCard post={post} />
+              </Grid>
+            </Hidden>
+          </>
+        ))}
       </Grid>
       {adminMode === "enabled"
         ? <Fab
