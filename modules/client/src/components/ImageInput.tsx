@@ -10,7 +10,7 @@ import Close from "@material-ui/icons/Close";
 import Crop from "@material-ui/icons/Crop";
 import PhotoLibrary from "@material-ui/icons/PhotoLibrary";
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Cropper from "react-easy-crop";
 
 const useStyles = makeStyles(theme => ({
@@ -25,8 +25,8 @@ const useStyles = makeStyles(theme => ({
     margin: theme.spacing(2),
   },
   previewImage: {
-    width: "700px",
-    maxWidth: "100%",
+    maxWidth: "700px",
+    width: "100%",
   },
   previewContainer: {
     marginTop: theme.spacing(8),
@@ -50,7 +50,8 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-type CropArea = { x: number; y: number; width: number; height: number; };
+type CropVal = { x: number; y: number; };
+type CropArea = CropVal & { width: number; height: number; };
 
 export const ImageInput = ({
   imageUrl,
@@ -59,18 +60,15 @@ export const ImageInput = ({
   imageUrl: string,
   setImageUrl: (val: string) => void;
 }) => {
-  const classes = useStyles();
-
   const [mode, setMode] = useState<"none" | "crop" | "uploading">("none");
   const [imageDataUrl, setImageDataUrl] = useState<string>("");
   const [previewImage, setPreviewImage] = useState<string>("");
-  const [crop, setCrop] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const [crop, setCrop] = useState<CropVal>({ x: 0, y: 0 });
   const [cropArea, setCropArea] = useState<CropArea>({ x: 0, y: 0, width: 0, height: 0 });
   const [zoom, setZoom] = useState<number>(1);
+  const classes = useStyles();
 
-  // Bubble all changes up via provided callback (and ignore updates to provided callback fn)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => setImageUrl(imageUrl), [imageUrl]);
+  const aspect = 5/3;
 
   const handleImageUpload = (event) => {
     const reader = new FileReader();
@@ -99,7 +97,7 @@ export const ImageInput = ({
   };
 
   // create the image with a src of the base64 string
-  const createImage = (url): Promise<any> =>
+  const createImage = (url): Promise<HTMLImageElement> =>
     new Promise((resolve, reject) => {
       const image = new Image()
       image.addEventListener('load', () => resolve(image))
@@ -192,7 +190,7 @@ export const ImageInput = ({
                 image={imageDataUrl}
                 crop={crop}
                 zoom={zoom}
-                aspect={4/3}
+                aspect={aspect}
                 onCropChange={setCrop}
                 onCropComplete={(area, pixels) => setCropArea(pixels)}
                 onZoomChange={setZoom}
