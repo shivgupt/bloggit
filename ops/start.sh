@@ -83,10 +83,6 @@ ipfs_internal_port=5001
 ipfs_image="ipfs/go-ipfs:v0.8.0"
 bash "$root/ops/pull-images.sh" "$ipfs_image"
 
-if [[ -f "$root/.ipfs/config" ]]
-then ipfs_config="- '$root/.ipfs/config:/root/.ipfs/config"
-fi
-
 ########################################
 # Server config
 
@@ -222,7 +218,6 @@ services:
       - '4001:4001'
     volumes:
       - 'ipfs:/data/ipfs'
-      $ipfs_config
 
 EOF
 
