@@ -3,17 +3,17 @@
   "name": "A place for my thoughts & research notes",
   "icons": [
     {
-      "src": "favicon.ico",
-      "sizes": "64x64 32x32 24x24 16x16",
+      "src": "truth.ico",
+      "sizes": "16x16 24x24 32x32 48x48 64x64",
       "type": "image/x-icon"
     },
     {
-      "src": "logo192.png",
+      "src": "truth192.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "logo512.png",
+      "src": "truth512.png",
       "type": "image/png",
       "sizes": "512x512"
     }
