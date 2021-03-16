@@ -3,7 +3,6 @@ import Card from "@material-ui/core/Card";
 import Fab from "@material-ui/core/Fab";
 import CardActionArea from "@material-ui/core/CardActionArea";
 import CardContent from "@material-ui/core/CardContent";
-import CardMedia from "@material-ui/core/CardMedia";
 import Chip from "@material-ui/core/Chip";
 import Divider from "@material-ui/core/Divider";
 import Grid from "@material-ui/core/Grid";
@@ -35,20 +34,26 @@ const useStyles = makeStyles((theme) => ({
     width: "100%",
     height: "420px",
   },
-  wrapper: {
-    width: "100%",
-    height: "150px",
-    overflow: "hidden",
+  cardContent: {
+    background: "rgba(66,  66,  66,  0.80)",
+    opacity: "0.999",
+    height: "420px",
   },
-  media: {
+  cardImageWrapper: {
+    width: "100%",
+    height: "210px",
+  },
+  cardImage: {
     height: "auto",
     maxWidth: "100%",
-    marginTop: "-40%",
+  },
+  carousel: {
+    margin: theme.spacing(1, 1),
+    width: "100%",
+    maxWidth: "420px",
   },
   section: {
     margin: theme.spacing(1, 1),
-    minWidth: "250px",
-    maxWidth: "600px",
     alignContent: "center",
     alignItems: "center",
   },
@@ -71,15 +76,16 @@ export const PostCard = ({ post }: { post: PostData }) => {
     <Card className={classes.card}>
       <CardActionArea disableRipple className={classes.actionArea} component={Link} to={`/${slug}`}>
         {post.img
-          ? <div className={classes.wrapper}><CardMedia
-              className={classes.media}
-              component="img"
-              image={post.img}
-              title={slug}
-            /></div>
+          ? <div className={classes.cardImageWrapper}>
+              <img
+                className={classes.cardImage}
+                src={post.img}
+                alt={slug}
+              />
+            </div>
           : null}
       </CardActionArea>
-      <CardContent>
+      <CardContent className={classes.cardContent}>
         <CardActionArea disableRipple className={classes.actionArea} component={Link} to={`/${slug}`}>
           <Typography variant="h5" gutterBottom display="block">{title}</Typography>
         </CardActionArea>
