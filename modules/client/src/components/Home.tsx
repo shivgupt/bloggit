@@ -1,9 +1,9 @@
 import { PostData } from "@blog/types";
 import Card from "@material-ui/core/Card";
 import Fab from "@material-ui/core/Fab";
+import Hidden from "@material-ui/core/Hidden";
 import CardActionArea from "@material-ui/core/CardActionArea";
 import CardContent from "@material-ui/core/CardContent";
-import CardMedia from "@material-ui/core/CardMedia";
 import Chip from "@material-ui/core/Chip";
 import Divider from "@material-ui/core/Divider";
 import Grid from "@material-ui/core/Grid";
@@ -24,8 +24,15 @@ const useStyles = makeStyles((theme) => ({
     alignContent: "center",
     alignItems: "center",
   },
+  carousel: {
+    margin: theme.spacing(1, 1),
+    width: "100%",
+    maxWidth: "420px",
+  },
+
   card: {
     width: "100%",
+    maxWidth: "420px",
     height: "420px",
   },
   actionArea: {
@@ -33,22 +40,25 @@ const useStyles = makeStyles((theme) => ({
   },
   contentActionArea: {
     width: "100%",
+    height: "210px",
+  },
+  cardContent: {
+    backgroundColor: theme.palette.type === "light"
+      ? "rgba(256, 256, 256, 0.90)"
+      : "rgba(66,  66,  66,  0.90)",
+    opacity: "0.99",
     height: "420px",
   },
-  wrapper: {
+  cardImageWrapper: {
     width: "100%",
-    height: "150px",
-    overflow: "hidden",
+    height: "210px",
   },
-  media: {
+  cardImage: {
     height: "auto",
     maxWidth: "100%",
-    marginTop: "-40%",
   },
-  section: {
+  header: {
     margin: theme.spacing(1, 1),
-    minWidth: "250px",
-    maxWidth: "600px",
     alignContent: "center",
     alignItems: "center",
   },
@@ -58,7 +68,11 @@ const useStyles = makeStyles((theme) => ({
   fab: getFabStyle(theme),
 }));
 
-export const PostCard = ({ post }: { post: PostData }) => {
+export const PostCard = ({
+  post,
+}: {
+  post: PostData,
+}) => {
   const classes = useStyles();
 
   const slug = post.slug;
@@ -71,15 +85,16 @@ export const PostCard = ({ post }: { post: PostData }) => {
     <Card className={classes.card}>
       <CardActionArea disableRipple className={classes.actionArea} component={Link} to={`/${slug}`}>
         {post.img
-          ? <div className={classes.wrapper}><CardMedia
-              className={classes.media}
-              component="img"
-              image={post.img}
-              title={slug}
-            /></div>
+          ? <div className={classes.cardImageWrapper}>
+              <img
+                className={classes.cardImage}
+                src={post.img}
+                alt={slug}
+              />
+            </div>
           : null}
       </CardActionArea>
-      <CardContent>
+      <CardContent className={classes.cardContent}>
         <CardActionArea disableRipple className={classes.actionArea} component={Link} to={`/${slug}`}>
           <Typography variant="h5" gutterBottom display="block">{title}</Typography>
         </CardActionArea>
@@ -98,7 +113,7 @@ export const PostCard = ({ post }: { post: PostData }) => {
             : null
           }
         <CardActionArea disableRipple className={classes.contentActionArea} component={Link} to={`/${slug}`}>
-          <Typography variant="caption" component="p" gutterBottom className={classes.section}>
+          <Typography variant="caption" component="p" gutterBottom className={classes.header}>
             {tldr.substr(0,cutoff)} {tldr.length > cutoff ? "..." : null}
           </Typography>
         </CardActionArea>
@@ -135,7 +150,7 @@ export const Home = ({
     <>
       {!filterBy
         ? <>
-            <Carousel className={classes.section}
+            <Carousel className={classes.carousel}
               fullHeightHover={false}
               navButtonsWrapperProps={{
                 className: "string",
@@ -155,28 +170,50 @@ export const Home = ({
             )}
             </Carousel>
             <Divider variant="middle" />
-            <Typography variant="h4" className={classes.section}>
+            <Typography variant="h4" className={classes.header}>
               Archives
             </Typography>
           </>
-        : <Typography variant="h4" className={classes.section}>
+        : <Typography variant="h4" className={classes.header}>
             All <em>{filterBy}</em> posts
           </Typography>
       }
-      <Grid container spacing={3} justify={"space-around"} alignItems={"center"}>
-        {sortedPosts.map((post: PostData) => {
-          if (!post.category) return null;
-          if (post.draft) return null;
-          if (!filterBy && post.featured) return null;
-          if (filterBy && post.category !== filterBy) {
-            return null;
-          }
-          return (
-            <Grid className={classes.root} item xs={12} md={6} lg={4} key={post.slug}>
-              <PostCard post={post} />
-            </Grid>
-          );
-        })}
+      <Grid
+        container
+        spacing={3}
+      >
+        {sortedPosts.filter((post: PostData) => {
+          if (!post.category || post.draft) return false;
+          if (!filterBy && post.featured) return false;
+          if (filterBy && post.category !== filterBy) return false;
+          return true;
+        }).map((post: PostData, idx: number) => (
+          <>
+            <Hidden mdUp>
+              <Grid
+                item
+                className={classes.root}
+                justify={"center"}
+                key={post.slug}
+                sm={12}
+                xs={12}
+              >
+                <PostCard post={post} />
+              </Grid>
+            </Hidden>
+            <Hidden smDown>
+              <Grid
+                item
+                className={classes.root}
+                justify={idx % 2 === 0 ? "flex-end" : "flex-start"}
+                key={post.slug}
+                md={6}
+              >
+                <PostCard post={post} />
+              </Grid>
+            </Hidden>
+          </>
+        ))}
       </Grid>
       {adminMode === "enabled"
         ? <Fab

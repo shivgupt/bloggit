@@ -6,10 +6,10 @@ import { env } from "./env";
 export const getFabStyle = (theme: Theme): any => ({
   position: "fixed",
   bottom: theme.spacing(2),
-  [theme.breakpoints.up("md")]: {
+  [theme.breakpoints.up("lg")]: {
     right: "23%",
   },
-  [theme.breakpoints.down("sm")]: {
+  [theme.breakpoints.down("md")]: {
     right: theme.spacing(2),
   },
 });

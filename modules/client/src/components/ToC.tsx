@@ -1,3 +1,4 @@
+import { PostData } from "@blog/types";
 import Box from "@material-ui/core/Box";
 import Button from "@material-ui/core/Button";
 import Divider from "@material-ui/core/Divider";
@@ -78,6 +79,9 @@ export const Toc = ({
 
   const { currentContent, slug, index } = gitContext.gitState
 
+  const byTitle = (pA: PostData, pB: PostData): number =>
+    (pA?.title || "").toLowerCase() > (pB?.title || "").toLowerCase() ? 1 : -1;
+
   useEffect(() => {
     // Update sidebar node
     if (slug !== "" && index?.posts?.[slug || ""]){
@@ -99,7 +103,7 @@ export const Toc = ({
           </Typography>
         </Box>
         <List component="nav" className={classes.list}>
-          {Object.keys(posts).map((c) => {
+          {Object.keys(posts).sort().map((c) => {
             if (c !== "top-level") {
               return (
                 <div key={c}>
@@ -126,7 +130,7 @@ export const Toc = ({
           })}
         </List>
         {posts["top-level"]
-          ? posts["top-level"].map((p) => {
+          ? posts["top-level"].sort(byTitle).map((p) => {
             return (
               <Box key={p.slug} textAlign="center" m={1}>
                 <Button
@@ -159,7 +163,7 @@ export const Toc = ({
         </Box>
         <Divider />
         <List component="nav" className={classes.list}>
-          {posts[node.value].map((p) => {
+          {posts[node.value].sort(byTitle).map((p) => {
             return (
               <div key={p.slug}>
                 <ListItem button key={p.title} component={Link} to={`/${p.slug}`} onClick={() =>
@@ -176,7 +180,7 @@ export const Toc = ({
           })}
         </List>
         {posts["top-level"]
-          ? posts["top-level"].map((p) => {
+          ? posts["top-level"].sort(byTitle).map((p) => {
             return (
               <Box key={p.slug} textAlign="center" m={1}>
                 <Button
