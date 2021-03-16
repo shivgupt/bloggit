@@ -103,7 +103,7 @@ const DrawerContent = ({
         <IconButton
           id="close-drawer"
           className={classes.closeDrawer}
-          onClick={() => toggleDrawer()}
+          onClick={toggleDrawer}
           size="small"
         ><Close/></IconButton>
       </Hidden>
@@ -132,7 +132,7 @@ const DrawerContent = ({
               edge="start"
               to={"/admin"}
               color="inherit"
-              onClick={() => toggleDrawer()}
+              onClick={toggleDrawer}
             >
               <AdminAccount />
             </IconButton>
@@ -164,6 +164,11 @@ export const NavBar = ({
 
   const toggleDrawer = () => setDrawer(!drawer);
 
+  const reset = () => {
+    setEditMode(false);
+    window.scrollTo(0, 0);
+  };
+
   const { index, slug } = gitContext.gitState;
   const siteTitle = index?.title || "My Blog";
   const pageTitle = index?.posts?.[slug || ""]?.title || "";
@@ -180,7 +185,7 @@ export const NavBar = ({
               className={classes.link}
               component={RouterLink}
               color="inherit"
-              onClick={() => setEditMode(false)}
+              onClick={reset}
               to="/"
             >
               <HomeIcon className={classes.icon} />
@@ -190,7 +195,7 @@ export const NavBar = ({
                 className={classes.link}
                 color="inherit"
                 component={RouterLink}
-                onClick={() => setEditMode(false)}
+                onClick={reset}
                 to={`/category/${category}`}
               >
                 <CategoryIcon className={classes.icon} />
@@ -210,7 +215,7 @@ export const NavBar = ({
                     className={classes.link}
                     color="inherit"
                     component={RouterLink}
-                    onClick={() => setEditMode(false)}
+                    onClick={reset}
                     to={`/category/${post?.category}`}
                   >
                     <CategoryIcon className={classes.icon} />
