@@ -8,6 +8,7 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from "@material-ui/core/styles";
 import Close from "@material-ui/icons/Close";
 import Crop from "@material-ui/icons/Crop";
+import CropFree from '@material-ui/icons/CropFree';
 import PhotoLibrary from "@material-ui/icons/PhotoLibrary";
 import axios from "axios";
 import React, { useState } from "react";
@@ -71,16 +72,22 @@ export const ImageInput = ({
   const aspect = 2/1;
 
   const handleImageUpload = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
     const reader = new FileReader();
-    reader.readAsDataURL(event.target.files[0]);
+    reader.readAsDataURL(file);
     reader.onload = () => {
       setImageDataUrl(reader.result as string);
       setMode("crop");
     }
   };
 
+  const reset = () => {
+    setMode("none")
+    setPreviewImage("");
+  }
+
   const uploadImage = async (data) => {
-    setMode("uploading");
     let res = await axios({
       method: "POST",
       url: "ipfs",
@@ -93,7 +100,7 @@ export const ImageInput = ({
       console.error(res);
     }
     await new Promise(res => setTimeout(res, 1000)); // pause to show off image preview
-    setMode("none");
+    reset();
   };
 
   // create the image with a src of the base64 string
@@ -107,6 +114,7 @@ export const ImageInput = ({
     })
 
   const skipCrop = async () => {
+    setMode("uploading");
     const image = await createImage(imageDataUrl)
     const canvas = document.createElement('canvas')
     const ctx = canvas.getContext('2d')!;
@@ -118,6 +126,7 @@ export const ImageInput = ({
   };
 
   const performCrop = async () => {
+    setMode("uploading");
     const image = await createImage(imageDataUrl)
     const canvas = document.createElement('canvas')
     const ctx = canvas.getContext('2d')!;
@@ -179,9 +188,16 @@ export const ImageInput = ({
               className={classes.cropButton}
               disabled={mode !== "crop"}
               onClick={skipCrop}
-              startIcon={<Close/>}
+              startIcon={<CropFree/>}
               variant="outlined"
             >Skip</Button>
+            <Button
+              className={classes.cropButton}
+              disabled={mode !== "crop"}
+              onClick={reset}
+              startIcon={<Close/>}
+              variant="outlined"
+            >Cancel</Button>
           </Toolbar>
         </AppBar>
         {mode === "crop"
@@ -196,17 +212,28 @@ export const ImageInput = ({
                 onZoomChange={setZoom}
               />
             </div>
-          : <div className={classes.previewContainer}>
-              <Typography align="center" display="block" variant="h6" className={classes.previewTitle}>
-                Uploading image to IPFS..
+          : mode === "uploading"
+            ? <div className={classes.previewContainer}>
+                {previewImage
+                  ? <>
+                      <Typography align="center" display="block" variant="h6" className={classes.previewTitle}>
+                        Uploading image to IPFS..
+                      </Typography>
+                      <img
+                        alt="preview"
+                        className={classes.previewImage}
+                        crossOrigin="anonymous"
+                        src={previewImage}
+                      />
+                    </>
+                  : <Typography align="center" display="block" variant="h6" className={classes.previewTitle}>
+                      Generating image...
+                    </Typography>
+                }
+              </div>
+            : <Typography align="center" display="block" variant="h6" className={classes.previewTitle}>
+                Cancelling...
               </Typography>
-              <img
-                alt="preview"
-                className={classes.previewImage}
-                crossOrigin="anonymous"
-                src={previewImage}
-              />
-            </div>
         }
       </Dialog>
     </>
