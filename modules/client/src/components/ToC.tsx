@@ -15,7 +15,7 @@ import { Link } from "react-router-dom";
 
 import { GitContext } from "../GitContext";
 import { PostsByCategory, SidebarNode } from "../types";
-import { getChildValue, replaceEmojiString, emptySidebarNode } from "../utils";
+import { getChildValue, replaceEmojiString, emptySidebarNode, slugify } from "../utils";
 
 import { HashLink } from "./HashLink";
 
@@ -49,7 +49,7 @@ const TocGenerator = ({
     console.warn("This heading has no child values..?");
     return null;
   }
-  const headingSlug = value.toLowerCase().replace(/[^a-z0-9 ]/g, "").replace(/\W+/g, "-");
+  const headingSlug = slugify(replaceEmojiString(value))
   const heading = replaceEmojiString(value);
   const marginStyle = classes[`list${level || 1}`];
 
