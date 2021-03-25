@@ -92,7 +92,7 @@ export const ImageInput = ({
       method: "POST",
       url: "ipfs",
       data,
-      headers: { "content-type": "multipart/form-data"}
+      headers: { "content-type": "application/octet-stream"}
     });
     if (res.status === 200) {
       setImageUrl(res.data);
@@ -103,6 +103,7 @@ export const ImageInput = ({
     reset();
   };
 
+  // Inspired by https://dev.to/shaerins/cropping-and-resizing-images-in-react-360a
   // create the image with a src of the base64 string
   const createImage = (url): Promise<HTMLImageElement> =>
     new Promise((resolve, reject) => {
@@ -115,14 +116,8 @@ export const ImageInput = ({
 
   const skipCrop = async () => {
     setMode("uploading");
-    const image = await createImage(imageDataUrl)
-    const canvas = document.createElement('canvas')
-    const ctx = canvas.getContext('2d')!;
-    canvas.width = image.width
-    canvas.height = image.height
-    ctx.drawImage(image, 0, 0);
-    setPreviewImage(canvas.toDataURL());
-    canvas.toBlob(uploadImage);
+    setPreviewImage(imageDataUrl);
+    await uploadImage(await (await fetch(imageDataUrl)).arrayBuffer())
   };
 
   const performCrop = async () => {
