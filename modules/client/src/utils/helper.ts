@@ -25,10 +25,12 @@ export const getPath = (post: PostData | undefined): string | undefined => {
 
 export const slugify = (s: string) => s
   .toLocaleLowerCase()
-  .replace(/[^a-z0-9 -]/g, "")
-  .replace(/\W+/g, "-")
-  .replace(/^-+/g, "")
-  .replace(/-+$/g, "");
+  .replace(/[^a-z0-9_ -]/g, "")
+  .replace(/\W/g, "-")
+  .replace(/_/g, "-")
+  .replace(/-+/g, "-")
+  .replace(/^-/g, "")
+  .replace(/-$/g, "");
 
 export const replaceEmojiString = (s: string) =>
   s.replace(/:\w+:/gi, name => emoji.getUnicode(name) || name);
