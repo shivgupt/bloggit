@@ -29,7 +29,7 @@ export const read = async (path: string): Promise<IpfsRead> => {
 
   // If the given path resolves to a dir, return a list of the files it includes
   if (lsRes.length) {
-    log.info(`Got ls result of ${lsRes.length} files: ${lsRes}`);
+    log.info(`Got ls result of ${lsRes.length} files`);
     return { contentType: "application/json", content: lsRes };
   }
 
@@ -52,19 +52,29 @@ export const read = async (path: string): Promise<IpfsRead> => {
   if (contentType !== "unknown") {
     log.info(`Returning ${content.length} bytes of ${contentType} content`);
     return { contentType, content };
-  } else {
-    log.info(`${contentType} content type from ${content.slice(0, 16).toString("hex")}`);
   }
   const text = content.toString("utf8");
+  if (text.includes("\ufffd")) { // this codepoint replaces any invalid utf8 data
+    contentType = "application/octet-stream";
+    log.info(`Returning ${content.length} bytes of ${contentType} content`);
+    return { contentType, content };
+  }
   try {
     const json = JSON.parse(text);
     contentType = "application/json";
     log.info(`Returning ${text.length} chars of ${contentType} content`);
     return { contentType, content: json };
   } catch (e) {
-    // TODO: check to see if all chars are printable & return binary type if not
-    log.warn(e.message);
-    log.info(`Returning ${text.length} chars of text content`);
-    return { contentType: "text/plain", content: text };
+    if (text.startsWith("<?xml")) {
+      if (text.includes("<svg")) {
+        contentType = "image/svg+xml";
+      } else {
+        contentType = "application/xml";
+      }
+    } else {
+      contentType = "text/plain";
+    }
+    log.info(`Returning ${text.length} chars of ${contentType} content`);
+    return { contentType, content: text };
   }
 };
