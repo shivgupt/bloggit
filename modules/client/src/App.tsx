@@ -164,6 +164,7 @@ const App: React.FC = () => {
 
   // Fetch index & post content whenever the url changes
   useEffect(() => {
+    setEditMode(false);
     syncGitState(refParam || gitState.latestRef, slugParam);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refParam, slugParam]);
