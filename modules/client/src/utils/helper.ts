@@ -62,3 +62,14 @@ export const getPostsByCategories = (posts: Posts): PostsByCategory => {
     }, {})
   );
 };
+
+export const getExistingCategories = (posts: Posts): string[] => {
+  return (
+    Object.values(posts).reduce((categories, post) => {
+      if (post.category && !categories.includes(post.category.toLowerCase())) {
+        return [ ...categories, post.category.toLowerCase() ]
+      }
+      return [...categories];
+    }, [] as string[])
+  )
+}
