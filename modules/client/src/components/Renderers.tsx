@@ -1,6 +1,7 @@
 import IconButton from "@material-ui/core/IconButton";
 import Link from "@material-ui/core/Link";
-import { useTheme } from "@material-ui/core/styles";
+import Typography from "@material-ui/core/Typography";
+import { makeStyles, useTheme } from "@material-ui/core/styles";
 import LinkIcon from "@material-ui/icons/Link";
 import React from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
@@ -9,6 +10,14 @@ import { atomDark, vs } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { getChildValue, replaceEmojiString, slugify } from "../utils";
 
 import { HashLink } from "./HashLink";
+
+const useStyles = makeStyles((theme) => ({
+  blockquote: {
+    padding: `0 ${theme.spacing(2)}px`, 
+    borderLeft: `${theme.spacing(0.5)}px solid ${theme.palette.divider}`,
+    marginLeft: 0,
+  },
+}));
 
 export const CodeBlockRenderer = ({
   language,
@@ -112,3 +121,25 @@ export const HeadingRenderer = ({
     ]
   );
 };
+
+export const BlockQuoteRenderer = ({
+  children,
+  key,
+  node,
+}) => {
+  const classes = useStyles();
+
+  if (children.length > 1) {
+    console.warn("This blockquote has more than one child..?");
+  }
+  const value = getChildValue(children[0]);
+  if (!value) return null;
+
+  return (
+    <blockquote className={classes.blockquote}>
+      <Typography color="textSecondary" variant="body2">
+        {value}
+      </Typography>
+    </blockquote>
+  )
+}
