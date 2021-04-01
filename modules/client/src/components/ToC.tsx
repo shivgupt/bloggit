@@ -163,21 +163,26 @@ export const Toc = ({
         </Box>
         <Divider />
         <List component="nav" className={classes.list}>
-          {posts[node.value].sort(byTitle).map((p) => {
-            return (
-              <div key={p.slug}>
-                <ListItem button key={p.title} component={Link} to={`/${p.slug}`} onClick={() =>
-                  (slug === p.slug)
-                    ? setNode({ parent: "posts", current: "toc", value: p })
-                    : null
-                  }
-                >
-                  {p.title}
-                </ListItem>
-                <Divider />
+          {posts[node.value]
+            ? posts[node.value].sort(byTitle).map((p) => {
+              return (
+                <div key={p.slug}>
+                  <ListItem button key={p.title} component={Link} to={`/${p.slug}`} onClick={() =>
+                    (slug === p.slug)
+                      ? setNode({ parent: "posts", current: "toc", value: p })
+                      : null
+                    }
+                  >
+                    {p.title}
+                  </ListItem>
+                  <Divider />
+                </div>
+              );
+            })
+            : <div>
+                <ListItem button> No published posts in this category </ListItem>
               </div>
-            );
-          })}
+          }
         </List>
         {posts["top-level"]
           ? posts["top-level"].sort(byTitle).map((p) => {
@@ -202,7 +207,7 @@ export const Toc = ({
         <IconButton
           onClick={() => {
             if (node.value.category) {
-              setNode({ parent: "categories", current: "posts", value: node.value.category })
+              setNode({ parent: "categories", current: "posts", value: node.value.category.toLowerCase() })
             } else {
               setNode({ current: "categories" })
             }
