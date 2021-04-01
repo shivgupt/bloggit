@@ -3,6 +3,7 @@ import Box from "@material-ui/core/Box";
 import Button from "@material-ui/core/Button";
 import Divider from "@material-ui/core/Divider";
 import IconButton from "@material-ui/core/IconButton";
+import Link from "@material-ui/core/Link";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import Typography from "@material-ui/core/Typography";
@@ -11,7 +12,7 @@ import NavigateNextIcon from "@material-ui/icons/NavigateNext";
 import NavigateBackIcon from "@material-ui/icons/NavigateBefore";
 import React, { useContext, useEffect, useState } from "react";
 import Markdown from "react-markdown";
-import { Link } from "react-router-dom";
+import { Link as RouterLink } from "react-router-dom";
 
 import { GitContext } from "../GitContext";
 import { PostsByCategory, SidebarNode } from "../types";
@@ -136,7 +137,7 @@ export const Toc = ({
                 <Button
                   size="small"
                   disableFocusRipple={false}
-                  component={Link}
+                  component={RouterLink}
                   to={`/${p.slug}`}
                 > {p.title} </Button>
               </Box>
@@ -157,9 +158,9 @@ export const Toc = ({
           <NavigateBackIcon />
         </IconButton>
         <Box key={`post_category_${node.value}`} textAlign="center" m={1}>
-          <Typography>
+          <Link color="textPrimary" component={RouterLink} to={`/category/${node.value}`}>
             {node.value.toUpperCase()} POSTS
-          </Typography>
+          </Link>
         </Box>
         <Divider />
         <List component="nav" className={classes.list}>
@@ -167,7 +168,7 @@ export const Toc = ({
             ? posts[node.value].sort(byTitle).map((p) => {
               return (
                 <div key={p.slug}>
-                  <ListItem button key={p.title} component={Link} to={`/${p.slug}`} onClick={() =>
+                  <ListItem button key={p.title} component={RouterLink} to={`/${p.slug}`} onClick={() =>
                     (slug === p.slug)
                       ? setNode({ parent: "posts", current: "toc", value: p })
                       : null
@@ -191,7 +192,7 @@ export const Toc = ({
                 <Button
                   size="small"
                   disableFocusRipple={false}
-                  component={Link}
+                  component={RouterLink}
                   to={`/${p.slug}`}
                 > {p.title} </Button>
               </Box>
