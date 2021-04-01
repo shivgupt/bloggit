@@ -100,7 +100,7 @@ export const HeadingRenderer = ({
     [
       children, 
       <IconButton
-        color="inherit"
+        color="secondary"
         component={HashLink as any}
         edge="start"
         key={slug}
