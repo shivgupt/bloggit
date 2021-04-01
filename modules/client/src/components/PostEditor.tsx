@@ -85,7 +85,7 @@ const defaultValidation: EditPostValidation = {
   }
 };
 
-export const EditPost = ({
+export const PostEditor = ({
   setEditMode,
   setSnackAlert,
 }: {

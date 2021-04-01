@@ -8,7 +8,7 @@ import React, { useEffect, useState } from "react";
 import { Route, Switch, useRouteMatch } from "react-router-dom";
 
 import { AdminHome } from "./components/AdminHome";
-import { EditPost } from "./components/EditPost";
+import { PostEditor } from "./components/PostEditor";
 import { Home } from "./components/Home";
 import { NavBar } from "./components/NavBar";
 import { PostPage } from "./components/Posts";
@@ -194,7 +194,7 @@ const App: React.FC = () => {
               <Route exact
                 path="/"
                 render={() => (editMode
-                  ? <EditPost setEditMode={setEditMode} setSnackAlert={setSnackAlert} />
+                  ? <PostEditor setEditMode={setEditMode} setSnackAlert={setSnackAlert} />
                   : <Home adminMode={adminMode} setEditMode={setEditMode} />
                 )}
               />
@@ -222,7 +222,7 @@ const App: React.FC = () => {
               <Route
                 path="/:slug"
                 render={() => (editMode
-                  ? <EditPost setEditMode={setEditMode} setSnackAlert={setSnackAlert} />
+                  ? <PostEditor setEditMode={setEditMode} setSnackAlert={setSnackAlert} />
                   : <PostPage adminMode={adminMode} setEditMode={setEditMode} />
                 )}
               />
