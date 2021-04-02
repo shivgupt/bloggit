@@ -290,6 +290,9 @@ export const PostEditor = ({
               {...params}
               error={!!validation.errs.category}
               helperText={validation.errs["category"]}
+              onChange={(event) => {
+                syncEditData({ ...editData, category: event.target.value })
+              }}
               id={"edit-category"}
               label="category"
               name="category"
