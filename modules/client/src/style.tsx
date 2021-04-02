@@ -23,6 +23,15 @@ export const siteTitleFont = createMuiTheme({
 });
 
 export const darkTheme = createMuiTheme({
+  breakpoints: {
+    values: {
+      xs: 0,
+      sm: 600,
+      md: 960,
+      lg: 1200,
+      xl: 1920,
+    },
+  },
   palette: {
     primary: {
       main: env.dark.primary,
@@ -35,6 +44,15 @@ export const darkTheme = createMuiTheme({
 });
 
 export const lightTheme = createMuiTheme({
+  breakpoints: {
+    values: {
+      xs: 0,
+      sm: 600,
+      md: 960,
+      lg: 1200,
+      xl: 1920,
+    },
+  },
   palette: {
     primary: {
       main: env.light.primary,

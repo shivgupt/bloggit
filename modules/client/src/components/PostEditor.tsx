@@ -11,6 +11,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import Delete from "@material-ui/icons/Delete";
 import Save from "@material-ui/icons/Save";
 import ArrowDropUp from "@material-ui/icons/ArrowDropUp";
+import Autocomplete from '@material-ui/lab/Autocomplete';
 import SpeedDial from "@material-ui/lab/SpeedDial";
 import SpeedDialAction from "@material-ui/lab/SpeedDialAction";
 import axios from "axios";
@@ -22,7 +23,7 @@ import { useHistory } from "react-router-dom";
 import { GitContext } from "../GitContext";
 import { getFabStyle } from "../style";
 import { SnackAlert } from "../types";
-import { emptyEntry, fetchHistory, getPath, slugify } from "../utils";
+import { emptyEntry, fetchHistory, getExistingCategories, getPath, slugify } from "../utils";
 
 import {
   CodeBlockRenderer,
@@ -85,7 +86,7 @@ const defaultValidation: EditPostValidation = {
   }
 };
 
-export const EditPost = ({
+export const PostEditor = ({
   setEditMode,
   setSnackAlert,
 }: {
@@ -252,10 +253,11 @@ export const EditPost = ({
     }
   };
 
+  const categories = getExistingCategories(gitState.index.posts);
   return (<>
     <Paper variant="outlined" className={classes.paper}>
       <div className={classes.root}>
-        {["title", "category", "slug", "tldr"].map(name => {
+        {["title", "slug", "tldr"].map(name => {
           let value = editData?.[name] || "";
           if (name === "slug" && editData?.[name] === null) {
             value = editData.displaySlug;
@@ -276,6 +278,27 @@ export const EditPost = ({
             />
           )
         })}
+        <Autocomplete
+          freeSolo
+          options={categories}
+          value={editData?.category}
+          onChange={(event, value) => {
+            syncEditData({ ...editData, category: typeof value === "string" ? value : undefined })
+          }}
+          renderInput={(params) => (
+            <TextField 
+              {...params}
+              error={!!validation.errs.category}
+              helperText={validation.errs["category"]}
+              onChange={(event) => {
+                syncEditData({ ...editData, category: event.target.value })
+              }}
+              id={"edit-category"}
+              label="category"
+              name="category"
+            />
+          )}
+        />
         <ImageInput
           imageUrl={editData.img || ""}
           setImageUrl={img => syncEditData({ ...editData, img })} 

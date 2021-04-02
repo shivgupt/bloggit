@@ -13,11 +13,12 @@ import { getFabStyle } from "../style";
 
 import { BrowseHistory } from "./BrowseHistory";
 import {
+  BlockQuoteRenderer,
   CodeBlockRenderer,
-  TextRenderer,
   HeadingRenderer,
   ImageRenderer,
-  LinkRenderer
+  LinkRenderer,
+  TextRenderer,
 } from "./Renderers";
 
 const useStyles = makeStyles((theme) => ({
@@ -126,6 +127,7 @@ export const PostPage = ({
           text: TextRenderer,
           link: LinkRenderer,
           image: ImageRenderer,
+          blockquote: BlockQuoteRenderer,
         }}
       />
     </Paper>
