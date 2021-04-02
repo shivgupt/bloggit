@@ -3,10 +3,11 @@ import Link from "@material-ui/core/Link";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import LinkIcon from "@material-ui/icons/Link";
-import React from "react";
+import React, { useContext } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { atomDark, vs } from "react-syntax-highlighter/dist/esm/styles/prism";
 
+import { GitContext } from "../GitContext";
 import { getChildValue, replaceEmojiString, slugify } from "../utils";
 
 import { HashLink } from "./HashLink";
@@ -90,17 +91,20 @@ export const HeadingRenderer = ({
   data: string;
   "data-sourcepos": string;
 }) => {
+  const gitContext = useContext(GitContext);
+  const { currentRef, slug } = gitContext.gitState;
+
   if (children.length > 1) {
     console.warn("This heading has more than one child..?");
   }
   const value = getChildValue(children[0]);
   if (!value) return null;
-  const slug = slugify(value)
+  const hashlinkSlug = slugify(value)
   return React.createElement(
     `h${level}`,
     {
       "data-sourcepos": dataSourcepos,
-      "id": slug,
+      "id": hashlinkSlug,
       style: {
         marginTop: "-65px",
         paddingTop: "65px"
@@ -112,9 +116,9 @@ export const HeadingRenderer = ({
         color="secondary"
         component={HashLink as any}
         edge="start"
-        key={slug}
+        key={hashlinkSlug}
         title="Link to position on page"
-        to={`#${slug}`}
+        to={`/${currentRef}/${slug}#${hashlinkSlug}`}
       >
         <LinkIcon />
       </IconButton>
