@@ -3,7 +3,7 @@ import { HistoryResponse } from "@blog/types";
 import { env } from "../env";
 import { logger } from "../utils";
 
-import { getCommit, getPrevCommits, getFileOid, slugToPath } from "./utils";
+import { getCommit, getPrevCommits, getFileOid, isPublished, slugToPath } from "./utils";
 
 const log = logger.child({ module: "GitHistory" });
 
@@ -24,7 +24,7 @@ const earliest = (current: number, _prev?: number): number => {
   return current;
 };
 
-// Return an array of all commits w/in which the given slug was modified
+// Return an array of all non-draft commits w/in which the given slug was modified
 export const history = async (slug: string): Promise<HistoryResponse> => {
   if (typeof slug !== "string") {
     throw new Error(`Invalid slug`);
@@ -40,6 +40,9 @@ export const history = async (slug: string): Promise<HistoryResponse> => {
   log.info(`Scanning ${commits.length} commits searching for changes at slug ${slug}`);
   for (const newCommit of commits) {
     log.debug(`Checking ${prevPath} on ${newCommit.oid.substring(0, 8)}`);
+    if (!await isPublished(slug, newCommit.oid)) {
+      continue; // Skip over any commits in which this slug is absent or is a draft
+    }
     const newPath = await slugToPath(newCommit.oid, slug);
     if (newPath && prevPath && newPath !== prevPath) {
       log.info(`${newPath} was renamed to ${prevPath} on ${prevCommit}`);
