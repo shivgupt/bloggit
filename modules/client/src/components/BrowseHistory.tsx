@@ -32,12 +32,14 @@ export const BrowseHistory = ({
   isHistorical,
   latestRef,
   setIsHistorical,
+  setLastEdited,
   slug,
 }: {
   currentRef: string;
   isHistorical: boolean;
   latestRef: string;
   setIsHistorical: (val: boolean) => void;
+  setLastEdited: (val: string) => void;
   slug: string;
 }) => {
   const [anchorEl, setAnchorEl] = useState<any>(null); // TODO: provide type?
@@ -60,10 +62,15 @@ export const BrowseHistory = ({
     (async () => {
       try {
         console.log(`Refreshing history: slug="${slug}" | latestRef="${latestRef}"`);
-        const history = (await fetchHistory(slug))
-          // Immediately discard the latest commit if it's included in the history response
-          .filter(entry => !entry.commit.startsWith(latestRef))
+        const allHistory = (await fetchHistory(slug));
 
+        // Save the date of the most recent edit
+        setLastEdited(getPrettyDateString(allHistory[0].timestamp) || "");
+
+        // Discard the most recent edit bc it's the current version
+        const history = allHistory.slice(1);
+
+        // Consolidate same-day edits
         const filteredHistory = {} as { [date: string]: HistoryResponseEntry };
         history.forEach(entry => {
           const date = entry.timestamp.split("T")[0];
@@ -83,6 +90,8 @@ export const BrowseHistory = ({
       }
     })();
     return () => { unmounted = true; };
+  // Ignore dependency on setLastEdited
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [latestRef, slug]);
 
   console.log("editHistory:", editHistory);

@@ -187,7 +187,6 @@ export const PostEditor = ({
       draft: !!editData.draft,
       featured: editData?.featured || false,
       img: editData.img,
-      lastEdit: now,
       path: editData?.path || undefined,
       publishedOn: editData?.publishedOn || (!editData.draft ? now : undefined),
       tldr: editData.tldr,

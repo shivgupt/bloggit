@@ -61,6 +61,7 @@ export const PostPage = ({
   adminMode: string;
 }) => {
   const [isHistorical, setIsHistorical] = useState<boolean>(false);
+  const [lastEdited, setLastEdited] = useState<string>("");
 
   const gitContext = useContext(GitContext);
   const history = useHistory();
@@ -76,7 +77,6 @@ export const PostPage = ({
     }
   },[slug]);
 
-  const lastEdit = indexEntry?.lastEdit ? getPrettyDateString(indexEntry.lastEdit) : null;
   const publishedOn = indexEntry?.publishedOn ? getPrettyDateString(indexEntry.publishedOn) : null;
 
   return (
@@ -86,6 +86,7 @@ export const PostPage = ({
       latestRef={latestRef}
       isHistorical={isHistorical}
       setIsHistorical={setIsHistorical}
+      setLastEdited={setLastEdited}
       slug={slug}
     />
 
@@ -113,9 +114,9 @@ export const PostPage = ({
           </Typography>
         : null
       }
-      { !isHistorical && lastEdit
+      { !isHistorical && lastEdited
         ? <Typography variant="caption" display="block" className={classes.date}>
-            Last Edited: {lastEdit}
+            Last Updated: {lastEdited}
           </Typography>
         : null
       }
