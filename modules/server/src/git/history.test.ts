@@ -30,52 +30,65 @@ describe("git/history", () => {
       { path: "index.json", content: getIndex(slug) },
       { path: `${slug}.md`, content: "Test Content" },
     ]);
-    expect((await history(slug)).length === 1);
+    const historyRes = await history(slug);
+    expect(historyRes.length).to.equal(1);
+    expect(historyRes[0].path).to.be.a("string");
+    expect(historyRes[0].commit).to.be.a("string");
+    expect(historyRes[0].timestamp).to.be.a("string");
   });
 
   it("should return a history entry if content is edited", async () => {
-    await edit([
+    const createRes = await edit([
       { path: "index.json", content: getIndex(slug) },
       { path: `${slug}.md`, content: "Test Content" },
     ]);
-    expect((await history(slug)).length === 1);
-    await edit([
+    let historyRes = await history(slug);
+    expect(historyRes.length).to.equal(1);
+    expect(historyRes[0].commit).to.equal(createRes.commit);
+    const editRes = await edit([
       { path: `${slug}.md`, content: "Updated Content" },
     ]);
-    expect((await history(slug)).length === 2);
+    historyRes = await history(slug);
+    expect(historyRes.length).to.equal(2);
+    expect(historyRes[0].commit).to.equal(editRes.commit);
+    expect(historyRes[1].commit).to.equal(createRes.commit);
   });
 
-  it("should not return a history entry if a different file is edited", async () => {
+  it("should not generate a history entry if a different file is edited", async () => {
     await edit([
       { path: "index.json", content: getIndex(slug) },
       { path: `${slug}.md`, content: "Test Content" },
     ]);
-    expect((await history(slug)).length === 1);
+    expect((await history(slug)).length).to.equal(1);
     await edit([
       { path: `${slug}-different.md`, content: "Updated Content" },
     ]);
-    expect((await history(slug)).length === 1);
+    expect((await history(slug)).length).to.equal(1);
   });
 
-  it("should not return a history entry if a draft is edited", async () => {
+  it("should not generate a history entry if a draft is edited", async () => {
+    // Create & edit a draft: no history entries generated
     await edit([
       { path: "index.json", content: getIndex(slug, true) },
       { path: `${slug}.md`, content: "Test Content" },
     ]);
-    expect((await history(slug)).length === 0);
-    await edit([
-      { path: "index.json", content: getIndex(slug, false) },
-    ]);
-    expect((await history(slug)).length === 1);
-    await edit([
-      { path: "index.json", content: getIndex(slug, true) },
-      { path: `${slug}.md`, content: "Updated Content" },
-    ]);
-    expect((await history(slug)).length === 1);
-    await edit([
-      { path: "index.json", content: getIndex(slug, false) },
-    ]);
-    expect((await history(slug)).length === 2);
+    await edit([{ path: `${slug}.md`, content: "Different content" }]);
+    const historyRes = await history(slug);
+    expect(historyRes.length).to.equal(0);
+    // Publish a draft: one history entry generated
+    await edit([{ path: "index.json", content: getIndex(slug, false) }]);
+    expect((await history(slug)).length).to.equal(1);
+    // Unpublish a draft: no history entry generated
+    await edit([{ path: "index.json", content: getIndex(slug, true) }]);
+    expect((await history(slug)).length).to.equal(1);
+    // Edit a draft: no history entry generated
+    await edit([{ path: `${slug}.md`, content: "Updated content" }]);
+    expect((await history(slug)).length).to.equal(1);
+    await edit([{ path: `${slug}.md`, content: "Updated content again" }]);
+    expect((await history(slug)).length).to.equal(1);
+    // Re-publish a draft: one history entry generated for all updates
+    await edit([{ path: "index.json", content: getIndex(slug, false) }]);
+    expect((await history(slug)).length).to.equal(2);
   });
 
 });

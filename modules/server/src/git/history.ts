@@ -32,6 +32,7 @@ export const history = async (slug: string): Promise<HistoryResponse> => {
   const ref = env.branch;
   const output = [] as HistoryResponse;
   const latestCommit = await getCommit(ref);
+  let prevPublished = await isPublished(ref, slug);
   let prevPath = await slugToPath(ref, slug);
   let prevOid = await getFileOid(ref, prevPath);
   let prevCommit = latestCommit.oid;
@@ -39,25 +40,29 @@ export const history = async (slug: string): Promise<HistoryResponse> => {
   const commits = await getPrevCommits(ref);
   log.info(`Scanning ${commits.length} commits searching for changes to slug ${slug}`);
   for (const newCommit of commits) {
-    log.debug(`Checking ${prevPath} on ${newCommit.oid.substring(0, 8)}`);
+    if (prevPath) {
+      log.debug(`Checking ${prevPath} on ${newCommit.oid.substring(0, 8)}`);
+    }
     const newPath = await slugToPath(newCommit.oid, slug);
+    const newOid = await getFileOid(newCommit.oid, newPath);
+    const newPublished = await isPublished(newCommit.oid, slug);
     if (newPath && prevPath && newPath !== prevPath) {
       log.info(`${newPath} was renamed to ${prevPath} on ${prevCommit}`);
     }
     // If the contents at this path have changed, record an update
-    const newOid = await getFileOid(newCommit.oid, newPath);
-    if (prevPath && prevOid && (!newOid || !(await isPublished(newCommit.oid, slug)))) {
+    if (prevOid && prevPublished && (!newOid || !newPublished)) {
       log.info(`${prevPath} was published on ${prevCommit}`);
       output.push({ path: prevPath, commit: prevCommit, timestamp: toISO(prevTimestamp) });
-    } else if (!prevOid && newOid) {
+    } else if ((!prevOid || !prevPublished) && newOid && newPublished) {
       log.info(`${newPath} was removed on ${prevCommit}`);
-    } else if (prevPath && newOid !== prevOid) {
+    } else if (prevOid && prevPublished && newOid && newPublished && newOid !== prevOid) {
       log.info(`${newPath} was updated on ${prevCommit}`);
       output.push({ path: prevPath, commit: prevCommit, timestamp: toISO(prevTimestamp) });
     }
-    prevPath = newPath;
     prevCommit = newCommit.oid;
     prevOid = newOid;
+    prevPath = newPath;
+    prevPublished = newPublished;
     prevTimestamp = earliest(newCommit.committer.timestamp, prevTimestamp);
   }
   return output;

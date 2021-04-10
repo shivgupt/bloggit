@@ -52,7 +52,7 @@ export const edit = async (editReq: EditRequest): Promise<EditResponse> => {
         return undefined;
       },
     });
-    log.info(`${treePath.map(entry => `${entry.path}:${entry.oid.substring(0, 8)}`).join(", ")}`);
+    log.debug(`${treePath.map(entry => `${entry.path}:${entry.oid.substring(0, 8)}`).join(", ")}`);
 
     if (edit.content === "") {
       log.info(`Deleting references to ${edit.path}`);
@@ -67,14 +67,14 @@ export const edit = async (editReq: EditRequest): Promise<EditResponse> => {
         }
         const rmIndex = tree.findIndex(e => e.path === toRemove);
         if (rmIndex >= 0) {
-          log.info(`Removing ${dir}[${rmIndex}]`);
+          log.debug(`Removing ${dir}[${rmIndex}]`);
           tree.splice(rmIndex, 1);
           toRemove = undefined;
         }
         if (tree.length > 0) {
           const syncIndex = tree.findIndex(e => newEntry?.path && e.path === newEntry.path);
           if (syncIndex >= 0) {
-            log.info(`Replacing ${dir}[${syncIndex}] with entry ${JSON.stringify(newEntry)}`);
+            log.debug(`Replacing ${dir}[${syncIndex}] with entry ${JSON.stringify(newEntry)}`);
             tree[syncIndex] = newEntry;
             toRemove = undefined;
           }
@@ -86,7 +86,7 @@ export const edit = async (editReq: EditRequest): Promise<EditResponse> => {
           };
           toRemove = undefined;
         } else {
-          log.info(`Nothing left in ${dir}, flagging it for deletion`);
+          log.debug(`Nothing left in ${dir}, flagging it for deletion`);
           toRemove = dir;
         }
       }
@@ -98,13 +98,13 @@ export const edit = async (editReq: EditRequest): Promise<EditResponse> => {
       let newEntry = { mode: "100644", oid: newBlobOid, type: "blob", path: filename };
       for (const dir of ["root"].concat(dirs).reverse()) {
         const tree = treePath.find(t => t.path.endsWith(dir))?.val || [];
-        log.info(`${tree.length > 0 ? "Using existing" : "Creating new"} tree for ${dir}`);
+        log.debug(`${tree.length > 0 ? "Using existing" : "Creating new"} tree for ${dir}`);
         const index = tree.findIndex(e => e.path === newEntry.path);
         if (index >= 0) {
-          log.info(`Replacing ${dir}[${index}] with ${JSON.stringify(newEntry)}`);
+          log.debug(`Replacing ${dir}[${index}] with ${JSON.stringify(newEntry)}`);
           tree[index] = newEntry;
         } else {
-          log.info(`Pushing new entry into ${dir}: ${JSON.stringify(newEntry)}`);
+          log.debug(`Pushing new entry into ${dir}: ${JSON.stringify(newEntry)}`);
           tree.push(newEntry);
         }
         newEntry = {

@@ -13,6 +13,14 @@ module.exports = {
     "plugin:react/recommended",
     "react-app",
   ],
+  overrides: [
+    {
+      files: "*.test.ts",
+      rules: {
+        "@typescript-eslint/no-unused-expressions": "off"
+      }
+    }
+  ],
   parser: "@typescript-eslint/parser",
   parserOptions: {
     ecmaFeatures: {
