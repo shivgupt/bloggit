@@ -16,10 +16,7 @@ if [[ "${cmd##*-}" == "test" ]]
 then
   set -o pipefail
   echo "Starting $unit tester"
-  if [[ -n "$(command -v pino-pretty)" ]]
-  then exec npm run test -- $opts | pino-pretty --colorize
-  else exec npm run test -- $opts
-  fi
+  exec npm run test -- $opts
 
 elif [[ "${cmd##*-}" == "watch" ]]
 then
@@ -60,10 +57,7 @@ then
       echo "Re-running tests..."
 
       prev_checksum="$(getChecksum)"
-      if [[ -n "$(command -v pino-pretty)" ]]
-      then (npm run test -- $opts | pino-pretty --colorize &)
-      else (npm run test -- $opts &)
-      fi
+      (npm run test -- $opts &)
 
     # If no changes, do nothing
     else sleep 2
