@@ -57,10 +57,8 @@ const useStyles = makeStyles((theme) => ({
 
 export const PostPage = ({
   adminMode,
-  setEditMode,
 }: {
   adminMode: string;
-  setEditMode: (editMode: boolean) => void;
 }) => {
   const [isHistorical, setIsHistorical] = useState<boolean>(false);
 

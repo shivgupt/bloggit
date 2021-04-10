@@ -125,11 +125,9 @@ export const PostCard = ({
 export const Home = ({
   adminMode,
   filterBy,
-  setEditMode,
 }: {
   adminMode: string;
   filterBy?: string,
-  setEditMode: (editMode: boolean) => void;
  }) => {
   const gitContext = useContext(GitContext);
   const history = useHistory();

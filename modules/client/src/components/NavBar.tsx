@@ -148,13 +148,11 @@ const DrawerContent = ({
 export const NavBar = ({
   adminMode,
   category,
-  setEditMode,
   theme,
   toggleTheme,
 }: {
   adminMode: string;
   category: string;
-  setEditMode: (val: boolean) => void;
   theme: Theme,
   toggleTheme: () => void;
 }) => {

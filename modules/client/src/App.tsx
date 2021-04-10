@@ -53,7 +53,6 @@ const App: React.FC = () => {
   const [gitState, setGitState] = useState(initialGitState);
   const [theme, setTheme] = useState(lightTheme);
   const [adminMode, setAdminMode] = useState<AdminMode>("invalid");
-  const [editMode, setEditMode] = useState(false);
   const [snackAlert, setSnackAlert] = useState<SnackAlert>(defaultSnackAlert);
 
   const createMatch = useRouteMatch({ path: "/admin/create", exact: true, strict: true });
@@ -201,7 +200,6 @@ const App: React.FC = () => {
         <NavBar
           adminMode={adminMode}
           category={categoryParam}
-          setEditMode={setEditMode}
           theme={theme}
           toggleTheme={toggleTheme}
         />
@@ -211,17 +209,13 @@ const App: React.FC = () => {
             <Switch>
               <Route exact strict
                 path="/"
-                render={() => (editMode
-                  ? <PostEditor setEditMode={setEditMode} setSnackAlert={setSnackAlert} />
-                  : <Home adminMode={adminMode} setEditMode={setEditMode} />
-                )}
+                render={() => (<Home adminMode={adminMode} />)}
               />
               <Route exact strict
                 path="/category/:slug"
                 render={() => (<Home
                   adminMode={adminMode}
                   filterBy={categoryParam}
-                  setEditMode={setEditMode}
                 />)}
               />
               <Route exact strict
@@ -229,28 +223,24 @@ const App: React.FC = () => {
                 render={() => (<AdminHome
                   adminMode={adminMode}
                   setAdminMode={setAdminMode}
-                  setEditMode={setEditMode}
                   validateAuthToken={validateAuthToken}
                 />)}
               />
               <Route exact strict
                 path="/admin/create"
-                render={() => (<PostEditor setEditMode={setEditMode} setSnackAlert={setSnackAlert} />)}
+                render={() => (<PostEditor setSnackAlert={setSnackAlert} />)}
               />
               <Route exact strict
                 path="/admin/edit/:slug"
-                render={() => (<PostEditor setEditMode={setEditMode} setSnackAlert={setSnackAlert} />)}
+                render={() => (<PostEditor setSnackAlert={setSnackAlert} />)}
               />
               <Route exact strict
                 path="/:ref/:slug"
-                render={() => <PostPage adminMode={adminMode} setEditMode={setEditMode} />}
+                render={() => <PostPage adminMode={adminMode} />}
               />
               <Route exact strict
                 path="/:slug"
-                render={() => (editMode
-                  ? <PostEditor setEditMode={setEditMode} setSnackAlert={setSnackAlert} />
-                  : <PostPage adminMode={adminMode} setEditMode={setEditMode} />
-                )}
+                render={() => (<PostPage adminMode={adminMode} />)}
               />
             </Switch>
           </Container>

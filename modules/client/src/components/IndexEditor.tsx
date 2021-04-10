@@ -50,11 +50,7 @@ type EditIndex = BlogIndex & {
   };
 };
 
-export const IndexEditor = ({
-  setEditMode,
-}: {
-  setEditMode: (editMode: boolean) => void;
-}) => {
+export const IndexEditor = () => {
   const [diff, setDiff] = useState<boolean>(false);
   const [saving, setSaving] = useState<boolean>(false);
   const [newIndex, setNewIndex] = useState<EditIndex>(emptyIndex);

@@ -87,10 +87,8 @@ const defaultValidation: EditPostValidation = {
 };
 
 export const PostEditor = ({
-  setEditMode,
   setSnackAlert,
 }: {
-  setEditMode: (editMode: boolean) => void;
   setSnackAlert: (snackAlert: SnackAlert) => void;
 }) => {
   const [validation, setValidation] = useState<EditPostValidation>(defaultValidation);
@@ -120,7 +118,7 @@ export const PostEditor = ({
     return () => {
       setOriginalEditData(emptyEdit);
     };
-  }, [gitState]); // gitState will only be updated after turning editMode off
+  }, [gitState]); // gitState will only be updated after editing is finished
 
   // This should only run once when the original data is recorded after mounting
   useEffect(() => setEditData(originalEditData), [originalEditData]);
