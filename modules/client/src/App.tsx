@@ -56,16 +56,34 @@ const App: React.FC = () => {
   const [editMode, setEditMode] = useState(false);
   const [snackAlert, setSnackAlert] = useState<SnackAlert>(defaultSnackAlert);
 
-  const categoryMatch = useRouteMatch("/category/:category");
-  const slugMatch = useRouteMatch("/:slug");
-  const refMatch = useRouteMatch("/:ref/:slug");
-  const categoryParam = (categoryMatch ? categoryMatch.params.category : "").toLowerCase();
-  const refParam = (categoryParam ? "" : refMatch ? refMatch.params.ref : "").toLowerCase();
-  const slugParam = (categoryParam ? "" : refMatch ? refMatch.params.slug
-    : slugMatch ? slugMatch.params.slug
-    : "").toLowerCase();
+  const createMatch = useRouteMatch({ path: "/admin/create", exact: true, strict: true });
+  const editIndexMatch = useRouteMatch({ path: "/admin/edit", exact: true, strict: true });
+  const categoryMatch = useRouteMatch({ path: "/category/:category", exact: true, strict: true });
+  const editMatch = useRouteMatch({ path: "/admin/edit/:slug", exact: true, strict: true });
+  const refMatch = useRouteMatch({ path: "/:ref/:slug", exact: true, strict: true });
+  const slugMatch = useRouteMatch({ path: "/:slug", exact: true, strict: true });
 
-  console.log(`Rendering App with refParam=${refParam} and slugParam=${slugParam} and categoryParam=${categoryParam}`);
+  const categoryParam = (
+    (createMatch || editIndexMatch) ? ""
+    : categoryMatch ? categoryMatch.params.category
+    : ""
+  ).toLowerCase();
+
+  const refParam = (
+    (categoryParam || createMatch || editMatch || editIndexMatch) ? ""
+    : refMatch ? refMatch.params.ref
+    : ""
+  ).toLowerCase();
+
+  const slugParam = (
+    (categoryParam || createMatch || editIndexMatch) ? ""
+    : refParam ? refMatch.params.slug
+    : editMatch ? editMatch.params.slug
+    : slugMatch ? slugMatch.params.slug
+    : ""
+  ).toLowerCase();
+
+  console.log(`Rendering App w url params: category="${categoryParam}" | ref="${refParam}" | slug="${slugParam}"`);
 
   const validateAuthToken = async (_authToken?: string) => {
     if (_authToken === "") {
@@ -164,7 +182,6 @@ const App: React.FC = () => {
 
   // Fetch index & post content whenever the url changes
   useEffect(() => {
-    setEditMode(false);
     syncGitState(refParam || gitState.latestRef, slugParam);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refParam, slugParam]);
@@ -192,14 +209,14 @@ const App: React.FC = () => {
           <div className={classes.appBarSpacer} />
           <Container maxWidth="xl" className={classes.container}>
             <Switch>
-              <Route exact
+              <Route exact strict
                 path="/"
                 render={() => (editMode
                   ? <PostEditor setEditMode={setEditMode} setSnackAlert={setSnackAlert} />
                   : <Home adminMode={adminMode} setEditMode={setEditMode} />
                 )}
               />
-              <Route exact
+              <Route exact strict
                 path="/category/:slug"
                 render={() => (<Home
                   adminMode={adminMode}
@@ -207,7 +224,7 @@ const App: React.FC = () => {
                   setEditMode={setEditMode}
                 />)}
               />
-              <Route exact
+              <Route exact strict
                 path="/admin"
                 render={() => (<AdminHome
                   adminMode={adminMode}
@@ -216,11 +233,19 @@ const App: React.FC = () => {
                   validateAuthToken={validateAuthToken}
                 />)}
               />
-              <Route
+              <Route exact strict
+                path="/admin/create"
+                render={() => (<PostEditor setEditMode={setEditMode} setSnackAlert={setSnackAlert} />)}
+              />
+              <Route exact strict
+                path="/admin/edit/:slug"
+                render={() => (<PostEditor setEditMode={setEditMode} setSnackAlert={setSnackAlert} />)}
+              />
+              <Route exact strict
                 path="/:ref/:slug"
                 render={() => <PostPage adminMode={adminMode} setEditMode={setEditMode} />}
               />
-              <Route
+              <Route exact strict
                 path="/:slug"
                 render={() => (editMode
                   ? <PostEditor setEditMode={setEditMode} setSnackAlert={setSnackAlert} />

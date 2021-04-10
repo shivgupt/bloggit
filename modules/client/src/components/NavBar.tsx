@@ -165,7 +165,6 @@ export const NavBar = ({
   const toggleDrawer = () => setDrawer(!drawer);
 
   const reset = () => {
-    setEditMode(false);
     window.scrollTo(0, 0);
   };
 

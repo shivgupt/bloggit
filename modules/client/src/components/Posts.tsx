@@ -6,10 +6,11 @@ import Typography from "@material-ui/core/Typography";
 import React, { useContext, useEffect, useState } from "react";
 import Markdown from "react-markdown";
 import "react-mde/lib/styles/css/react-mde-all.css";
-import { getPrettyDateString } from "src/utils";
+import { useHistory } from "react-router-dom";
 
 import { GitContext } from "../GitContext";
 import { getFabStyle } from "../style";
+import { getPrettyDateString } from "../utils";
 
 import { BrowseHistory } from "./BrowseHistory";
 import {
@@ -62,7 +63,9 @@ export const PostPage = ({
   setEditMode: (editMode: boolean) => void;
 }) => {
   const [isHistorical, setIsHistorical] = useState<boolean>(false);
+
   const gitContext = useContext(GitContext);
+  const history = useHistory();
   const classes = useStyles();
 
   const { currentRef, latestRef, slug, currentContent, indexEntry } = gitContext.gitState;
@@ -137,7 +140,7 @@ export const PostPage = ({
           className={classes.fab}
           color="primary"
           onClick={() => {
-            setEditMode(true);
+            history.push(`/admin/edit/${slug}`);
           }}
         ><Edit/></Fab>
       : null

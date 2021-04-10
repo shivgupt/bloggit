@@ -221,8 +221,7 @@ export const Home = ({
             className={classes.fab}
             color="primary"
             onClick={() => {
-              setEditMode(true);
-              history.push("/");
+              history.push("/admin/create");
             }}
           ><Add/></Fab>
         : null

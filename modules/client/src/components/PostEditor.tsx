@@ -154,7 +154,7 @@ export const PostEditor = ({
   const saveImage: SaveImageHandler = async function*(data: ArrayBuffer) {
     let res = await axios({
       method: "POST",
-      url: "ipfs",
+      url: "/ipfs",
       data: data,
       headers: { "content-type": "multipart/form-data"}
     });
@@ -210,7 +210,7 @@ export const PostEditor = ({
     // Send request to update index.json and create new file
     let res = await axios({
       method: "post",
-      url: "git/edit",
+      url: "/git/edit",
       data: editRequest,
       headers: { "content-type": "application/json" }
     });
@@ -225,8 +225,8 @@ export const PostEditor = ({
       } else if (editRes?.status === "no change") {
         console.warn(`Edit request yielded no change, still on commit ${editRes.commit}`);
       }
-      setEditMode(false);
       setSaving(false);
+      history.push(`/${newSlug}`);
     } else {
       console.error(`Something went wrong`, res);
     }
@@ -234,14 +234,14 @@ export const PostEditor = ({
 
   const confirmDiscard = () => {
     if (!validation.hasChanged) {
-      setEditMode(false);
+      history.push(`/${gitState.slug}`);
     } else {
       setSnackAlert({
         open: true,
         msg: "Do you want to discard all the changes",
         severity: "warning",
         action: <Button onClick={() => {
-          setEditMode(false);
+          history.push(`/${gitState.slug}`);
           setSnackAlert({
             open: true,
             msg: "Changes discarded",

@@ -90,7 +90,7 @@ export const ImageInput = ({
   const uploadImage = async (data) => {
     let res = await axios({
       method: "POST",
-      url: "ipfs",
+      url: "/ipfs",
       data,
       headers: { "content-type": "application/octet-stream"}
     });
