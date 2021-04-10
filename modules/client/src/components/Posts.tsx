@@ -43,6 +43,18 @@ const useStyles = makeStyles((theme) => ({
     padding: "20px",
     textAlign: "justify",
     fontVariant: "discretionary-ligatures",
+    "& p > img": {
+      paddingTop: theme.spacing(4),
+      paddingBottom: theme.spacing(4),
+    },
+    "& p > img + em": {
+      display: "block",
+      maxWidth: "80%",
+      marginTop: theme.spacing(-3),
+      marginRight: "auto",
+      marginBottom: theme.spacing(4),
+      marginLeft: "auto",
+    },
   },
   media: {
     [theme.breakpoints.up("md")]: {

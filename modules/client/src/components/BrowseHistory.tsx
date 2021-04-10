@@ -94,8 +94,6 @@ export const BrowseHistory = ({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [latestRef, slug]);
 
-  console.log("editHistory:", editHistory);
-
   return (
     <Grid container spacing={1} className={classes.buttonBar}>
 

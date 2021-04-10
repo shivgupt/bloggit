@@ -48,7 +48,7 @@ export const TextRenderer = ({
   value: string;
 }) => {
   return <> {replaceEmojiString(value)} </>
-}
+};
 
 export const LinkRenderer = ({
   href,
