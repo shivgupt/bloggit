@@ -32,17 +32,17 @@
   },
   "devDependencies": {
     "@blog/types": "1.0.0",
-    "@testing-library/jest-dom": "5.11.9",
-    "@testing-library/react": "11.2.5",
-    "@testing-library/user-event": "12.8.3",
-    "@types/jest": "26.0.20",
-    "@types/node": "14.14.34",
+    "@testing-library/jest-dom": "5.11.10",
+    "@testing-library/react": "11.2.6",
+    "@testing-library/user-event": "13.1.2",
+    "@types/jest": "26.0.22",
+    "@types/node": "14.14.37",
     "@types/react": "17.0.3",
     "@types/react-copy-to-clipboard": "5.0.0",
-    "@types/react-dom": "17.0.2",
+    "@types/react-dom": "17.0.3",
     "cypress": "6.6.0",
     "cypress-terminal-report": "3.0.1",
-    "typescript": "4.2.3"
+    "typescript": "4.2.4"
   },
   "eslintConfig": {
     "extends": ["react-app"]
