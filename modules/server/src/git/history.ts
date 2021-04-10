@@ -50,12 +50,16 @@ export const history = async (slug: string): Promise<HistoryResponse> => {
       log.info(`${newPath} was renamed to ${prevPath} on ${prevCommit}`);
     }
     // If the contents at this path have changed, record an update
-    if (prevOid && prevPublished && (!newOid || !newPublished)) {
+    if (prevPath && prevOid && prevPublished && (!newPath || !newOid || !newPublished)) {
       log.info(`${prevPath} was published on ${prevCommit}`);
       output.push({ path: prevPath, commit: prevCommit, timestamp: toISO(prevTimestamp) });
     } else if ((!prevOid || !prevPublished) && newOid && newPublished) {
       log.info(`${newPath} was removed on ${prevCommit}`);
-    } else if (prevOid && prevPublished && newOid && newPublished && newOid !== prevOid) {
+    } else if (
+      prevPath && prevOid && prevPublished &&
+      newPath && newOid && newPublished &&
+      newOid !== prevOid
+    ) {
       log.info(`${newPath} was updated on ${prevCommit}`);
       output.push({ path: prevPath, commit: prevCommit, timestamp: toISO(prevTimestamp) });
     }
