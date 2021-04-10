@@ -27,12 +27,10 @@ const useStyles = makeStyles((theme: Theme) => ({
 export const AdminHome = ({
   adminMode,
   setAdminMode,
-  setEditMode,
   validateAuthToken,
 }: {
   adminMode: AdminMode;
   setAdminMode: (val: AdminMode) => void;
-  setEditMode: (val: boolean) => void;
   validateAuthToken: (_authToken?: string) => Promise<void>;
 }) => {
   const [authToken, setAuthToken] = useState<string>("");
@@ -112,7 +110,7 @@ export const AdminHome = ({
       }
       {adminMode === "enabled"
         ? <div className={classes.section}>
-            <IndexEditor setEditMode={setEditMode} />
+            <IndexEditor />
           </div>
         : null
       }

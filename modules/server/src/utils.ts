@@ -1,10 +1,20 @@
 import pino from "pino";
+import prettifier from "pino-pretty";
 
 import { env } from "./env";
 
 export const wait = (ms: number): Promise<void> => new Promise(res => setTimeout(res, ms));
 
-export const logger = pino({ level: env.logLevel });
+export const logger = pino({
+  level: env.logLevel,
+  prettyPrint: {
+    colorize: true,
+    ignore: "pid,hostname,module",
+    messageFormat: `[{module}] {msg}`,
+    translateTime: true,
+  },
+  prettifier,
+});
 
 // Convert between utf8-encoded strings and Uint8Arrays
 // A la https://stackoverflow.com/a/43934805

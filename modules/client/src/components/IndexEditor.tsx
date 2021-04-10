@@ -50,11 +50,7 @@ type EditIndex = BlogIndex & {
   };
 };
 
-export const IndexEditor = ({
-  setEditMode,
-}: {
-  setEditMode: (editMode: boolean) => void;
-}) => {
+export const IndexEditor = () => {
   const [diff, setDiff] = useState<boolean>(false);
   const [saving, setSaving] = useState<boolean>(false);
   const [newIndex, setNewIndex] = useState<EditIndex>(emptyIndex);
@@ -133,7 +129,7 @@ export const IndexEditor = ({
     editRequest.push({ path: "index.json", content: JSON.stringify(indexToSave, null, 2) });
     await axios({
       method: "post",
-      url: "git/edit",
+      url: "/git/edit",
       headers: { "content-type": "application/json" },
       data: editRequest,
     });
@@ -184,8 +180,7 @@ export const IndexEditor = ({
                   <IconButton
                     id={`edit-${slug}`}
                     onClick={() => {
-                      setEditMode(true);
-                      history.push(`/${slug}`);
+                      history.push(`/admin/edit/${slug}`);
                     }}
                     color="secondary"
                     size="small"
@@ -193,7 +188,6 @@ export const IndexEditor = ({
                 </TableCell>
 
                 <TableCell align="left" padding="none" onClick={() => {
-                  setEditMode(false);
                   history.push(`/${slug}`)
                 }}>
                   {title}
@@ -245,8 +239,7 @@ export const IndexEditor = ({
           saveChanges();
         } else {
           console.log("Creating new post..");
-          setEditMode(true);
-          history.push("/");
+          history.push("/admin/create");
         }
       }}
     >{(diff ? <Save/> : <Add/>)}</Fab>

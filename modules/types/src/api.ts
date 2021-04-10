@@ -8,11 +8,12 @@ export type EditResponse = {
   status: string;
 };
 
-export type HistoryResponse = Array<{
+export type HistoryResponseEntry = {
   commit: string;
   path: string;
   timestamp: string;
-}>;
+};
+export type HistoryResponse = HistoryResponseEntry[]
 
 export type ReadResponse = {
   author: string;

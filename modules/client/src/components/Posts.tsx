@@ -6,10 +6,11 @@ import Typography from "@material-ui/core/Typography";
 import React, { useContext, useEffect, useState } from "react";
 import Markdown from "react-markdown";
 import "react-mde/lib/styles/css/react-mde-all.css";
-import { getPrettyDateString } from "src/utils";
+import { useHistory } from "react-router-dom";
 
 import { GitContext } from "../GitContext";
 import { getFabStyle } from "../style";
+import { getPrettyDateString } from "../utils";
 
 import { BrowseHistory } from "./BrowseHistory";
 import {
@@ -42,6 +43,18 @@ const useStyles = makeStyles((theme) => ({
     padding: "20px",
     textAlign: "justify",
     fontVariant: "discretionary-ligatures",
+    "& p > img": {
+      paddingTop: theme.spacing(4),
+      paddingBottom: theme.spacing(4),
+    },
+    "& p > img + em": {
+      display: "block",
+      maxWidth: "80%",
+      marginTop: theme.spacing(-3),
+      marginRight: "auto",
+      marginBottom: theme.spacing(4),
+      marginLeft: "auto",
+    },
   },
   media: {
     [theme.breakpoints.up("md")]: {
@@ -56,13 +69,14 @@ const useStyles = makeStyles((theme) => ({
 
 export const PostPage = ({
   adminMode,
-  setEditMode,
 }: {
   adminMode: string;
-  setEditMode: (editMode: boolean) => void;
 }) => {
   const [isHistorical, setIsHistorical] = useState<boolean>(false);
+  const [lastEdited, setLastEdited] = useState<string>("");
+
   const gitContext = useContext(GitContext);
+  const history = useHistory();
   const classes = useStyles();
 
   const { currentRef, latestRef, slug, currentContent, indexEntry } = gitContext.gitState;
@@ -75,7 +89,6 @@ export const PostPage = ({
     }
   },[slug]);
 
-  const lastEdit = indexEntry?.lastEdit ? getPrettyDateString(indexEntry.lastEdit) : null;
   const publishedOn = indexEntry?.publishedOn ? getPrettyDateString(indexEntry.publishedOn) : null;
 
   return (
@@ -85,6 +98,7 @@ export const PostPage = ({
       latestRef={latestRef}
       isHistorical={isHistorical}
       setIsHistorical={setIsHistorical}
+      setLastEdited={setLastEdited}
       slug={slug}
     />
 
@@ -112,9 +126,9 @@ export const PostPage = ({
           </Typography>
         : null
       }
-      { !isHistorical && lastEdit
+      { !isHistorical && lastEdited
         ? <Typography variant="caption" display="block" className={classes.date}>
-            Last Edited: {lastEdit}
+            Last Updated: {lastEdited}
           </Typography>
         : null
       }
@@ -137,7 +151,7 @@ export const PostPage = ({
           className={classes.fab}
           color="primary"
           onClick={() => {
-            setEditMode(true);
+            history.push(`/admin/edit/${slug}`);
           }}
         ><Edit/></Fab>
       : null

@@ -148,13 +148,11 @@ const DrawerContent = ({
 export const NavBar = ({
   adminMode,
   category,
-  setEditMode,
   theme,
   toggleTheme,
 }: {
   adminMode: string;
   category: string;
-  setEditMode: (val: boolean) => void;
   theme: Theme,
   toggleTheme: () => void;
 }) => {
@@ -165,7 +163,6 @@ export const NavBar = ({
   const toggleDrawer = () => setDrawer(!drawer);
 
   const reset = () => {
-    setEditMode(false);
     window.scrollTo(0, 0);
   };
 

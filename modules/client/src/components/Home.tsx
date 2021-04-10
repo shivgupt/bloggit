@@ -125,11 +125,9 @@ export const PostCard = ({
 export const Home = ({
   adminMode,
   filterBy,
-  setEditMode,
 }: {
   adminMode: string;
   filterBy?: string,
-  setEditMode: (editMode: boolean) => void;
  }) => {
   const gitContext = useContext(GitContext);
   const history = useHistory();
@@ -221,8 +219,7 @@ export const Home = ({
             className={classes.fab}
             color="primary"
             onClick={() => {
-              setEditMode(true);
-              history.push("/");
+              history.push("/admin/create");
             }}
           ><Add/></Fab>
         : null
