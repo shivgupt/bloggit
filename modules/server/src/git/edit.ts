@@ -19,7 +19,7 @@ export const edit = async (editReq: EditRequest): Promise<EditResponse> => {
       throw new Error("Invalid edit request");
     }
   }
-  log.debug(`Received request to edit: ${JSON.stringify(editReq)}`);
+  log.debug(editReq, `Received request to edit:`); //  ${JSON.stringify(editReq)}`);
 
   const latestCommit = await resolveRef(env.branch);
   const latestTree = await git.readTree({ ...gitOpts, oid: latestCommit });

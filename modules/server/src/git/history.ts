@@ -37,19 +37,16 @@ export const history = async (slug: string): Promise<HistoryResponse> => {
   let prevCommit = latestCommit.oid;
   let prevTimestamp = earliest(latestCommit.committer.timestamp);
   const commits = await getPrevCommits(ref);
-  log.info(`Scanning ${commits.length} commits searching for changes at slug ${slug}`);
+  log.info(`Scanning ${commits.length} commits searching for changes to slug ${slug}`);
   for (const newCommit of commits) {
     log.debug(`Checking ${prevPath} on ${newCommit.oid.substring(0, 8)}`);
-    if (!await isPublished(slug, newCommit.oid)) {
-      continue; // Skip over any commits in which this slug is absent or is a draft
-    }
     const newPath = await slugToPath(newCommit.oid, slug);
     if (newPath && prevPath && newPath !== prevPath) {
       log.info(`${newPath} was renamed to ${prevPath} on ${prevCommit}`);
     }
     // If the contents at this path have changed, record an update
     const newOid = await getFileOid(newCommit.oid, newPath);
-    if (prevPath && prevOid && !newOid) {
+    if (prevPath && prevOid && (!newOid || !(await isPublished(newCommit.oid, slug)))) {
       log.info(`${prevPath} was published on ${prevCommit}`);
       output.push({ path: prevPath, commit: prevCommit, timestamp: toISO(prevTimestamp) });
     } else if (!prevOid && newOid) {
