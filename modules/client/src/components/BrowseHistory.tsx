@@ -1,4 +1,4 @@
-import { HistoryResponse } from "@blog/types";
+import { HistoryResponse, HistoryResponseEntry } from "@blog/types";
 import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
 import ListItemText from "@material-ui/core/ListItemText";
@@ -12,7 +12,7 @@ import FastForward from "@material-ui/icons/FastForward";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
-import { fetchHistory } from "../utils";
+import { fetchHistory, getPrettyDateString } from "../utils";
 
 import { Copyable } from "./Copyable";
 
@@ -59,15 +59,33 @@ export const BrowseHistory = ({
     let unmounted = false;
     (async () => {
       try {
-        console.log(`Refreshing history bc slug changed to "${slug}"`);
-        const history = await fetchHistory(slug);
-        if (!unmounted) setEditHistory(history);
+        console.log(`Refreshing history: slug="${slug}" | latestRef="${latestRef}"`);
+        const history = (await fetchHistory(slug))
+          // Immediately discard the latest commit if it's included in the history response
+          .filter(entry => !entry.commit.startsWith(latestRef))
+
+        const filteredHistory = {} as { [date: string]: HistoryResponseEntry };
+        history.forEach(entry => {
+          const date = entry.timestamp.split("T")[0];
+          if (!filteredHistory[date] || filteredHistory[date].timestamp < entry.timestamp) {
+            filteredHistory[date] = entry;
+          }
+        });
+
+        if (!unmounted) {
+          setEditHistory(
+            Object.values(filteredHistory)
+              .sort((h1, h2) => h1.timestamp < h2.timestamp ? 1 : -1) as HistoryResponse
+          );
+        }
       } catch (e) {
         console.warn(e.message);
       }
     })();
     return () => { unmounted = true; };
-  }, [slug]);
+  }, [latestRef, slug]);
+
+  console.log("editHistory:", editHistory);
 
   return (
     <Grid container spacing={1} className={classes.buttonBar}>
@@ -83,23 +101,26 @@ export const BrowseHistory = ({
         />
       </Grid>
 
-      <Grid item>
-        <Button
-          id="open-history"
-          startIcon={<ExpandMore/>}
-          aria-haspopup="true"
-          variant="contained"
-          size={"medium"}
-          color="primary"
-          onClick={(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
-            setAnchorEl(event.currentTarget);
-          }}
-        >
-          <Typography noWrap variant="button">
-            History
-          </Typography>
-        </Button>
-      </Grid>
+      {editHistory.length > 0
+        ? <Grid item>
+            <Button
+              id="open-history"
+              startIcon={<ExpandMore/>}
+              aria-haspopup="true"
+              variant="contained"
+              size={"medium"}
+              color="primary"
+              onClick={(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
+                setAnchorEl(event.currentTarget);
+              }}
+            >
+              <Typography noWrap variant="button">
+                History
+              </Typography>
+            </Button>
+          </Grid>
+        : null
+      }
 
       {isHistorical
         ? <Grid item>
@@ -131,7 +152,7 @@ export const BrowseHistory = ({
         onClose={() => setAnchorEl(null)}
       >
         {
-          editHistory.filter(entry => !entry.commit.startsWith(latestRef)).map((entry, i) => {
+          editHistory.map((entry, i) => {
             const commit = entry.commit.substring(0,8);
             const key = `history-entry-${i+1}`;
             return (
@@ -143,7 +164,7 @@ export const BrowseHistory = ({
                 selected={commit === currentRef}
                 to={`/${commit}/${slug}`}
               >
-                <ListItemText primary={(new Date(entry.timestamp)).toLocaleString()} />
+                <ListItemText primary={getPrettyDateString(entry.timestamp)} />
               </MenuItem>
             );
           })
