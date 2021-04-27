@@ -21,23 +21,35 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export const CodeBlockRenderer = ({
-  language,
-  value,
+  inline,
+  className,
+  children,
 }: {
-  language: string;
-  value: string;
+  inline: boolean
+  className: string;
+  children: string;
 }) => {
   const theme = useTheme();
   if (theme.palette.type === "dark") {
     return (
-      <SyntaxHighlighter showLineNumbers language={language} style={atomDark}>
-        {value}
+      <SyntaxHighlighter
+        showLineNumbers
+        language={className.split("-")[1]}
+        style={atomDark}
+        inline={inline}
+      >
+        {children}
       </SyntaxHighlighter>
     );
   }
   return (
-    <SyntaxHighlighter showLineNumbers language={language} style={vs}>
-      {value}
+    <SyntaxHighlighter
+      showLineNumbers
+      language={className.split("-")[1]}
+      style={vs}
+      inline={inline}
+    >
+      {children}
     </SyntaxHighlighter>
   );
 };
@@ -83,13 +95,9 @@ export const ImageRenderer = ({
 export const HeadingRenderer = ({
   children,
   level,
-  data,
-  "data-sourcepos": dataSourcepos,
 }: {
   children: any[];
-  level: string;
-  data: string;
-  "data-sourcepos": string;
+  level: number;
 }) => {
   const gitContext = useContext(GitContext);
   const { currentRef, slug } = gitContext.gitState;
@@ -103,7 +111,6 @@ export const HeadingRenderer = ({
   return React.createElement(
     `h${level}`,
     {
-      "data-sourcepos": dataSourcepos,
       "id": hashlinkSlug,
       style: {
         marginTop: "-65px",

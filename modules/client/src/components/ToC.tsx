@@ -227,8 +227,8 @@ export const Toc = ({
         <List component="nav" className={classes.list}>
           <Markdown
             allowedTypes={["text", "heading"]}
-            source={currentContent}
-            renderers={{ heading: TocGenerator }}
+            children={currentContent}
+            components={{ heading: TocGenerator }}
             className={classes.list}
           />
         </List>

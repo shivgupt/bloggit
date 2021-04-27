@@ -133,9 +133,9 @@ export const PostPage = ({
         : null
       }
       <Markdown
-        source={currentContent}
+        children={currentContent}
         className={classes.text}
-        renderers={{
+        components={{
           heading: HeadingRenderer,
           code: CodeBlockRenderer,
           text: TextRenderer,

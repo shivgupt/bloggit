@@ -322,14 +322,19 @@ export const PostEditor = ({
         generateMarkdownPreview={(markdown) =>
           Promise.resolve(
             <Markdown
-              source={markdown}
+              children={markdown}
               className={classes.text}
-              renderers={{
-                heading: HeadingRenderer,
-                code: CodeBlockRenderer,
-                text: TextRenderer,
-                link: LinkRenderer,
-                image: ImageRenderer,
+              components={{
+                h1: ({ node, ...props}) => <HeadingRenderer {...props} />,
+                h2: ({ node, ...props }) => <HeadingRenderer {...props} />,
+                h3: ({ node, ...props }) => <HeadingRenderer {...props} />,
+                h4: ({ node, ...props }) => <HeadingRenderer {...props} />,
+                h5: ({ node, ...props }) => <HeadingRenderer {...props} />,
+                h6: ({ node, ...props }) => <HeadingRenderer {...props} />,
+                text: ({ node, ...props }) => <TextRenderer {...props} />,
+                link: ({ node, ...props }) => <LinkRenderer {...props} />,
+                image: ({ node, ...props }) => <ImageRenderer {...props} />,
+                code: ({ node, ...props }) => <CodeBlockRenderer {...props} />,
               }}
             />
           )}
