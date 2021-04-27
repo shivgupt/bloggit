@@ -192,17 +192,17 @@ export const PostEditor = ({
       tldr: editData.tldr,
     } as PostData;
     newIndex.posts[newSlug] = newIndexEntry;
+    if (oldSlug && oldSlug !== newSlug) {
+      delete newIndex.posts[oldSlug]
+    }
     const newPath = getPath(newIndexEntry);
-    const oldPath = getPath(gitState.index.posts[gitState.slug]);
     const editRequest = [
       { path: newPath, content: editData.content, },
       { path: "index.json", content: JSON.stringify(newIndex, null, 2), }
     ] as EditRequest;
+    const oldPath = getPath(gitState.index.posts[gitState.slug]);
     if (oldPath && oldPath !== newPath) {
       editRequest.push({ path: oldPath, content: "" });
-    }
-    if (oldSlug && oldSlug !== newSlug) {
-      delete newIndex.posts[oldSlug]
     }
     // Send request to update index.json and create new file
     let res = await axios({
