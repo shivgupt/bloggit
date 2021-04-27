@@ -150,7 +150,7 @@ const App: React.FC = () => {
 
   const syncGitState = async (ref?: string, slug?: string, getLatest?: boolean) => {
     const latestRef = (getLatest ? null : gitState.latestRef) || await fetchRef();
-    const currentRef = ref || latestRef;
+    const currentRef = ref || "";
     const newGitState = {
       latestRef,
       currentRef,
@@ -158,9 +158,10 @@ const App: React.FC = () => {
       index: await fetchIndex(latestRef),
     } as GitState;
     // console.log(`Syncing ref ${currentRef}${slug ? ` and slug ${slug}` : ""}`);
-    if (slug && !["admin", "create-new-post"].includes(slug)) {
-      newGitState.currentContent = await fetchContent(slug, currentRef)
-      newGitState.indexEntry = (await fetchIndex(currentRef))?.posts?.[slug] || emptyEntry;
+    if (slug && !["admin", "create"].includes(slug)) {
+      newGitState.currentContent = await fetchContent(slug, currentRef || latestRef)
+      newGitState.indexEntry =
+        (await fetchIndex(currentRef || latestRef))?.posts?.[slug] || emptyEntry;
     } else {
       newGitState.currentContent = "";
       newGitState.indexEntry = emptyEntry;
@@ -181,7 +182,7 @@ const App: React.FC = () => {
 
   // Fetch index & post content whenever the url changes
   useEffect(() => {
-    syncGitState(refParam || gitState.latestRef, slugParam);
+    syncGitState(refParam, slugParam);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refParam, slugParam]);
 
@@ -212,7 +213,7 @@ const App: React.FC = () => {
                 render={() => (<Home adminMode={adminMode} />)}
               />
               <Route exact strict
-                path="/category/:slug"
+                path="/category/:category"
                 render={() => (<Home
                   adminMode={adminMode}
                   filterBy={categoryParam}

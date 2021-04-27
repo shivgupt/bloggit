@@ -34,12 +34,14 @@ const useStyles = makeStyles(theme => ({
 
 const TocGenerator = ({
   children,
-  level
+  level,
 }: {
   children: string[];
   level: number;
 }) => {
   const classes = useStyles();
+  const gitContext = useContext(GitContext);
+  const { currentRef, slug } = gitContext.gitState
 
   if (children.length > 1) {
     console.warn("This heading has more than one child..?");
@@ -61,7 +63,7 @@ const TocGenerator = ({
         key={headingSlug}
         className={marginStyle}
         component={HashLink as any}
-        to={{ hash:`#${headingSlug}` }}
+        to={`/${currentRef ? `${currentRef}/` : ""}${slug}#${headingSlug}`}
       >
         {heading}
       </ListItem>

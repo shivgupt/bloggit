@@ -118,7 +118,7 @@ export const HeadingRenderer = ({
         edge="start"
         key={hashlinkSlug}
         title="Link to position on page"
-        to={`/${currentRef}/${slug}#${hashlinkSlug}`}
+        to={`/${currentRef ? `${currentRef}/` : ""}${slug}#${hashlinkSlug}`}
       >
         <LinkIcon />
       </IconButton>

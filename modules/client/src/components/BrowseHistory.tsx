@@ -47,7 +47,7 @@ export const BrowseHistory = ({
   const classes = useStyles();
 
   useEffect(() => {
-    if (latestRef !== currentRef) {
+    if (currentRef) {
       setIsHistorical(true);
     } else {
       setIsHistorical(false);
