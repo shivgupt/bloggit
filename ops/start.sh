@@ -223,7 +223,7 @@ EOF
 
 docker stack deploy -c "$docker_compose" "$project"
 
-echo "The blog stack has been deployed, waiting for $public_url to start responding.."
+echo "The $project stack has been deployed, waiting for $public_url to start responding.."
 timeout=$(( $(date +%s) + 60 ))
 while true
 do
@@ -238,7 +238,7 @@ do
   fi
 done
 
-# Delete old blog images in prod to prevent the disk from filling up
+# Delete old images in prod to prevent the disk from filling up
 if [[ "$BLOG_PROD" == "true" ]]
 then
   docker container prune --force;

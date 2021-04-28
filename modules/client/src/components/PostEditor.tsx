@@ -16,7 +16,6 @@ import SpeedDial from "@material-ui/lab/SpeedDial";
 import SpeedDialAction from "@material-ui/lab/SpeedDialAction";
 import axios from "axios";
 import React, { useContext, useEffect, useState } from "react";
-import Markdown from "react-markdown";
 import ReactMde, { SaveImageHandler } from "react-mde";
 import { useHistory } from "react-router-dom";
 
@@ -25,13 +24,7 @@ import { getFabStyle } from "../style";
 import { SnackAlert } from "../types";
 import { emptyEntry, fetchHistory, getExistingCategories, getPath, slugify } from "../utils";
 
-import {
-  CodeBlockRenderer,
-  TextRenderer,
-  HeadingRenderer,
-  ImageRenderer,
-  LinkRenderer
-} from "./Renderers";
+import { Markdown } from "./Markdown";
 import { ImageInput } from "./ImageInput";
 
 const useStyles = makeStyles((theme) => ({
@@ -192,17 +185,17 @@ export const PostEditor = ({
       tldr: editData.tldr,
     } as PostData;
     newIndex.posts[newSlug] = newIndexEntry;
+    if (oldSlug && oldSlug !== newSlug) {
+      delete newIndex.posts[oldSlug]
+    }
     const newPath = getPath(newIndexEntry);
-    const oldPath = getPath(gitState.index.posts[gitState.slug]);
     const editRequest = [
       { path: newPath, content: editData.content, },
       { path: "index.json", content: JSON.stringify(newIndex, null, 2), }
     ] as EditRequest;
+    const oldPath = getPath(gitState.index.posts[gitState.slug]);
     if (oldPath && oldPath !== newPath) {
       editRequest.push({ path: oldPath, content: "" });
-    }
-    if (oldSlug && oldSlug !== newSlug) {
-      delete newIndex.posts[oldSlug]
     }
     // Send request to update index.json and create new file
     let res = await axios({
@@ -319,19 +312,9 @@ export const PostEditor = ({
         selectedTab={selectedTab}
         onTabChange={setSelectedTab}
         minEditorHeight={400}
-        generateMarkdownPreview={(markdown) =>
+        generateMarkdownPreview={(content) =>
           Promise.resolve(
-            <Markdown
-              source={markdown}
-              className={classes.text}
-              renderers={{
-                heading: HeadingRenderer,
-                code: CodeBlockRenderer,
-                text: TextRenderer,
-                link: LinkRenderer,
-                image: ImageRenderer,
-              }}
-            />
+            <Markdown content={content} />
           )}
         paste={{ saveImage }}
       />

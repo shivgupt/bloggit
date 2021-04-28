@@ -25,9 +25,10 @@ export const getPath = (post: PostData | undefined): string | undefined => {
 
 export const slugify = (s: string) => s
   .toLocaleLowerCase()
-  .replace(/[^a-z0-9_ -]/g, "")
+  .replace(/[^a-z0-9_ /-]/g, "")
   .replace(/\W/g, "-")
   .replace(/_/g, "-")
+  .replace(/\//g, "-")
   .replace(/-+/g, "-")
   .replace(/^-/g, "")
   .replace(/-$/g, "");
@@ -37,8 +38,11 @@ export const replaceEmojiString = (s: string) =>
 
 export const getChildValue = (child) => {
   if (!child) return;
-  if (child.props.value) return child.props.value;
-  return getChildValue(child.props.children[0]);
+  if (child?.value) return child.value;
+  if (child?.props?.value) return child.props.value;
+  if (child?.children?.length) return getChildValue(child?.children[0]);
+  if (child?.props?.children?.length) return getChildValue(child?.props?.children?.[0]);
+  return;
 };
 
 export const getPostsByCategories = (posts: Posts): PostsByCategory => {
