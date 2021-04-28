@@ -12,7 +12,7 @@ import { getFabStyle } from "../style";
 import { getPrettyDateString } from "../utils";
 
 import { BrowseHistory } from "./BrowseHistory";
-import { ImageRenderer, Markdown } from "./Markdown";
+import { Markdown } from "./Markdown";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -96,7 +96,7 @@ export const PostPage = ({
 
     <Paper variant="outlined" className={classes.paper}>
       { indexEntry?.img
-        ? <ImageRenderer
+        ? <img
             src={indexEntry.img}
             alt={indexEntry.img}
             style={{
