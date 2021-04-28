@@ -44,14 +44,14 @@ export const CodeBlockRenderer = ({
   inline,
   node,
 }: {
-  children: string;
-  className: string;
-  inline: boolean
+  children: any[];
+  className?: string;
+  inline?: boolean
   node: any;
 }) => {
   const theme = useTheme();
   const match = /language-(\w+)/.exec(className || '')
-  if (inline) {
+  if (!!inline) {
     return (
       <code className={className}>{getChildValue(node.children[0])}</code>
     );
@@ -92,7 +92,6 @@ export const HeadingRenderer = ({
   level: number;
   node: any;
 }) => {
-  console.log("render heading node", node);
   const { currentRef, slug } = useContext(GitContext).gitState;
   const value = getChildValue(node);
   if (!value) {
@@ -100,9 +99,10 @@ export const HeadingRenderer = ({
     return null;
   }
   const hashlinkSlug = slugify(value)
+  const Heading = `h${level}` as "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
 
   return (<>
-    <h1 id={hashlinkSlug} style={{ marginTop: "-65px", paddingTop: "65px" }}>
+    <Heading id={hashlinkSlug} style={{ marginTop: "-65px", paddingTop: "65px" }}>
       {value}
       <IconButton
         color="secondary"
@@ -115,22 +115,24 @@ export const HeadingRenderer = ({
       >
         <LinkIcon />
       </IconButton>
-    </h1>
+    </Heading>
   </>);
 };
 
 export const ImageRenderer = ({
+  node,
   src,
   alt,
   style,
 }: {
-  src: string;
-  alt: string;
-  style?: object;
+  node?: any;
+  src?: string;
+  alt?: string;
+  style?: any;
 }) => {
     return <img
-      src={src}
-      alt={alt}
+      src={src || node.properties.src}
+      alt={alt || node.properties.alt}
       style={style || {
         display: "block",
         margin: "auto",
@@ -169,15 +171,15 @@ export const Markdown = ({
     <ReactMarkdown
       className={classes.text}
       components={{
-        h1: (props) => <HeadingRenderer {...props} />,
-        h2: (props) => <HeadingRenderer {...props} />,
-        // h3: (props) => <HeadingRenderer {...props} />,
-        // h4: (props) => <HeadingRenderer {...props} />,
-        // h5: (props) => <HeadingRenderer {...props} />,
-        // h6: (props) => <HeadingRenderer {...props} />,
-        a: (props: any) => <LinkRenderer {...props} />,
-        img: (props: any) => <ImageRenderer {...props} />,
-        code: (props: any) => <CodeBlockRenderer {...props} />,
+        h1: HeadingRenderer,
+        h2: HeadingRenderer,
+        h3: HeadingRenderer,
+        h4: HeadingRenderer,
+        h5: HeadingRenderer,
+        h6: HeadingRenderer,
+        a: LinkRenderer,
+        img: ImageRenderer,
+        code: CodeBlockRenderer,
       }}
     >
       {replaceEmojiString(content)}

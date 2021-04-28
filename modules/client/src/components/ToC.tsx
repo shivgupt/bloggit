@@ -11,7 +11,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import NavigateNextIcon from "@material-ui/icons/NavigateNext";
 import NavigateBackIcon from "@material-ui/icons/NavigateBefore";
 import React, { useContext, useEffect, useState } from "react";
-import Markdown from "react-markdown";
+import ReactMarkdown from "react-markdown";
 import { Link as RouterLink } from "react-router-dom";
 
 import { GitContext } from "../GitContext";
@@ -27,6 +27,7 @@ const useStyles = makeStyles(theme => ({
   list3: { width: "100%", "paddingLeft": theme.spacing(6) },
   list4: { width: "100%", "paddingLeft": theme.spacing(8) },
   list5: { width: "100%", "paddingLeft": theme.spacing(10) },
+  list6: { width: "100%", "paddingLeft": theme.spacing(12) },
   tocIcon: {
     marginLeft: theme.spacing(2),
   },
@@ -35,19 +36,21 @@ const useStyles = makeStyles(theme => ({
 const TocGenerator = ({
   children,
   level,
+  node,
 }: {
-  children: string[];
-  level: number;
+  children: any[];
+  level?: number;
+  node: any;
 }) => {
   const classes = useStyles();
   const gitContext = useContext(GitContext);
   const { currentRef, slug } = gitContext.gitState
 
-  if (children.length > 1) {
+  if (children?.length > 1) {
     console.warn("This heading has more than one child..?");
     return null;
   }
-  const value = getChildValue(children[0]);
+  const value = getChildValue(node);
   if (!value) {
     console.warn("This heading has no child values..?");
     return null;
@@ -225,19 +228,20 @@ export const Toc = ({
         </Box>
         <Divider />
         <List component="nav" className={classes.list}>
-          <Markdown
+          <ReactMarkdown
             allowedElements={["h1", "h2", "h3", "h4", "h5", "h6"]}
-            children={currentContent}
-            components={{
-              h1: (props: any) => <TocGenerator {...props} />,
-              h2: (props: any) => <TocGenerator {...props} />,
-              h3: (props: any) => <TocGenerator {...props} />,
-              h4: (props: any) => <TocGenerator {...props} />,
-              h5: (props: any) => <TocGenerator {...props} />,
-              h6: (props: any) => <TocGenerator {...props} />,
-            }}
             className={classes.list}
-          />
+            components={{
+              h1: TocGenerator,
+              h2: TocGenerator,
+              h3: TocGenerator,
+              h4: TocGenerator,
+              h5: TocGenerator,
+              h6: TocGenerator,
+            }}
+          >
+            {currentContent}
+          </ReactMarkdown>
         </List>
         <Divider />
       </div>
