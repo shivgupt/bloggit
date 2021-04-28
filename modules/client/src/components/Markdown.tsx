@@ -6,6 +6,7 @@ import React, { useContext } from "react";
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { atomDark, vs } from "react-syntax-highlighter/dist/esm/styles/prism";
+import gfm from "remark-gfm";
 
 import { GitContext } from "../GitContext";
 import { getChildValue, replaceEmojiString, slugify } from "../utils";
@@ -154,6 +155,7 @@ export const Markdown = ({
         h6: HeadingRenderer,
         img: ImageRenderer,
       }}
+      remarkPlugins={[gfm]}
     >
       {replaceEmojiString(content)}
     </ReactMarkdown>
