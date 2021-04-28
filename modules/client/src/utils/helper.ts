@@ -25,9 +25,10 @@ export const getPath = (post: PostData | undefined): string | undefined => {
 
 export const slugify = (s: string) => s
   .toLocaleLowerCase()
-  .replace(/[^a-z0-9_ -]/g, "")
+  .replace(/[^a-z0-9_ /-]/g, "")
   .replace(/\W/g, "-")
   .replace(/_/g, "-")
+  .replace(/\//g, "-")
   .replace(/-+/g, "-")
   .replace(/^-/g, "")
   .replace(/-$/g, "");

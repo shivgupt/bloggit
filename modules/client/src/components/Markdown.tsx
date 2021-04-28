@@ -2,12 +2,11 @@ import IconButton from "@material-ui/core/IconButton";
 import Link from "@material-ui/core/Link";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import LinkIcon from "@material-ui/icons/Link";
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { atomDark, vs } from "react-syntax-highlighter/dist/esm/styles/prism";
 import gfm from "remark-gfm";
-
 import { GitContext } from "../GitContext";
 import { getChildValue, replaceEmojiString, slugify } from "../utils";
 
@@ -43,8 +42,38 @@ export const Markdown = ({
 }: {
   content: string;
 }) => {
+  const [imgErrors, setImgErrors] = useState({});
   const classes = useStyles();
   const theme = useTheme();
+
+  useEffect(() => {
+    console.log(`Got image errors`, imgErrors);
+  }, [imgErrors]);
+
+  const ImageRenderer = ({
+    node,
+  }: {
+    node?: any;
+  }) => {
+    const src = node.properties.src;
+    return (!imgErrors[src]
+      ? <img
+        onError={(e) => {
+          if (!imgErrors[src]) {
+            setImgErrors(old => ({ ...old, [src]: true }))
+          }
+        }}
+        src={src}
+        alt={node.properties.alt}
+        style={{ display: "block", margin: "auto", maxWidth: "90%", }}
+      />
+    : <video
+        controls
+        src={src}
+        style={{ display: "block", margin: "auto", maxWidth: "90%", }}
+      />
+    )
+  };
 
   const LinkRenderer = ({
     node,
@@ -124,22 +153,6 @@ export const Markdown = ({
       </Heading>
     </>);
   };
-
-  const ImageRenderer = ({
-    node,
-  }: {
-    node?: any;
-  }) => {
-      return <img
-        src={node.properties.src}
-        alt={node.properties.alt}
-        style={{
-          display: "block",
-          margin: "auto",
-          maxWidth: "90%",
-        }}
-      />;
-    };
 
   return (
     <ReactMarkdown
