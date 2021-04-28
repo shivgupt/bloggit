@@ -4,7 +4,6 @@ import { makeStyles } from "@material-ui/core/styles";
 import Edit from "@material-ui/icons/Edit";
 import Typography from "@material-ui/core/Typography";
 import React, { useContext, useEffect, useState } from "react";
-import Markdown from "react-markdown";
 import "react-mde/lib/styles/css/react-mde-all.css";
 import { useHistory } from "react-router-dom";
 
@@ -13,14 +12,7 @@ import { getFabStyle } from "../style";
 import { getPrettyDateString } from "../utils";
 
 import { BrowseHistory } from "./BrowseHistory";
-import {
-  BlockQuoteRenderer,
-  CodeBlockRenderer,
-  HeadingRenderer,
-  ImageRenderer,
-  LinkRenderer,
-  TextRenderer,
-} from "./Renderers";
+import { ImageRenderer, Markdown } from "./Markdown";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -132,18 +124,7 @@ export const PostPage = ({
           </Typography>
         : null
       }
-      <Markdown
-        children={currentContent}
-        className={classes.text}
-        components={{
-          heading: HeadingRenderer,
-          code: CodeBlockRenderer,
-          text: TextRenderer,
-          link: LinkRenderer,
-          image: ImageRenderer,
-          blockquote: BlockQuoteRenderer,
-        }}
-      />
+      <Markdown content={currentContent} />
     </Paper>
     {adminMode === "enabled" && !isHistorical
       ? <Fab

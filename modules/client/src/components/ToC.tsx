@@ -226,9 +226,16 @@ export const Toc = ({
         <Divider />
         <List component="nav" className={classes.list}>
           <Markdown
-            allowedTypes={["text", "heading"]}
+            allowedElements={["h1", "h2", "h3", "h4", "h5", "h6"]}
             children={currentContent}
-            components={{ heading: TocGenerator }}
+            components={{
+              h1: (props: any) => <TocGenerator {...props} />,
+              h2: (props: any) => <TocGenerator {...props} />,
+              h3: (props: any) => <TocGenerator {...props} />,
+              h4: (props: any) => <TocGenerator {...props} />,
+              h5: (props: any) => <TocGenerator {...props} />,
+              h6: (props: any) => <TocGenerator {...props} />,
+            }}
             className={classes.list}
           />
         </List>

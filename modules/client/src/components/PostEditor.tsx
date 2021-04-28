@@ -16,7 +16,6 @@ import SpeedDial from "@material-ui/lab/SpeedDial";
 import SpeedDialAction from "@material-ui/lab/SpeedDialAction";
 import axios from "axios";
 import React, { useContext, useEffect, useState } from "react";
-import Markdown from "react-markdown";
 import ReactMde, { SaveImageHandler } from "react-mde";
 import { useHistory } from "react-router-dom";
 
@@ -25,13 +24,7 @@ import { getFabStyle } from "../style";
 import { SnackAlert } from "../types";
 import { emptyEntry, fetchHistory, getExistingCategories, getPath, slugify } from "../utils";
 
-import {
-  CodeBlockRenderer,
-  TextRenderer,
-  HeadingRenderer,
-  ImageRenderer,
-  LinkRenderer
-} from "./Renderers";
+import { Markdown } from "./Markdown";
 import { ImageInput } from "./ImageInput";
 
 const useStyles = makeStyles((theme) => ({
@@ -319,24 +312,9 @@ export const PostEditor = ({
         selectedTab={selectedTab}
         onTabChange={setSelectedTab}
         minEditorHeight={400}
-        generateMarkdownPreview={(markdown) =>
+        generateMarkdownPreview={(content) =>
           Promise.resolve(
-            <Markdown
-              children={markdown}
-              className={classes.text}
-              components={{
-                h1: ({ node, ...props}) => <HeadingRenderer {...props} />,
-                h2: ({ node, ...props }) => <HeadingRenderer {...props} />,
-                h3: ({ node, ...props }) => <HeadingRenderer {...props} />,
-                h4: ({ node, ...props }) => <HeadingRenderer {...props} />,
-                h5: ({ node, ...props }) => <HeadingRenderer {...props} />,
-                h6: ({ node, ...props }) => <HeadingRenderer {...props} />,
-                text: ({ node, ...props }) => <TextRenderer {...props} />,
-                link: ({ node, ...props }) => <LinkRenderer {...props} />,
-                image: ({ node, ...props }) => <ImageRenderer {...props} />,
-                code: ({ node, ...props }) => <CodeBlockRenderer {...props} />,
-              }}
-            />
+            <Markdown content={content} />
           )}
         paste={{ saveImage }}
       />
