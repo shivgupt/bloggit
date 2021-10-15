@@ -23,6 +23,7 @@ export default {
     // Ignore known warnings
     const fromPkg = (pkgName) => warning?.id?.startsWith(`/root/node_modules/${pkgName}`);
     if (warning.code === "EVAL" && fromPkg("depd")) return;
+    if (warning.code === "EVAL" && fromPkg("@protobufjs")) return;
     warn(warning);
   },
   external: ["readable-stream", "readable-stream/transform", "electron"],
