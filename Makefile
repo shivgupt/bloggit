@@ -74,6 +74,9 @@ build-report:
 dls:
 	@docker service ls && echo '=====' && docker container ls -a
 
+lint:
+	bash ops/lint.sh
+
 test-server: server-js
 	bash ops/test/server.sh test
 watch-server: node-modules

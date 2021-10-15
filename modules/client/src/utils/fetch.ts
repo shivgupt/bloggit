@@ -14,9 +14,9 @@ export const fetchRef = async (): Promise<string> => {
     throw new Error(`Failed to retrieve branch from data: ${JSON.stringify(response.data)}`);
   }
   return response.data.commit.substring(0, 8);
-}
+};
 
-let fileCache: { [ref: string]: { [path: string]: string; } } = {};
+const fileCache: { [ref: string]: { [path: string]: string; } } = {};
 export const fetchFile = async (path: string, _ref?: string): Promise<string> => {
   const ref = _ref || await fetchRef();
   if (!fileCache[ref]) {
@@ -34,7 +34,7 @@ export const fetchFile = async (path: string, _ref?: string): Promise<string> =>
       }
     } catch (e) {
       console.error(e.message);
-      fileCache[ref][path] = "Does Not Exist"
+      fileCache[ref][path] = "Does Not Exist";
     }
   }
   return fileCache[ref][path];
@@ -59,7 +59,7 @@ export const fetchIndex = async (_ref?: string): Promise<BlogIndex> => {
   }
 };
 
-let historyCache: { [slug: string]: HistoryResponse } = {};
+const historyCache: { [slug: string]: HistoryResponse } = {};
 export const fetchHistory = async (slug: string, force?: boolean): Promise<HistoryResponse> => {
   if (!slug) return [];
   if (!force && historyCache[slug]) {
@@ -86,7 +86,7 @@ const slugToPath = async (slug: string, ref: string): Promise<string> => {
     const history = historyCache[slug].find(entry => entry.commit?.startsWith(ref));
     if (history?.path) {
       console.log(`Found path for ${ref}/${slug} in history: ${history.path}`);
-      return history.path
+      return history.path;
     }
   }
   console.log(`Path for ${ref}/${slug} is not available via git history`);
@@ -99,7 +99,7 @@ const slugToPath = async (slug: string, ref: string): Promise<string> => {
       await fetchFile(path, ref);
       return path;
     } catch (e) {
-      console.warn(`${path} does not exist on ${ref}: ${e.message}`)
+      console.warn(`${path} does not exist on ${ref}: ${e.message}`);
     }
   }
   if (entry.category) {
@@ -108,7 +108,7 @@ const slugToPath = async (slug: string, ref: string): Promise<string> => {
       await fetchFile(path, ref);
       return path;
     } catch (e) {
-      console.warn(`${path} does not exist on ${ref}: ${e.message}`)
+      console.warn(`${path} does not exist on ${ref}: ${e.message}`);
     }
   }
   path = `${slug}.md`;
@@ -116,7 +116,7 @@ const slugToPath = async (slug: string, ref: string): Promise<string> => {
     await fetchFile(path, ref);
     return path;
   } catch (e) {
-    console.warn(`${path} does not exist on ${ref}: ${e.message}`)
+    console.warn(`${path} does not exist on ${ref}: ${e.message}`);
   }
   throw new Error(`No valid path exists for ${slug}`);
 };
@@ -127,5 +127,5 @@ export const fetchContent = async(
 ): Promise<string> => {
   const ref = _ref || await fetchRef();
   const path = await slugToPath(slug, ref);
-  return await fetchFile(path, ref)
+  return await fetchFile(path, ref);
 };

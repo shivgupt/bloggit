@@ -4,16 +4,16 @@ import emoji from "emoji-dictionary";
 import { PostsByCategory } from "../types";
 
 export const getPrettyDateString = (dateString: string) => {
-  let date = new Date(dateString);
+  const date = new Date(dateString);
   if (date.toString() === "Invalid Date") {
     return null;
   }
-  return date.toLocaleDateString('en', {
+  return date.toLocaleDateString("en", {
     year: "numeric",
     month: "long",
     day: "numeric",
   });
-}
+};
 
 export const getPath = (post: PostData | undefined): string | undefined => {
   if (!post) return undefined;
@@ -49,19 +49,19 @@ export const getPostsByCategories = (posts: Posts): PostsByCategory => {
   return (
     Object.values(posts).reduce((categories, post) => {
       if (post.category) {
-        if (post.draft) return ({...categories});
+        if (post.draft) return ({ ...categories });
         return ({
           ...categories,
           [post.category.toLocaleLowerCase()]: [
             ...(categories[post.category.toLocaleLowerCase()]||[]),
             post
           ]
-        })
+        });
       } else {
         return ({
           ...categories,
           "top-level": [ ...(categories["top-level"] || []), post ]
-        })
+        });
       }
     }, {})
   );
@@ -71,9 +71,9 @@ export const getExistingCategories = (posts: Posts): string[] => {
   return (
     Object.values(posts).reduce((categories, post) => {
       if (post.category && !categories.includes(post.category.toLowerCase())) {
-        return [ ...categories, post.category.toLowerCase() ]
+        return [ ...categories, post.category.toLowerCase() ];
       }
       return [...categories];
     }, [] as string[])
-  )
-}
+  );
+};
