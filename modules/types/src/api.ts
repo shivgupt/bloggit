@@ -29,8 +29,8 @@ export const ReadResponse = Type.Object({
 });
 export type ReadResponse = Static<typeof ReadResponse>;
 
-export const RefResponse = {
+export const RefResponse = Type.Object({
   branch: Type.String(),
   commit: Type.String(),
-};
+});
 export type RefResponse = Static<typeof RefResponse>;

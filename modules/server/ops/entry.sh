@@ -82,7 +82,7 @@ if [[ "$BLOG_PROD" == "true" ]]
 then
   echo "Starting blog server in prod-mode"
   export NODE_ENV=production
-  exec node --no-deprecation dist/entry.js
+  exec node --no-deprecation dist/bundle.js
 else
   echo "Starting blog server in dev-mode"
   export NODE_ENV=development
@@ -98,5 +98,5 @@ else
     --polling-interval 1000 \
     --watch src \
     --exec ts-node \
-    ./src/entry.ts
+    ./src/index.ts
 fi

@@ -1,4 +1,4 @@
-import ipfsClient from "ipfs-client";
+import { create as ipfsClient } from "ipfs-client";
 
 import { env } from "../env";
 

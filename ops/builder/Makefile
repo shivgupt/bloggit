@@ -18,7 +18,7 @@ $(shell mkdir -p .flags)
 # TODO: add test rules?
 
 # TODO: fetch a list of modules to auto-populate the default build rule?
-default: server-js client-js
+default: server client
 
 node-modules: package.json $(shell ls modules/**/package.json)
 	$(log_start)
@@ -28,17 +28,17 @@ node-modules: package.json $(shell ls modules/**/package.json)
 # TODO: generalize below so we can build modules which support `npm run build`
 # It'd be nice to derive the dependency graph from package.json deps
 
-types: node-modules $(shell find modules/server/src $(find_options))
+types: node-modules $(shell find modules/server $(find_options))
 	$(log_start)
 	cd modules/types && npm run build
 	$(log_finish) && mv -f $(totalTime) .flags/$@
 
-server-js: node-modules $(shell find modules/server/src $(find_options))
+server: node-modules $(shell find modules/server $(find_options))
 	$(log_start)
 	cd modules/server && npm run build
 	$(log_finish) && mv -f $(totalTime) .flags/$@
 
-client-js: node-modules $(shell find modules/client/src $(find_options))
+client: node-modules $(shell find modules/client $(find_options))
 	$(log_start)
 	cd modules/client && npm run build
 	$(log_finish) && mv -f $(totalTime) .flags/$@
