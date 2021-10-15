@@ -51,7 +51,7 @@ const App: React.FC = () => {
   const classes = useStyles();
 
   const [gitState, setGitState] = useState(initialGitState);
-  const [theme, setTheme] = useState(lightTheme);
+  const [theme, setTheme] = useState(darkTheme);
   const [adminMode, setAdminMode] = useState<AdminMode>("invalid");
   const [snackAlert, setSnackAlert] = useState<SnackAlert>(defaultSnackAlert);
 
