@@ -2,7 +2,7 @@
   "name": "@blog/types",
   "version": "1.0.0",
   "description": "Types shared between blog client & server",
-  "author": "Bo & Shiv Henderson",
+  "author": "Bo & Shiv Hendo",
   "license": "GPL-3.0-or-later",
   "homepage": "https://github.com/bohendo/blog#readme",
   "repository": { "type": "git", "url": "git+ssh://git@github.com/bohendo/blog.git" },

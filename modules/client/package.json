@@ -1,6 +1,7 @@
 {
   "name": "blog-client",
   "version": "0.1.0",
+  "author": "Bo & Shiv Hendo",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
