@@ -11,6 +11,7 @@ export BLOG_MIRROR_KEY="${BLOG_MIRROR_KEY:-}"
 export BLOG_MIRROR_REF="${BLOG_MIRROR_REF:-mirror}"
 
 # Log all env vars
+echo "Starting server in env:"
 echo "- BLOG_AUTH_PASSWORD=$BLOG_AUTH_PASSWORD"
 echo "- BLOG_AUTH_USERNAME=$BLOG_AUTH_USERNAME"
 echo "- BLOG_BRANCH=$BLOG_BRANCH"
@@ -24,7 +25,6 @@ echo "- BLOG_MIRROR_REF=$BLOG_MIRROR_REF"
 echo "- BLOG_MIRROR_URL=$BLOG_MIRROR_URL"
 echo "- BLOG_PORT=$BLOG_PORT"
 echo "- BLOG_PROD=$BLOG_PROD"
-echo "Starting server in env:"
 
 if [[ -d "modules/server" ]]
 then cd modules/server
@@ -100,12 +100,13 @@ else
   fi
   exec nodemon \
     --delay 1 \
+    --exec "node -r ts-node/register" \
     --exitcrash \
-    --ignore ./*.test.ts \
+    --experimental-modules \
     --ignore ./*.swp \
+    --ignore ./*.test.ts \
     --legacy-watch \
     --polling-interval 1000 \
     --watch src \
-    --exec "node -r ts-node/register" \
-    "$dev_target"
+    "dist/bundle.js"
 fi

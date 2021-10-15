@@ -22,7 +22,13 @@ export default {
     if (warning.code === "EVAL" && fromPkg("depd")) return;
     warn(warning);
   },
-  external: ["readable-stream", "readable-stream/transform", "ipfs-client"],
+  external: [
+    "ipfs-client",
+    "native-fetch",
+    "node-fetch",
+    "readable-stream",
+    "readable-stream/transform",
+  ],
   plugins: [
     NodeResolve({
       exportConditions: ["node"],
