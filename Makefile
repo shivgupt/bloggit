@@ -77,6 +77,9 @@ dls:
 lint:
 	bash ops/lint.sh
 
+deploy:
+	bash ops/deploy.sh
+
 test-server: server
 	bash ops/test/server.sh test
 watch-server: node-modules
