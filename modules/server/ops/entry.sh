@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+dev_target="src/index.ts"
+prod_target="dist/bundle.js"
+
 # Ensure defaults are set for important env vars
 export BLOG_BRANCH="${BLOG_BRANCH:-main}"
 export BLOG_INTERNAL_CONTENT_DIR="${BLOG_INTERNAL_CONTENT_DIR:-/blog-content.git}"
@@ -25,6 +28,10 @@ echo "Starting server in env:"
 
 if [[ -d "modules/server" ]]
 then cd modules/server
+fi
+
+if [[ ! -f "$dev_target" && ! -f "$prod_target" ]]
+then echo "Fatal: couldn't find file to run" && pwd && ls && exit 1
 fi
 
 ########################################
@@ -82,7 +89,7 @@ if [[ "$BLOG_PROD" == "true" ]]
 then
   echo "Starting blog server in prod-mode"
   export NODE_ENV=production
-  exec node --no-deprecation dist/bundle.js
+  exec node --no-deprecation "$prod_target"
 else
   echo "Starting blog server in dev-mode"
   export NODE_ENV=development
@@ -94,9 +101,11 @@ else
   exec nodemon \
     --delay 1 \
     --exitcrash \
+    --ignore ./*.test.ts \
+    --ignore ./*.swp \
     --legacy-watch \
     --polling-interval 1000 \
     --watch src \
-    --exec ts-node \
-    ./src/index.ts
+    --exec "node -r ts-node/register" \
+    "$dev_target"
 fi

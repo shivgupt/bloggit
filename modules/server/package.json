@@ -6,8 +6,9 @@
   "license": "GPL-3.0-or-later",
   "main": "dist/bundle.js",
   "scripts": {
-    "build": "tsc && rollup --config rollup.config.js",
-    "test": "ts-mocha --check-leaks --exit --timeout 60000 'src/**/*.test.ts'"
+    "build": "rollup --config rollup.config.js",
+    "test": "ts-mocha --check-leaks --exit --timeout 60000 'src/**/*.test.ts'",
+    "start": "nodemon --exec ts-node"
   },
   "dependencies": {
     "body-parser": "1.19.0",
@@ -16,6 +17,7 @@
     "isomorphic-git": "1.10.1",
     "it-all": "1.0.6",
     "node-fetch": "3.0.0",
+    "nodemon": "2.0.13",
     "pino": "6.13.3",
     "pino-pretty": "7.0.1"
   },
@@ -33,10 +35,7 @@
     "chai": "4.3.4",
     "chai-as-promised": "7.1.1",
     "mocha": "9.1.1",
-    "nodemon": "2.0.13",
     "rollup": "2.58.0",
-    "rollup-plugin-cjs-es": "1.0.1",
-    "rollup-plugin-re": "1.0.7",
     "ts-mocha": "8.0.0",
     "ts-node": "10.3.0",
     "tslib": "2.3.1",
