@@ -8,8 +8,11 @@
     "esModuleInterop": true,
     "experimentalDecorators": true,
     "forceConsistentCasingInFileNames": true,
+    "incremental": true,
+    "lib": ["es2019"],
+    "module": "commonjs",
     "moduleResolution": "node",
-    "noFallthroughCasesInSwitch": true,
+    "noEmit": false,
     "noImplicitAny": false,
     "noImplicitReturns": true,
     "noLib": false,
@@ -20,6 +23,9 @@
     "skipLibCheck": true,
     "sourceMap": true,
     "strict": true,
-    "typeRoots": ["./node_modules/@types"]
+    "target": "es6",
+    "typeRoots": [
+      "./node_modules/@types"
+    ]
   }
 }
