@@ -103,10 +103,10 @@ else
     --exec "node -r ts-node/register" \
     --exitcrash \
     --experimental-modules \
-    --ignore ./*.swp \
-    --ignore ./*.test.ts \
+    --ignore '**/*.swp' \
+    --ignore '**/*.test.ts' \
     --legacy-watch \
     --polling-interval 1000 \
-    --watch src \
-    "dist/bundle.js"
+    --watch '**/*.ts' \
+    "$dev_target"
 fi

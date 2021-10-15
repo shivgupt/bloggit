@@ -186,12 +186,11 @@ export const Home = ({
           if (filterBy && post.category !== filterBy) return false;
           return true;
         }).map((post: PostData, idx: number) => (
-          <>
+          <React.Fragment key={idx}>
             <Hidden mdUp>
               <Grid
                 item
                 className={classes.root}
-                justify={"center"}
                 key={post.slug}
                 sm={12}
                 xs={12}
@@ -210,7 +209,7 @@ export const Home = ({
                 <PostCard post={post} />
               </Grid>
             </Hidden>
-          </>
+          </React.Fragment>
         ))}
       </Grid>
       {adminMode === "enabled"

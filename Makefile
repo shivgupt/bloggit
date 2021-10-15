@@ -114,6 +114,7 @@ types: node-modules $(shell find modules/types $(find_options))
 
 server: types $(shell find modules/server $(find_options))
 	bash ops/maketh.sh $@
+	touch modules/server/src/index.ts
 
 client: types $(shell find modules/client $(find_options))
 	bash ops/maketh.sh $@
