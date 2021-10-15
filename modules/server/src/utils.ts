@@ -1,5 +1,4 @@
 import pino from "pino";
-import prettifier from "pino-pretty";
 
 import { env } from "./env";
 
@@ -13,7 +12,6 @@ export const logger = pino({
     messageFormat: `[{module}] {msg}`,
     translateTime: true,
   },
-  prettifier,
 });
 
 // Convert between utf8-encoded strings and Uint8Arrays

@@ -83,7 +83,9 @@ const genericHashLink = (props: any, As, ref: any) => {
 export const HashLink = React.forwardRef((props, ref) => {
   return genericHashLink(props, Link, ref);
 });
+HashLink.displayName = "HashLink";
 
 export const NavHashLink = React.forwardRef((props, ref) => {
   return genericHashLink(props, NavLink, ref);
 });
+NavHashLink.displayName = "NavHashLink";

@@ -86,12 +86,12 @@ export const PostCard = ({
       <CardActionArea disableRipple className={classes.actionArea} component={Link} to={`/${slug}`}>
         {post.img
           ? <div className={classes.cardImageWrapper}>
-              <img
-                className={classes.cardImage}
-                src={post.img}
-                alt={slug}
-              />
-            </div>
+            <img
+              className={classes.cardImage}
+              src={post.img}
+              alt={slug}
+            />
+          </div>
           : null}
       </CardActionArea>
       <CardContent className={classes.cardContent}>
@@ -99,19 +99,19 @@ export const PostCard = ({
           <Typography variant="h5" gutterBottom display="block">{title}</Typography>
         </CardActionArea>
           &nbsp;
-          <Chip
-            label={post.category}
-            component={Link}
-            to={`/category/${post.category}`}
-            clickable
-            className={classes.chip}
-          />
-          {publishedOn
-            ? <Typography variant="caption" gutterBottom display="inline">
-                {publishedOn}
-              </Typography>
-            : null
-          }
+        <Chip
+          label={post.category}
+          component={Link}
+          to={`/category/${post.category}`}
+          clickable
+          className={classes.chip}
+        />
+        {publishedOn
+          ? <Typography variant="caption" gutterBottom display="inline">
+            {publishedOn}
+          </Typography>
+          : null
+        }
         <CardActionArea disableRipple className={classes.contentActionArea} component={Link} to={`/${slug}`}>
           <Typography variant="caption" component="p" gutterBottom className={classes.header}>
             {tldr.substr(0,cutoff)} {tldr.length > cutoff ? "..." : null}
@@ -119,8 +119,8 @@ export const PostCard = ({
         </CardActionArea>
       </CardContent>
     </Card>
-  )
-}
+  );
+};
 
 export const Home = ({
   adminMode,
@@ -139,42 +139,42 @@ export const Home = ({
     if ((!a.publishedOn && !b.publishedOn) || a.publishedOn === b.publishedOn) return 0;
     if (!a.publishedOn) return 1;
     if (!b.publishedOn) return -1;
-    return a.publishedOn > b.publishedOn ? -1 : 1
-  })
+    return a.publishedOn > b.publishedOn ? -1 : 1;
+  });
 
-  const featured = sortedPosts.filter((post) => post.featured)
+  const featured = sortedPosts.filter((post) => post.featured);
 
   return (
     <>
       {!filterBy
         ? <>
-            <Carousel className={classes.carousel}
-              fullHeightHover={false}
-              navButtonsWrapperProps={{
-                className: "string",
-                style: {
-                  top: "calc(75%)",
-                }
-              }}
-              navButtonsProps={{
-                className: "string",
-                style: {
-                  top: "calc(75%)",
-                },
-              }}
-            >
+          <Carousel className={classes.carousel}
+            fullHeightHover={false}
+            navButtonsWrapperProps={{
+              className: "string",
+              style: {
+                top: "calc(75%)",
+              }
+            }}
+            navButtonsProps={{
+              className: "string",
+              style: {
+                top: "calc(75%)",
+              },
+            }}
+          >
             {featured.map((post: PostData) => 
               <PostCard key={post.slug} post={post} />,
             )}
-            </Carousel>
-            <Divider variant="middle" />
-            <Typography variant="h4" className={classes.header}>
+          </Carousel>
+          <Divider variant="middle" />
+          <Typography variant="h4" className={classes.header}>
               Archives
-            </Typography>
-          </>
+          </Typography>
+        </>
         : <Typography variant="h4" className={classes.header}>
             All <em>{filterBy}</em> posts
-          </Typography>
+        </Typography>
       }
       <Grid
         container
@@ -215,13 +215,13 @@ export const Home = ({
       </Grid>
       {adminMode === "enabled"
         ? <Fab
-            id={"fab"}
-            className={classes.fab}
-            color="primary"
-            onClick={() => {
-              history.push("/admin/create");
-            }}
-          ><Add/></Fab>
+          id={"fab"}
+          className={classes.fab}
+          color="primary"
+          onClick={() => {
+            history.push("/admin/create");
+          }}
+        ><Add/></Fab>
         : null
       }
     </>

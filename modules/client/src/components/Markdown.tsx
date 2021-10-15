@@ -7,6 +7,7 @@ import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { atomDark, vs } from "react-syntax-highlighter/dist/esm/styles/prism";
 import gfm from "remark-gfm";
+
 import { GitContext } from "../GitContext";
 import { getChildValue, replaceEmojiString, slugify } from "../utils";
 
@@ -58,29 +59,27 @@ export const Markdown = ({
     const src = node.properties.src;
     return (!imgErrors[src]
       ? <img
-        onError={(e) => {
+        onError={() => {
           if (!imgErrors[src]) {
-            setImgErrors(old => ({ ...old, [src]: true }))
+            setImgErrors(old => ({ ...old, [src]: true }));
           }
         }}
         src={src}
         alt={node.properties.alt}
-        style={{ display: "block", margin: "auto", maxWidth: "90%", }}
+        style={{ display: "block", margin: "auto", maxWidth: "90%" }}
       />
-    : <video
+      : <video
         controls
         src={src}
-        style={{ display: "block", margin: "auto", maxWidth: "90%", }}
+        style={{ display: "block", margin: "auto", maxWidth: "90%" }}
       />
-    )
+    );
   };
 
   const LinkRenderer = ({
     node,
-    children,
   }: {
     node: any;
-    children: any[];
   }) => {
     return (
       <Link
@@ -104,8 +103,8 @@ export const Markdown = ({
     inline?: boolean
     node: any;
   }) => {
-    const match = /language-(\w+)/.exec(className || '')
-    if (!!inline) {
+    const match = /language-(\w+)/.exec(className || "");
+    if (inline) {
       return (
         <code className={className}>{getChildValue(node.children[0])}</code>
       );
@@ -115,9 +114,10 @@ export const Markdown = ({
           style={theme.palette.type === "dark" ? atomDark : vs}
           language={match ? match[1] : "text"}
           PreTag="div"
-          children={String(children).replace(/\n$/, '')}
-        />
-      )
+        >
+          {String(children).replace(/\n$/, "")}
+        </SyntaxHighlighter>
+      );
     }
   };
 
@@ -134,7 +134,7 @@ export const Markdown = ({
       console.warn(`Heading node has no child value`, node);
       return null;
     }
-    const hashlinkSlug = slugify(value)
+    const hashlinkSlug = slugify(value);
     const Heading = `h${level}` as "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
     return (<>
       <Heading id={hashlinkSlug} style={{ marginTop: "-65px", paddingTop: "65px" }}>
@@ -173,4 +173,4 @@ export const Markdown = ({
       {replaceEmojiString(content)}
     </ReactMarkdown>
   );
-}
+};

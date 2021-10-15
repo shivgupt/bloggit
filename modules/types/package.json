@@ -1,18 +1,26 @@
 {
   "name": "@blog/types",
   "version": "1.0.0",
-  "description": "TypeScript typings for types shared between blog server & client",
-  "main": "dist/src/index.js",
-  "types": "dist/src/index.d.ts",
-  "license": "MIT",
-  "files": [
-    "dist",
-    "src"
-  ],
+  "description": "Types shared between blog client & server",
+  "author": "Bo & Shiv Henderson",
+  "license": "GPL-3.0-or-later",
+  "homepage": "https://github.com/bohendo/blog#readme",
+  "repository": { "type": "git", "url": "git+ssh://git@github.com/bohendo/blog.git" },
+  "bugs": { "url": "https://github.com/bohendo/blog/issues" },
+  "main": "dist/bundle.js",
+  "module": "dist/bundle.esm.js",
+  "types": "dist/bundle.d.ts",
+  "files": ["dist/bundle.js", "dist/bundle.esm.js", "dist/bundle.d.ts"],
   "scripts": {
-    "build": "rm -rf dist && tsc"
+    "build": "rollup --config rollup.config.js"
+  },
+  "dependencies": {
+    "@sinclair/typebox": "0.20.5"
   },
   "devDependencies": {
-    "typescript": "4.2.4"
+    "@rollup/plugin-typescript": "8.2.5",
+    "rollup": "2.58.0",
+    "rollup-plugin-dts": "4.0.0",
+    "typescript": "4.3.5"
   }
 }

@@ -42,4 +42,4 @@ export const defaultSnackAlert: SnackAlert = {
   open: false,
   msg: "",
   severity: "info",
-}
+};

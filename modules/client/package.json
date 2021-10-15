@@ -8,13 +8,14 @@
     "eject": "react-scripts eject"
   },
   "dependencies": {
+    "@blog/types": "1.0.0",
     "@date-io/date-fns": "2.10.8",
     "@fontsource/monsieur-la-doulaise": "4.2.2",
     "@material-ui/core": "4.11.4",
     "@material-ui/icons": "4.11.2",
     "@material-ui/lab": "4.0.0-alpha.58",
     "@material-ui/pickers": "3.3.10",
-    "axios": "0.21.1",
+    "axios": "0.21.4",
     "emoji-dictionary": "1.0.11",
     "react": "17.0.2",
     "react-copy-to-clipboard": "5.0.3",
@@ -32,21 +33,20 @@
     "web-vitals": "1.1.1"
   },
   "devDependencies": {
-    "@blog/types": "1.0.0",
     "@testing-library/jest-dom": "5.12.0",
     "@testing-library/react": "11.2.6",
     "@testing-library/user-event": "13.1.5",
     "@types/jest": "26.0.23",
-    "@types/node": "15.0.1",
+    "@types/node": "16.11.0",
     "@types/react": "17.0.4",
     "@types/react-copy-to-clipboard": "5.0.0",
     "@types/react-dom": "17.0.3",
     "cypress": "7.2.0",
     "cypress-terminal-report": "3.1.0",
-    "typescript": "4.2.4"
+    "typescript": "4.3.5"
   },
   "eslintConfig": {
-    "extends": ["react-app"]
+    "extends": "../../.eslintrc.js"
   },
   "browserslist": {
     "production": [

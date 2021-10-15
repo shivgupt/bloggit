@@ -44,7 +44,7 @@ const TocGenerator = ({
 }) => {
   const classes = useStyles();
   const gitContext = useContext(GitContext);
-  const { currentRef, slug } = gitContext.gitState
+  const { currentRef, slug } = gitContext.gitState;
 
   if (children?.length > 1) {
     console.warn("This heading has more than one child..?");
@@ -55,7 +55,7 @@ const TocGenerator = ({
     console.warn("This heading has no child values..?");
     return null;
   }
-  const headingSlug = slugify(replaceEmojiString(value))
+  const headingSlug = slugify(replaceEmojiString(value));
   const heading = replaceEmojiString(value);
   const marginStyle = classes[`list${level || 1}`];
 
@@ -83,7 +83,7 @@ export const Toc = ({
   const gitContext = useContext(GitContext);
   const classes = useStyles();
 
-  const { currentContent, slug, index } = gitContext.gitState
+  const { currentContent, slug, index } = gitContext.gitState;
 
   const byTitle = (pA: PostData, pB: PostData): number =>
     (pA?.title || "").toLowerCase() > (pB?.title || "").toLowerCase() ? 1 : -1;
@@ -146,7 +146,7 @@ export const Toc = ({
                   to={`/${p.slug}`}
                 > {p.title} </Button>
               </Box>
-            )})
+            );})
           : null
         }
       </div>
@@ -177,7 +177,7 @@ export const Toc = ({
                     (slug === p.slug)
                       ? setNode({ parent: "posts", current: "toc", value: p })
                       : null
-                    }
+                  }
                   >
                     {p.title}
                   </ListItem>
@@ -186,8 +186,8 @@ export const Toc = ({
               );
             })
             : <div>
-                <ListItem button> No published posts in this category </ListItem>
-              </div>
+              <ListItem button> No published posts in this category </ListItem>
+            </div>
           }
         </List>
         {posts["top-level"]
@@ -201,7 +201,7 @@ export const Toc = ({
                   to={`/${p.slug}`}
                 > {p.title} </Button>
               </Box>
-            )})
+            );})
           : null
         }
       </div>
@@ -213,9 +213,9 @@ export const Toc = ({
         <IconButton
           onClick={() => {
             if (node.value.category) {
-              setNode({ parent: "categories", current: "posts", value: node.value.category.toLowerCase() })
+              setNode({ parent: "categories", current: "posts", value: node.value.category.toLowerCase() });
             } else {
-              setNode({ current: "categories" })
+              setNode({ current: "categories" });
             }
           }}
         >

@@ -51,7 +51,7 @@ const App: React.FC = () => {
   const classes = useStyles();
 
   const [gitState, setGitState] = useState(initialGitState);
-  const [theme, setTheme] = useState(lightTheme);
+  const [theme, setTheme] = useState(darkTheme);
   const [adminMode, setAdminMode] = useState<AdminMode>("invalid");
   const [snackAlert, setSnackAlert] = useState<SnackAlert>(defaultSnackAlert);
 
@@ -136,7 +136,7 @@ const App: React.FC = () => {
         console.error(`Non-auth server failure:`, e);
       }
     }
-  }
+  };
 
   const toggleTheme = () => {
     if (theme.palette.type === "dark") {
@@ -159,7 +159,7 @@ const App: React.FC = () => {
     } as GitState;
     // console.log(`Syncing ref ${currentRef}${slug ? ` and slug ${slug}` : ""}`);
     if (slug && !["admin", "create"].includes(slug)) {
-      newGitState.currentContent = await fetchContent(slug, currentRef || latestRef)
+      newGitState.currentContent = await fetchContent(slug, currentRef || latestRef);
       newGitState.indexEntry =
         (await fetchIndex(currentRef || latestRef))?.posts?.[slug] || emptyEntry;
     } else {
@@ -167,7 +167,7 @@ const App: React.FC = () => {
       newGitState.indexEntry = emptyEntry;
     }
     setGitState(newGitState);
-  }
+  };
 
   // Run this effect exactly once when the page initially loads
   useEffect(() => {
@@ -188,11 +188,11 @@ const App: React.FC = () => {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, [categoryParam])
+  }, [categoryParam]);
 
   useEffect(() => {
     console.log(`Admin mode set to "${adminMode}"`);
-  }, [adminMode])
+  }, [adminMode]);
 
   return (
     <ThemeProvider theme={theme}>

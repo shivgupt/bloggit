@@ -74,7 +74,13 @@ build-report:
 dls:
 	@docker service ls && echo '=====' && docker container ls -a
 
-test-server: server-js
+lint:
+	bash ops/lint.sh
+
+deploy:
+	bash ops/deploy.sh
+
+test-server: server
 	bash ops/test/server.sh test
 watch-server: node-modules
 	bash ops/test/server.sh watch
@@ -99,13 +105,13 @@ node-modules: builder package.json $(shell ls modules/**/package.json)
 ########################################
 # Compile/Transpile src
 
-types: node-modules $(shell find modules/types/src $(find_options))
+types: node-modules $(shell find modules/types $(find_options))
 	bash ops/maketh.sh $@
 
-server-js: types $(shell find modules/server/src $(find_options))
+server: types $(shell find modules/server $(find_options))
 	bash ops/maketh.sh $@
 
-client-js: types $(shell find modules/client/src $(find_options))
+client: types $(shell find modules/client $(find_options))
 	bash ops/maketh.sh $@
 
 ########################################
@@ -117,13 +123,13 @@ proxy: $(shell find ops/proxy $(find_options))
 	docker tag $(project)_proxy:latest $(project)_proxy:$(commit)
 	$(log_finish) && mv -f $(totalTime) .flags/$@
 
-webserver: client-js $(shell find modules/client/ops $(find_options))
+webserver: client $(shell find modules/client/ops $(find_options))
 	$(log_start)
 	docker build --file modules/client/ops/Dockerfile $(cache_from) --tag $(project)_webserver:latest modules/client
 	docker tag $(project)_webserver:latest $(project)_webserver:$(commit)
 	$(log_finish) && mv -f $(totalTime) .flags/$@
 
-server: server-js $(shell find modules/server/ops $(find_options))
+server-image: server $(shell find modules/server/ops $(find_options))
 	$(log_start)
 	docker build --file modules/server/ops/Dockerfile $(cache_from) --tag $(project)_server:latest modules/server
 	docker tag $(project)_server:latest $(project)_server:$(commit)

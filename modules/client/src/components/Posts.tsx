@@ -84,19 +84,19 @@ export const PostPage = ({
   const publishedOn = indexEntry?.publishedOn ? getPrettyDateString(indexEntry.publishedOn) : null;
 
   return (
-  <div className={classes.root}>
-    <BrowseHistory
-      currentRef={currentRef}
-      latestRef={latestRef}
-      isHistorical={isHistorical}
-      setIsHistorical={setIsHistorical}
-      setLastEdited={setLastEdited}
-      slug={slug}
-    />
+    <div className={classes.root}>
+      <BrowseHistory
+        currentRef={currentRef}
+        latestRef={latestRef}
+        isHistorical={isHistorical}
+        setIsHistorical={setIsHistorical}
+        setLastEdited={setLastEdited}
+        slug={slug}
+      />
 
-    <Paper variant="outlined" className={classes.paper}>
-      { indexEntry?.img
-        ? <img
+      <Paper variant="outlined" className={classes.paper}>
+        { indexEntry?.img
+          ? <img
             src={indexEntry.img}
             alt={indexEntry.img}
             style={{
@@ -110,24 +110,24 @@ export const PostPage = ({
               width: "100%",
             }}
           />
-        : null
-      }
-      { publishedOn
-        ? <Typography variant="caption" display="block" className={classes.date}>
+          : null
+        }
+        { publishedOn
+          ? <Typography variant="caption" display="block" className={classes.date}>
             Published On: {publishedOn}
           </Typography>
-        : null
-      }
-      { !isHistorical && lastEdited
-        ? <Typography variant="caption" display="block" className={classes.date}>
+          : null
+        }
+        { !isHistorical && lastEdited
+          ? <Typography variant="caption" display="block" className={classes.date}>
             Last Updated: {lastEdited}
           </Typography>
-        : null
-      }
-      <Markdown content={currentContent} />
-    </Paper>
-    {adminMode === "enabled" && !isHistorical
-      ? <Fab
+          : null
+        }
+        <Markdown content={currentContent} />
+      </Paper>
+      {adminMode === "enabled" && !isHistorical
+        ? <Fab
           id={"fab"}
           className={classes.fab}
           color="primary"
@@ -135,8 +135,8 @@ export const PostPage = ({
             history.push(`/admin/edit/${slug}`);
           }}
         ><Edit/></Fab>
-      : null
-    }
-  </div>
+        : null
+      }
+    </div>
   );
 };

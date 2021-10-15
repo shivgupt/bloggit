@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+dev_target="src/index.ts"
+prod_target="dist/bundle.js"
+
 # Ensure defaults are set for important env vars
 export BLOG_BRANCH="${BLOG_BRANCH:-main}"
 export BLOG_INTERNAL_CONTENT_DIR="${BLOG_INTERNAL_CONTENT_DIR:-/blog-content.git}"
@@ -8,6 +11,7 @@ export BLOG_MIRROR_KEY="${BLOG_MIRROR_KEY:-}"
 export BLOG_MIRROR_REF="${BLOG_MIRROR_REF:-mirror}"
 
 # Log all env vars
+echo "Starting server in env:"
 echo "- BLOG_AUTH_PASSWORD=$BLOG_AUTH_PASSWORD"
 echo "- BLOG_AUTH_USERNAME=$BLOG_AUTH_USERNAME"
 echo "- BLOG_BRANCH=$BLOG_BRANCH"
@@ -21,10 +25,13 @@ echo "- BLOG_MIRROR_REF=$BLOG_MIRROR_REF"
 echo "- BLOG_MIRROR_URL=$BLOG_MIRROR_URL"
 echo "- BLOG_PORT=$BLOG_PORT"
 echo "- BLOG_PROD=$BLOG_PROD"
-echo "Starting server in env:"
 
 if [[ -d "modules/server" ]]
 then cd modules/server
+fi
+
+if [[ ! -f "$dev_target" && ! -f "$prod_target" ]]
+then echo "Fatal: couldn't find file to run" && pwd && ls && exit 1
 fi
 
 ########################################
@@ -82,7 +89,7 @@ if [[ "$BLOG_PROD" == "true" ]]
 then
   echo "Starting blog server in prod-mode"
   export NODE_ENV=production
-  exec node --no-deprecation dist/entry.js
+  exec node --no-deprecation "$prod_target"
 else
   echo "Starting blog server in dev-mode"
   export NODE_ENV=development
@@ -93,10 +100,13 @@ else
   fi
   exec nodemon \
     --delay 1 \
+    --exec "node -r ts-node/register" \
     --exitcrash \
+    --experimental-modules \
+    --ignore ./*.swp \
+    --ignore ./*.test.ts \
     --legacy-watch \
     --polling-interval 1000 \
     --watch src \
-    --exec ts-node \
-    ./src/entry.ts
+    "dist/bundle.js"
 fi

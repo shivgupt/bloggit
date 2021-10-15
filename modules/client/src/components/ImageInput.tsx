@@ -1,14 +1,14 @@
-import AppBar from '@material-ui/core/AppBar';
-import Button from '@material-ui/core/Button';
-import Dialog from '@material-ui/core/Dialog';
+import AppBar from "@material-ui/core/AppBar";
+import Button from "@material-ui/core/Button";
+import Dialog from "@material-ui/core/Dialog";
 import IconButton from "@material-ui/core/IconButton";
-import Input from '@material-ui/core/Input';
-import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
+import Input from "@material-ui/core/Input";
+import Toolbar from "@material-ui/core/Toolbar";
+import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Close from "@material-ui/icons/Close";
 import Crop from "@material-ui/icons/Crop";
-import CropFree from '@material-ui/icons/CropFree';
+import CropFree from "@material-ui/icons/CropFree";
 import PhotoLibrary from "@material-ui/icons/PhotoLibrary";
 import axios from "axios";
 import React, { useState } from "react";
@@ -79,20 +79,20 @@ export const ImageInput = ({
     reader.onload = () => {
       setImageDataUrl(reader.result as string);
       setMode("crop");
-    }
+    };
   };
 
   const reset = () => {
-    setMode("none")
+    setMode("none");
     setPreviewImage("");
-  }
+  };
 
   const uploadImage = async (data) => {
-    let res = await axios({
+    const res = await axios({
       method: "POST",
       url: "/ipfs",
       data,
-      headers: { "content-type": "application/octet-stream"}
+      headers: { "content-type": "application/octet-stream" }
     });
     if (res.status === 200) {
       setImageUrl(res.data);
@@ -107,36 +107,36 @@ export const ImageInput = ({
   // create the image with a src of the base64 string
   const createImage = (url): Promise<HTMLImageElement> =>
     new Promise((resolve, reject) => {
-      const image = new Image()
-      image.addEventListener('load', () => resolve(image))
-      image.addEventListener('error', error => reject(error))
-      image.setAttribute('crossOrigin', 'anonymous')
-      image.src = url
-    })
+      const image = new Image();
+      image.addEventListener("load", () => resolve(image));
+      image.addEventListener("error", error => reject(error));
+      image.setAttribute("crossOrigin", "anonymous");
+      image.src = url;
+    });
 
   const skipCrop = async () => {
     setMode("uploading");
     setPreviewImage(imageDataUrl);
-    await uploadImage(await (await fetch(imageDataUrl)).arrayBuffer())
+    await uploadImage(await (await fetch(imageDataUrl)).arrayBuffer());
   };
 
   const performCrop = async () => {
     setMode("uploading");
-    const image = await createImage(imageDataUrl)
-    const canvas = document.createElement('canvas')
-    const ctx = canvas.getContext('2d')!;
-    canvas.width = cropArea.width
-    canvas.height = cropArea.height
+    const image = await createImage(imageDataUrl);
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = cropArea.width;
+    canvas.height = cropArea.height;
     ctx.drawImage(
-        image,
-        cropArea.x,
-        cropArea.y,
-        cropArea.width,
-        cropArea.height,
-        0,
-        0,
-        canvas.width,
-        canvas.height
+      image,
+      cropArea.x,
+      cropArea.y,
+      cropArea.width,
+      cropArea.height,
+      0,
+      0,
+      canvas.width,
+      canvas.height
     );
     setPreviewImage(canvas.toDataURL());
     canvas.toBlob(uploadImage);
@@ -197,38 +197,38 @@ export const ImageInput = ({
         </AppBar>
         {mode === "crop"
           ? <div className={classes.cropContainer}>
-              <Cropper
-                image={imageDataUrl}
-                crop={crop}
-                zoom={zoom}
-                aspect={aspect}
-                onCropChange={setCrop}
-                onCropComplete={(area, pixels) => setCropArea(pixels)}
-                onZoomChange={setZoom}
-              />
-            </div>
+            <Cropper
+              image={imageDataUrl}
+              crop={crop}
+              zoom={zoom}
+              aspect={aspect}
+              onCropChange={setCrop}
+              onCropComplete={(area, pixels) => setCropArea(pixels)}
+              onZoomChange={setZoom}
+            />
+          </div>
           : mode === "uploading"
             ? <div className={classes.previewContainer}>
-                {previewImage
-                  ? <>
-                      <Typography align="center" display="block" variant="h6" className={classes.previewTitle}>
+              {previewImage
+                ? <>
+                  <Typography align="center" display="block" variant="h6" className={classes.previewTitle}>
                         Uploading image to IPFS..
-                      </Typography>
-                      <img
-                        alt="preview"
-                        className={classes.previewImage}
-                        crossOrigin="anonymous"
-                        src={previewImage}
-                      />
-                    </>
-                  : <Typography align="center" display="block" variant="h6" className={classes.previewTitle}>
+                  </Typography>
+                  <img
+                    alt="preview"
+                    className={classes.previewImage}
+                    crossOrigin="anonymous"
+                    src={previewImage}
+                  />
+                </>
+                : <Typography align="center" display="block" variant="h6" className={classes.previewTitle}>
                       Generating image...
-                    </Typography>
-                }
-              </div>
+                </Typography>
+              }
+            </div>
             : <Typography align="center" display="block" variant="h6" className={classes.previewTitle}>
                 Cancelling...
-              </Typography>
+            </Typography>
         }
       </Dialog>
     </>
