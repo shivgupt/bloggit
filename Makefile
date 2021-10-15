@@ -32,6 +32,9 @@ prod: dev webserver
 start: dev
 	bash ops/start.sh
 
+start-prod: dev
+	export BLOG_PROD=true; bash ops/start.sh
+
 restart: stop
 	bash ops/start.sh
 
@@ -55,13 +58,14 @@ purge: clean reset
 push: push-commit
 push-commit:
 	bash ops/push-images.sh $(commit)
+	bash ops/push-images.sh latest
 push-semver:
 	bash ops/pull-images.sh $(commit)
 	bash ops/tag-images.sh $(semver)
 	bash ops/push-images.sh $(semver)
+	bash ops/push-images.sh latest
 
-pull: pull-latest
-pull-latest:
+pull:
 	bash ops/pull-images.sh latest
 pull-commit:
 	bash ops/pull-images.sh $(commit)
