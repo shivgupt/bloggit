@@ -1,5 +1,5 @@
 import "react-mde/lib/styles/css/react-mde-all.css";
-import { EditRequest, EditResponse, PostData } from "@blog/types";
+import { EditRequest, EditResponse, PostData } from "@bloggit/types";
 import Backdrop from "@material-ui/core/Backdrop";
 import Button from "@material-ui/core/Button";
 import CircularProgress from "@material-ui/core/CircularProgress";

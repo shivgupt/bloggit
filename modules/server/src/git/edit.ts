@@ -1,4 +1,4 @@
-import { EditRequest, EditResponse } from "@blog/types";
+import { EditRequest, EditResponse } from "@bloggit/types";
 import git from "isomorphic-git";
 
 import { env } from "../env";

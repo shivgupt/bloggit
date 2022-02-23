@@ -1,4 +1,4 @@
-import { BlogIndex, HistoryResponse, PostData } from "@blog/types";
+import { BlogIndex, HistoryResponse, PostData } from "@bloggit/types";
 import axios from "axios";
 
 import { emptyIndex } from "./constants";

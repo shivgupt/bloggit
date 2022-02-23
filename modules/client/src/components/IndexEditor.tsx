@@ -1,4 +1,4 @@
-import { BlogIndex, EditRequest, PostData } from "@blog/types";
+import { BlogIndex, EditRequest, PostData } from "@bloggit/types";
 import Backdrop from "@material-ui/core/Backdrop";
 import Checkbox from "@material-ui/core/Checkbox";
 import CircularProgress from "@material-ui/core/CircularProgress";

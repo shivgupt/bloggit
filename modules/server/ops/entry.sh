@@ -87,11 +87,11 @@ fi
 
 if [[ "$BLOG_PROD" == "true" ]]
 then
-  echo "Starting blog server in prod-mode"
+  echo "Starting bloggit server in prod-mode"
   export NODE_ENV=production
   exec node --no-deprecation "$prod_target"
 else
-  echo "Starting blog server in dev-mode"
+  echo "Starting bloggit server in dev-mode"
   export NODE_ENV=development
   if [[ -z "$(command -v nodemon)" ]]
   then

@@ -1,4 +1,4 @@
-import { BlogIndex, PostData } from "@blog/types";
+import { BlogIndex, PostData } from "@bloggit/types";
 
 export type AdminMode = "invalid" | "enabled" | "disabled";
 

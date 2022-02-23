@@ -1,4 +1,4 @@
-import { PostData } from "@blog/types";
+import { PostData } from "@bloggit/types";
 import Card from "@material-ui/core/Card";
 import Fab from "@material-ui/core/Fab";
 import Hidden from "@material-ui/core/Hidden";
