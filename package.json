@@ -1,6 +1,6 @@
 {
   "name": "bloggit",
-  "version": "0.7.12",
+  "version": "0.7.13",
   "registry": "docker.io",
   "author": "Bo & Shiv Henderson",
   "license": "GPL-3.0-or-later",
