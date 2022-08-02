@@ -1,4 +1,4 @@
-import { PostData } from "@blog/types";
+import { PostData } from "@bloggit/types";
 import Box from "@material-ui/core/Box";
 import Button from "@material-ui/core/Button";
 import Divider from "@material-ui/core/Divider";
@@ -11,7 +11,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import NavigateNextIcon from "@material-ui/icons/NavigateNext";
 import NavigateBackIcon from "@material-ui/icons/NavigateBefore";
 import React, { useContext, useEffect, useState } from "react";
-import Markdown from "react-markdown";
+import ReactMarkdown from "react-markdown";
 import { Link as RouterLink } from "react-router-dom";
 
 import { GitContext } from "../GitContext";
@@ -27,6 +27,7 @@ const useStyles = makeStyles(theme => ({
   list3: { width: "100%", "paddingLeft": theme.spacing(6) },
   list4: { width: "100%", "paddingLeft": theme.spacing(8) },
   list5: { width: "100%", "paddingLeft": theme.spacing(10) },
+  list6: { width: "100%", "paddingLeft": theme.spacing(12) },
   tocIcon: {
     marginLeft: theme.spacing(2),
   },
@@ -34,23 +35,27 @@ const useStyles = makeStyles(theme => ({
 
 const TocGenerator = ({
   children,
-  level
+  level,
+  node,
 }: {
-  children: string[];
-  level: number;
+  children: any[];
+  level?: number;
+  node: any;
 }) => {
   const classes = useStyles();
+  const gitContext = useContext(GitContext);
+  const { currentRef, slug } = gitContext.gitState;
 
-  if (children.length > 1) {
+  if (children?.length > 1) {
     console.warn("This heading has more than one child..?");
     return null;
   }
-  const value = getChildValue(children[0]);
+  const value = getChildValue(node);
   if (!value) {
     console.warn("This heading has no child values..?");
     return null;
   }
-  const headingSlug = slugify(replaceEmojiString(value))
+  const headingSlug = slugify(replaceEmojiString(value));
   const heading = replaceEmojiString(value);
   const marginStyle = classes[`list${level || 1}`];
 
@@ -61,7 +66,7 @@ const TocGenerator = ({
         key={headingSlug}
         className={marginStyle}
         component={HashLink as any}
-        to={{ hash:`#${headingSlug}` }}
+        to={`/${currentRef ? `${currentRef}/` : ""}${slug}#${headingSlug}`}
       >
         {heading}
       </ListItem>
@@ -78,7 +83,7 @@ export const Toc = ({
   const gitContext = useContext(GitContext);
   const classes = useStyles();
 
-  const { currentContent, slug, index } = gitContext.gitState
+  const { currentContent, slug, index } = gitContext.gitState;
 
   const byTitle = (pA: PostData, pB: PostData): number =>
     (pA?.title || "").toLowerCase() > (pB?.title || "").toLowerCase() ? 1 : -1;
@@ -141,7 +146,7 @@ export const Toc = ({
                   to={`/${p.slug}`}
                 > {p.title} </Button>
               </Box>
-            )})
+            );})
           : null
         }
       </div>
@@ -172,7 +177,7 @@ export const Toc = ({
                     (slug === p.slug)
                       ? setNode({ parent: "posts", current: "toc", value: p })
                       : null
-                    }
+                  }
                   >
                     {p.title}
                   </ListItem>
@@ -181,8 +186,8 @@ export const Toc = ({
               );
             })
             : <div>
-                <ListItem button> No published posts in this category </ListItem>
-              </div>
+              <ListItem button> No published posts in this category </ListItem>
+            </div>
           }
         </List>
         {posts["top-level"]
@@ -196,7 +201,7 @@ export const Toc = ({
                   to={`/${p.slug}`}
                 > {p.title} </Button>
               </Box>
-            )})
+            );})
           : null
         }
       </div>
@@ -208,9 +213,9 @@ export const Toc = ({
         <IconButton
           onClick={() => {
             if (node.value.category) {
-              setNode({ parent: "categories", current: "posts", value: node.value.category.toLowerCase() })
+              setNode({ parent: "categories", current: "posts", value: node.value.category.toLowerCase() });
             } else {
-              setNode({ current: "categories" })
+              setNode({ current: "categories" });
             }
           }}
         >
@@ -223,12 +228,20 @@ export const Toc = ({
         </Box>
         <Divider />
         <List component="nav" className={classes.list}>
-          <Markdown
-            allowedTypes={["text", "heading"]}
-            source={currentContent}
-            renderers={{ heading: TocGenerator }}
+          <ReactMarkdown
+            allowedElements={["h1", "h2", "h3", "h4", "h5", "h6"]}
             className={classes.list}
-          />
+            components={{
+              h1: TocGenerator,
+              h2: TocGenerator,
+              h3: TocGenerator,
+              h4: TocGenerator,
+              h5: TocGenerator,
+              h6: TocGenerator,
+            }}
+          >
+            {currentContent}
+          </ReactMarkdown>
         </List>
         <Divider />
       </div>

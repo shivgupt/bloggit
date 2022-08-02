@@ -7,7 +7,7 @@ import CopyIcon from "@material-ui/icons/Link";
 import React, { useState } from "react";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles(() => ({
   label: {
     textTransform: "none",
   },

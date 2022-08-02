@@ -188,7 +188,7 @@ export const NavBar = ({
               <HomeIcon className={classes.icon} />
             </Link>
             {category
-            ? <Link
+              ? <Link
                 className={classes.link}
                 color="inherit"
                 component={RouterLink}
@@ -198,16 +198,16 @@ export const NavBar = ({
                 <CategoryIcon className={classes.icon} />
                 {category}
               </Link>
-            : null
+              : null
             }
             {slug
-            ? slug === "admin"
-              ? <Typography>
+              ? slug === "admin"
+                ? <Typography>
                   <Person className={classes.icon} />
                   Admin
                 </Typography>
-              : post?.category
-                ? [ <Link
+                : post?.category
+                  ? [ <Link
                     key="navbar-category"
                     className={classes.link}
                     color="inherit"
@@ -222,12 +222,12 @@ export const NavBar = ({
                     <DocIcon className={classes.icon} />
                     {pageTitle}
                   </Typography>
-                ]
-              : <Typography key="navbar-category-icon" noWrap className={classes.postTitle}>
+                  ]
+                  : <Typography key="navbar-category-icon" noWrap className={classes.postTitle}>
                     <DocIcon className={classes.icon} />
                     {pageTitle}
                   </Typography>
-            : null
+              : null
             }
           </Breadcrumbs>
           <Hidden lgUp>

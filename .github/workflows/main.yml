@@ -1,0 +1,37 @@
+name: main
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    env:
+      DOCKER_USER: ${{ secrets.DOCKER_USER }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v1
+      - run: make pull
+      - run: make all
+      - run: docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+      - run: make push-commit
+
+  test:
+    runs-on: ubuntu-20.04
+    env:
+      DOCKER_USER: ${{ secrets.DOCKER_USER }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+    needs: [build]
+    steps:
+      - uses: actions/checkout@v1
+      - run: make pull-commit
+      - run: make test-server
+      - run: BLOG_PROD=true make test-client
+      - run: make lint
+      - run: make start-prod
+      - run: make dls
+      - run: bash ops/health-check.sh server
+      - run: bash ops/health-check.sh webserver
+      - run: bash ops/health-check.sh proxy

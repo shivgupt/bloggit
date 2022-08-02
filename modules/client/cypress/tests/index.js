@@ -171,8 +171,8 @@ describe("Blog Client", () => {
     });
     cy.visit(`${Cypress.env("baseUrl")}/${slug}`);
     my.openDrawer();
-    cy.get(`a[href="/#${innerTitleSlug}"]`).should("exist");
-    cy.get(`a[href="/#${innerSubtitleSlug}"]`).should("exist");
+    cy.get(`a[href="/${slug}#${innerTitleSlug}"]`).should("exist");
+    cy.get(`a[href="/${slug}#${innerSubtitleSlug}"]`).should("exist");
     my.closeDrawer();
     my.removePost(slug);
   });

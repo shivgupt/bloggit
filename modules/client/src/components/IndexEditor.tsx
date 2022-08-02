@@ -1,4 +1,4 @@
-import { BlogIndex, EditRequest, PostData } from "@blog/types";
+import { BlogIndex, EditRequest, PostData } from "@bloggit/types";
 import Backdrop from "@material-ui/core/Backdrop";
 import Checkbox from "@material-ui/core/Checkbox";
 import CircularProgress from "@material-ui/core/CircularProgress";
@@ -65,14 +65,14 @@ export const IndexEditor = () => {
     const nextIndex = JSON.parse(JSON.stringify(newIndex)) as EditIndex;
     nextIndex.posts[slug].featured = !nextIndex.posts[slug].draft && !newIndex.posts[slug].featured;
     setNewIndex(nextIndex);
-  }
+  };
 
   const toggleDraft = (slug: string): void => {
     const nextIndex = JSON.parse(JSON.stringify(newIndex)) as EditIndex;
     nextIndex.posts[slug].draft = !newIndex.posts[slug].removed && !newIndex.posts[slug].draft;
     nextIndex.posts[slug].featured = !nextIndex.posts[slug].draft && newIndex.posts[slug].featured;
     setNewIndex(nextIndex);
-  }
+  };
 
   const toggleRemoved = (slug: string): void => {
     const nextIndex = JSON.parse(JSON.stringify(newIndex)) as EditIndex;
@@ -80,7 +80,7 @@ export const IndexEditor = () => {
     nextIndex.posts[slug].draft = false;
     nextIndex.posts[slug].featured = false;
     setNewIndex(nextIndex);
-  }
+  };
 
   useEffect(() => {
     setNewIndex(oldIndex as EditIndex);
@@ -117,7 +117,7 @@ export const IndexEditor = () => {
     const editRequest = [] as EditRequest;
     Object.keys(indexToSave.posts).forEach(slug => {
       if (indexToSave.posts[slug].removed) {
-        const oldPath = getPath(indexToSave.posts[slug])
+        const oldPath = getPath(indexToSave.posts[slug]);
         if (oldPath) {
           console.log(`Removing ${oldPath} from git repo`);
           editRequest.push({ path: oldPath!, content: "" });
@@ -188,7 +188,7 @@ export const IndexEditor = () => {
                 </TableCell>
 
                 <TableCell align="left" padding="none" onClick={() => {
-                  history.push(`/${slug}`)
+                  history.push(`/${slug}`);
                 }}>
                   {title}
                 </TableCell>
@@ -221,7 +221,7 @@ export const IndexEditor = () => {
                 </TableCell>
 
               </TableRow>
-            )
+            );
           })
           : null
         }

@@ -51,7 +51,7 @@ const App: React.FC = () => {
   const classes = useStyles();
 
   const [gitState, setGitState] = useState(initialGitState);
-  const [theme, setTheme] = useState(lightTheme);
+  const [theme, setTheme] = useState(darkTheme);
   const [adminMode, setAdminMode] = useState<AdminMode>("invalid");
   const [snackAlert, setSnackAlert] = useState<SnackAlert>(defaultSnackAlert);
 
@@ -136,7 +136,7 @@ const App: React.FC = () => {
         console.error(`Non-auth server failure:`, e);
       }
     }
-  }
+  };
 
   const toggleTheme = () => {
     if (theme.palette.type === "dark") {
@@ -150,7 +150,7 @@ const App: React.FC = () => {
 
   const syncGitState = async (ref?: string, slug?: string, getLatest?: boolean) => {
     const latestRef = (getLatest ? null : gitState.latestRef) || await fetchRef();
-    const currentRef = ref || latestRef;
+    const currentRef = ref || "";
     const newGitState = {
       latestRef,
       currentRef,
@@ -158,15 +158,16 @@ const App: React.FC = () => {
       index: await fetchIndex(latestRef),
     } as GitState;
     // console.log(`Syncing ref ${currentRef}${slug ? ` and slug ${slug}` : ""}`);
-    if (slug && !["admin", "create-new-post"].includes(slug)) {
-      newGitState.currentContent = await fetchContent(slug, currentRef)
-      newGitState.indexEntry = (await fetchIndex(currentRef))?.posts?.[slug] || emptyEntry;
+    if (slug && !["admin", "create"].includes(slug)) {
+      newGitState.currentContent = await fetchContent(slug, currentRef || latestRef);
+      newGitState.indexEntry =
+        (await fetchIndex(currentRef || latestRef))?.posts?.[slug] || emptyEntry;
     } else {
       newGitState.currentContent = "";
       newGitState.indexEntry = emptyEntry;
     }
     setGitState(newGitState);
-  }
+  };
 
   // Run this effect exactly once when the page initially loads
   useEffect(() => {
@@ -181,17 +182,17 @@ const App: React.FC = () => {
 
   // Fetch index & post content whenever the url changes
   useEffect(() => {
-    syncGitState(refParam || gitState.latestRef, slugParam);
+    syncGitState(refParam, slugParam);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refParam, slugParam]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, [categoryParam])
+  }, [categoryParam]);
 
   useEffect(() => {
     console.log(`Admin mode set to "${adminMode}"`);
-  }, [adminMode])
+  }, [adminMode]);
 
   return (
     <ThemeProvider theme={theme}>
@@ -212,7 +213,7 @@ const App: React.FC = () => {
                 render={() => (<Home adminMode={adminMode} />)}
               />
               <Route exact strict
-                path="/category/:slug"
+                path="/category/:category"
                 render={() => (<Home
                   adminMode={adminMode}
                   filterBy={categoryParam}

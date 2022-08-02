@@ -4,7 +4,6 @@ import { makeStyles } from "@material-ui/core/styles";
 import Edit from "@material-ui/icons/Edit";
 import Typography from "@material-ui/core/Typography";
 import React, { useContext, useEffect, useState } from "react";
-import Markdown from "react-markdown";
 import "react-mde/lib/styles/css/react-mde-all.css";
 import { useHistory } from "react-router-dom";
 
@@ -13,14 +12,7 @@ import { getFabStyle } from "../style";
 import { getPrettyDateString } from "../utils";
 
 import { BrowseHistory } from "./BrowseHistory";
-import {
-  BlockQuoteRenderer,
-  CodeBlockRenderer,
-  HeadingRenderer,
-  ImageRenderer,
-  LinkRenderer,
-  TextRenderer,
-} from "./Renderers";
+import { Markdown } from "./Markdown";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -92,19 +84,19 @@ export const PostPage = ({
   const publishedOn = indexEntry?.publishedOn ? getPrettyDateString(indexEntry.publishedOn) : null;
 
   return (
-  <div className={classes.root}>
-    <BrowseHistory
-      currentRef={currentRef}
-      latestRef={latestRef}
-      isHistorical={isHistorical}
-      setIsHistorical={setIsHistorical}
-      setLastEdited={setLastEdited}
-      slug={slug}
-    />
+    <div className={classes.root}>
+      <BrowseHistory
+        currentRef={currentRef}
+        latestRef={latestRef}
+        isHistorical={isHistorical}
+        setIsHistorical={setIsHistorical}
+        setLastEdited={setLastEdited}
+        slug={slug}
+      />
 
-    <Paper variant="outlined" className={classes.paper}>
-      { indexEntry?.img
-        ? <ImageRenderer
+      <Paper variant="outlined" className={classes.paper}>
+        { indexEntry?.img
+          ? <img
             src={indexEntry.img}
             alt={indexEntry.img}
             style={{
@@ -118,35 +110,24 @@ export const PostPage = ({
               width: "100%",
             }}
           />
-        : null
-      }
-      { publishedOn
-        ? <Typography variant="caption" display="block" className={classes.date}>
+          : null
+        }
+        { publishedOn
+          ? <Typography variant="caption" display="block" className={classes.date}>
             Published On: {publishedOn}
           </Typography>
-        : null
-      }
-      { !isHistorical && lastEdited
-        ? <Typography variant="caption" display="block" className={classes.date}>
+          : null
+        }
+        { !isHistorical && lastEdited
+          ? <Typography variant="caption" display="block" className={classes.date}>
             Last Updated: {lastEdited}
           </Typography>
-        : null
-      }
-      <Markdown
-        source={currentContent}
-        className={classes.text}
-        renderers={{
-          heading: HeadingRenderer,
-          code: CodeBlockRenderer,
-          text: TextRenderer,
-          link: LinkRenderer,
-          image: ImageRenderer,
-          blockquote: BlockQuoteRenderer,
-        }}
-      />
-    </Paper>
-    {adminMode === "enabled" && !isHistorical
-      ? <Fab
+          : null
+        }
+        <Markdown content={currentContent} />
+      </Paper>
+      {adminMode === "enabled" && !isHistorical
+        ? <Fab
           id={"fab"}
           className={classes.fab}
           color="primary"
@@ -154,8 +135,8 @@ export const PostPage = ({
             history.push(`/admin/edit/${slug}`);
           }}
         ><Edit/></Fab>
-      : null
-    }
-  </div>
+        : null
+      }
+    </div>
   );
 };

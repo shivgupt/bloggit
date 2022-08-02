@@ -1,4 +1,4 @@
-import { ReadResponse, RefResponse } from "@blog/types";
+import { ReadResponse, RefResponse } from "@bloggit/types";
 import express from "express";
 
 import { env } from "../env";

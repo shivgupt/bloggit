@@ -87,31 +87,31 @@ export const AdminHome = ({
       <Divider variant="middle" />
       {adminMode !== "invalid"
         ? <FormControlLabel
-            id="toggle-admin-mode"
-            control={
-              <Switch
-                size="small"
-                checked={adminMode === "enabled"}
-                onChange={() => {
-                  if (adminMode === "enabled") setAdminMode("disabled");
-                  else setAdminMode("enabled");
-                }}
-              />
-            }
-            label="Admin Mode"
-            labelPlacement="start"
-            className={classes.section}
-          />
+          id="toggle-admin-mode"
+          control={
+            <Switch
+              size="small"
+              checked={adminMode === "enabled"}
+              onChange={() => {
+                if (adminMode === "enabled") setAdminMode("disabled");
+                else setAdminMode("enabled");
+              }}
+            />
+          }
+          label="Admin Mode"
+          labelPlacement="start"
+          className={classes.section}
+        />
         : <div className={classes.section}>
-            <Typography className={classes.section}>
+          <Typography className={classes.section}>
               Supply a valid admin token to activate admin mode
-            </Typography>
-          </div>
+          </Typography>
+        </div>
       }
       {adminMode === "enabled"
         ? <div className={classes.section}>
-            <IndexEditor />
-          </div>
+          <IndexEditor />
+        </div>
         : null
       }
     </div>

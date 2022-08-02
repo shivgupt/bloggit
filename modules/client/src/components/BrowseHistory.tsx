@@ -1,4 +1,4 @@
-import { HistoryResponse, HistoryResponseEntry } from "@blog/types";
+import { HistoryResponse, HistoryResponseEntry } from "@bloggit/types";
 import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
 import ListItemText from "@material-ui/core/ListItemText";
@@ -47,7 +47,7 @@ export const BrowseHistory = ({
   const classes = useStyles();
 
   useEffect(() => {
-    if (latestRef !== currentRef) {
+    if (currentRef) {
       setIsHistorical(true);
     } else {
       setIsHistorical(false);
@@ -110,40 +110,40 @@ export const BrowseHistory = ({
 
       {editHistory.length > 0
         ? <Grid item>
-            <Button
-              id="open-history"
-              startIcon={<ExpandMore/>}
-              aria-haspopup="true"
-              variant="contained"
-              size={"medium"}
-              color="primary"
-              onClick={(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
-                setAnchorEl(event.currentTarget);
-              }}
-            >
-              <Typography noWrap variant="button">
+          <Button
+            id="open-history"
+            startIcon={<ExpandMore/>}
+            aria-haspopup="true"
+            variant="contained"
+            size={"medium"}
+            color="primary"
+            onClick={(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
+              setAnchorEl(event.currentTarget);
+            }}
+          >
+            <Typography noWrap variant="button">
                 History
-              </Typography>
-            </Button>
-          </Grid>
+            </Typography>
+          </Button>
+        </Grid>
         : null
       }
 
       {isHistorical
         ? <Grid item>
-            <Tooltip arrow placement="bottom" title="Go to latest version">
-              <Button
-                color="primary"
-                component={Link}
-                id="jump-to-present"
-                size={"medium"}
-                to={`/${slug}`}
-                variant="contained"
-              >
-                <FastForward/>
-              </Button>
-            </Tooltip>
-          </Grid>
+          <Tooltip arrow placement="bottom" title="Go to latest version">
+            <Button
+              color="primary"
+              component={Link}
+              id="jump-to-present"
+              size={"medium"}
+              to={`/${slug}`}
+              variant="contained"
+            >
+              <FastForward/>
+            </Button>
+          </Tooltip>
+        </Grid>
         : null
       }
 

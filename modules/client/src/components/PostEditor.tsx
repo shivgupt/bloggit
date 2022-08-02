@@ -1,5 +1,5 @@
 import "react-mde/lib/styles/css/react-mde-all.css";
-import { EditRequest, EditResponse, PostData } from "@blog/types";
+import { EditRequest, EditResponse, PostData } from "@bloggit/types";
 import Backdrop from "@material-ui/core/Backdrop";
 import Button from "@material-ui/core/Button";
 import CircularProgress from "@material-ui/core/CircularProgress";
@@ -11,12 +11,11 @@ import { makeStyles } from "@material-ui/core/styles";
 import Delete from "@material-ui/icons/Delete";
 import Save from "@material-ui/icons/Save";
 import ArrowDropUp from "@material-ui/icons/ArrowDropUp";
-import Autocomplete from '@material-ui/lab/Autocomplete';
+import Autocomplete from "@material-ui/lab/Autocomplete";
 import SpeedDial from "@material-ui/lab/SpeedDial";
 import SpeedDialAction from "@material-ui/lab/SpeedDialAction";
 import axios from "axios";
 import React, { useContext, useEffect, useState } from "react";
-import Markdown from "react-markdown";
 import ReactMde, { SaveImageHandler } from "react-mde";
 import { useHistory } from "react-router-dom";
 
@@ -25,13 +24,7 @@ import { getFabStyle } from "../style";
 import { SnackAlert } from "../types";
 import { emptyEntry, fetchHistory, getExistingCategories, getPath, slugify } from "../utils";
 
-import {
-  CodeBlockRenderer,
-  TextRenderer,
-  HeadingRenderer,
-  ImageRenderer,
-  LinkRenderer
-} from "./Renderers";
+import { Markdown } from "./Markdown";
 import { ImageInput } from "./ImageInput";
 
 const useStyles = makeStyles((theme) => ({
@@ -134,8 +127,8 @@ export const PostEditor = ({
       !newEditData.displaySlug ? "Slug is required"
       : newEditData.displaySlug.match(/[^a-z0-9-]/) ? "Slug should only contain a-z, 0-9 and -"
       : Object.keys(gitState.index.posts).some(
-          s => s !== gitState.slug && s === newEditData.displaySlug
-        ) ? "This slug is already in use"
+        s => s !== gitState.slug && s === newEditData.displaySlug
+      ) ? "This slug is already in use"
       : "";
     const hasError = !!(slugErr || titleErr);
     const hasChanged = originalEditData.title !== newEditData.title
@@ -147,14 +140,14 @@ export const PostEditor = ({
       || originalEditData.content !== newEditData.content;
     setValidation({ errs: { title: titleErr, slug: slugErr }, hasError, hasChanged });
     setEditData(newEditData);
-  }
+  };
 
   const saveImage: SaveImageHandler = async function*(data: ArrayBuffer) {
-    let res = await axios({
+    const res = await axios({
       method: "POST",
       url: "/ipfs",
       data: data,
-      headers: { "content-type": "multipart/form-data"}
+      headers: { "content-type": "multipart/form-data" }
     });
     if (res.status === 200) {
       console.log(res);
@@ -178,7 +171,7 @@ export const PostEditor = ({
     const newIndex = JSON.parse(JSON.stringify(gitState?.index));
     const oldSlug = originalEditData.slug;
     const newSlug = editData.slug || editData.displaySlug;
-    const now = (new Date()).toISOString()
+    const now = (new Date()).toISOString();
     newIndex.posts = newIndex.posts || {};
     const newIndexEntry = {
       slug: newSlug,
@@ -192,20 +185,20 @@ export const PostEditor = ({
       tldr: editData.tldr,
     } as PostData;
     newIndex.posts[newSlug] = newIndexEntry;
+    if (oldSlug && oldSlug !== newSlug) {
+      delete newIndex.posts[oldSlug];
+    }
     const newPath = getPath(newIndexEntry);
-    const oldPath = getPath(gitState.index.posts[gitState.slug]);
     const editRequest = [
-      { path: newPath, content: editData.content, },
-      { path: "index.json", content: JSON.stringify(newIndex, null, 2), }
+      { path: newPath, content: editData.content },
+      { path: "index.json", content: JSON.stringify(newIndex, null, 2) }
     ] as EditRequest;
+    const oldPath = getPath(gitState.index.posts[gitState.slug]);
     if (oldPath && oldPath !== newPath) {
       editRequest.push({ path: oldPath, content: "" });
     }
-    if (oldSlug && oldSlug !== newSlug) {
-      delete newIndex.posts[oldSlug]
-    }
     // Send request to update index.json and create new file
-    let res = await axios({
+    const res = await axios({
       method: "post",
       url: "/git/edit",
       data: editRequest,
@@ -217,7 +210,7 @@ export const PostEditor = ({
         await syncGitState(editRes.commit.substring(0, 8), newSlug, true);
         await fetchHistory(newSlug, true);
         if (gitState.slug !== newSlug) {
-          history.push(`/${newSlug}`)
+          history.push(`/${newSlug}`);
         }
       } else if (editRes?.status === "no change") {
         console.warn(`Edit request yielded no change, still on commit ${editRes.commit}`);
@@ -244,7 +237,7 @@ export const PostEditor = ({
             msg: "Changes discarded",
             severity: "success",
             hideDuration: 6000,
-          })
+          });
         }}> Yes </Button>
       });
     }
@@ -269,18 +262,20 @@ export const PostEditor = ({
               key={`edit-${name}`}
               label={name}
               name={name}
-              onChange={event => syncEditData({ ...editData, [event.target.name]: event.target.value })}
+              onChange={
+                event => syncEditData({ ...editData, [event.target.name]: event.target.value })
+              }
               required={["title"].includes(name)}
               value={value}
             />
-          )
+          );
         })}
         <Autocomplete
           freeSolo
           options={categories}
           value={editData?.category}
           onChange={(event, value) => {
-            syncEditData({ ...editData, category: typeof value === "string" ? value : undefined })
+            syncEditData({ ...editData, category: typeof value === "string" ? value : undefined });
           }}
           renderInput={(params) => (
             <TextField 
@@ -288,7 +283,7 @@ export const PostEditor = ({
               error={!!validation.errs.category}
               helperText={validation.errs["category"]}
               onChange={(event) => {
-                syncEditData({ ...editData, category: event.target.value })
+                syncEditData({ ...editData, category: event.target.value });
               }}
               id={"edit-category"}
               label="category"
@@ -319,19 +314,9 @@ export const PostEditor = ({
         selectedTab={selectedTab}
         onTabChange={setSelectedTab}
         minEditorHeight={400}
-        generateMarkdownPreview={(markdown) =>
+        generateMarkdownPreview={(content) =>
           Promise.resolve(
-            <Markdown
-              source={markdown}
-              className={classes.text}
-              renderers={{
-                heading: HeadingRenderer,
-                code: CodeBlockRenderer,
-                text: TextRenderer,
-                link: LinkRenderer,
-                image: ImageRenderer,
-              }}
-            />
+            <Markdown content={content} />
           )}
         paste={{ saveImage }}
       />
@@ -349,14 +334,14 @@ export const PostEditor = ({
       icon={<ArrowDropUp fontSize="large" />}
     >
       <SpeedDialAction
-        FabProps={{id: "fab-discard"}}
+        FabProps={{ id: "fab-discard" }}
         icon={<Delete />}
         key="fab-discard"
         onClick={confirmDiscard}
         tooltipTitle="Discard changes"
       />,
       <SpeedDialAction
-        FabProps={{id: "fab-save"}}
+        FabProps={{ id: "fab-save" }}
         icon={<Save />}
         key="fab-save"
         onClick={() => saveChanges()}
