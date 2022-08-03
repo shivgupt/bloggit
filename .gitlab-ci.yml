@@ -13,7 +13,7 @@ build:
       alias: localhost
   script:
     - apk add bash curl git jq make
-    - make pull-latest
+    - make pull
     - make all
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - make push
