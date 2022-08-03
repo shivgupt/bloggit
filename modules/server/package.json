@@ -1,8 +1,8 @@
 {
-  "name": "@blog/server",
+  "name": "@bloggit/server",
   "version": "1.0.0",
-  "description": "Server-side blog logic",
-  "author": "Bo Henderson",
+  "description": "Server-side bloggit logic",
+  "author": "Bo & Shiv Hendo",
   "license": "GPL-3.0-or-later",
   "main": "dist/bundle.js",
   "scripts": {
@@ -13,7 +13,7 @@
     "body-parser": "1.19.0",
     "express": "4.17.1",
     "ipfs-client": "0.3.4",
-    "isomorphic-git": "1.10.1",
+    "isomorphic-git": "1.8.2",
     "it-all": "1.0.6",
     "node-fetch": "2.6.1",
     "nodemon": "2.0.13",
@@ -21,7 +21,7 @@
     "pino-pretty": "7.0.1"
   },
   "devDependencies": {
-    "@blog/types": "1.0.0",
+    "@bloggit/types": "1.0.0",
     "@rollup/plugin-commonjs": "21.0.0",
     "@rollup/plugin-json": "4.1.0",
     "@rollup/plugin-node-resolve": "13.0.5",

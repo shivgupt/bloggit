@@ -1,4 +1,4 @@
-import { PostData } from "@blog/types";
+import { PostData } from "@bloggit/types";
 import Box from "@material-ui/core/Box";
 import Button from "@material-ui/core/Button";
 import Divider from "@material-ui/core/Divider";

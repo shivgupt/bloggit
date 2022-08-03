@@ -87,11 +87,11 @@ fi
 
 if [[ "$BLOG_PROD" == "true" ]]
 then
-  echo "Starting blog server in prod-mode"
+  echo "Starting bloggit server in prod-mode"
   export NODE_ENV=production
   exec node --no-deprecation "$prod_target"
 else
-  echo "Starting blog server in dev-mode"
+  echo "Starting bloggit server in dev-mode"
   export NODE_ENV=development
   if [[ -z "$(command -v nodemon)" ]]
   then
@@ -103,10 +103,10 @@ else
     --exec "node -r ts-node/register" \
     --exitcrash \
     --experimental-modules \
-    --ignore ./*.swp \
-    --ignore ./*.test.ts \
+    --ignore '**/*.swp' \
+    --ignore '**/*.test.ts' \
     --legacy-watch \
     --polling-interval 1000 \
-    --watch src \
-    "dist/bundle.js"
+    --watch '**/*.ts' \
+    "$dev_target"
 fi

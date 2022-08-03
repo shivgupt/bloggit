@@ -1,4 +1,4 @@
-import { HistoryResponse, HistoryResponseEntry } from "@blog/types";
+import { HistoryResponse, HistoryResponseEntry } from "@bloggit/types";
 import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
 import ListItemText from "@material-ui/core/ListItemText";
