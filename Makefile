@@ -27,7 +27,7 @@ $(shell mkdir -p .flags)
 default: dev
 all: dev prod
 dev: server proxy
-prod: dev webserver
+prod: dev webserver server-image
 
 start: dev
 	bash ops/start.sh
