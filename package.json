@@ -1,7 +1,7 @@
 {
   "name": "bloggit",
   "version": "0.7.14",
-  "registry": "docker.io",
+  "registry": "registry.gitlab.com",
   "author": "Bo & Shiv Henderson",
   "license": "GPL-3.0-or-later",
   "devDependencies": {
