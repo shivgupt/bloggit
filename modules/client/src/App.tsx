@@ -5,7 +5,7 @@ import { createStyles, makeStyles, Theme, ThemeProvider } from "@material-ui/cor
 import Alert from "@material-ui/lab/Alert";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { Route, Switch, useRouteMatch } from "react-router-dom";
+import { Route, Routes, useMatch } from "react-router-dom";
 
 import { AdminHome } from "./components/AdminHome";
 import { PostEditor } from "./components/PostEditor";
@@ -55,12 +55,12 @@ const App: React.FC = () => {
   const [adminMode, setAdminMode] = useState<AdminMode>("invalid");
   const [snackAlert, setSnackAlert] = useState<SnackAlert>(defaultSnackAlert);
 
-  const createMatch = useRouteMatch({ path: "/admin/create", exact: true, strict: true });
-  const editIndexMatch = useRouteMatch({ path: "/admin/edit", exact: true, strict: true });
-  const categoryMatch = useRouteMatch({ path: "/category/:category", exact: true, strict: true });
-  const editMatch = useRouteMatch({ path: "/admin/edit/:slug", exact: true, strict: true });
-  const refMatch = useRouteMatch({ path: "/:ref/:slug", exact: true, strict: true });
-  const slugMatch = useRouteMatch({ path: "/:slug", exact: true, strict: true });
+  const createMatch = useMatch({ path: "/admin/create", exact: true, strict: true });
+  const editIndexMatch = useMatch({ path: "/admin/edit", exact: true, strict: true });
+  const categoryMatch = useMatch({ path: "/category/:category", exact: true, strict: true });
+  const editMatch = useMatch({ path: "/admin/edit/:slug", exact: true, strict: true });
+  const refMatch = useMatch({ path: "/:ref/:slug", exact: true, strict: true });
+  const slugMatch = useMatch({ path: "/:slug", exact: true, strict: true });
 
   const categoryParam = (
     (createMatch || editIndexMatch) ? ""
@@ -207,7 +207,7 @@ const App: React.FC = () => {
         <main className={classes.main}>
           <div className={classes.appBarSpacer} />
           <Container maxWidth="xl" className={classes.container}>
-            <Switch>
+            <Routes>
               <Route exact strict
                 path="/"
                 render={() => (<Home adminMode={adminMode} />)}
@@ -243,7 +243,7 @@ const App: React.FC = () => {
                 path="/:slug"
                 render={() => (<PostPage adminMode={adminMode} />)}
               />
-            </Switch>
+            </Routes>
           </Container>
         </main>
       </GitContext.Provider>

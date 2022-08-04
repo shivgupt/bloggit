@@ -11,6 +11,7 @@ import gfm from "remark-gfm";
 import { GitContext } from "../GitContext";
 import { getChildValue, replaceEmojiString, slugify } from "../utils";
 
+import { Renderer3D } from "./renderer3D";
 import { HashLink } from "./HashLink";
 
 const useStyles = makeStyles((theme) => ({
@@ -44,12 +45,17 @@ export const Markdown = ({
   content: string;
 }) => {
   const [imgErrors, setImgErrors] = useState({});
+  const [vidErrors, setVidErrors] = useState({});
   const classes = useStyles();
   const theme = useTheme();
 
   useEffect(() => {
     console.log(`Got image errors`, imgErrors);
   }, [imgErrors]);
+
+  useEffect(() => {
+    console.log(`Got video errors`, vidErrors);
+  }, [vidErrors]);
 
   const ImageRenderer = ({
     node,
@@ -68,11 +74,17 @@ export const Markdown = ({
         alt={node.properties.alt}
         style={{ display: "block", margin: "auto", maxWidth: "90%" }}
       />
-      : <video
-        controls
-        src={src}
-        style={{ display: "block", margin: "auto", maxWidth: "90%" }}
-      />
+      : !vidErrors[src] ? <video
+          onError={() => {
+            if (!vidErrors[src]) {
+              setVidErrors(old => ({ ...old, [src]: true }));
+            }
+          }}
+          controls
+          src={src}
+          style={{ display: "block", margin: "auto", maxWidth: "90%" }}
+        />
+        : <Renderer3D src={src} />
     );
   };
 

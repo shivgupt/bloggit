@@ -17,7 +17,7 @@ import SpeedDialAction from "@material-ui/lab/SpeedDialAction";
 import axios from "axios";
 import React, { useContext, useEffect, useState } from "react";
 import ReactMde, { SaveImageHandler } from "react-mde";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import { GitContext } from "../GitContext";
 import { getFabStyle } from "../style";
@@ -92,7 +92,7 @@ export const PostEditor = ({
   const [saving, setSaving] = useState<boolean>(false);
 
   const classes = useStyles();
-  const history = useHistory();
+  const navigate = useNavigate();
   const { gitState, syncGitState } = useContext(GitContext);
 
   // This should only run once when this component is unmounted
@@ -210,13 +210,13 @@ export const PostEditor = ({
         await syncGitState(editRes.commit.substring(0, 8), newSlug, true);
         await fetchHistory(newSlug, true);
         if (gitState.slug !== newSlug) {
-          history.push(`/${newSlug}`);
+          navigate(`/${newSlug}`);
         }
       } else if (editRes?.status === "no change") {
         console.warn(`Edit request yielded no change, still on commit ${editRes.commit}`);
       }
       setSaving(false);
-      history.push(`/${newSlug}`);
+      navigate(`/${newSlug}`);
     } else {
       console.error(`Something went wrong`, res);
     }
@@ -224,14 +224,14 @@ export const PostEditor = ({
 
   const confirmDiscard = () => {
     if (!validation.hasChanged) {
-      history.push(`/${gitState.slug}`);
+      navigate(`/${gitState.slug}`);
     } else {
       setSnackAlert({
         open: true,
         msg: "Do you want to discard all the changes",
         severity: "warning",
         action: <Button onClick={() => {
-          history.push(`/${gitState.slug}`);
+          navigate(`/${gitState.slug}`);
           setSnackAlert({
             open: true,
             msg: "Changes discarded",

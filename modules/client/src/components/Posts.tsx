@@ -5,7 +5,7 @@ import Edit from "@material-ui/icons/Edit";
 import Typography from "@material-ui/core/Typography";
 import React, { useContext, useEffect, useState } from "react";
 import "react-mde/lib/styles/css/react-mde-all.css";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import { GitContext } from "../GitContext";
 import { getFabStyle } from "../style";
@@ -68,7 +68,7 @@ export const PostPage = ({
   const [lastEdited, setLastEdited] = useState<string>("");
 
   const gitContext = useContext(GitContext);
-  const history = useHistory();
+  const navigate = useNavigate();
   const classes = useStyles();
 
   const { currentRef, latestRef, slug, currentContent, indexEntry } = gitContext.gitState;
@@ -132,7 +132,7 @@ export const PostPage = ({
           className={classes.fab}
           color="primary"
           onClick={() => {
-            history.push(`/admin/edit/${slug}`);
+            navigate(`/admin/edit/${slug}`);
           }}
         ><Edit/></Fab>
         : null

@@ -260,7 +260,7 @@ export const NavBar = ({
             />
           </Drawer>
         </Hidden>
-        <Hidden mdDown>
+        <Hidden>
           <Drawer
             anchor="right"
             classes={{ paper: classes.permanentDrawer }}
