@@ -27,7 +27,7 @@ import {
   store,
 } from "./utils";
 
-const StyledContainer = styled("Container")(({ theme }) => ({
+const StyledContainer = styled(Container)(({ theme }) => ({
     [theme.breakpoints.up("lg")]: {
       width: "80%",
       marginRight: "20%",
@@ -43,32 +43,34 @@ const App: React.FC = () => {
   const [adminMode, setAdminMode] = useState<AdminMode>("invalid");
   const [snackAlert, setSnackAlert] = useState<SnackAlert>(defaultSnackAlert);
 
-  const createMatch = useMatch({ path: "/admin/create", exact: true, strict: true });
-  const editIndexMatch = useMatch({ path: "/admin/edit", exact: true, strict: true });
-  const categoryMatch = useMatch({ path: "/category/:category", exact: true, strict: true });
-  const editMatch = useMatch({ path: "/admin/edit/:slug", exact: true, strict: true });
-  const refMatch = useMatch({ path: "/:ref/:slug", exact: true, strict: true });
-  const slugMatch = useMatch({ path: "/:slug", exact: true, strict: true });
+  // TODO: verify and test change
+  const createMatch = useMatch("/admin/create");
+  const editIndexMatch = useMatch("/admin/edit");
+  const categoryMatch = useMatch("/category/:category");
+  const editMatch = useMatch("/admin/edit/:slug");
+  const refMatch = useMatch("/:ref/:slug");
+  const slugMatch = useMatch("/:slug");
 
   const categoryParam = (
     (createMatch || editIndexMatch) ? ""
     : categoryMatch ? categoryMatch.params.category
     : ""
-  ).toLowerCase();
+  )!.toLowerCase();
 
   const refParam = (
     (categoryParam || createMatch || editMatch || editIndexMatch) ? ""
     : refMatch ? refMatch.params.ref
     : ""
-  ).toLowerCase();
+  )!.toLowerCase();
 
   const slugParam = (
     (categoryParam || createMatch || editIndexMatch) ? ""
-    : refParam ? refMatch.params.slug
-    : editMatch ? editMatch.params.slug
-    : slugMatch ? slugMatch.params.slug
+    : refParam ? refMatch!.params.slug
+    : editMatch ? editMatch!.params.slug
+    : slugMatch ? slugMatch!.params.slug
     : ""
-  ).toLowerCase();
+  )!.toLowerCase();
+  //TODO
 
   console.log(`Rendering App w url params: category="${categoryParam}" | ref="${refParam}" | slug="${slugParam}"`);
 
@@ -127,7 +129,7 @@ const App: React.FC = () => {
   };
 
   const toggleTheme = () => {
-    if (theme.palette.type === "dark") {
+    if (theme.palette.mode === "dark") {
       store.save("theme", "light");
       setTheme(lightTheme);
     } else {
@@ -195,40 +197,31 @@ const App: React.FC = () => {
         <main>
           <StyledContainer maxWidth="xl">
             <Routes>
-              <Route exact strict
-                path="/"
-                render={() => (<Home adminMode={adminMode} />)}
-              />
-              <Route exact strict
-                path="/category/:category"
-                render={() => (<Home
+              <Route path="/" element={<Home adminMode={adminMode} />} />
+              <Route path="/category/:category" element={<Home
                   adminMode={adminMode}
                   filterBy={categoryParam}
-                />)}
+                />}
               />
-              <Route exact strict
-                path="/admin"
-                render={() => (<AdminHome
+              <Route path="/admin"
+                element={<AdminHome
                   adminMode={adminMode}
                   setAdminMode={setAdminMode}
                   validateAuthToken={validateAuthToken}
-                />)}
+                />}
               />
-              <Route exact strict
-                path="/admin/create"
-                render={() => (<PostEditor setSnackAlert={setSnackAlert} />)}
+              <Route path="/admin/create"
+                element={<PostEditor setSnackAlert={setSnackAlert} />}
               />
-              <Route exact strict
+              <Route
                 path="/admin/edit/:slug"
-                render={() => (<PostEditor setSnackAlert={setSnackAlert} />)}
+                element={<PostEditor setSnackAlert={setSnackAlert} />}
               />
-              <Route exact strict
-                path="/:ref/:slug"
-                render={() => <PostPage adminMode={adminMode} />}
+              <Route path="/:ref/:slug"
+                element={<PostPage adminMode={adminMode} />}
               />
-              <Route exact strict
-                path="/:slug"
-                render={() => (<PostPage adminMode={adminMode} />)}
+              <Route path="/:slug"
+                element={<PostPage adminMode={adminMode} />}
               />
             </Routes>
           </StyledContainer>
