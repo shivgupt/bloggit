@@ -231,7 +231,12 @@ do
   if [[ -z "$res" || "$res" == *"Waiting for proxy to wake up"* ]]
   then
     if [[ "$(date +%s)" -gt "$timeout" ]]
-    then echo "Timed out waiting for $public_url to respond.." && exit
+    then
+      echo "Timed out waiting for $public_url to respond.."
+      docker service logs "${project}_proxy"
+      docker service logs "${project}_webserver"
+      docker service logs "${project}_server"
+      exit
     else sleep 2
     fi
   else echo "Good Morning!"; break;
