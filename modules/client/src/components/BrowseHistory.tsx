@@ -1,14 +1,14 @@
 import { HistoryResponse, HistoryResponseEntry } from "@bloggit/types";
-import Button from "@material-ui/core/Button";
-import Grid from "@material-ui/core/Grid";
-import ListItemText from "@material-ui/core/ListItemText";
-import Menu from "@material-ui/core/Menu";
-import MenuItem from "@material-ui/core/MenuItem";
-import Tooltip from "@material-ui/core/Tooltip";
-import Typography from "@material-ui/core/Typography";
-import { makeStyles } from "@material-ui/core/styles";
-import ExpandMore from "@material-ui/icons/ExpandMore";
-import FastForward from "@material-ui/icons/FastForward";
+import Button from "@mui/material/Button";
+import Grid from "@mui/material/Grid";
+import ListItemText from "@mui/material/ListItemText";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import Tooltip from "@mui/material/Tooltip";
+import Typography from "@mui/material/Typography";
+import { makeStyles } from "@mui/material/styles";
+import ExpandMore from "@mui/icons-material/ExpandMore";
+import FastForward from "@mui/icons-material/FastForward";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 

@@ -1,8 +1,8 @@
-import Fab from "@material-ui/core/Fab";
-import Paper from "@material-ui/core/Paper";
-import { makeStyles } from "@material-ui/core/styles";
-import Edit from "@material-ui/icons/Edit";
-import Typography from "@material-ui/core/Typography";
+import Fab from "@mui/material/Fab";
+import Paper from "@mui/material/Paper";
+import { makeStyles } from "@mui/material/styles";
+import Edit from "@mui/icons-material/Edit";
+import Typography from "@mui/material/Typography";
 import React, { useContext, useEffect, useState } from "react";
 import "react-mde/lib/styles/css/react-mde-all.css";
 import { useNavigate } from "react-router-dom";

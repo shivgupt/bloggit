@@ -1,7 +1,7 @@
-import IconButton from "@material-ui/core/IconButton";
-import Link from "@material-ui/core/Link";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
-import LinkIcon from "@material-ui/icons/Link";
+import IconButton from "@mui/material/IconButton";
+import Link from "@mui/material/Link";
+import { makeStyles, useTheme } from "@mui/material/styles";
+import LinkIcon from "@mui/icons-material/Link";
 import React, { useContext, useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
