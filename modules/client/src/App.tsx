@@ -1,8 +1,10 @@
-import Container from "@material-ui/core/Container";
-import CssBaseline from "@material-ui/core/CssBaseline";
-import Snackbar from "@material-ui/core/Snackbar";
-import { createStyles, makeStyles, Theme, ThemeProvider } from "@material-ui/core/styles";
-import Alert from "@material-ui/lab/Alert";
+import Container from "@mui/material/Container";
+import CssBaseline from "@mui/material/CssBaseline";
+import Snackbar from "@mui/material/Snackbar";
+import { Theme, ThemeProvider } from "@mui/material/styles";
+import Alert from "@mui/material/Alert";
+import { styled } from "@mui/material/styles";
+
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Route, Routes, useMatch } from "react-router-dom";
@@ -25,12 +27,7 @@ import {
   store,
 } from "./utils";
 
-const useStyles = makeStyles((theme: Theme) => createStyles({
-  appBarSpacer: theme.mixins.toolbar,
-  root: {
-    display: "flex",
-  },
-  container: {
+const StyledContainer = styled("Container")(({ theme }) => ({
     [theme.breakpoints.up("lg")]: {
       width: "80%",
       marginRight: "20%",
@@ -38,18 +35,9 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-  },
-  main: {
-    flexGrow: 1,
-    marginTop: theme.spacing(2),
-    padding: theme.spacing(0.25),
-  },
-  fab: getFabStyle(theme),
 }));
 
 const App: React.FC = () => {
-  const classes = useStyles();
-
   const [gitState, setGitState] = useState(initialGitState);
   const [theme, setTheme] = useState(darkTheme);
   const [adminMode, setAdminMode] = useState<AdminMode>("invalid");
@@ -204,9 +192,8 @@ const App: React.FC = () => {
           theme={theme}
           toggleTheme={toggleTheme}
         />
-        <main className={classes.main}>
-          <div className={classes.appBarSpacer} />
-          <Container maxWidth="xl" className={classes.container}>
+        <main>
+          <StyledContainer maxWidth="xl">
             <Routes>
               <Route exact strict
                 path="/"
@@ -244,7 +231,7 @@ const App: React.FC = () => {
                 render={() => (<PostPage adminMode={adminMode} />)}
               />
             </Routes>
-          </Container>
+          </StyledContainer>
         </main>
       </GitContext.Provider>
       <Snackbar
