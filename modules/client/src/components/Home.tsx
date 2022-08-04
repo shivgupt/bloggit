@@ -12,7 +12,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import Add from "@material-ui/icons/Add";
 import React, { useContext } from "react";
 import Carousel from "react-material-ui-carousel";
-import { useHistory, Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 import { getFabStyle } from "../style";
 import { getPrettyDateString, replaceEmojiString } from "../utils";
@@ -130,7 +130,7 @@ export const Home = ({
   filterBy?: string,
  }) => {
   const gitContext = useContext(GitContext);
-  const history = useHistory();
+  const navigate = useNavigate();
   const classes = useStyles();
 
   if (!gitContext.gitState?.index?.posts) return null;
@@ -218,7 +218,7 @@ export const Home = ({
           className={classes.fab}
           color="primary"
           onClick={() => {
-            history.push("/admin/create");
+            navigate("/admin/create");
           }}
         ><Add/></Fab>
         : null

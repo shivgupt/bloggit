@@ -18,7 +18,7 @@ import Edit from "@material-ui/icons/Edit";
 import Save from "@material-ui/icons/Save";
 import axios from "axios";
 import React, { useContext, useEffect, useState } from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import { GitContext } from "../GitContext";
 import { getFabStyle } from "../style";
@@ -55,7 +55,7 @@ export const IndexEditor = () => {
   const [saving, setSaving] = useState<boolean>(false);
   const [newIndex, setNewIndex] = useState<EditIndex>(emptyIndex);
   const gitContext = useContext(GitContext);
-  const history = useHistory();
+  const navigate = useNavigate();
   const classes = useStyles();
 
   const oldIndex = gitContext.gitState?.index;
@@ -180,7 +180,7 @@ export const IndexEditor = () => {
                   <IconButton
                     id={`edit-${slug}`}
                     onClick={() => {
-                      history.push(`/admin/edit/${slug}`);
+                      navigate(`/admin/edit/${slug}`);
                     }}
                     color="secondary"
                     size="small"
@@ -188,7 +188,7 @@ export const IndexEditor = () => {
                 </TableCell>
 
                 <TableCell align="left" padding="none" onClick={() => {
-                  history.push(`/${slug}`);
+                  navigate(`/${slug}`);
                 }}>
                   {title}
                 </TableCell>
@@ -239,7 +239,7 @@ export const IndexEditor = () => {
           saveChanges();
         } else {
           console.log("Creating new post..");
-          history.push("/admin/create");
+          navigate("/admin/create");
         }
       }}
     >{(diff ? <Save/> : <Add/>)}</Fab>
