@@ -1,13 +1,13 @@
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
-import Drawer from "@mui/material/Drawer";
+import Drawer, { DrawerProps } from "@mui/material/Drawer";
 import Hidden from "@mui/material/Hidden";
 import IconButton from "@mui/material/IconButton";
 import Link from "@mui/material/Link";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import { makeStyles, Theme, ThemeProvider } from "@mui/material/styles";
+import { styled, Theme, ThemeProvider } from "@mui/material/styles";
 import AdminAccount from "@mui/icons-material/Tune";
 import CategoryIcon from "@mui/icons-material/Category";
 import Close from "@mui/icons-material/Close";
@@ -27,56 +27,28 @@ import { getPostsByCategories } from "../utils";
 
 import { Toc } from "./ToC";
 
-const useStyles = makeStyles(theme => ({
-  appBar: {
-    [theme.breakpoints.up("lg")]: {
-      width: "80%",
-      marginRight: "20%",
-    },
-    display: "flex",
-    justifyContent: "stretch",
-  },
-  drawer: {
-    [theme.breakpoints.up("lg")]: {
-      width: "20%",
-      flexShrink: 0,
-    },
-  },
-  link: {
-    display: "flex",
-  },
-  grow: {
-    borderBottom: `5px solid ${theme.palette.divider}`,
-  },
-  icon: {
-    marginRight: theme.spacing(0.5),
-    width: "20px",
-    height: "20px",
-  },
-  permanentDrawer: {
+const StyledNav = styled("nav")(({ theme }) => ({
+  [theme.breakpoints.up("lg")]: {
     width: "20%",
+    flexShrink: 0,
   },
-  hiddenDrawer: {
-    width: "60%",
-  },
-  closeDrawer: {
-    height: theme.spacing(8),
-    marginBottom: theme.spacing(-4),
-    marginLeft: "75%",
-  },
-  breadcrumb: {
-    flex: 1,
-    marginLeft: theme.spacing(1),
-  },
-  postTitle: {
-    [theme.breakpoints.between(0,500)]: {
-      maxWidth: "100px"
-    },
-    [theme.breakpoints.between(500,800)]: {
-      maxWidth: "200px"
-    },
-  },
-}));
+}))
+
+const StyledHiddenDrawer = styled(({ className, ...props }: DrawerProps) => (
+  <Drawer {...props} classes={{ paper: className }} />
+))`
+    & .MuiDrawer-paper {
+      width: "60%",
+    }
+`;
+
+const StyledPermanentDrawer = styled(({ className, ...props }: DrawerProps) => (
+  <Drawer {...props} classes={{ paper: className }} />
+))`
+    & .MuiDrawer-paper {
+      width: "20%",
+    }
+`;
 
 const DrawerContent = ({
   adminMode,
@@ -91,7 +63,6 @@ const DrawerContent = ({
   toggleDrawer: () => void;
   toggleTheme: () => void;
 }) => {
-  const classes = useStyles();
   const gitContext = useContext(GitContext);
 
   const { index } = gitContext.gitState;
@@ -102,14 +73,18 @@ const DrawerContent = ({
       <Hidden lgUp>
         <IconButton
           id="close-drawer"
-          className={classes.closeDrawer}
+          sx={{
+            height: 8,
+            mb: -4,
+            ml: "75%",
+          }}
           onClick={toggleDrawer}
           size="small"
         ><Close/></IconButton>
       </Hidden>
       <ThemeProvider theme={siteTitleFont}>
         <Typography variant="h4" component="div" >
-          <Box textAlign="center" m={2} p={2}>
+          <Box component="div" sx={{ textAlign: "center", m: 2, p: 2}}>
             {siteTitle}
           </Box>
         </Typography>
@@ -119,12 +94,12 @@ const DrawerContent = ({
         edge="start"
         color="secondary"
       >
-        {theme.palette.type === "dark" ? <LightIcon /> : <DarkIcon />}
+        {theme.palette.mode === "dark" ? <LightIcon /> : <DarkIcon />}
       </IconButton>
       <Toc posts={posts}/>
       { adminMode !== "invalid" ?
         <>
-          <Box textAlign="center" m={1}>
+          <Box component="div" textAlign="center" m={1}>
 
             <IconButton
               id="go-to-admin-page"
@@ -158,7 +133,6 @@ export const NavBar = ({
 }) => {
   const [drawer, setDrawer] = useState<boolean>(false);
   const gitContext = useContext(GitContext);
-  const classes = useStyles();
 
   const toggleDrawer = () => setDrawer(!drawer);
 
@@ -174,28 +148,40 @@ export const NavBar = ({
 
   return (
     <>
-      <AppBar position="fixed" className={classes.appBar}>
+      <AppBar position="fixed" sx={{
+        [theme.breakpoints.up("lg")]: {
+          width: "80%",
+          marginRight: "20%",
+        },
+        display: "flex",
+        justifyContent: "stretch",
+      }}>
         <Toolbar>
-          <Breadcrumbs aria-label="breadcrumb" separator={<NextIcon fontSize="small"/>} className={classes.breadcrumb}>
+          <Breadcrumbs aria-label="breadcrumb" separator={<NextIcon fontSize="small"/>}
+            sx={{
+              flex: 1,
+              ml: 1,
+            }}
+          >
             <Link
               id="go-home"
-              className={classes.link}
+              sx={{ display: "flex" }}
               component={RouterLink}
               color="inherit"
               onClick={reset}
               to="/"
             >
-              <HomeIcon className={classes.icon} />
+              <HomeIcon sx={{ marginRight: theme.spacing(0.5), width: "20px", height: "20px" }} />
             </Link>
             {category
               ? <Link
-                className={classes.link}
+                sx={{ display: "flex" }}
                 color="inherit"
                 component={RouterLink}
                 onClick={reset}
                 to={`/category/${category}`}
               >
-                <CategoryIcon className={classes.icon} />
+                <CategoryIcon sx={{ marginRight: theme.spacing(0.5), width: "20px", height: "20px" }} />
                 {category}
               </Link>
               : null
@@ -203,28 +189,44 @@ export const NavBar = ({
             {slug
               ? slug === "admin"
                 ? <Typography>
-                  <Person className={classes.icon} />
+                  <Person sx={{ marginRight: theme.spacing(0.5), width: "20px", height: "20px" }} />
                   Admin
                 </Typography>
                 : post?.category
                   ? [ <Link
                     key="navbar-category"
-                    className={classes.link}
+                    sx={{ display: "flex" }}
                     color="inherit"
                     component={RouterLink}
                     onClick={reset}
                     to={`/category/${post?.category}`}
                   >
-                    <CategoryIcon className={classes.icon} />
+                    <CategoryIcon sx={{ marginRight: theme.spacing(0.5), width: "20px", height: "20px" }} />
                     {post?.category}
                   </Link>,
-                  <Typography key="navbar-category-icon" noWrap className={classes.postTitle}>
-                    <DocIcon className={classes.icon} />
+                  <Typography key="navbar-category-icon" noWrap
+                    sx={{
+                      [theme.breakpoints.between(0,500)]: {
+                        maxWidth: "100px"
+                      },
+                      [theme.breakpoints.between(500,800)]: {
+                        maxWidth: "200px"
+                      },
+                    }}>
+                    <DocIcon sx={{ marginRight: theme.spacing(0.5), width: "20px", height: "20px" }} />
                     {pageTitle}
                   </Typography>
                   ]
-                  : <Typography key="navbar-category-icon" noWrap className={classes.postTitle}>
-                    <DocIcon className={classes.icon} />
+                  : <Typography key="navbar-category-icon" noWrap
+                      sx={{
+                        [theme.breakpoints.between(0,500)]: {
+                          maxWidth: "100px"
+                        },
+                        [theme.breakpoints.between(500,800)]: {
+                          maxWidth: "200px"
+                        },
+                      }}>
+                    <DocIcon sx={{ marginRight: theme.spacing(0.5), width: "20px", height: "20px" }} />
                     {pageTitle}
                   </Typography>
               : null
@@ -243,13 +245,12 @@ export const NavBar = ({
           </Hidden>
         </Toolbar>
       </AppBar>
-      <nav className={classes.drawer}>
+      <StyledNav>
         <Hidden lgUp>
-          <Drawer
+          <StyledHiddenDrawer
             anchor="right"
             open={drawer}
             onClose={toggleDrawer}
-            classes={{ paper: classes.hiddenDrawer }}
           >
             <DrawerContent
               adminMode={adminMode}
@@ -258,12 +259,11 @@ export const NavBar = ({
               toggleDrawer={toggleDrawer}
               toggleTheme={toggleTheme}
             />
-          </Drawer>
+          </StyledHiddenDrawer>
         </Hidden>
-        <Hidden>
-          <Drawer
+        <Hidden mdDown>
+          <StyledPermanentDrawer
             anchor="right"
-            classes={{ paper: classes.permanentDrawer }}
             variant="permanent"
             open
           >
@@ -274,9 +274,9 @@ export const NavBar = ({
               toggleDrawer={toggleDrawer}
               toggleTheme={toggleTheme}
             />
-          </Drawer>
+          </StyledPermanentDrawer>
         </Hidden>
-      </nav>
+      </StyledNav>
     </>
   );
 };
