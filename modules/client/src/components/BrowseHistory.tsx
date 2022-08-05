@@ -1,14 +1,15 @@
-import { HistoryResponse, HistoryResponseEntry } from "@bloggit/types";
 import Button from "@mui/material/Button";
+import ExpandMore from "@mui/icons-material/ExpandMore";
+import FastForward from "@mui/icons-material/FastForward";
 import Grid from "@mui/material/Grid";
 import ListItemText from "@mui/material/ListItemText";
-import Menu from "@mui/material/Menu";
+import Menu, { MenuProps } from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
-import { makeStyles } from "@mui/material/styles";
-import ExpandMore from "@mui/icons-material/ExpandMore";
-import FastForward from "@mui/icons-material/FastForward";
+import { HistoryResponse, HistoryResponseEntry } from "@bloggit/types";
+import { styled } from "@mui/material/styles";
+
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -16,16 +17,14 @@ import { fetchHistory, getPrettyDateString } from "../utils";
 
 import { Copyable } from "./Copyable";
 
-const useStyles = makeStyles((theme) => ({
-  buttonBar: {
-    marginTop: theme.spacing(-1.75),
-    paddingLeft: theme.spacing(1),
-  },
-  paper: {
-    border: "1px solid #d3d4d5",
-    maxHeight: "50%",
-  },
-}));
+const StyledMenu = styled(({ className, ...props }: MenuProps) => (
+  <Menu {...props} classes={{ paper: className }} />
+))`
+    & .MuiMenu-paper {
+      border: "1px solid #d3d4d5",
+      maxHeight: "50%",
+    }
+`;
 
 export const BrowseHistory = ({
   currentRef,
@@ -44,7 +43,6 @@ export const BrowseHistory = ({
 }) => {
   const [anchorEl, setAnchorEl] = useState<any>(null); // TODO: provide type?
   const [editHistory, setEditHistory] = useState<HistoryResponse>([]);
-  const classes = useStyles();
 
   useEffect(() => {
     if (currentRef) {
@@ -95,7 +93,7 @@ export const BrowseHistory = ({
   }, [latestRef, slug]);
 
   return (
-    <Grid container spacing={1} className={classes.buttonBar}>
+    <Grid container spacing={1} sx={{ mt: -1.75, pl: 1, }}>
 
       <Grid item>
         <Copyable
@@ -147,10 +145,8 @@ export const BrowseHistory = ({
         : null
       }
 
-      <Menu
+      <StyledMenu
         elevation={0}
-        PaperProps={{ id: "history-menu", className: classes.paper }}
-        getContentAnchorEl={null}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
         transformOrigin={{ vertical: "top", horizontal: "center" }}
         anchorEl={anchorEl}
@@ -176,7 +172,7 @@ export const BrowseHistory = ({
             );
           })
         }
-      </Menu>
+      </StyledMenu>
 
     </Grid>
   );

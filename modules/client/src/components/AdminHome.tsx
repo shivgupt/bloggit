@@ -13,7 +13,9 @@ import { AdminMode } from "../types";
 
 import { IndexEditor } from "./IndexEditor";
 
-const StyledDiv = styled("Div")(({ theme }) => ({
+// TODO: verify admin mode margin
+
+const StyledDiv = styled("div")(({ theme }) => ({
   margin: theme.spacing(1, 1),
   "& > *": {
     margin: theme.spacing(1),
@@ -96,7 +98,8 @@ export const AdminHome = ({
           label="Admin Mode"
           labelPlacement="start"
           sx={{
-            margin: (1,1),
+            mt: 1,
+            mb: 1,
             "& > *": {
               margin: 1,
             }
