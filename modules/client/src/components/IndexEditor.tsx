@@ -12,7 +12,7 @@ import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import TextField from "@mui/material/TextField";
-import { makeStyles, Theme } from "@mui/material/styles";
+import { styled } from "@mui/material/styles";
 import Add from "@mui/icons-material/Add";
 import Edit from "@mui/icons-material/Edit";
 import Save from "@mui/icons-material/Save";
@@ -24,23 +24,9 @@ import { GitContext } from "../GitContext";
 import { getFabStyle } from "../style";
 import { emptyIndex, getPath } from "../utils";
 
-const useStyles = makeStyles((theme: Theme) => ({
-  root: {
-    width: "100%",
-    backgroundColor: theme.palette.background.paper,
-  },
-  editColumn: {
-    width: "36px",
-  },
-  bottomSpace: {
-    height: theme.spacing(10),
-  },
-  backdrop: {
-    zIndex: theme.zIndex.drawer + 1,
-    color: "#fff",
-  },
-  fab: getFabStyle(theme),
-}));
+const StyledDiv = styled("div")(({ theme }) => ({
+  height: theme.spacing(10),
+}))
 
 type EditIndex = BlogIndex & {
   posts: {
@@ -56,7 +42,6 @@ export const IndexEditor = () => {
   const [newIndex, setNewIndex] = useState<EditIndex>(emptyIndex);
   const gitContext = useContext(GitContext);
   const navigate = useNavigate();
-  const classes = useStyles();
 
   const oldIndex = gitContext.gitState?.index;
   const title = newIndex?.title;
@@ -158,7 +143,7 @@ export const IndexEditor = () => {
     <Table size="small">
       <TableHead>
         <TableRow> 
-          <TableCell padding="none" className={classes.editColumn}></TableCell>
+          <TableCell padding="none" sx={{ width: "36px" }}></TableCell>
           <TableCell padding="none">Title</TableCell>
           <TableCell padding="checkbox">Featured</TableCell>
           <TableCell padding="checkbox">Draft</TableCell>
@@ -176,7 +161,7 @@ export const IndexEditor = () => {
             return (
               <TableRow id={`table-row-${slug}`} key={`table-row-${slug}`}>
 
-                <TableCell padding="none" className={classes.editColumn}>
+                <TableCell padding="none" sx={{ width: "36px" }}>
                   <IconButton
                     id={`edit-${slug}`}
                     onClick={() => {
@@ -227,11 +212,11 @@ export const IndexEditor = () => {
         }
       </TableBody>
     </Table>
-    <div className={classes.bottomSpace}/>
+    <StyledDiv />
 
     <Fab
       id={"fab"}
-      className={classes.fab}
+      sx={ (theme) => getFabStyle(theme) }
       color="primary"
       onClick={() => {
         if (diff) {
@@ -243,7 +228,11 @@ export const IndexEditor = () => {
         }
       }}
     >{(diff ? <Save/> : <Add/>)}</Fab>
-    <Backdrop className={classes.backdrop} open={saving}>
+    <Backdrop open={saving}
+      sx={{
+        zIndex: (theme) => theme.zIndex.drawer + 1,
+        color: "#fff"
+      }}>
       <CircularProgress color="inherit" />
     </Backdrop>
   </>);
