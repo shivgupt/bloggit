@@ -4,7 +4,7 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import { Theme, styled } from "@mui/material/styles";
+import { styled } from "@mui/material/styles";
 import RemoveCircle from "@mui/icons-material/RemoveCircle";
 
 import React, { useState } from "react";

@@ -1,6 +1,6 @@
 import IconButton from "@mui/material/IconButton";
 import Link from "@mui/material/Link";
-import { makeStyles, useTheme } from "@mui/material/styles";
+import { styled, useTheme } from "@mui/material/styles";
 import LinkIcon from "@mui/icons-material/Link";
 import React, { useContext, useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
@@ -14,8 +14,7 @@ import { getChildValue, replaceEmojiString, slugify } from "../utils";
 import { Renderer3D } from "./renderer3D";
 import { HashLink } from "./HashLink";
 
-const useStyles = makeStyles((theme) => ({
-  text: {
+const StyledReactMarkdown =styled(ReactMarkdown)(({ theme }) => ({
     padding: "20px",
     textAlign: "justify",
     fontVariant: "discretionary-ligatures",
@@ -36,7 +35,6 @@ const useStyles = makeStyles((theme) => ({
       marginBottom: theme.spacing(4),
       marginLeft: "auto",
     },
-  },
 }));
 
 export const Markdown = ({
@@ -46,7 +44,6 @@ export const Markdown = ({
 }) => {
   const [imgErrors, setImgErrors] = useState({});
   const [vidErrors, setVidErrors] = useState({});
-  const classes = useStyles();
   const theme = useTheme();
 
   useEffect(() => {
@@ -123,7 +120,7 @@ export const Markdown = ({
     } else {
       return (
         <SyntaxHighlighter
-          style={theme.palette.type === "dark" ? atomDark : vs}
+          style={theme.palette.mode === "dark" ? atomDark : vs}
           language={match ? match[1] : "text"}
           PreTag="div"
         >
@@ -167,8 +164,7 @@ export const Markdown = ({
   };
 
   return (
-    <ReactMarkdown
-      className={classes.text}
+    <StyledReactMarkdown
       components={{
         a: LinkRenderer,
         code: CodeBlockRenderer,
@@ -183,6 +179,6 @@ export const Markdown = ({
       remarkPlugins={[gfm]}
     >
       {replaceEmojiString(content)}
-    </ReactMarkdown>
+    </StyledReactMarkdown>
   );
 };
