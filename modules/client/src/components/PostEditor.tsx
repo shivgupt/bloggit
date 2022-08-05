@@ -7,7 +7,7 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Paper from "@mui/material/Paper";
 import Switch from "@mui/material/Switch";
 import TextField from "@mui/material/TextField";
-import { makeStyles } from "@mui/material/styles";
+import { styled } from "@mui/material/styles";
 import Delete from "@mui/icons-material/Delete";
 import Save from "@mui/icons-material/Save";
 import ArrowDropUp from "@mui/icons-material/ArrowDropUp";
@@ -27,30 +27,12 @@ import { emptyEntry, fetchHistory, getExistingCategories, getPath, slugify } fro
 import { Markdown } from "./Markdown";
 import { ImageInput } from "./ImageInput";
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    flexGrow: 1,
-    margin: theme.spacing(1, 1),
-    "& > *": {
-      margin: theme.spacing(1),
-    }
-  },
-  paper: {
-    flexGrow: 1,
-  },
-  button: {
+const StyledDiv = styled("div")(({ theme }) => ({
+  flexGrow: 1,
+  margin: theme.spacing(1, 1),
+  "& > *": {
     margin: theme.spacing(1),
-  },
-  text: {
-    padding: "20px",
-    textAlign: "justify",
-    fontVariant: "discretionary-ligatures",
-  },
-  backdrop: {
-    zIndex: theme.zIndex.drawer + 1,
-    color: "#fff",
-  },
-  speedDial: getFabStyle(theme),
+  }
 }));
 
 type EditData = PostData & {
@@ -91,7 +73,6 @@ export const PostEditor = ({
   const [open, setOpen] = useState<boolean>(false);
   const [saving, setSaving] = useState<boolean>(false);
 
-  const classes = useStyles();
   const navigate = useNavigate();
   const { gitState, syncGitState } = useContext(GitContext);
 
@@ -245,8 +226,8 @@ export const PostEditor = ({
 
   const categories = getExistingCategories(gitState.index.posts);
   return (<>
-    <Paper variant="outlined" className={classes.paper}>
-      <div className={classes.root}>
+    <Paper variant="outlined" sx={{ flexGrow: 1 }}>
+      <StyledDiv>
         {["title", "slug", "tldr"].map(name => {
           let value = editData?.[name] || "";
           if (name === "slug" && editData?.[name] === null) {
@@ -307,7 +288,7 @@ export const PostEditor = ({
             />
           }
         />
-      </div>
+      </StyledDiv>
       <ReactMde
         value={editData.content}
         onChange={content => syncEditData({ ...editData, content })}
@@ -321,7 +302,7 @@ export const PostEditor = ({
         paste={{ saveImage }}
       />
     </Paper>
-    <Backdrop className={classes.backdrop} open={saving}>
+    <Backdrop sx={{ zIndex: (theme) => theme.zIndex.drawer + 1, color: "#fff" }} open={saving}>
       <CircularProgress color="inherit" />
     </Backdrop>
     <SpeedDial
@@ -330,7 +311,7 @@ export const PostEditor = ({
       onClose={() => setOpen(false)}
       onOpen={() => setOpen(true)}
       open={open}
-      className={classes.speedDial}
+      sx={ (theme) => getFabStyle(theme) }
       icon={<ArrowDropUp fontSize="large" />}
     >
       <SpeedDialAction
