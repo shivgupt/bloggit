@@ -5,7 +5,7 @@ import IconButton from "@mui/material/IconButton";
 import Input from "@mui/material/Input";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import { makeStyles } from "@mui/material/styles";
+import { styled } from "@mui/material/styles";
 import Close from "@mui/icons-material/Close";
 import Crop from "@mui/icons-material/Crop";
 import CropFree from "@mui/icons-material/CropFree";
@@ -14,42 +14,17 @@ import axios from "axios";
 import React, { useState } from "react";
 import Cropper from "react-easy-crop";
 
-const useStyles = makeStyles(theme => ({
-  container: {
-    display: "flex",
-    flexWrap: "wrap"
-  },
-  cropContainer: {
-    paddingBottom: theme.spacing(2),
-  },
-  previewTitle: {
-    margin: theme.spacing(2),
-  },
-  previewImage: {
-    maxWidth: "700px",
-    width: "100%",
-  },
-  previewContainer: {
-    marginTop: theme.spacing(8),
-    justifyContent: "center",
-    marginLeft: "auto",
-    marginRight: "auto",
-    maxWidth: "100%",
-  },
-  formControl: {
-    margin: theme.spacing(1)
-  },
-  input: {
-    display: "none"
-  },
-  cropButton: {
-    color: "white",
-    margin: theme.spacing(1),
-  },
-  cropToolbar: {
-    justifyContent: "center",
-  },
-}));
+const StyledDiv1 = styled("div")(({ theme }) => ({
+  marginTop: theme.spacing(8),
+  justifyContent: "center",
+  marginLeft: "auto",
+  marginRight: "auto",
+  maxWidth: "100%",
+}))
+
+const StyledDiv2 = styled("div")(({ theme }) => ({
+  paddingBottom: theme.spacing(2),
+}))
 
 type CropVal = { x: number; y: number; };
 type CropArea = CropVal & { width: number; height: number; };
@@ -67,7 +42,6 @@ export const ImageInput = ({
   const [crop, setCrop] = useState<CropVal>({ x: 0, y: 0 });
   const [cropArea, setCropArea] = useState<CropArea>({ x: 0, y: 0, width: 0, height: 0 });
   const [zoom, setZoom] = useState<number>(1);
-  const classes = useStyles();
 
   const aspect = 2/1;
 
@@ -149,11 +123,11 @@ export const ImageInput = ({
         value={imageUrl}
         onChange={(event) => setImageUrl(event.target.value)}
         endAdornment={
-          <div className={classes.container}>
+          <div style={{ display: "flex", flexWrap: "wrap" }}>
             <input
               id="image-uploader"
               accept="image/*"
-              className={classes.input}
+              style={{ display: "none" }}
               type="file"
               onChange={handleImageUpload}
             />
@@ -171,23 +145,32 @@ export const ImageInput = ({
         open={mode !== "none"}
       >
         <AppBar>
-          <Toolbar className={classes.cropToolbar}>
+          <Toolbar sx={{ justifyContent: "center" }}>
             <Button
-              className={classes.cropButton}
+              sx={{
+                color: "white",
+                margin: 1,
+              }}
               disabled={mode !== "crop"}
               onClick={performCrop}
               startIcon={<Crop/>}
               variant="outlined"
             >Crop</Button>
             <Button
-              className={classes.cropButton}
+              sx={{
+                color: "white",
+                margin: 1,
+              }}
               disabled={mode !== "crop"}
               onClick={skipCrop}
               startIcon={<CropFree/>}
               variant="outlined"
             >Skip</Button>
             <Button
-              className={classes.cropButton}
+              sx={{
+                color: "white",
+                margin: 1,
+              }}
               disabled={mode !== "crop"}
               onClick={reset}
               startIcon={<Close/>}
@@ -196,37 +179,40 @@ export const ImageInput = ({
           </Toolbar>
         </AppBar>
         {mode === "crop"
-          ? <div className={classes.cropContainer}>
-            <Cropper
-              image={imageDataUrl}
-              crop={crop}
-              zoom={zoom}
-              aspect={aspect}
-              onCropChange={setCrop}
-              onCropComplete={(area, pixels) => setCropArea(pixels)}
-              onZoomChange={setZoom}
-            />
-          </div>
+          ? <StyledDiv2>
+              <Cropper
+                image={imageDataUrl}
+                crop={crop}
+                zoom={zoom}
+                aspect={aspect}
+                onCropChange={setCrop}
+                onCropComplete={(area, pixels) => setCropArea(pixels)}
+                onZoomChange={setZoom}
+              />
+          </StyledDiv2>
           : mode === "uploading"
-            ? <div className={classes.previewContainer}>
+            ? <StyledDiv1>
               {previewImage
                 ? <>
-                  <Typography align="center" display="block" variant="h6" className={classes.previewTitle}>
+                  <Typography align="center" display="block" variant="h6" sx={{ margin: 2, }}>
                         Uploading image to IPFS..
                   </Typography>
                   <img
                     alt="preview"
-                    className={classes.previewImage}
+                    style={{
+                      maxWidth: "700px",
+                      width: "100%",
+                    }}
                     crossOrigin="anonymous"
                     src={previewImage}
                   />
                 </>
-                : <Typography align="center" display="block" variant="h6" className={classes.previewTitle}>
+                : <Typography align="center" display="block" variant="h6" sx={{ margin: 2, }}>
                       Generating image...
                 </Typography>
               }
-            </div>
-            : <Typography align="center" display="block" variant="h6" className={classes.previewTitle}>
+            </StyledDiv1>
+            : <Typography align="center" display="block" variant="h6" sx={{ margin: 2, }}>
                 Cancelling...
             </Typography>
         }
