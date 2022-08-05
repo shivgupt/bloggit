@@ -1,6 +1,6 @@
 import Fab from "@mui/material/Fab";
 import Paper from "@mui/material/Paper";
-import { makeStyles } from "@mui/material/styles";
+import { styled } from "@mui/material/styles";
 import Edit from "@mui/icons-material/Edit";
 import Typography from "@mui/material/Typography";
 import React, { useContext, useEffect, useState } from "react";
@@ -14,50 +14,10 @@ import { getPrettyDateString } from "../utils";
 import { BrowseHistory } from "./BrowseHistory";
 import { Markdown } from "./Markdown";
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    maxWidth: "864px",
-    width: "100%",
-  },
-  paper: {
-    flexGrow: 1,
-    margin: theme.spacing(1, 1),
-    "& > *": {
-      margin: theme.spacing(1),
-    }
-  },
-  date: {
-    paddingLeft: "20px",
-    textAlign: "justify",
-    fontVariant: "discretionary-ligatures",
-  },
-  text: {
-    padding: "20px",
-    textAlign: "justify",
-    fontVariant: "discretionary-ligatures",
-    "& p > img": {
-      paddingTop: theme.spacing(4),
-      paddingBottom: theme.spacing(4),
-    },
-    "& p > img + em": {
-      display: "block",
-      maxWidth: "80%",
-      marginTop: theme.spacing(-3),
-      marginRight: "auto",
-      marginBottom: theme.spacing(4),
-      marginLeft: "auto",
-    },
-  },
-  media: {
-    [theme.breakpoints.up("md")]: {
-      height: 500,
-    },
-    [theme.breakpoints.down("sm")]: {
-      height: 300,
-    }
-  },
-  fab: getFabStyle(theme),
-}));
+const StyledDiv = styled("div")(({ theme }) => ({
+  maxWidth: "864px",
+  width: "100%",
+}))
 
 export const PostPage = ({
   adminMode,
@@ -69,7 +29,6 @@ export const PostPage = ({
 
   const gitContext = useContext(GitContext);
   const navigate = useNavigate();
-  const classes = useStyles();
 
   const { currentRef, latestRef, slug, currentContent, indexEntry } = gitContext.gitState;
 
@@ -84,7 +43,7 @@ export const PostPage = ({
   const publishedOn = indexEntry?.publishedOn ? getPrettyDateString(indexEntry.publishedOn) : null;
 
   return (
-    <div className={classes.root}>
+    <StyledDiv>
       <BrowseHistory
         currentRef={currentRef}
         latestRef={latestRef}
@@ -94,7 +53,7 @@ export const PostPage = ({
         slug={slug}
       />
 
-      <Paper variant="outlined" className={classes.paper}>
+      <Paper variant="outlined" sx={{ flexGrow: 1, mt: 1, mr: 1, "& > *": { m: 1, } }}>
         { indexEntry?.img
           ? <img
             src={indexEntry.img}
@@ -113,13 +72,25 @@ export const PostPage = ({
           : null
         }
         { publishedOn
-          ? <Typography variant="caption" display="block" className={classes.date}>
+          ? <Typography variant="caption" display="block"
+              sx={{
+                paddingLeft: "20px",
+                textAlign: "justify",
+                fontVariant: "discretionary-ligatures",
+              }}
+            >
             Published On: {publishedOn}
           </Typography>
           : null
         }
         { !isHistorical && lastEdited
-          ? <Typography variant="caption" display="block" className={classes.date}>
+          ? <Typography variant="caption" display="block"
+              sx={{
+                paddingLeft: "20px",
+                textAlign: "justify",
+                fontVariant: "discretionary-ligatures",
+              }}
+            >
             Last Updated: {lastEdited}
           </Typography>
           : null
@@ -129,7 +100,7 @@ export const PostPage = ({
       {adminMode === "enabled" && !isHistorical
         ? <Fab
           id={"fab"}
-          className={classes.fab}
+          sx={ (theme) => getFabStyle(theme) }
           color="primary"
           onClick={() => {
             navigate(`/admin/edit/${slug}`);
@@ -137,6 +108,6 @@ export const PostPage = ({
         ><Edit/></Fab>
         : null
       }
-    </div>
+    </StyledDiv>
   );
 };
