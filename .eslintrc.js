@@ -12,6 +12,7 @@ module.exports = {
     "plugin:import/warnings",
     "plugin:react/recommended",
     "react-app",
+    "react-app/jest",
   ],
   overrides: [
     {
