@@ -81,7 +81,7 @@ export const Markdown = ({
           src={src}
           style={{ display: "block", margin: "auto", maxWidth: "90%" }}
         />
-        : <Renderer3D src={src} />
+        : <div id="VRBox"> <Renderer3D src={src} /> </div>
     );
   };
 
