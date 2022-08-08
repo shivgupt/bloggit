@@ -93,7 +93,7 @@ export const BrowseHistory = ({
   }, [latestRef, slug]);
 
   return (
-    <Grid container spacing={1} sx={{ mt: -1.75, pl: 1, }}>
+    <Grid container spacing={1} sx={{ mt: 1, pl: 1, }}>
 
       <Grid item>
         <Copyable

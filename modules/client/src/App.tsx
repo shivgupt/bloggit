@@ -27,6 +27,10 @@ import {
   store,
 } from "./utils";
 
+const StyledDiv = styled("div")(({theme}) => ({
+  ...theme.mixins.toolbar
+}));
+
 const StyledContainer = styled(Container)(({ theme }) => ({
     [theme.breakpoints.up("lg")]: {
       width: "80%",
@@ -195,6 +199,7 @@ const App: React.FC = () => {
           toggleTheme={toggleTheme}
         />
         <main>
+          <StyledDiv />
           <StyledContainer maxWidth="xl">
             <Routes>
               <Route path="/" element={<Home adminMode={adminMode} />} />
