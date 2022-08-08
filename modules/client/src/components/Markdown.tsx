@@ -81,8 +81,18 @@ export const Markdown = ({
           src={src}
           style={{ display: "block", margin: "auto", maxWidth: "90%" }}
         />
-        : <div id="VRBox"> <Renderer3D src={src} /> </div>
+        : <Renderer3D src={src} />
     );
+  };
+
+  const AnimationRenderer = ({
+    node,
+  }: {
+    node?: any;
+  }) => {
+    const src = node.properties.src;
+    console.log(src)
+    return (<div id="VRBox"> <Renderer3D src={src} /> </div>)
   };
 
   const LinkRenderer = ({
@@ -175,6 +185,7 @@ export const Markdown = ({
         h5: HeadingRenderer,
         h6: HeadingRenderer,
         img: ImageRenderer,
+        animate: AnimationRenderer,
       }}
       remarkPlugins={[gfm]}
     >
