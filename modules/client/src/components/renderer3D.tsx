@@ -15,7 +15,7 @@ export const Renderer3D = (src: any) => {
     <div style = {{height:"100vh", width:"100%"}}>
       <Canvas>
         <Suspense fallback={null}>
-          <primitive object={gltf.scene} scale={1} />
+          <primitive object={gltf.scene} scale={.3} />
           <OrbitControls />
           <Environment preset="sunset" background />
         </Suspense>
