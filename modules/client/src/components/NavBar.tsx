@@ -34,22 +34,6 @@ const StyledNav = styled("nav")(({ theme }) => ({
   },
 }))
 
-const StyledHiddenDrawer = styled(({ className, ...props }: DrawerProps) => (
-  <Drawer {...props} classes={{ paper: className }} />
-))`
-    & .MuiDrawer-paper {
-      width: "60%",
-    }
-`;
-
-const StyledPermanentDrawer = styled(({ className, ...props }: DrawerProps) => (
-  <Drawer {...props} classes={{ paper: className }} />
-))`
-    & .MuiDrawer-paper {
-      width: "20%",
-    }
-`;
-
 const DrawerContent = ({
   adminMode,
   siteTitle,
@@ -75,6 +59,7 @@ const DrawerContent = ({
           id="close-drawer"
           sx={{
             height: 8,
+            mt: 1,
             mb: -4,
             ml: "75%",
           }}
@@ -247,7 +232,14 @@ export const NavBar = ({
       </AppBar>
       <StyledNav>
         <Hidden lgUp>
-          <StyledHiddenDrawer
+          <Drawer
+            sx={{
+              width: "60%",
+              '& .MuiDrawer-paper': {
+                width: "60%",
+                boxSizing: 'border-box',
+              },
+            }}
             anchor="right"
             open={drawer}
             onClose={toggleDrawer}
@@ -259,10 +251,17 @@ export const NavBar = ({
               toggleDrawer={toggleDrawer}
               toggleTheme={toggleTheme}
             />
-          </StyledHiddenDrawer>
+          </Drawer>
         </Hidden>
         <Hidden mdDown>
-          <StyledPermanentDrawer
+          <Drawer
+            sx={{
+              width: "20%",
+              '& .MuiDrawer-paper': {
+                width: "20%",
+                boxSizing: 'border-box',
+              },
+            }}
             anchor="right"
             variant="permanent"
             open
@@ -274,7 +273,7 @@ export const NavBar = ({
               toggleDrawer={toggleDrawer}
               toggleTheme={toggleTheme}
             />
-          </StyledPermanentDrawer>
+          </Drawer>
         </Hidden>
       </StyledNav>
     </>
