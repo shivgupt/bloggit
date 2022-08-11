@@ -10,18 +10,21 @@ export const VRHouseTour = () => {
 
   const { player } = useXR()
 
-  console.log(JSON.stringify(player, null, 2));
-  console.log(JSON.stringify(player.position, null, 2));
-  /*
   useEffect(() => {
-    player.position.z += 0.1
-  }, []);
-  */
+    player.position.x = 0;
+    player.position.y = 3;
+    player.position.z = 0;
+  }, [])
+
+  console.log(Object.keys(player));
+  console.log(player.position);
+  console.log(glb);
 
   return (
     <div style = {{height:"100vh", width:"100%"}}>
       <VRCanvas>
-        <ambientLight intensity={0.5} />
+        <ambientLight intensity={0.1} />
+        <spotLight position={[-1.5152270793914795, -1.5152270793914795, 5]} />
         <mesh>
           <primitive object={glb.scene} scale={1} />
         </mesh>
