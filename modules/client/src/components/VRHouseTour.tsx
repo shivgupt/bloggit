@@ -28,7 +28,7 @@ export const VRHouseTour = () => {
     <div style = {{height:"100vh", width:"100%"}}>
       <VRCanvas frameloop="demand" dpr={[1, 1.5]} shadows camera={{ near: 0.1, far: 100, fov: 75 }}>
         <ambientLight intensity={0.1} />
-        <Interactive onHover={() => console.log("Hovering")}>
+        <Interactive onSqueeze={(event) => console.log('Squeezy', event)}>
           <mesh>
             <primitive object={glb.scene} scale={1} />
           </mesh>
