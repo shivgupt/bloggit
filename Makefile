@@ -113,8 +113,8 @@ types: node-modules $(shell find modules/types $(find_options))
 	bash ops/maketh.sh $@
 
 server: types $(shell find modules/server $(find_options))
-	bash ops/maketh.sh $@
 	touch modules/server/src/index.ts
+	bash ops/maketh.sh $@
 
 client: types $(shell find modules/client $(find_options))
 	bash ops/maketh.sh $@
