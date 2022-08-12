@@ -16,11 +16,11 @@ export const VRHouseTour = () => {
   const [marker, setMarker] = useState(new THREE.Vector3(0,3,0))
 
   useEffect(() => {
-    console.log(`Player =`, player);
-    player.position.x = 0;
+    player.position.x = marker.x || 0;
     player.position.y = 3;
-    player.position.z = 0;
-  }, [])
+    player.position.z = marker.z || 0;
+    console.log("setting player position", player)
+  }, [marker])
 
   const floor1 = glb.scene.children.find((child, index, a) => child.name === 'Floor1');
 
