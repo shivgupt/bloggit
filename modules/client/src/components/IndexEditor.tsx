@@ -1,46 +1,32 @@
-import { BlogIndex, EditRequest, PostData } from "@blog/types";
-import Backdrop from "@material-ui/core/Backdrop";
-import Checkbox from "@material-ui/core/Checkbox";
-import CircularProgress from "@material-ui/core/CircularProgress";
-import Divider from "@material-ui/core/Divider";
-import Fab from "@material-ui/core/Fab";
-import IconButton from "@material-ui/core/IconButton";
-import Switch from "@material-ui/core/Switch";
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableCell from "@material-ui/core/TableCell";
-import TableHead from "@material-ui/core/TableHead";
-import TableRow from "@material-ui/core/TableRow";
-import TextField from "@material-ui/core/TextField";
-import { makeStyles, Theme } from "@material-ui/core/styles";
-import Add from "@material-ui/icons/Add";
-import Edit from "@material-ui/icons/Edit";
-import Save from "@material-ui/icons/Save";
+import { BlogIndex, EditRequest, PostData } from "@bloggit/types";
+import Backdrop from "@mui/material/Backdrop";
+import Checkbox from "@mui/material/Checkbox";
+import CircularProgress from "@mui/material/CircularProgress";
+import Divider from "@mui/material/Divider";
+import Fab from "@mui/material/Fab";
+import IconButton from "@mui/material/IconButton";
+import Switch from "@mui/material/Switch";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import TextField from "@mui/material/TextField";
+import { styled } from "@mui/material/styles";
+import Add from "@mui/icons-material/Add";
+import Edit from "@mui/icons-material/Edit";
+import Save from "@mui/icons-material/Save";
 import axios from "axios";
 import React, { useContext, useEffect, useState } from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import { GitContext } from "../GitContext";
 import { getFabStyle } from "../style";
 import { emptyIndex, getPath } from "../utils";
 
-const useStyles = makeStyles((theme: Theme) => ({
-  root: {
-    width: "100%",
-    backgroundColor: theme.palette.background.paper,
-  },
-  editColumn: {
-    width: "36px",
-  },
-  bottomSpace: {
-    height: theme.spacing(10),
-  },
-  backdrop: {
-    zIndex: theme.zIndex.drawer + 1,
-    color: "#fff",
-  },
-  fab: getFabStyle(theme),
-}));
+const StyledDiv = styled("div")(({ theme }) => ({
+  height: theme.spacing(10),
+}))
 
 type EditIndex = BlogIndex & {
   posts: {
@@ -55,8 +41,7 @@ export const IndexEditor = () => {
   const [saving, setSaving] = useState<boolean>(false);
   const [newIndex, setNewIndex] = useState<EditIndex>(emptyIndex);
   const gitContext = useContext(GitContext);
-  const history = useHistory();
-  const classes = useStyles();
+  const navigate = useNavigate();
 
   const oldIndex = gitContext.gitState?.index;
   const title = newIndex?.title;
@@ -158,7 +143,7 @@ export const IndexEditor = () => {
     <Table size="small">
       <TableHead>
         <TableRow> 
-          <TableCell padding="none" className={classes.editColumn}></TableCell>
+          <TableCell padding="none" sx={{ width: "36px" }}></TableCell>
           <TableCell padding="none">Title</TableCell>
           <TableCell padding="checkbox">Featured</TableCell>
           <TableCell padding="checkbox">Draft</TableCell>
@@ -176,11 +161,11 @@ export const IndexEditor = () => {
             return (
               <TableRow id={`table-row-${slug}`} key={`table-row-${slug}`}>
 
-                <TableCell padding="none" className={classes.editColumn}>
+                <TableCell padding="none" sx={{ width: "36px" }}>
                   <IconButton
                     id={`edit-${slug}`}
                     onClick={() => {
-                      history.push(`/admin/edit/${slug}`);
+                      navigate(`/admin/edit/${slug}`);
                     }}
                     color="secondary"
                     size="small"
@@ -188,7 +173,7 @@ export const IndexEditor = () => {
                 </TableCell>
 
                 <TableCell align="left" padding="none" onClick={() => {
-                  history.push(`/${slug}`);
+                  navigate(`/${slug}`);
                 }}>
                   {title}
                 </TableCell>
@@ -227,11 +212,11 @@ export const IndexEditor = () => {
         }
       </TableBody>
     </Table>
-    <div className={classes.bottomSpace}/>
+    <StyledDiv />
 
     <Fab
       id={"fab"}
-      className={classes.fab}
+      sx={ (theme) => getFabStyle(theme) }
       color="primary"
       onClick={() => {
         if (diff) {
@@ -239,11 +224,15 @@ export const IndexEditor = () => {
           saveChanges();
         } else {
           console.log("Creating new post..");
-          history.push("/admin/create");
+          navigate("/admin/create");
         }
       }}
     >{(diff ? <Save/> : <Add/>)}</Fab>
-    <Backdrop className={classes.backdrop} open={saving}>
+    <Backdrop open={saving}
+      sx={{
+        zIndex: (theme) => theme.zIndex.drawer + 1,
+        color: "#fff"
+      }}>
       <CircularProgress color="inherit" />
     </Backdrop>
   </>);

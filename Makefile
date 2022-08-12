@@ -4,7 +4,7 @@ SHELL=/bin/bash
 
 dir=$(shell cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )
 project=$(shell cat $(dir)/package.json | jq .name | tr -d '"')
-find_options=-type f -not -path "*/node_modules/*" -not -name "*.swp" -not -path "*/.*" -not -name "*.log"
+find_options=-type f -not -path "*/node_modules/*" -not -path "*/dist/*" -not -name "*.swp" -not -path "*/.*" -not -name "*.log"
 semver=v$(shell cat package.json | grep '"version":' | awk -F '"' '{print $$4}')
 commit=$(shell git rev-parse HEAD | head -c 8)
 user=$(shell if [[ -n "${CI_PROJECT_NAMESPACE}" ]]; then echo "${CI_PROJECT_NAMESPACE}"; else echo "`whoami`"; fi)
@@ -27,10 +27,13 @@ $(shell mkdir -p .flags)
 default: dev
 all: dev prod
 dev: server proxy
-prod: dev webserver
+prod: dev webserver server-image
 
 start: dev
 	bash ops/start.sh
+
+start-prod: dev
+	export BLOG_PROD=true; bash ops/start.sh
 
 restart: stop
 	bash ops/start.sh
@@ -55,13 +58,14 @@ purge: clean reset
 push: push-commit
 push-commit:
 	bash ops/push-images.sh $(commit)
+	bash ops/push-images.sh latest
 push-semver:
 	bash ops/pull-images.sh $(commit)
 	bash ops/tag-images.sh $(semver)
 	bash ops/push-images.sh $(semver)
+	bash ops/push-images.sh latest
 
-pull: pull-latest
-pull-latest:
+pull:
 	bash ops/pull-images.sh latest
 pull-commit:
 	bash ops/pull-images.sh $(commit)
@@ -109,6 +113,7 @@ types: node-modules $(shell find modules/types $(find_options))
 	bash ops/maketh.sh $@
 
 server: types $(shell find modules/server $(find_options))
+	touch modules/server/src/index.ts
 	bash ops/maketh.sh $@
 
 client: types $(shell find modules/client $(find_options))

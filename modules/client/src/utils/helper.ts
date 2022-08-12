@@ -1,4 +1,4 @@
-import { PostData, Posts } from "@blog/types";
+import { PostData, Posts } from "@bloggit/types";
 import emoji from "emoji-dictionary";
 
 import { PostsByCategory } from "../types";

@@ -1,27 +1,25 @@
-import Button from "@material-ui/core/Button";
-import Divider from "@material-ui/core/Divider";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import Switch from "@material-ui/core/Switch";
-import TextField from "@material-ui/core/TextField";
-import Typography from "@material-ui/core/Typography";
-import { makeStyles, Theme } from "@material-ui/core/styles";
-import RemoveCircle from "@material-ui/icons/RemoveCircle";
+import Button from "@mui/material/Button";
+import Divider from "@mui/material/Divider";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Switch from "@mui/material/Switch";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
+import { styled } from "@mui/material/styles";
+import RemoveCircle from "@mui/icons-material/RemoveCircle";
+
 import React, { useState } from "react";
 
 import { AdminMode } from "../types";
 
 import { IndexEditor } from "./IndexEditor";
 
-const useStyles = makeStyles((theme: Theme) => ({
-  section: {
-    margin: theme.spacing(1, 1),
-    "& > *": {
-      margin: theme.spacing(1),
-    }
-  },
-  button: {
-    marginTop: theme.spacing(2)
-  },
+// TODO: verify admin mode margin
+
+const StyledDiv = styled("div")(({ theme }) => ({
+  margin: theme.spacing(1, 1),
+  "& > *": {
+    margin: theme.spacing(1),
+  }
 }));
 
 export const AdminHome = ({
@@ -34,13 +32,12 @@ export const AdminHome = ({
   validateAuthToken: (_authToken?: string) => Promise<void>;
 }) => {
   const [authToken, setAuthToken] = useState<string>("");
-  const classes = useStyles();
 
   return (
     <div>
       {adminMode !== "invalid"
         ? (
-          <div className={classes.section}>
+          <StyledDiv>
             <Typography display="inline" variant="body1">
               This device is registered for Admin access
             </Typography>
@@ -55,11 +52,11 @@ export const AdminHome = ({
             >
               Unregister
             </Button>
-          </div>
+          </StyledDiv>
         )
         : (
 
-          <div className={classes.section}>
+          <StyledDiv>
             <TextField
               autoComplete={"off"}
               helperText="Register for admin mode"
@@ -71,7 +68,7 @@ export const AdminHome = ({
               variant="outlined"
             />
             <Button
-              className={classes.button}
+              sx={{ mt: 2, }}
               id="register-admin-token"
               size="small"
               onClick={() => validateAuthToken(authToken)}
@@ -79,7 +76,7 @@ export const AdminHome = ({
             >
               Register
             </Button>
-          </div>
+          </StyledDiv>
 
         )
       }
@@ -100,18 +97,24 @@ export const AdminHome = ({
           }
           label="Admin Mode"
           labelPlacement="start"
-          className={classes.section}
+          sx={{
+            mt: 1,
+            mb: 1,
+            "& > *": {
+              margin: 1,
+            }
+          }}
         />
-        : <div className={classes.section}>
-          <Typography className={classes.section}>
-              Supply a valid admin token to activate admin mode
-          </Typography>
-        </div>
+        : <StyledDiv>
+            <Typography>
+                Supply a valid admin token to activate admin mode
+            </Typography>
+          </StyledDiv>
       }
       {adminMode === "enabled"
-        ? <div className={classes.section}>
+        ? <StyledDiv>
           <IndexEditor />
-        </div>
+        </StyledDiv>
         : null
       }
     </div>

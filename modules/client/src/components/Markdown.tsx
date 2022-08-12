@@ -1,7 +1,7 @@
-import IconButton from "@material-ui/core/IconButton";
-import Link from "@material-ui/core/Link";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
-import LinkIcon from "@material-ui/icons/Link";
+import IconButton from "@mui/material/IconButton";
+import Link from "@mui/material/Link";
+import { styled, useTheme } from "@mui/material/styles";
+import LinkIcon from "@mui/icons-material/Link";
 import React, { useContext, useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
@@ -11,10 +11,10 @@ import gfm from "remark-gfm";
 import { GitContext } from "../GitContext";
 import { getChildValue, replaceEmojiString, slugify } from "../utils";
 
+import { Renderer3D } from "./renderer3D";
 import { HashLink } from "./HashLink";
 
-const useStyles = makeStyles((theme) => ({
-  text: {
+const StyledReactMarkdown =styled(ReactMarkdown)(({ theme }) => ({
     padding: "20px",
     textAlign: "justify",
     fontVariant: "discretionary-ligatures",
@@ -35,7 +35,6 @@ const useStyles = makeStyles((theme) => ({
       marginBottom: theme.spacing(4),
       marginLeft: "auto",
     },
-  },
 }));
 
 export const Markdown = ({
@@ -44,12 +43,16 @@ export const Markdown = ({
   content: string;
 }) => {
   const [imgErrors, setImgErrors] = useState({});
-  const classes = useStyles();
+  const [vidErrors, setVidErrors] = useState({});
   const theme = useTheme();
 
   useEffect(() => {
     console.log(`Got image errors`, imgErrors);
   }, [imgErrors]);
+
+  useEffect(() => {
+    console.log(`Got video errors`, vidErrors);
+  }, [vidErrors]);
 
   const ImageRenderer = ({
     node,
@@ -68,12 +71,28 @@ export const Markdown = ({
         alt={node.properties.alt}
         style={{ display: "block", margin: "auto", maxWidth: "90%" }}
       />
-      : <video
-        controls
-        src={src}
-        style={{ display: "block", margin: "auto", maxWidth: "90%" }}
-      />
+      : !vidErrors[src] ? <video
+          onError={() => {
+            if (!vidErrors[src]) {
+              setVidErrors(old => ({ ...old, [src]: true }));
+            }
+          }}
+          controls
+          src={src}
+          style={{ display: "block", margin: "auto", maxWidth: "90%" }}
+        />
+        : <Renderer3D src={src} />
     );
+  };
+
+  const AnimationRenderer = ({
+    node,
+  }: {
+    node?: any;
+  }) => {
+    const src = node.properties.src;
+    console.log(src)
+    return (<div id="VRBox"> <Renderer3D src={src} /> </div>)
   };
 
   const LinkRenderer = ({
@@ -111,7 +130,7 @@ export const Markdown = ({
     } else {
       return (
         <SyntaxHighlighter
-          style={theme.palette.type === "dark" ? atomDark : vs}
+          style={theme.palette.mode === "dark" ? atomDark : vs}
           language={match ? match[1] : "text"}
           PreTag="div"
         >
@@ -155,8 +174,7 @@ export const Markdown = ({
   };
 
   return (
-    <ReactMarkdown
-      className={classes.text}
+    <StyledReactMarkdown
       components={{
         a: LinkRenderer,
         code: CodeBlockRenderer,
@@ -167,10 +185,11 @@ export const Markdown = ({
         h5: HeadingRenderer,
         h6: HeadingRenderer,
         img: ImageRenderer,
+        animate: AnimationRenderer,
       }}
       remarkPlugins={[gfm]}
     >
       {replaceEmojiString(content)}
-    </ReactMarkdown>
+    </StyledReactMarkdown>
   );
 };

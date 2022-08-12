@@ -1,4 +1,4 @@
-import { HistoryResponse } from "@blog/types";
+import { HistoryResponse } from "@bloggit/types";
 
 import { env } from "../env";
 import { logger } from "../utils";

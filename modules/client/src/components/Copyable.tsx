@@ -1,18 +1,15 @@
-import Button from "@material-ui/core/Button";
-import Tooltip from "@material-ui/core/Tooltip";
-import Typography from "@material-ui/core/Typography";
-import { makeStyles } from "@material-ui/core/styles";
-import CopiedIcon from "@material-ui/icons/AssignmentTurnedIn";
-import CopyIcon from "@material-ui/icons/Link";
+import Button from "@mui/material/Button";
+import Tooltip from "@mui/material/Tooltip";
+import Typography from "@mui/material/Typography";
+import CopiedIcon from "@mui/icons-material/AssignmentTurnedIn";
+import CopyIcon from "@mui/icons-material/Link";
 import React, { useState } from "react";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 
-const useStyles = makeStyles(() => ({
-  label: {
-    textTransform: "none",
-  },
-}));
-
+/*
+  //TODO: check Botton css need lable class
+  label: { textTransform: "none", };
+*/
 export const Copyable = ({
   color,
   id,
@@ -21,7 +18,7 @@ export const Copyable = ({
   tooltip,
   value,
 }: {
-  color?: "default" | "inherit" | "primary" | "secondary",
+  color?: "inherit" | "primary" | "secondary",
   id: string,
   size: "medium" | "large" | "small",
   text: string,
@@ -29,7 +26,6 @@ export const Copyable = ({
   value: string,
 }) => {
   const [copied, setCopied] = useState(false);
-  const classes = useStyles();
 
   return (
     <CopyToClipboard
@@ -41,7 +37,6 @@ export const Copyable = ({
     >
       <Tooltip arrow title={tooltip || text}>
         <Button
-          className={classes.label}
           color={color || "inherit"}
           id={id}
           size={size || "medium"}

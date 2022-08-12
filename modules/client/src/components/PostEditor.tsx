@@ -1,23 +1,23 @@
 import "react-mde/lib/styles/css/react-mde-all.css";
-import { EditRequest, EditResponse, PostData } from "@blog/types";
-import Backdrop from "@material-ui/core/Backdrop";
-import Button from "@material-ui/core/Button";
-import CircularProgress from "@material-ui/core/CircularProgress";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import Paper from "@material-ui/core/Paper";
-import Switch from "@material-ui/core/Switch";
-import TextField from "@material-ui/core/TextField";
-import { makeStyles } from "@material-ui/core/styles";
-import Delete from "@material-ui/icons/Delete";
-import Save from "@material-ui/icons/Save";
-import ArrowDropUp from "@material-ui/icons/ArrowDropUp";
-import Autocomplete from "@material-ui/lab/Autocomplete";
-import SpeedDial from "@material-ui/lab/SpeedDial";
-import SpeedDialAction from "@material-ui/lab/SpeedDialAction";
+import { EditRequest, EditResponse, PostData } from "@bloggit/types";
+import Backdrop from "@mui/material/Backdrop";
+import Button from "@mui/material/Button";
+import CircularProgress from "@mui/material/CircularProgress";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Paper from "@mui/material/Paper";
+import Switch from "@mui/material/Switch";
+import TextField from "@mui/material/TextField";
+import { styled } from "@mui/material/styles";
+import Delete from "@mui/icons-material/Delete";
+import Save from "@mui/icons-material/Save";
+import ArrowDropUp from "@mui/icons-material/ArrowDropUp";
+import Autocomplete from "@mui/material/Autocomplete";
+import SpeedDial from "@mui/material/SpeedDial";
+import SpeedDialAction from "@mui/material/SpeedDialAction";
 import axios from "axios";
 import React, { useContext, useEffect, useState } from "react";
 import ReactMde, { SaveImageHandler } from "react-mde";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import { GitContext } from "../GitContext";
 import { getFabStyle } from "../style";
@@ -27,30 +27,12 @@ import { emptyEntry, fetchHistory, getExistingCategories, getPath, slugify } fro
 import { Markdown } from "./Markdown";
 import { ImageInput } from "./ImageInput";
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    flexGrow: 1,
-    margin: theme.spacing(1, 1),
-    "& > *": {
-      margin: theme.spacing(1),
-    }
-  },
-  paper: {
-    flexGrow: 1,
-  },
-  button: {
+const StyledDiv = styled("div")(({ theme }) => ({
+  flexGrow: 1,
+  margin: theme.spacing(1, 1),
+  "& > *": {
     margin: theme.spacing(1),
-  },
-  text: {
-    padding: "20px",
-    textAlign: "justify",
-    fontVariant: "discretionary-ligatures",
-  },
-  backdrop: {
-    zIndex: theme.zIndex.drawer + 1,
-    color: "#fff",
-  },
-  speedDial: getFabStyle(theme),
+  }
 }));
 
 type EditData = PostData & {
@@ -91,8 +73,7 @@ export const PostEditor = ({
   const [open, setOpen] = useState<boolean>(false);
   const [saving, setSaving] = useState<boolean>(false);
 
-  const classes = useStyles();
-  const history = useHistory();
+  const navigate = useNavigate();
   const { gitState, syncGitState } = useContext(GitContext);
 
   // This should only run once when this component is unmounted
@@ -210,13 +191,13 @@ export const PostEditor = ({
         await syncGitState(editRes.commit.substring(0, 8), newSlug, true);
         await fetchHistory(newSlug, true);
         if (gitState.slug !== newSlug) {
-          history.push(`/${newSlug}`);
+          navigate(`/${newSlug}`);
         }
       } else if (editRes?.status === "no change") {
         console.warn(`Edit request yielded no change, still on commit ${editRes.commit}`);
       }
       setSaving(false);
-      history.push(`/${newSlug}`);
+      navigate(`/${newSlug}`);
     } else {
       console.error(`Something went wrong`, res);
     }
@@ -224,14 +205,14 @@ export const PostEditor = ({
 
   const confirmDiscard = () => {
     if (!validation.hasChanged) {
-      history.push(`/${gitState.slug}`);
+      navigate(`/${gitState.slug}`);
     } else {
       setSnackAlert({
         open: true,
         msg: "Do you want to discard all the changes",
         severity: "warning",
         action: <Button onClick={() => {
-          history.push(`/${gitState.slug}`);
+          navigate(`/${gitState.slug}`);
           setSnackAlert({
             open: true,
             msg: "Changes discarded",
@@ -245,8 +226,8 @@ export const PostEditor = ({
 
   const categories = getExistingCategories(gitState.index.posts);
   return (<>
-    <Paper variant="outlined" className={classes.paper}>
-      <div className={classes.root}>
+    <Paper variant="outlined" sx={{ flexGrow: 1 }}>
+      <StyledDiv>
         {["title", "slug", "tldr"].map(name => {
           let value = editData?.[name] || "";
           if (name === "slug" && editData?.[name] === null) {
@@ -307,7 +288,7 @@ export const PostEditor = ({
             />
           }
         />
-      </div>
+      </StyledDiv>
       <ReactMde
         value={editData.content}
         onChange={content => syncEditData({ ...editData, content })}
@@ -321,7 +302,7 @@ export const PostEditor = ({
         paste={{ saveImage }}
       />
     </Paper>
-    <Backdrop className={classes.backdrop} open={saving}>
+    <Backdrop sx={{ zIndex: (theme) => theme.zIndex.drawer + 1, color: "#fff" }} open={saving}>
       <CircularProgress color="inherit" />
     </Backdrop>
     <SpeedDial
@@ -330,7 +311,7 @@ export const PostEditor = ({
       onClose={() => setOpen(false)}
       onOpen={() => setOpen(true)}
       open={open}
-      className={classes.speedDial}
+      sx={ (theme) => getFabStyle(theme) }
       icon={<ArrowDropUp fontSize="large" />}
     >
       <SpeedDialAction

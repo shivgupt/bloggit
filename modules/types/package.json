@@ -1,12 +1,12 @@
 {
-  "name": "@blog/types",
+  "name": "@bloggit/types",
   "version": "1.0.0",
-  "description": "Types shared between blog client & server",
-  "author": "Bo & Shiv Henderson",
+  "description": "Types shared between bloggit client & server",
+  "author": "Bo & Shiv Hendo",
   "license": "GPL-3.0-or-later",
-  "homepage": "https://github.com/bohendo/blog#readme",
-  "repository": { "type": "git", "url": "git+ssh://git@github.com/bohendo/blog.git" },
-  "bugs": { "url": "https://github.com/bohendo/blog/issues" },
+  "homepage": "https://github.com/bohendo/bloggit#readme",
+  "repository": { "type": "git", "url": "git+ssh://git@github.com/bohendo/bloggit.git" },
+  "bugs": { "url": "https://github.com/bohendo/bloggit/issues" },
   "main": "dist/bundle.js",
   "module": "dist/bundle.esm.js",
   "types": "dist/bundle.d.ts",
@@ -18,9 +18,9 @@
     "@sinclair/typebox": "0.20.5"
   },
   "devDependencies": {
-    "@rollup/plugin-typescript": "8.2.5",
-    "rollup": "2.58.0",
-    "rollup-plugin-dts": "4.0.0",
-    "typescript": "4.3.5"
+    "@rollup/plugin-typescript": "8.3.4",
+    "rollup": "2.77.2",
+    "rollup-plugin-dts": "4.2.2",
+    "typescript": "^4.7.4"
   }
 }

@@ -7,7 +7,7 @@ import { gitRouter } from "./git";
 import { ipfsRouter } from "./ipfs";
 import { logger } from "./utils";
 
-const log = logger.child({ module: "Entry" });
+const log = logger.child({ module: "Index" });
 
 log.info(env, `Starting server in env:`);
 
@@ -20,7 +20,7 @@ app.use((req, res, next) => {
   const query = req.query && Object.keys(req.query).length > 0
     ? `?${Object.entries(req.query).map(([key, val]) => `${key}=${val}`).join("&")}`
     : "";
-  log.info(req.headers, `=> ${req.method} ${req.path}${query}`);
+  log.info(`=> ${req.method} ${req.path}${query}`);
   next();
 });
 
