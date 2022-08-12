@@ -7,7 +7,7 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 
 export const Renderer3D = (src: any) => {
   console.log(src)
-  let srcURL = `http://${window.location.host}${src.src}`;
+  let srcURL = `${window.location.origin}${src.src}`;
 
   const gltf = useLoader(GLTFLoader, srcURL);
 
