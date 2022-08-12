@@ -29,9 +29,12 @@ export const VRHouseTour = () => {
   const move = (event) => {
     if (event.intersection) {
       const point = event.intersection.point;
-      console.log('Player current position', player.position, 'Player new position', point)
-      console.log(event)
-      setMarker(point)
+        console.log(event.intersection)
+      if (event.intersection.object.uuid === floor1?.uuid || event.intersection.object.parent.uuid === floor1?.uuid)
+      {
+        console.log(floor1!)
+        setMarker(point)
+      }
       /*
       player.position.x = point.x;
       player.position.y = point.y;
@@ -43,7 +46,7 @@ export const VRHouseTour = () => {
   return (
     <div style = {{height:"100vh", width:"100%"}}>
       <VRCanvas frameloop="demand" dpr={[1, 1.5]} shadows camera={{ near: 0.1, far: 100, fov: 75 }}>
-        <ambientLight intensity={0.1} />
+        <ambientLight intensity={0.5} />
         <Interactive onSqueeze={(event) => move(event)}>
           <Box position={marker}>
             <meshBasicMaterial color="hotpink" />
