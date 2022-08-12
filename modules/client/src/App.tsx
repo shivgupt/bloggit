@@ -10,10 +10,12 @@ import React, { useEffect, useState } from "react";
 import { Route, Routes, useMatch } from "react-router-dom";
 
 import { AdminHome } from "./components/AdminHome";
-import { PostEditor } from "./components/PostEditor";
 import { Home } from "./components/Home";
 import { NavBar } from "./components/NavBar";
+import { PostEditor } from "./components/PostEditor";
 import { PostPage } from "./components/Posts";
+import { VRHouseTour } from "./components/VRHouseTour";
+
 import { GitContext } from "./GitContext";
 import { darkTheme, lightTheme, getFabStyle } from "./style";
 import { AdminMode, GitState, SnackAlert } from "./types";
@@ -227,6 +229,9 @@ const App: React.FC = () => {
               />
               <Route path="/:slug"
                 element={<PostPage adminMode={adminMode} />}
+              />
+              <Route path="/vrhousetour"
+                element={<VRHouseTour />}
               />
             </Routes>
           </StyledContainer>
