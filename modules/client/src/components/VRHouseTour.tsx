@@ -9,7 +9,7 @@ import * as THREE from "three"
 export const VRHouseTour = () => {
 
   // Load house glb
-  const glb = useLoader(GLTFLoader, `http://${window.location.host}/ipfs/QmVmQa83LRATp3KAZzwdr1eWWZZKrxmVsNXpExL5xSrt1r`);
+  const glb = useLoader(GLTFLoader, `${window.location.origin}/ipfs/QmVmQa83LRATp3KAZzwdr1eWWZZKrxmVsNXpExL5xSrt1r`);
   const { nodes, materials } = useGraph(glb.scene)
 
   const { player } = useXR()
