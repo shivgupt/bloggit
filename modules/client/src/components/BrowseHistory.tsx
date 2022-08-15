@@ -1,14 +1,15 @@
-import { HistoryResponse, HistoryResponseEntry } from "@blog/types";
-import Button from "@material-ui/core/Button";
-import Grid from "@material-ui/core/Grid";
-import ListItemText from "@material-ui/core/ListItemText";
-import Menu from "@material-ui/core/Menu";
-import MenuItem from "@material-ui/core/MenuItem";
-import Tooltip from "@material-ui/core/Tooltip";
-import Typography from "@material-ui/core/Typography";
-import { makeStyles } from "@material-ui/core/styles";
-import ExpandMore from "@material-ui/icons/ExpandMore";
-import FastForward from "@material-ui/icons/FastForward";
+import Button from "@mui/material/Button";
+import ExpandMore from "@mui/icons-material/ExpandMore";
+import FastForward from "@mui/icons-material/FastForward";
+import Grid from "@mui/material/Grid";
+import ListItemText from "@mui/material/ListItemText";
+import Menu, { MenuProps } from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import Tooltip from "@mui/material/Tooltip";
+import Typography from "@mui/material/Typography";
+import { HistoryResponse, HistoryResponseEntry } from "@bloggit/types";
+import { styled } from "@mui/material/styles";
+
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -16,16 +17,14 @@ import { fetchHistory, getPrettyDateString } from "../utils";
 
 import { Copyable } from "./Copyable";
 
-const useStyles = makeStyles((theme) => ({
-  buttonBar: {
-    marginTop: theme.spacing(-1.75),
-    paddingLeft: theme.spacing(1),
-  },
-  paper: {
-    border: "1px solid #d3d4d5",
-    maxHeight: "50%",
-  },
-}));
+const StyledMenu = styled(({ className, ...props }: MenuProps) => (
+  <Menu {...props} classes={{ paper: className }} />
+))`
+    & .MuiMenu-paper {
+      border: "1px solid #d3d4d5",
+      maxHeight: "50%",
+    }
+`;
 
 export const BrowseHistory = ({
   currentRef,
@@ -44,10 +43,9 @@ export const BrowseHistory = ({
 }) => {
   const [anchorEl, setAnchorEl] = useState<any>(null); // TODO: provide type?
   const [editHistory, setEditHistory] = useState<HistoryResponse>([]);
-  const classes = useStyles();
 
   useEffect(() => {
-    if (latestRef !== currentRef) {
+    if (currentRef) {
       setIsHistorical(true);
     } else {
       setIsHistorical(false);
@@ -95,7 +93,7 @@ export const BrowseHistory = ({
   }, [latestRef, slug]);
 
   return (
-    <Grid container spacing={1} className={classes.buttonBar}>
+    <Grid container spacing={1} sx={{ mt: 1, pl: 1, }}>
 
       <Grid item>
         <Copyable
@@ -110,47 +108,45 @@ export const BrowseHistory = ({
 
       {editHistory.length > 0
         ? <Grid item>
-            <Button
-              id="open-history"
-              startIcon={<ExpandMore/>}
-              aria-haspopup="true"
-              variant="contained"
-              size={"medium"}
-              color="primary"
-              onClick={(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
-                setAnchorEl(event.currentTarget);
-              }}
-            >
-              <Typography noWrap variant="button">
+          <Button
+            id="open-history"
+            startIcon={<ExpandMore/>}
+            aria-haspopup="true"
+            variant="contained"
+            size={"medium"}
+            color="primary"
+            onClick={(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
+              setAnchorEl(event.currentTarget);
+            }}
+          >
+            <Typography noWrap variant="button">
                 History
-              </Typography>
-            </Button>
-          </Grid>
+            </Typography>
+          </Button>
+        </Grid>
         : null
       }
 
       {isHistorical
         ? <Grid item>
-            <Tooltip arrow placement="bottom" title="Go to latest version">
-              <Button
-                color="primary"
-                component={Link}
-                id="jump-to-present"
-                size={"medium"}
-                to={`/${slug}`}
-                variant="contained"
-              >
-                <FastForward/>
-              </Button>
-            </Tooltip>
-          </Grid>
+          <Tooltip arrow placement="bottom" title="Go to latest version">
+            <Button
+              color="primary"
+              component={Link}
+              id="jump-to-present"
+              size={"medium"}
+              to={`/${slug}`}
+              variant="contained"
+            >
+              <FastForward/>
+            </Button>
+          </Tooltip>
+        </Grid>
         : null
       }
 
-      <Menu
+      <StyledMenu
         elevation={0}
-        PaperProps={{ id: "history-menu", className: classes.paper }}
-        getContentAnchorEl={null}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
         transformOrigin={{ vertical: "top", horizontal: "center" }}
         anchorEl={anchorEl}
@@ -176,7 +172,7 @@ export const BrowseHistory = ({
             );
           })
         }
-      </Menu>
+      </StyledMenu>
 
     </Grid>
   );

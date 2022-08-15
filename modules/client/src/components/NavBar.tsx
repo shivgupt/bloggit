@@ -1,23 +1,23 @@
-import AppBar from "@material-ui/core/AppBar";
-import Box from "@material-ui/core/Box";
-import Breadcrumbs from "@material-ui/core/Breadcrumbs";
-import Drawer from "@material-ui/core/Drawer";
-import Hidden from "@material-ui/core/Hidden";
-import IconButton from "@material-ui/core/IconButton";
-import Link from "@material-ui/core/Link";
-import Toolbar from "@material-ui/core/Toolbar";
-import Typography from "@material-ui/core/Typography";
-import { makeStyles, Theme, ThemeProvider } from "@material-ui/core/styles";
-import AdminAccount from "@material-ui/icons/Tune";
-import CategoryIcon from "@material-ui/icons/Category";
-import Close from "@material-ui/icons/Close";
-import DarkIcon from "@material-ui/icons/Brightness4";
-import DocIcon from "@material-ui/icons/Description";
-import HomeIcon from "@material-ui/icons/Home";
-import LightIcon from "@material-ui/icons/BrightnessHigh";
-import MenuIcon from "@material-ui/icons/Menu";
-import NextIcon from "@material-ui/icons/NavigateNext";
-import Person from "@material-ui/icons/Person";
+import AppBar from "@mui/material/AppBar";
+import Box from "@mui/material/Box";
+import Breadcrumbs from "@mui/material/Breadcrumbs";
+import Drawer, { DrawerProps } from "@mui/material/Drawer";
+import Hidden from "@mui/material/Hidden";
+import IconButton from "@mui/material/IconButton";
+import Link from "@mui/material/Link";
+import Toolbar from "@mui/material/Toolbar";
+import Typography from "@mui/material/Typography";
+import { styled, Theme, ThemeProvider } from "@mui/material/styles";
+import AdminAccount from "@mui/icons-material/Tune";
+import CategoryIcon from "@mui/icons-material/Category";
+import Close from "@mui/icons-material/Close";
+import DarkIcon from "@mui/icons-material/Brightness4";
+import DocIcon from "@mui/icons-material/Description";
+import HomeIcon from "@mui/icons-material/Home";
+import LightIcon from "@mui/icons-material/BrightnessHigh";
+import MenuIcon from "@mui/icons-material/Menu";
+import NextIcon from "@mui/icons-material/NavigateNext";
+import Person from "@mui/icons-material/Person";
 import React, { useState, useContext } from "react";
 import { Link as RouterLink } from "react-router-dom";
 
@@ -27,56 +27,12 @@ import { getPostsByCategories } from "../utils";
 
 import { Toc } from "./ToC";
 
-const useStyles = makeStyles(theme => ({
-  appBar: {
-    [theme.breakpoints.up("lg")]: {
-      width: "80%",
-      marginRight: "20%",
-    },
-    display: "flex",
-    justifyContent: "stretch",
-  },
-  drawer: {
-    [theme.breakpoints.up("lg")]: {
-      width: "20%",
-      flexShrink: 0,
-    },
-  },
-  link: {
-    display: "flex",
-  },
-  grow: {
-    borderBottom: `5px solid ${theme.palette.divider}`,
-  },
-  icon: {
-    marginRight: theme.spacing(0.5),
-    width: "20px",
-    height: "20px",
-  },
-  permanentDrawer: {
+const StyledNav = styled("nav")(({ theme }) => ({
+  [theme.breakpoints.up("lg")]: {
     width: "20%",
+    flexShrink: 0,
   },
-  hiddenDrawer: {
-    width: "60%",
-  },
-  closeDrawer: {
-    height: theme.spacing(8),
-    marginBottom: theme.spacing(-4),
-    marginLeft: "75%",
-  },
-  breadcrumb: {
-    flex: 1,
-    marginLeft: theme.spacing(1),
-  },
-  postTitle: {
-    [theme.breakpoints.between(0,500)]: {
-      maxWidth: "100px"
-    },
-    [theme.breakpoints.between(500,800)]: {
-      maxWidth: "200px"
-    },
-  },
-}));
+}))
 
 const DrawerContent = ({
   adminMode,
@@ -91,7 +47,6 @@ const DrawerContent = ({
   toggleDrawer: () => void;
   toggleTheme: () => void;
 }) => {
-  const classes = useStyles();
   const gitContext = useContext(GitContext);
 
   const { index } = gitContext.gitState;
@@ -102,14 +57,19 @@ const DrawerContent = ({
       <Hidden lgUp>
         <IconButton
           id="close-drawer"
-          className={classes.closeDrawer}
+          sx={{
+            height: 8,
+            mt: 1,
+            mb: -4,
+            ml: "75%",
+          }}
           onClick={toggleDrawer}
           size="small"
         ><Close/></IconButton>
       </Hidden>
       <ThemeProvider theme={siteTitleFont}>
         <Typography variant="h4" component="div" >
-          <Box textAlign="center" m={2} p={2}>
+          <Box component="div" sx={{ textAlign: "center", m: 2, p: 2}}>
             {siteTitle}
           </Box>
         </Typography>
@@ -119,12 +79,12 @@ const DrawerContent = ({
         edge="start"
         color="secondary"
       >
-        {theme.palette.type === "dark" ? <LightIcon /> : <DarkIcon />}
+        {theme.palette.mode === "dark" ? <LightIcon /> : <DarkIcon />}
       </IconButton>
       <Toc posts={posts}/>
       { adminMode !== "invalid" ?
         <>
-          <Box textAlign="center" m={1}>
+          <Box component="div" textAlign="center" m={1}>
 
             <IconButton
               id="go-to-admin-page"
@@ -158,7 +118,6 @@ export const NavBar = ({
 }) => {
   const [drawer, setDrawer] = useState<boolean>(false);
   const gitContext = useContext(GitContext);
-  const classes = useStyles();
 
   const toggleDrawer = () => setDrawer(!drawer);
 
@@ -174,60 +133,88 @@ export const NavBar = ({
 
   return (
     <>
-      <AppBar position="fixed" className={classes.appBar}>
+      <AppBar position="fixed" sx={{
+        [theme.breakpoints.up("lg")]: {
+          width: "80%",
+          marginRight: "20%",
+        },
+        display: "flex",
+        justifyContent: "stretch",
+      }}>
         <Toolbar>
-          <Breadcrumbs aria-label="breadcrumb" separator={<NextIcon fontSize="small"/>} className={classes.breadcrumb}>
+          <Breadcrumbs aria-label="breadcrumb" separator={<NextIcon fontSize="small"/>}
+            sx={{
+              flex: 1,
+              ml: 1,
+            }}
+          >
             <Link
               id="go-home"
-              className={classes.link}
+              sx={{ display: "flex" }}
               component={RouterLink}
               color="inherit"
               onClick={reset}
               to="/"
             >
-              <HomeIcon className={classes.icon} />
+              <HomeIcon sx={{ marginRight: theme.spacing(0.5), width: "20px", height: "20px" }} />
             </Link>
             {category
-            ? <Link
-                className={classes.link}
+              ? <Link
+                sx={{ display: "flex" }}
                 color="inherit"
                 component={RouterLink}
                 onClick={reset}
                 to={`/category/${category}`}
               >
-                <CategoryIcon className={classes.icon} />
+                <CategoryIcon sx={{ marginRight: theme.spacing(0.5), width: "20px", height: "20px" }} />
                 {category}
               </Link>
-            : null
+              : null
             }
             {slug
-            ? slug === "admin"
-              ? <Typography>
-                  <Person className={classes.icon} />
+              ? slug === "admin"
+                ? <Typography>
+                  <Person sx={{ marginRight: theme.spacing(0.5), width: "20px", height: "20px" }} />
                   Admin
                 </Typography>
-              : post?.category
-                ? [ <Link
+                : post?.category
+                  ? [ <Link
                     key="navbar-category"
-                    className={classes.link}
+                    sx={{ display: "flex" }}
                     color="inherit"
                     component={RouterLink}
                     onClick={reset}
                     to={`/category/${post?.category}`}
                   >
-                    <CategoryIcon className={classes.icon} />
+                    <CategoryIcon sx={{ marginRight: theme.spacing(0.5), width: "20px", height: "20px" }} />
                     {post?.category}
                   </Link>,
-                  <Typography key="navbar-category-icon" noWrap className={classes.postTitle}>
-                    <DocIcon className={classes.icon} />
+                  <Typography key="navbar-category-icon" noWrap
+                    sx={{
+                      [theme.breakpoints.between(0,500)]: {
+                        maxWidth: "100px"
+                      },
+                      [theme.breakpoints.between(500,800)]: {
+                        maxWidth: "200px"
+                      },
+                    }}>
+                    <DocIcon sx={{ marginRight: theme.spacing(0.5), width: "20px", height: "20px" }} />
                     {pageTitle}
                   </Typography>
-                ]
-              : <Typography key="navbar-category-icon" noWrap className={classes.postTitle}>
-                    <DocIcon className={classes.icon} />
+                  ]
+                  : <Typography key="navbar-category-icon" noWrap
+                      sx={{
+                        [theme.breakpoints.between(0,500)]: {
+                          maxWidth: "100px"
+                        },
+                        [theme.breakpoints.between(500,800)]: {
+                          maxWidth: "200px"
+                        },
+                      }}>
+                    <DocIcon sx={{ marginRight: theme.spacing(0.5), width: "20px", height: "20px" }} />
                     {pageTitle}
                   </Typography>
-            : null
+              : null
             }
           </Breadcrumbs>
           <Hidden lgUp>
@@ -243,13 +230,19 @@ export const NavBar = ({
           </Hidden>
         </Toolbar>
       </AppBar>
-      <nav className={classes.drawer}>
+      <StyledNav>
         <Hidden lgUp>
           <Drawer
+            sx={{
+              width: "60%",
+              '& .MuiDrawer-paper': {
+                width: "60%",
+                boxSizing: 'border-box',
+              },
+            }}
             anchor="right"
             open={drawer}
             onClose={toggleDrawer}
-            classes={{ paper: classes.hiddenDrawer }}
           >
             <DrawerContent
               adminMode={adminMode}
@@ -262,8 +255,14 @@ export const NavBar = ({
         </Hidden>
         <Hidden mdDown>
           <Drawer
+            sx={{
+              width: "20%",
+              '& .MuiDrawer-paper': {
+                width: "20%",
+                boxSizing: 'border-box',
+              },
+            }}
             anchor="right"
-            classes={{ paper: classes.permanentDrawer }}
             variant="permanent"
             open
           >
@@ -276,7 +275,7 @@ export const NavBar = ({
             />
           </Drawer>
         </Hidden>
-      </nav>
+      </StyledNav>
     </>
   );
 };

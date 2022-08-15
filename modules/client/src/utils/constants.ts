@@ -1,4 +1,4 @@
-import { PostData, BlogIndex } from "@blog/types";
+import { PostData, BlogIndex } from "@bloggit/types";
 
 import {
   GitState,
@@ -42,4 +42,4 @@ export const defaultSnackAlert: SnackAlert = {
   open: false,
   msg: "",
   severity: "info",
-}
+};

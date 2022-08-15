@@ -41,7 +41,7 @@ describe("Blog Client", () => {
     my.removePost(data.slug);
   });
 
-  it(`should edit a post`, () => {
+  it.skip(`should edit a post`, () => {
     const slug = "test-edit";
     const oldData = {
       content: "This should edit a post",
@@ -149,7 +149,6 @@ describe("Blog Client", () => {
     cy.get(`button#open-history`).click();
     cy.get(`a#history-entry-1`).first().click();
     cy.location(`pathname`).should(`match`, /\/[a-f0-9]{8}\/[a-zA-Z0-0-]{1,}/)
-    cy.get(`div#history-menu`).should("exist");
     cy.get(`a#jump-to-present`).should("exist");
     cy.contains(`p`, firstContent).should("exist");
     my.removePost(slug);
@@ -171,8 +170,8 @@ describe("Blog Client", () => {
     });
     cy.visit(`${Cypress.env("baseUrl")}/${slug}`);
     my.openDrawer();
-    cy.get(`a[href="/#${innerTitleSlug}"]`).should("exist");
-    cy.get(`a[href="/#${innerSubtitleSlug}"]`).should("exist");
+    cy.get(`a[href="/${slug}#${innerTitleSlug}"]`).should("exist");
+    cy.get(`a[href="/${slug}#${innerSubtitleSlug}"]`).should("exist");
     my.closeDrawer();
     my.removePost(slug);
   });

@@ -1,4 +1,4 @@
-import { createMuiTheme, Theme } from "@material-ui/core/styles";
+import { Theme, createTheme } from '@mui/material/styles';
 import "@fontsource/monsieur-la-doulaise";
 
 import { env } from "./env";
@@ -14,7 +14,7 @@ export const getFabStyle = (theme: Theme): any => ({
   },
 });
 
-export const siteTitleFont = createMuiTheme({
+export const siteTitleFont = createTheme({
   typography: {
     fontFamily: [
       env.fontFamily,
@@ -22,16 +22,18 @@ export const siteTitleFont = createMuiTheme({
   },
 });
 
-export const darkTheme = createMuiTheme({
-  breakpoints: {
-    values: {
-      xs: 0,
-      sm: 600,
-      md: 960,
-      lg: 1200,
-      xl: 1920,
-    },
+const breakpoints = {
+  values: {
+    xs: 0,
+    sm: 600,
+    md: 960,
+    lg: 1200,
+    xl: 1920,
   },
+};
+
+export const darkTheme = createTheme({
+  breakpoints,
   palette: {
     primary: {
       main: env.dark.primary,
@@ -39,20 +41,12 @@ export const darkTheme = createMuiTheme({
     secondary: {
       main: env.dark.secondary,
     },
-    type: "dark",
+    mode: "dark",
   },
 });
 
-export const lightTheme = createMuiTheme({
-  breakpoints: {
-    values: {
-      xs: 0,
-      sm: 600,
-      md: 960,
-      lg: 1200,
-      xl: 1920,
-    },
-  },
+export const lightTheme = createTheme({
+  breakpoints,
   palette: {
     primary: {
       main: env.light.primary,
@@ -60,6 +54,6 @@ export const lightTheme = createMuiTheme({
     secondary: {
       main: env.light.secondary,
     },
-    type: "light",
+    mode: "light",
   },
 });

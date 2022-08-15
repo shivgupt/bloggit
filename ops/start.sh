@@ -223,7 +223,7 @@ EOF
 
 docker stack deploy -c "$docker_compose" "$project"
 
-echo "The blog stack has been deployed, waiting for $public_url to start responding.."
+echo "The $project stack has been deployed, waiting for $public_url to start responding.."
 timeout=$(( $(date +%s) + 60 ))
 while true
 do
@@ -231,14 +231,19 @@ do
   if [[ -z "$res" || "$res" == *"Waiting for proxy to wake up"* ]]
   then
     if [[ "$(date +%s)" -gt "$timeout" ]]
-    then echo "Timed out waiting for $public_url to respond.." && exit
+    then
+      echo "Timed out waiting for $public_url to respond.."
+      docker service logs "${project}_proxy"
+      docker service logs "${project}_webserver"
+      docker service logs "${project}_server"
+      exit
     else sleep 2
     fi
   else echo "Good Morning!"; break;
   fi
 done
 
-# Delete old blog images in prod to prevent the disk from filling up
+# Delete old images in prod to prevent the disk from filling up
 if [[ "$BLOG_PROD" == "true" ]]
 then
   docker container prune --force;

@@ -1,17 +1,19 @@
-import { PostData } from "@blog/types";
-import Box from "@material-ui/core/Box";
-import Button from "@material-ui/core/Button";
-import Divider from "@material-ui/core/Divider";
-import IconButton from "@material-ui/core/IconButton";
-import Link from "@material-ui/core/Link";
-import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
-import Typography from "@material-ui/core/Typography";
-import { makeStyles } from "@material-ui/core/styles";
-import NavigateNextIcon from "@material-ui/icons/NavigateNext";
-import NavigateBackIcon from "@material-ui/icons/NavigateBefore";
+import { PostData } from "@bloggit/types";
+
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Divider from "@mui/material/Divider";
+import IconButton from "@mui/material/IconButton";
+import Link from "@mui/material/Link";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import Typography from "@mui/material/Typography";
+import { styled } from "@mui/material/styles";
+import NavigateNextIcon from "@mui/icons-material/NavigateNext";
+import NavigateBackIcon from "@mui/icons-material/NavigateBefore";
+
 import React, { useContext, useEffect, useState } from "react";
-import Markdown from "react-markdown";
+import ReactMarkdown from "react-markdown";
 import { Link as RouterLink } from "react-router-dom";
 
 import { GitContext } from "../GitContext";
@@ -20,48 +22,42 @@ import { getChildValue, replaceEmojiString, emptySidebarNode, slugify } from "..
 
 import { HashLink } from "./HashLink";
 
-const useStyles = makeStyles(theme => ({
-  list: { width: "100%" },
-  list1: { width: "100%", "paddingLeft": theme.spacing(2) },
-  list2: { width: "100%", "paddingLeft": theme.spacing(4) },
-  list3: { width: "100%", "paddingLeft": theme.spacing(6) },
-  list4: { width: "100%", "paddingLeft": theme.spacing(8) },
-  list5: { width: "100%", "paddingLeft": theme.spacing(10) },
-  tocIcon: {
-    marginLeft: theme.spacing(2),
-  },
-}));
+const Root = styled("div")(({ theme }) => ({
+  width: "100%"
+}))
 
 const TocGenerator = ({
   children,
-  level
+  level,
+  node,
 }: {
-  children: string[];
-  level: number;
+  children: any[];
+  level?: number;
+  node: any;
 }) => {
-  const classes = useStyles();
+  const gitContext = useContext(GitContext);
+  const { currentRef, slug } = gitContext.gitState;
 
-  if (children.length > 1) {
+  if (children?.length > 1) {
     console.warn("This heading has more than one child..?");
     return null;
   }
-  const value = getChildValue(children[0]);
+  const value = getChildValue(node);
   if (!value) {
     console.warn("This heading has no child values..?");
     return null;
   }
-  const headingSlug = slugify(replaceEmojiString(value))
+  const headingSlug = slugify(replaceEmojiString(value));
   const heading = replaceEmojiString(value);
-  const marginStyle = classes[`list${level || 1}`];
 
   return (
     <>
       <ListItem
         button
         key={headingSlug}
-        className={marginStyle}
+        sx={{ width: "100%", paddingLeft: level || 1}}
         component={HashLink as any}
-        to={{ hash:`#${headingSlug}` }}
+        to={`/${currentRef ? `${currentRef}/` : ""}${slug}#${headingSlug}`}
       >
         {heading}
       </ListItem>
@@ -76,9 +72,8 @@ export const Toc = ({
 }) => {
   const [node, setNode] = useState<SidebarNode>(emptySidebarNode);
   const gitContext = useContext(GitContext);
-  const classes = useStyles();
 
-  const { currentContent, slug, index } = gitContext.gitState
+  const { currentContent, slug, index } = gitContext.gitState;
 
   const byTitle = (pA: PostData, pB: PostData): number =>
     (pA?.title || "").toLowerCase() > (pB?.title || "").toLowerCase() ? 1 : -1;
@@ -97,13 +92,13 @@ export const Toc = ({
   switch(node.current) {
   case "categories": 
     return (
-      <div className={classes.list}>
-        <Box key={"categories"} textAlign="center" m={1}>
+      <Root>
+        <Box component="div" key={"categories"} textAlign="center" m={1}>
           <Typography>
             CATEGORIES
           </Typography>
         </Box>
-        <List component="nav" className={classes.list}>
+        <List component="nav" sx={{ width: "100%" }}>
           {Object.keys(posts).sort().map((c) => {
             if (c !== "top-level") {
               return (
@@ -133,7 +128,7 @@ export const Toc = ({
         {posts["top-level"]
           ? posts["top-level"].sort(byTitle).map((p) => {
             return (
-              <Box key={p.slug} textAlign="center" m={1}>
+              <Box component="div" key={p.slug} textAlign="center" m={1}>
                 <Button
                   size="small"
                   disableFocusRipple={false}
@@ -141,15 +136,15 @@ export const Toc = ({
                   to={`/${p.slug}`}
                 > {p.title} </Button>
               </Box>
-            )})
+            );})
           : null
         }
-      </div>
+      </Root>
     );
 
   case "posts": 
     return (
-      <div className={classes.list}>
+      <Root>
         <IconButton
           onClick={() => setNode({ 
             current: "categories",
@@ -157,13 +152,13 @@ export const Toc = ({
         >
           <NavigateBackIcon />
         </IconButton>
-        <Box key={`post_category_${node.value}`} textAlign="center" m={1}>
+        <Box component="div" key={`post_category_${node.value}`} textAlign="center" m={1}>
           <Link color="textPrimary" component={RouterLink} to={`/category/${node.value}`}>
             {node.value.toUpperCase()} POSTS
           </Link>
         </Box>
         <Divider />
-        <List component="nav" className={classes.list}>
+        <List component="nav" sx={{ width: "100%" }}>
           {posts[node.value]
             ? posts[node.value].sort(byTitle).map((p) => {
               return (
@@ -172,7 +167,7 @@ export const Toc = ({
                     (slug === p.slug)
                       ? setNode({ parent: "posts", current: "toc", value: p })
                       : null
-                    }
+                  }
                   >
                     {p.title}
                   </ListItem>
@@ -181,14 +176,14 @@ export const Toc = ({
               );
             })
             : <div>
-                <ListItem button> No published posts in this category </ListItem>
-              </div>
+              <ListItem button> No published posts in this category </ListItem>
+            </div>
           }
         </List>
         {posts["top-level"]
           ? posts["top-level"].sort(byTitle).map((p) => {
             return (
-              <Box key={p.slug} textAlign="center" m={1}>
+              <Box component="div" key={p.slug} textAlign="center" m={1}>
                 <Button
                   size="small"
                   disableFocusRipple={false}
@@ -196,42 +191,55 @@ export const Toc = ({
                   to={`/${p.slug}`}
                 > {p.title} </Button>
               </Box>
-            )})
+            );})
           : null
         }
-      </div>
+      </Root>
     );
 
   case "toc":
     return (
-      <div className={classes.list}>
+      <Root>
         <IconButton
           onClick={() => {
             if (node.value.category) {
-              setNode({ parent: "categories", current: "posts", value: node.value.category.toLowerCase() })
+              setNode({ parent: "categories", current: "posts", value: node.value.category.toLowerCase() });
             } else {
-              setNode({ current: "categories" })
+              setNode({ current: "categories" });
             }
           }}
         >
           <NavigateBackIcon />
         </IconButton>
-        <Box key={`post_${node.value.slug}`} textAlign="center" m={1}>
+        <Box component="div" key={`post_${node.value.slug}`}
+          sx={{
+            textAlign: "center",
+            m: "1"
+          }}
+        >
           <Typography>
             TABLE OF CONTENTS
           </Typography>
         </Box>
         <Divider />
-        <List component="nav" className={classes.list}>
-          <Markdown
-            allowedTypes={["text", "heading"]}
-            source={currentContent}
-            renderers={{ heading: TocGenerator }}
-            className={classes.list}
-          />
+        <List component="nav" sx={{ width: "100%" }}>
+          <ReactMarkdown
+            allowedElements={["h1", "h2", "h3", "h4", "h5", "h6"]}
+            className={"Root"}
+            components={{
+              h1: TocGenerator,
+              h2: TocGenerator,
+              h3: TocGenerator,
+              h4: TocGenerator,
+              h5: TocGenerator,
+              h6: TocGenerator,
+            }}
+          >
+            {currentContent}
+          </ReactMarkdown>
         </List>
         <Divider />
-      </div>
+      </Root>
     );
   default:
     return null;

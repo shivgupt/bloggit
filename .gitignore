@@ -1,10 +1,13 @@
 # Cache
-.cache
-.config
-.docker-compose.yml
-.node-gyp
-.npm
-.rpt2_cache
+**/*.docker-compose.yml
+**/.cache
+**/.config
+**/.git
+**/.node-gyp
+**/.npm
+**/.rollup.cache
+**/.rpt2_cache
+**/docker-compose.yml
 modules/*/package-lock.json
 
 # Local storage

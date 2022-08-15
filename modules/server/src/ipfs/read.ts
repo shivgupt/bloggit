@@ -56,7 +56,7 @@ export const read = async (path: string): Promise<IpfsRead> => {
   const text = content.toString("utf8");
   if (text.includes("\ufffd")) { // this codepoint replaces any invalid utf8 data
     contentType = "application/octet-stream";
-    log.info(`Returning ${content.length} bytes of ${contentType} content`);
+    log.info(`Returning ${content.length} bytes of ${contentType} content, Starting with ${content.toString("hex").substr(0,8)}`);
     return { contentType, content };
   }
   try {

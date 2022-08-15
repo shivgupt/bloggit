@@ -1,5 +1,4 @@
 import pino from "pino";
-import prettifier from "pino-pretty";
 
 import { env } from "./env";
 
@@ -13,7 +12,6 @@ export const logger = pino({
     messageFormat: `[{module}] {msg}`,
     translateTime: true,
   },
-  prettifier,
 });
 
 // Convert between utf8-encoded strings and Uint8Arrays
@@ -59,7 +57,10 @@ export const getContentType = (content: Buffer): string => {
       fmtSig("00 00 00 14 66 74 79 70 6d 70 34 31"),
       fmtSig("00 00 00 18 66 74 79 70 6d 70 34 32"),
       fmtSig("00 00 00 20 66 74 79 70 69 73 6F 6D"),
-    ]
+    ],
+    "model/gltf-binary": [
+      fmtSig("67 6C 54 46"),
+    ],
   })) {
     if (val.some(sig =>
       content.length >= sig.length && content.compare(sig, 0, sig.length, 0, sig.length) === 0

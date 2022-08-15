@@ -1,71 +1,23 @@
-import Fab from "@material-ui/core/Fab";
-import Paper from "@material-ui/core/Paper";
-import { makeStyles } from "@material-ui/core/styles";
-import Edit from "@material-ui/icons/Edit";
-import Typography from "@material-ui/core/Typography";
+import Fab from "@mui/material/Fab";
+import Paper from "@mui/material/Paper";
+import { styled } from "@mui/material/styles";
+import Edit from "@mui/icons-material/Edit";
+import Typography from "@mui/material/Typography";
 import React, { useContext, useEffect, useState } from "react";
-import Markdown from "react-markdown";
 import "react-mde/lib/styles/css/react-mde-all.css";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import { GitContext } from "../GitContext";
 import { getFabStyle } from "../style";
 import { getPrettyDateString } from "../utils";
 
 import { BrowseHistory } from "./BrowseHistory";
-import {
-  BlockQuoteRenderer,
-  CodeBlockRenderer,
-  HeadingRenderer,
-  ImageRenderer,
-  LinkRenderer,
-  TextRenderer,
-} from "./Renderers";
+import { Markdown } from "./Markdown";
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    maxWidth: "864px",
-    width: "100%",
-  },
-  paper: {
-    flexGrow: 1,
-    margin: theme.spacing(1, 1),
-    "& > *": {
-      margin: theme.spacing(1),
-    }
-  },
-  date: {
-    paddingLeft: "20px",
-    textAlign: "justify",
-    fontVariant: "discretionary-ligatures",
-  },
-  text: {
-    padding: "20px",
-    textAlign: "justify",
-    fontVariant: "discretionary-ligatures",
-    "& p > img": {
-      paddingTop: theme.spacing(4),
-      paddingBottom: theme.spacing(4),
-    },
-    "& p > img + em": {
-      display: "block",
-      maxWidth: "80%",
-      marginTop: theme.spacing(-3),
-      marginRight: "auto",
-      marginBottom: theme.spacing(4),
-      marginLeft: "auto",
-    },
-  },
-  media: {
-    [theme.breakpoints.up("md")]: {
-      height: 500,
-    },
-    [theme.breakpoints.down("sm")]: {
-      height: 300,
-    }
-  },
-  fab: getFabStyle(theme),
-}));
+const StyledDiv = styled("div")(({ theme }) => ({
+  maxWidth: "864px",
+  width: "100%",
+}))
 
 export const PostPage = ({
   adminMode,
@@ -76,8 +28,7 @@ export const PostPage = ({
   const [lastEdited, setLastEdited] = useState<string>("");
 
   const gitContext = useContext(GitContext);
-  const history = useHistory();
-  const classes = useStyles();
+  const navigate = useNavigate();
 
   const { currentRef, latestRef, slug, currentContent, indexEntry } = gitContext.gitState;
 
@@ -92,19 +43,19 @@ export const PostPage = ({
   const publishedOn = indexEntry?.publishedOn ? getPrettyDateString(indexEntry.publishedOn) : null;
 
   return (
-  <div className={classes.root}>
-    <BrowseHistory
-      currentRef={currentRef}
-      latestRef={latestRef}
-      isHistorical={isHistorical}
-      setIsHistorical={setIsHistorical}
-      setLastEdited={setLastEdited}
-      slug={slug}
-    />
+    <StyledDiv>
+      <BrowseHistory
+        currentRef={currentRef}
+        latestRef={latestRef}
+        isHistorical={isHistorical}
+        setIsHistorical={setIsHistorical}
+        setLastEdited={setLastEdited}
+        slug={slug}
+      />
 
-    <Paper variant="outlined" className={classes.paper}>
-      { indexEntry?.img
-        ? <ImageRenderer
+      <Paper variant="outlined" sx={{ flexGrow: 1, mt: 1, mr: 1, "& > *": { m: 1, } }}>
+        { indexEntry?.img
+          ? <img
             src={indexEntry.img}
             alt={indexEntry.img}
             style={{
@@ -118,44 +69,45 @@ export const PostPage = ({
               width: "100%",
             }}
           />
-        : null
-      }
-      { publishedOn
-        ? <Typography variant="caption" display="block" className={classes.date}>
+          : null
+        }
+        { publishedOn
+          ? <Typography variant="caption" display="block"
+              sx={{
+                paddingLeft: "20px",
+                textAlign: "justify",
+                fontVariant: "discretionary-ligatures",
+              }}
+            >
             Published On: {publishedOn}
           </Typography>
-        : null
-      }
-      { !isHistorical && lastEdited
-        ? <Typography variant="caption" display="block" className={classes.date}>
+          : null
+        }
+        { !isHistorical && lastEdited
+          ? <Typography variant="caption" display="block"
+              sx={{
+                paddingLeft: "20px",
+                textAlign: "justify",
+                fontVariant: "discretionary-ligatures",
+              }}
+            >
             Last Updated: {lastEdited}
           </Typography>
-        : null
-      }
-      <Markdown
-        source={currentContent}
-        className={classes.text}
-        renderers={{
-          heading: HeadingRenderer,
-          code: CodeBlockRenderer,
-          text: TextRenderer,
-          link: LinkRenderer,
-          image: ImageRenderer,
-          blockquote: BlockQuoteRenderer,
-        }}
-      />
-    </Paper>
-    {adminMode === "enabled" && !isHistorical
-      ? <Fab
+          : null
+        }
+        <Markdown content={currentContent} />
+      </Paper>
+      {adminMode === "enabled" && !isHistorical
+        ? <Fab
           id={"fab"}
-          className={classes.fab}
+          sx={ (theme) => getFabStyle(theme) }
           color="primary"
           onClick={() => {
-            history.push(`/admin/edit/${slug}`);
+            navigate(`/admin/edit/${slug}`);
           }}
         ><Edit/></Fab>
-      : null
-    }
-  </div>
+        : null
+      }
+    </StyledDiv>
   );
 };
