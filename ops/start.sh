@@ -21,10 +21,10 @@ if [[ -f .env ]]; then source .env; fi
 BLOG_AUTH_PASSWORD="${BLOG_AUTH_PASSWORD:-abc123}"
 BLOG_AUTH_USERNAME="${BLOG_AUTH_USERNAME:-admin}"
 BLOG_BRANCH="${BLOG_BRANCH:-main}"
+BLOG_DATADIR_CONTENT="${BLOG_DATADIR_CONTENT:-$root/blog-content.git}"
+BLOG_DATADIR_IPFS="${BLOG_DATADIR_IPFS:-$root/ipfs}"
 BLOG_DOMAINNAME="${BLOG_DOMAINNAME:-}"
 BLOG_EMAIL="${BLOG_EMAIL:-noreply@gmail.com}" # for notifications when ssl certs expire
-BLOG_HOST_CONTENT_DIR="${BLOG_HOST_CONTENT_DIR:-$root/.blog-content.git}"
-BLOG_INTERNAL_CONTENT_DIR="${BLOG_INTERNAL_CONTENT_DIR:-/blog-content.git}"
 BLOG_LOG_LEVEL="${BLOG_LOG_LEVEL:-info}"
 BLOG_MAX_UPLOAD_SIZE="${BLOG_MAX_UPLOAD_SIZE:-100mb}"
 BLOG_MIRROR_KEY="${BLOG_MIRROR_KEY:-}"
@@ -41,10 +41,10 @@ echo "Launching $project in env:"
 echo "- BLOG_AUTH_PASSWORD=$BLOG_AUTH_PASSWORD"
 echo "- BLOG_AUTH_USERNAME=$BLOG_AUTH_USERNAME"
 echo "- BLOG_BRANCH=$BLOG_BRANCH"
+echo "- BLOG_DATADIR_CONTENT=$BLOG_DATADIR_CONTENT"
+echo "- BLOG_DATADIR_IPFS=$BLOG_DATADIR_IPFS"
 echo "- BLOG_DOMAINNAME=$BLOG_DOMAINNAME"
 echo "- BLOG_EMAIL=$BLOG_EMAIL"
-echo "- BLOG_HOST_CONTENT_DIR=$BLOG_HOST_CONTENT_DIR"
-echo "- BLOG_INTERNAL_CONTENT_DIR=$BLOG_INTERNAL_CONTENT_DIR"
 echo "- BLOG_LOG_LEVEL=$BLOG_LOG_LEVEL"
 echo "- BLOG_MAX_UPLOAD_SIZE=$BLOG_MAX_UPLOAD_SIZE"
 echo "- BLOG_MIRROR_KEY=$BLOG_MIRROR_KEY"
@@ -55,9 +55,8 @@ echo "- BLOG_SEMVER=$BLOG_SEMVER"
 ########################################
 # Misc Config
 
-if [[ "$BLOG_HOST_CONTENT_DIR" == "/"* ]]
-then mkdir -p "$BLOG_HOST_CONTENT_DIR"
-fi
+mkdir -p "$BLOG_DATADIR_CONTENT"
+mkdir -p "$BLOG_DATADIR_IPFS"
 
 commit=$(git rev-parse HEAD | head -c 8)
 semver="v$(grep -m 1 '"version":' "$root/package.json" | cut -d '"' -f 4)"
@@ -86,6 +85,8 @@ bash "$root/ops/pull-images.sh" "$ipfs_image"
 ########################################
 # Server config
 
+internal_content="/blog-content.git"
+
 server_internal_port=8080
 server_env="environment:
       BLOG_AUTH_PASSWORD: '$BLOG_AUTH_PASSWORD'
@@ -93,7 +94,7 @@ server_env="environment:
       BLOG_BRANCH: '$BLOG_BRANCH'
       BLOG_DOMAINNAME: '$BLOG_DOMAINNAME'
       BLOG_EMAIL: '$BLOG_EMAIL'
-      BLOG_INTERNAL_CONTENT_DIR: '$BLOG_INTERNAL_CONTENT_DIR'
+      BLOG_INTERNAL_CONTENT_DIR: '$internal_content'
       BLOG_LOG_LEVEL: '$BLOG_LOG_LEVEL'
       BLOG_MAX_UPLOAD_SIZE: '$BLOG_MAX_UPLOAD_SIZE'
       BLOG_MIRROR_KEY: '$BLOG_MIRROR_KEY'
@@ -110,7 +111,7 @@ then
     $common
     $server_env
     volumes:
-      - '$BLOG_HOST_CONTENT_DIR:$BLOG_INTERNAL_CONTENT_DIR'"
+      - '$BLOG_DATADIR_CONTENT:$internal_content'"
 
 else
   server_image="${project}_builder:$version"
@@ -123,7 +124,7 @@ else
       - '5000:5000'
     volumes:
       - '$root:/root'
-      - '$BLOG_HOST_CONTENT_DIR:$BLOG_INTERNAL_CONTENT_DIR'"
+      - '$BLOG_DATADIR_CONTENT:$internal_content'"
 
 fi
 bash "$root/ops/pull-images.sh" "$server_image"
@@ -191,7 +192,6 @@ networks:
 
 volumes:
   certs:
-  ipfs:
 
 services:
 
@@ -217,7 +217,7 @@ services:
     ports:
       - '4001:4001'
     volumes:
-      - 'ipfs:/data/ipfs'
+      - '$BLOG_DATADIR_IPFS:/data/ipfs'
 
 EOF
 

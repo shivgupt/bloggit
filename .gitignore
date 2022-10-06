@@ -15,8 +15,11 @@ modules/*/package-lock.json
 **/*.local
 .blog-content.git
 .env
+.ipfs
 .test-content
 .test-content.git
+blog-content.git
+ipfs
 
 # Compiled output
 .flags
