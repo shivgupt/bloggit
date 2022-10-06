@@ -53,6 +53,9 @@ reset: stop
 	rm -rf .blog-content.git .test-content .test-content.git
 	rm -rf .bash_history .config
 
+reset-images:
+	rm .flags/proxy .flags/server-image .flags/webserver
+
 purge: clean reset
 
 push: push-commit
