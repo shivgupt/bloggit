@@ -229,8 +229,6 @@ services:
   ipfs:
     image: '$ipfs_image'
     $common
-    ports:
-      - '4001:4001'
     volumes:
       - '$datadir_ipfs:/data/ipfs'
 

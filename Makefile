@@ -107,20 +107,28 @@ builder: $(shell find ops/builder $(find_options))
 	$(log_finish) && mv -f $(totalTime) .flags/$@
 
 node-modules: builder package.json $(shell ls modules/**/package.json)
-	bash ops/maketh.sh $@
+	$(log_start)
+	lerna bootstrap --hoist --no-progress
+	$(log_finish) && mv -f $(totalTime) .flags/$@
 
 ########################################
 # Compile/Transpile src
 
 types: node-modules $(shell find modules/types $(find_options))
-	bash ops/maketh.sh $@
+	$(log_start)
+	cd modules/types && npm run build
+	$(log_finish) && mv -f $(totalTime) .flags/$@
 
 server: types $(shell find modules/server $(find_options))
+	$(log_start)
+	cd modules/server && npm run build
+	$(log_finish) && mv -f $(totalTime) .flags/$@
 	touch modules/server/src/index.ts
-	bash ops/maketh.sh $@
 
 client: types $(shell find modules/client $(find_options))
-	bash ops/maketh.sh $@
+	$(log_start)
+	cd modules/client && npm run build
+	$(log_finish) && mv -f $(totalTime) .flags/$@
 
 ########################################
 # Build docker images
