@@ -30,6 +30,7 @@ BLOG_MIRROR_KEY="${BLOG_MIRROR_KEY:-}"
 BLOG_MIRROR_URL="${BLOG_MIRROR_URL:-}"
 BLOG_PROD="${BLOG_PROD:-false}"
 BLOG_SEMVER="${BLOG_SEMVER:-false}"
+BLOG_URBIT_NAME="${BLOG_URBIT_NAME:-fakezod}"
 
 # If semver flag is given, we should ensure the prod flag is also active
 if [[ "$BLOG_SEMVER" == "true" ]]
@@ -40,6 +41,7 @@ echo "Launching $project in env:"
 echo "- BLOG_AUTH_PASSWORD=$BLOG_AUTH_PASSWORD"
 echo "- BLOG_AUTH_USERNAME=$BLOG_AUTH_USERNAME"
 echo "- BLOG_BRANCH=$BLOG_BRANCH"
+echo "- BLOG_DATADIR=$BLOG_DATADIR"
 echo "- BLOG_DOMAINNAME=$BLOG_DOMAINNAME"
 echo "- BLOG_EMAIL=$BLOG_EMAIL"
 echo "- BLOG_LOG_LEVEL=$BLOG_LOG_LEVEL"
@@ -48,6 +50,7 @@ echo "- BLOG_MIRROR_KEY=$BLOG_MIRROR_KEY"
 echo "- BLOG_MIRROR_URL=$BLOG_MIRROR_URL"
 echo "- BLOG_PROD=$BLOG_PROD"
 echo "- BLOG_SEMVER=$BLOG_SEMVER"
+echo "- BLOG_URBIT_NAME=$BLOG_URBIT_NAME"
 
 ########################################
 # Misc Config
@@ -213,6 +216,8 @@ services:
       DOMAINNAME: '$BLOG_DOMAINNAME'
       EMAIL: '$BLOG_EMAIL'
       SERVER_URL: 'server:$server_internal_port'
+      URBIT_NAME: '$BLOG_URBIT_NAME'
+      URBIT_URL: 'urbit:$urbit_internal_port'
       WEBSERVER_URL: 'webserver:$webserver_internal_port'
     volumes:
       - 'certs:/etc/letsencrypt'
@@ -234,9 +239,8 @@ services:
     $common
     environment:
       DATADIR: '/root/urbit/data'
+      URBIT_NAME: '$BLOG_URBIT_NAME'
       PORT: '$urbit_internal_port'
-    ports:
-      - '31337:$urbit_internal_port'
     volumes:
       - '$datadir_urbit:/root/urbit/data'
 

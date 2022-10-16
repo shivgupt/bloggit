@@ -2,7 +2,7 @@
 
 DATADIR="${DATADIR:-/root/data}"
 PORT="${PORT:-80}"
-URBIT_NAME="${URBIT_NAME:-dozzod-dozzod}"
+URBIT_NAME="${URBIT_NAME:-fakezod}"
 
 echo "Running urbit in env"
 echo "- DATADIR: $DATADIR"

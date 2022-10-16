@@ -20,6 +20,7 @@ modules/*/package-lock.json
 .test-content.git
 blog-content.git
 ipfs
+data
 
 # Compiled output
 .flags
