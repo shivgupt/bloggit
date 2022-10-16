@@ -133,8 +133,6 @@ else
     $common
     $server_env
     entrypoint: 'bash modules/server/ops/entry.sh'
-    ports:
-      - '5000:5000'
     volumes:
       - '$root:/root'
       - '$datadir_content:$internal_content'"
@@ -241,6 +239,8 @@ services:
       PORT: '$urbit_internal_port'
     volumes:
       - '$datadir_urbit:/root/urbit/data'
+    ports:
+      - '31337:80'
 
 EOF
 
