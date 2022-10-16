@@ -21,8 +21,7 @@ if [[ -f .env ]]; then source .env; fi
 BLOG_AUTH_PASSWORD="${BLOG_AUTH_PASSWORD:-abc123}"
 BLOG_AUTH_USERNAME="${BLOG_AUTH_USERNAME:-admin}"
 BLOG_BRANCH="${BLOG_BRANCH:-main}"
-BLOG_DATADIR_CONTENT="${BLOG_DATADIR_CONTENT:-$root/blog-content.git}"
-BLOG_DATADIR_IPFS="${BLOG_DATADIR_IPFS:-$root/ipfs}"
+BLOG_DATADIR="${BLOG_DATADIR:-$root/data}"
 BLOG_DOMAINNAME="${BLOG_DOMAINNAME:-}"
 BLOG_EMAIL="${BLOG_EMAIL:-noreply@gmail.com}" # for notifications when ssl certs expire
 BLOG_LOG_LEVEL="${BLOG_LOG_LEVEL:-info}"
@@ -41,8 +40,6 @@ echo "Launching $project in env:"
 echo "- BLOG_AUTH_PASSWORD=$BLOG_AUTH_PASSWORD"
 echo "- BLOG_AUTH_USERNAME=$BLOG_AUTH_USERNAME"
 echo "- BLOG_BRANCH=$BLOG_BRANCH"
-echo "- BLOG_DATADIR_CONTENT=$BLOG_DATADIR_CONTENT"
-echo "- BLOG_DATADIR_IPFS=$BLOG_DATADIR_IPFS"
 echo "- BLOG_DOMAINNAME=$BLOG_DOMAINNAME"
 echo "- BLOG_EMAIL=$BLOG_EMAIL"
 echo "- BLOG_LOG_LEVEL=$BLOG_LOG_LEVEL"
@@ -55,8 +52,13 @@ echo "- BLOG_SEMVER=$BLOG_SEMVER"
 ########################################
 # Misc Config
 
-mkdir -p "$BLOG_DATADIR_CONTENT"
-mkdir -p "$BLOG_DATADIR_IPFS"
+datadir_content="$BLOG_DATADIR/blog-content"
+datadir_ipfs="$BLOG_DATADIR/ipfs"
+datadir_urbit="$BLOG_DATADIR/urbit"
+
+mkdir -p "$datadir_content"
+mkdir -p "$datadir_ipfs"
+mkdir -p "$datadir_urbit"
 
 commit=$(git rev-parse HEAD | head -c 8)
 semver="v$(grep -m 1 '"version":' "$root/package.json" | cut -d '"' -f 4)"
@@ -73,6 +75,14 @@ common="networks:
       driver: 'json-file'
       options:
           max-size: '10m'"
+
+########################################
+# Urbit config
+
+urbit_internal_port=80
+
+urbit_image="tloncorp/urbit:v1.10"
+bash "$root/ops/pull-images.sh" "$urbit_image"
 
 ########################################
 # IPFS config
@@ -111,7 +121,7 @@ then
     $common
     $server_env
     volumes:
-      - '$BLOG_DATADIR_CONTENT:$internal_content'"
+      - '$datadir_content:$internal_content'"
 
 else
   server_image="${project}_builder:$version"
@@ -124,7 +134,7 @@ else
       - '5000:5000'
     volumes:
       - '$root:/root'
-      - '$BLOG_DATADIR_CONTENT:$internal_content'"
+      - '$datadir_content:$internal_content'"
 
 fi
 bash "$root/ops/pull-images.sh" "$server_image"
@@ -217,7 +227,18 @@ services:
     ports:
       - '4001:4001'
     volumes:
-      - '$BLOG_DATADIR_IPFS:/data/ipfs'
+      - '$datadir_ipfs:/data/ipfs'
+
+  urbit:
+    image: '$urbit_image'
+    $common
+    environment:
+      DATADIR: '/root/urbit/data'
+      PORT: '$urbit_internal_port'
+    ports:
+      - '31337:$urbit_internal_port'
+    volumes:
+      - '$datadir_urbit:/root/urbit/data'
 
 EOF
 

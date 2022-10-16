@@ -142,3 +142,9 @@ server-image: server $(shell find modules/server/ops $(find_options))
 	docker build --file modules/server/ops/Dockerfile $(cache_from) --tag $(project)_server:latest modules/server
 	docker tag $(project)_server:latest $(project)_server:$(commit)
 	$(log_finish) && mv -f $(totalTime) .flags/$@
+
+urbit: $(shell find modules/urbit $(find_options))
+	$(log_start)
+	docker build --file modules/urbit/Dockerfile $(cache_from) --tag $(project)_urbit:latest modules/urbit
+	docker tag $(project)_urbit:latest $(project)_urbit:$(commit)
+	$(log_finish) && mv -f $(totalTime) .flags/$@
