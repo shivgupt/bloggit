@@ -26,7 +26,7 @@ $(shell mkdir -p .flags)
 
 default: dev
 all: dev prod
-dev: server proxy
+dev: server proxy urbit
 prod: dev webserver server-image
 
 start: dev
@@ -54,7 +54,7 @@ reset: stop
 	rm -rf .bash_history .config
 
 reset-images:
-	rm .flags/proxy .flags/server-image .flags/webserver
+	rm .flags/proxy .flags/server-image .flags/webserver .flags/urbit 
 
 purge: clean reset
 

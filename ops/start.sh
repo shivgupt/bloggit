@@ -84,7 +84,7 @@ common="networks:
 
 urbit_internal_port=80
 
-urbit_image="tloncorp/urbit:v1.10"
+urbit_image="${project}_urbit:$version"
 bash "$root/ops/pull-images.sh" "$urbit_image"
 
 ########################################

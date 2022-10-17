@@ -9,7 +9,7 @@ commit=$(git rev-parse HEAD | head -c 8)
 
 registry="$registryRoot/$organization"
 
-for name in builder proxy server webserver
+for name in builder proxy server webserver urbit
 do
   image=${project}_$name
   for version in ${1:-latest $commit}
