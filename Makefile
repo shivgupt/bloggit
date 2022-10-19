@@ -133,10 +133,16 @@ client: types $(shell find modules/client $(find_options))
 ########################################
 # Build docker images
 
-proxy: $(shell find ops/proxy $(find_options))
+proxy: $(shell find modules/proxy $(find_options))
 	$(log_start)
-	docker build --file ops/proxy/Dockerfile $(cache_from) --tag $(project)_proxy:latest ops/proxy
+	docker build --file modules/proxy/Dockerfile $(cache_from) --tag $(project)_proxy:latest modules/proxy
 	docker tag $(project)_proxy:latest $(project)_proxy:$(commit)
+	$(log_finish) && mv -f $(totalTime) .flags/$@
+
+urbit: $(shell find modules/urbit $(find_options))
+	$(log_start)
+	docker build --file modules/urbit/Dockerfile $(cache_from) --tag $(project)_urbit:latest modules/urbit
+	docker tag $(project)_urbit:latest $(project)_urbit:$(commit)
 	$(log_finish) && mv -f $(totalTime) .flags/$@
 
 webserver: client $(shell find modules/client/ops $(find_options))
@@ -149,10 +155,4 @@ server-image: server $(shell find modules/server/ops $(find_options))
 	$(log_start)
 	docker build --file modules/server/ops/Dockerfile $(cache_from) --tag $(project)_server:latest modules/server
 	docker tag $(project)_server:latest $(project)_server:$(commit)
-	$(log_finish) && mv -f $(totalTime) .flags/$@
-
-urbit: $(shell find modules/urbit $(find_options))
-	$(log_start)
-	docker build --file modules/urbit/Dockerfile $(cache_from) --tag $(project)_urbit:latest modules/urbit
-	docker tag $(project)_urbit:latest $(project)_urbit:$(commit)
 	$(log_finish) && mv -f $(totalTime) .flags/$@

@@ -10,6 +10,9 @@ echo "- PORT: $PORT"
 echo "- URBIT_NAME: $URBIT_NAME"
 echo
 
+start-urbit --help
+exit
+
 cd "$DATADIR" || exit 1
 echo start-urbit --http-port="$PORT" "$URBIT_NAME"
 exec start-urbit --http-port="$PORT" "$URBIT_NAME"
