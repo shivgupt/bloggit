@@ -10,9 +10,12 @@ echo "- PORT: $PORT"
 echo "- URBIT_NAME: $URBIT_NAME"
 echo
 
-start-urbit --help
-exit
-
 cd "$DATADIR" || exit 1
-echo start-urbit --http-port="$PORT" "$URBIT_NAME"
-exec start-urbit --http-port="$PORT" "$URBIT_NAME"
+
+if [[ "$URBIT_NAME" == "fakezod" ]]
+then isFake="--fake"
+else isFake=""
+fi
+
+echo start-urbit --port="$PORT" "$isFake" "$URBIT_NAME"
+exec start-urbit --port="$PORT" "$isFake" "$URBIT_NAME"
