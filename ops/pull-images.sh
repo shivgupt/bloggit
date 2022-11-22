@@ -8,10 +8,10 @@ organization="${CI_PROJECT_NAMESPACE:-$(whoami)}" # TODO: is there a better way 
 release=$(grep -m 1 '"version":' "$root/package.json" | cut -d '"' -f 4)
 commit=$(git rev-parse HEAD | head -c 8)
 
-registry="$registryRoot/$organization/$project"
+registry="$registryRoot/$organization"
 
 default_images=$(
-  echo 'builder webserver server proxy' |\
+  echo 'builder webserver server proxy urbit' |\
     sed "s/^/${project}_/g" |\
     sed "s/ / ${project}_/g"
 )

@@ -11,12 +11,15 @@
 modules/*/package-lock.json
 
 # Local storage
-!modules/client/.env
-**/*.local
+*.local
 .blog-content.git
 .env
+.ipfs
 .test-content
 .test-content.git
+blog-content.git
+data
+ipfs
 
 # Compiled output
 .flags

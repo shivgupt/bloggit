@@ -1,6 +1,5 @@
 # Specify make-specific variables (VPATH = prerequisite search path)
 VPATH=.flags
-SHELL=/bin/bash
 
 dir=$(shell cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )
 project=$(shell cat $(dir)/package.json | jq .name | tr -d '"')
@@ -12,6 +11,15 @@ registry=registry.gitlab.com/$(user)/$(project)
 
 # Pool of images to pull cached layers from during docker build steps
 cache_from=$(shell if [[ -n "${CI}" ]]; then echo "--cache-from=$(project)_server:$(commit),$(project)_server:latest,$(project)_builder:latest,$(project)_proxy:$(commit),$(project)_proxy:latest"; else echo ""; fi)
+
+# Setup docker run time
+# If on Linux, give the container our uid & gid so we know what to reset permissions to
+# On Mac, the docker-VM takes care of this for us so pass root's id (ie noop)
+cwd=$(shell pwd)
+my_id=$(shell id -u):$(shell id -g)
+id=$(shell if [[ "`uname`" == "Darwin" ]]; then echo 0:0; else echo $(my_id); fi)
+interactive=$(shell if [[ -t 0 && -t 2 ]]; then echo "--interactive"; else echo ""; fi)
+docker_run=docker run --env=CI=${CI} --name=$(project)_builder $(interactive) --tty --rm --volume=$(cwd):/root $(project)_builder $(id)
 
 startTime=.flags/.startTime
 totalTime=.flags/.totalTime
@@ -26,7 +34,7 @@ $(shell mkdir -p .flags)
 
 default: dev
 all: dev prod
-dev: server proxy
+dev: server proxy urbit
 prod: dev webserver server-image
 
 start: dev
@@ -52,6 +60,9 @@ reset: stop
 	rm -rf .docker-compose.yml
 	rm -rf .blog-content.git .test-content .test-content.git
 	rm -rf .bash_history .config
+
+reset-images:
+	rm .flags/proxy .flags/server-image .flags/webserver .flags/urbit 
 
 purge: clean reset
 
@@ -104,28 +115,42 @@ builder: $(shell find ops/builder $(find_options))
 	$(log_finish) && mv -f $(totalTime) .flags/$@
 
 node-modules: builder package.json $(shell ls modules/**/package.json)
-	bash ops/maketh.sh $@
+	$(log_start)
+	$(docker_run) "lerna bootstrap --hoist --no-progress"
+	$(log_finish) && mv -f $(totalTime) .flags/$@
 
 ########################################
 # Compile/Transpile src
 
 types: node-modules $(shell find modules/types $(find_options))
-	bash ops/maketh.sh $@
+	$(log_start)
+	$(docker_run) "cd modules/types && npm run build"
+	$(log_finish) && mv -f $(totalTime) .flags/$@
 
 server: types $(shell find modules/server $(find_options))
+	$(log_start)
+	$(docker_run) "cd modules/server && npm run build"
 	touch modules/server/src/index.ts
-	bash ops/maketh.sh $@
+	$(log_finish) && mv -f $(totalTime) .flags/$@
 
 client: types $(shell find modules/client $(find_options))
-	bash ops/maketh.sh $@
+	$(log_start)
+	$(docker_run) "cd modules/client && npm run build"
+	$(log_finish) && mv -f $(totalTime) .flags/$@
 
 ########################################
 # Build docker images
 
-proxy: $(shell find ops/proxy $(find_options))
+proxy: $(shell find modules/proxy $(find_options))
 	$(log_start)
-	docker build --file ops/proxy/Dockerfile $(cache_from) --tag $(project)_proxy:latest ops/proxy
+	docker build --file modules/proxy/Dockerfile $(cache_from) --tag $(project)_proxy:latest modules/proxy
 	docker tag $(project)_proxy:latest $(project)_proxy:$(commit)
+	$(log_finish) && mv -f $(totalTime) .flags/$@
+
+urbit: $(shell find modules/urbit $(find_options))
+	$(log_start)
+	docker build --file modules/urbit/Dockerfile $(cache_from) --tag $(project)_urbit:latest modules/urbit
+	docker tag $(project)_urbit:latest $(project)_urbit:$(commit)
 	$(log_finish) && mv -f $(totalTime) .flags/$@
 
 webserver: client $(shell find modules/client/ops $(find_options))

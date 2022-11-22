@@ -21,16 +21,16 @@ if [[ -f .env ]]; then source .env; fi
 BLOG_AUTH_PASSWORD="${BLOG_AUTH_PASSWORD:-abc123}"
 BLOG_AUTH_USERNAME="${BLOG_AUTH_USERNAME:-admin}"
 BLOG_BRANCH="${BLOG_BRANCH:-main}"
+BLOG_DATADIR="${BLOG_DATADIR:-$root/data}"
 BLOG_DOMAINNAME="${BLOG_DOMAINNAME:-}"
 BLOG_EMAIL="${BLOG_EMAIL:-noreply@gmail.com}" # for notifications when ssl certs expire
-BLOG_HOST_CONTENT_DIR="${BLOG_HOST_CONTENT_DIR:-$root/.blog-content.git}"
-BLOG_INTERNAL_CONTENT_DIR="${BLOG_INTERNAL_CONTENT_DIR:-/blog-content.git}"
 BLOG_LOG_LEVEL="${BLOG_LOG_LEVEL:-info}"
 BLOG_MAX_UPLOAD_SIZE="${BLOG_MAX_UPLOAD_SIZE:-100mb}"
 BLOG_MIRROR_KEY="${BLOG_MIRROR_KEY:-}"
 BLOG_MIRROR_URL="${BLOG_MIRROR_URL:-}"
 BLOG_PROD="${BLOG_PROD:-false}"
 BLOG_SEMVER="${BLOG_SEMVER:-false}"
+BLOG_URBIT_NAME="${BLOG_URBIT_NAME:-fakezod}"
 
 # If semver flag is given, we should ensure the prod flag is also active
 if [[ "$BLOG_SEMVER" == "true" ]]
@@ -41,23 +41,27 @@ echo "Launching $project in env:"
 echo "- BLOG_AUTH_PASSWORD=$BLOG_AUTH_PASSWORD"
 echo "- BLOG_AUTH_USERNAME=$BLOG_AUTH_USERNAME"
 echo "- BLOG_BRANCH=$BLOG_BRANCH"
+echo "- BLOG_DATADIR=$BLOG_DATADIR"
 echo "- BLOG_DOMAINNAME=$BLOG_DOMAINNAME"
 echo "- BLOG_EMAIL=$BLOG_EMAIL"
-echo "- BLOG_HOST_CONTENT_DIR=$BLOG_HOST_CONTENT_DIR"
-echo "- BLOG_INTERNAL_CONTENT_DIR=$BLOG_INTERNAL_CONTENT_DIR"
 echo "- BLOG_LOG_LEVEL=$BLOG_LOG_LEVEL"
 echo "- BLOG_MAX_UPLOAD_SIZE=$BLOG_MAX_UPLOAD_SIZE"
 echo "- BLOG_MIRROR_KEY=$BLOG_MIRROR_KEY"
 echo "- BLOG_MIRROR_URL=$BLOG_MIRROR_URL"
 echo "- BLOG_PROD=$BLOG_PROD"
 echo "- BLOG_SEMVER=$BLOG_SEMVER"
+echo "- BLOG_URBIT_NAME=$BLOG_URBIT_NAME"
 
 ########################################
 # Misc Config
 
-if [[ "$BLOG_HOST_CONTENT_DIR" == "/"* ]]
-then mkdir -p "$BLOG_HOST_CONTENT_DIR"
-fi
+datadir_content="$BLOG_DATADIR/blog-content"
+datadir_ipfs="$BLOG_DATADIR/ipfs"
+datadir_urbit="$BLOG_DATADIR/urbit"
+
+mkdir -p "$datadir_content"
+mkdir -p "$datadir_ipfs"
+mkdir -p "$datadir_urbit"
 
 commit=$(git rev-parse HEAD | head -c 8)
 semver="v$(grep -m 1 '"version":' "$root/package.json" | cut -d '"' -f 4)"
@@ -76,6 +80,14 @@ common="networks:
           max-size: '10m'"
 
 ########################################
+# Urbit config
+
+urbit_internal_port=80
+
+urbit_image="${project}_urbit:$version"
+bash "$root/ops/pull-images.sh" "$urbit_image"
+
+########################################
 # IPFS config
 
 ipfs_internal_port=5001
@@ -86,6 +98,8 @@ bash "$root/ops/pull-images.sh" "$ipfs_image"
 ########################################
 # Server config
 
+internal_content="/blog-content.git"
+
 server_internal_port=8080
 server_env="environment:
       BLOG_AUTH_PASSWORD: '$BLOG_AUTH_PASSWORD'
@@ -93,7 +107,7 @@ server_env="environment:
       BLOG_BRANCH: '$BLOG_BRANCH'
       BLOG_DOMAINNAME: '$BLOG_DOMAINNAME'
       BLOG_EMAIL: '$BLOG_EMAIL'
-      BLOG_INTERNAL_CONTENT_DIR: '$BLOG_INTERNAL_CONTENT_DIR'
+      BLOG_INTERNAL_CONTENT_DIR: '$internal_content'
       BLOG_LOG_LEVEL: '$BLOG_LOG_LEVEL'
       BLOG_MAX_UPLOAD_SIZE: '$BLOG_MAX_UPLOAD_SIZE'
       BLOG_MIRROR_KEY: '$BLOG_MIRROR_KEY'
@@ -110,7 +124,7 @@ then
     $common
     $server_env
     volumes:
-      - '$BLOG_HOST_CONTENT_DIR:$BLOG_INTERNAL_CONTENT_DIR'"
+      - '$datadir_content:$internal_content'"
 
 else
   server_image="${project}_builder:$version"
@@ -119,11 +133,9 @@ else
     $common
     $server_env
     entrypoint: 'bash modules/server/ops/entry.sh'
-    ports:
-      - '5000:5000'
     volumes:
       - '$root:/root'
-      - '$BLOG_HOST_CONTENT_DIR:$BLOG_INTERNAL_CONTENT_DIR'"
+      - '$datadir_content:$internal_content'"
 
 fi
 bash "$root/ops/pull-images.sh" "$server_image"
@@ -191,7 +203,6 @@ networks:
 
 volumes:
   certs:
-  ipfs:
 
 services:
 
@@ -203,6 +214,8 @@ services:
       DOMAINNAME: '$BLOG_DOMAINNAME'
       EMAIL: '$BLOG_EMAIL'
       SERVER_URL: 'server:$server_internal_port'
+      URBIT_NAME: '$BLOG_URBIT_NAME'
+      URBIT_URL: 'urbit:$urbit_internal_port'
       WEBSERVER_URL: 'webserver:$webserver_internal_port'
     volumes:
       - 'certs:/etc/letsencrypt'
@@ -214,10 +227,20 @@ services:
   ipfs:
     image: '$ipfs_image'
     $common
-    ports:
-      - '4001:4001'
     volumes:
-      - 'ipfs:/data/ipfs'
+      - '$datadir_ipfs:/data/ipfs'
+
+  urbit:
+    image: '$urbit_image'
+    $common
+    environment:
+      DATADIR: '/root/urbit/data'
+      URBIT_NAME: '$BLOG_URBIT_NAME'
+      PORT: '$urbit_internal_port'
+    volumes:
+      - '$datadir_urbit:/root/urbit/data'
+    ports:
+      - '31337:80'
 
 EOF
 
