@@ -130,8 +130,8 @@ types: node-modules $(shell find modules/types $(find_options))
 server: types $(shell find modules/server $(find_options))
 	$(log_start)
 	$(docker_run) "cd modules/server && npm run build"
-	$(log_finish) && mv -f $(totalTime) .flags/$@
 	touch modules/server/src/index.ts
+	$(log_finish) && mv -f $(totalTime) .flags/$@
 
 client: types $(shell find modules/client $(find_options))
 	$(log_start)
