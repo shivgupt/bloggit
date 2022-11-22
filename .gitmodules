@@ -1,0 +1,3 @@
+[submodule "modules/urbit/src"]
+	path = modules/urbit/src
+	url = ssh://onedev/urbit

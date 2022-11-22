@@ -4,12 +4,16 @@ null_ui=localhost
 
 EMAIL="${EMAIL:-noreply@gmail.com}"
 WEBSERVER_URL="${WEBSERVER_URL:-$null_ui}"
+URBIT_URL="${URBIT_URL:-$null_ui}"
+URBIT_NAME="${URBIT_NAME:-$null_ui}"
 
-echo "DOMAINNAME=$DOMAINNAME"
-echo "EMAIL=$EMAIL"
-echo "Proxy container launched in env:"
-echo "SERVER_URL=$SERVER_URL"
-echo "WEBSERVER_URL=$WEBSERVER_URL"
+echo "Starting proxy in env:"
+echo "- DOMAINNAME=$DOMAINNAME"
+echo "- EMAIL=$EMAIL"
+echo "- SERVER_URL=$SERVER_URL"
+echo "- URBIT_NAME=$URBIT_NAME"
+echo "- URBIT_URL=$URBIT_URL"
+echo "- WEBSERVER_URL=$WEBSERVER_URL"
 
 # Provide a message indicating that we're still waiting for everything to wake up
 function loading_msg {

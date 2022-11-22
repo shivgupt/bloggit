@@ -8,7 +8,6 @@ RUN curl https://raw.githubusercontent.com/vishnubob/wait-for-it/ed77b63706ea721
 RUN npm install -g lerna@4.0.0
 RUN npm install ipfs-client@0.7.1 --no-save --no-package-lock
 RUN npm install pino-pretty@7.0.1 --no-save --no-package-lock
-COPY Makefile /Makefile
 COPY test.sh /test.sh
 COPY entry.sh /entry.sh
 
