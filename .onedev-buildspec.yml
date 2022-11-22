@@ -1,0 +1,108 @@
+version: 17
+jobs:
+- name: Test
+  jobExecutor: system76
+  steps:
+  - !CheckoutStep
+    name: checkout
+    cloneCredential: !DefaultCredential {}
+    withLfs: false
+    withSubmodules: false
+    condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
+  - !CommandStep
+    name: build
+    runInContainer: false
+    interpreter: !ShellInterpreter
+      shell: bash
+      commands:
+      - CI=true make all
+    useTTY: false
+    condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
+  - !PushRepository
+    name: push code to github
+    remoteUrl: https://github.com/Ligmex/ligmex.git
+    userName: bohendo
+    passwordSecret: github-token
+    withLfs: false
+    force: false
+    condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
+  - !CommandStep
+    name: push images to docker hub
+    runInContainer: false
+    interpreter: !DefaultInterpreter
+      commands:
+      - make push-commit
+    useTTY: false
+    condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
+  triggers:
+  - !BranchUpdateTrigger
+    branches: main
+    projects: ligmex
+  retryCondition: never
+  maxRetries: 3
+  retryDelay: 30
+  cpuRequirement: 250
+  memoryRequirement: 256
+  caches:
+  - key: node_modules
+    path: node_modules
+  - key: cache
+    path: .cache
+  timeout: 3600
+- name: Deploy
+  jobExecutor: system76
+  steps:
+  - !CheckoutStep
+    name: checkout
+    cloneCredential: !DefaultCredential {}
+    withLfs: false
+    withSubmodules: false
+    condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
+  - !CommandStep
+    name: build
+    runInContainer: false
+    interpreter: !DefaultInterpreter
+      commands:
+      - CI=true make all
+    useTTY: false
+    condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
+  - !PushRepository
+    name: push code to github
+    remoteUrl: https://github.com/Ligmex/ligmex.git
+    userName: bohendo
+    passwordSecret: github-token
+    withLfs: false
+    force: false
+    condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
+  - !CommandStep
+    name: push images to docker hub
+    runInContainer: false
+    interpreter: !DefaultInterpreter
+      commands:
+      - make push-commit
+      - make push-semver
+    useTTY: false
+    condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
+  - !CommandStep
+    name: deploy to prod
+    runInContainer: false
+    interpreter: !DefaultInterpreter
+      commands:
+      - make deploy-fr
+    useTTY: false
+    condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
+  triggers:
+  - !BranchUpdateTrigger
+    branches: prod
+    projects: ligmex
+  retryCondition: never
+  maxRetries: 3
+  retryDelay: 30
+  cpuRequirement: 250
+  memoryRequirement: 256
+  caches:
+  - key: node_modules
+    path: node_modules
+  - key: cache
+    path: .cache
+  timeout: 3600
