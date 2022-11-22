@@ -1,6 +1,5 @@
 # Specify make-specific variables (VPATH = prerequisite search path)
 VPATH=.flags
-SHELL=/bin/bash
 
 dir=$(shell cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )
 project=$(shell cat $(dir)/package.json | jq .name | tr -d '"')
