@@ -11,11 +11,8 @@ jobs:
       - pwd
       - ls
       - ls ..
-      - ls ../user
-      - sleep 2
-      - ls -a ../user/.ssh
-      - cat ../user/.ssh/known_hosts
-      - sleep 2
+      - ls -a ../user
+      - git clone ssh://onedev/urbit
     useTTY: false
     condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
   - !CheckoutStep
