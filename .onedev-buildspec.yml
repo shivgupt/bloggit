@@ -8,7 +8,7 @@ jobs:
     runInContainer: false
     interpreter: !DefaultInterpreter
       commands:
-      - git clone --recurse-submodules ssh://onedev/project .
+      - git clone --recurse-submodules ssh://onedev/bloggit .
     useTTY: false
     condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
   - !CommandStep
@@ -36,7 +36,7 @@ jobs:
     runInContainer: false
     interpreter: !DefaultInterpreter
       commands:
-      - git clone --recurse-submodules ssh://onedev/project .
+      - git clone --recurse-submodules ssh://onedev/bloggit .
     useTTY: false
     condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
   - !CommandStep
