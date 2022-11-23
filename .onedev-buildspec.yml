@@ -8,7 +8,12 @@ jobs:
     runInContainer: false
     interpreter: !DefaultInterpreter
       commands:
-      - git clone --recurse-submodules ssh://onedev/bloggit .
+      - echo "ls -a $(pwd):"
+      - ls -a
+      - git init
+      - git remote add origin ssh://onedev/bloggit .
+      - git pull origin main
+      - git submodule update --init --recursive modules/urbit
     useTTY: false
     condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
   - !CommandStep
