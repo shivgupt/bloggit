@@ -5,7 +5,8 @@ jobs:
   steps:
   - !CheckoutStep
     name: checkout
-    cloneCredential: !DefaultCredential {}
+    cloneCredential: !SshCredential
+      keySecret: oneagent-key
     withLfs: false
     withSubmodules: true
     condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
@@ -31,7 +32,8 @@ jobs:
   steps:
   - !CheckoutStep
     name: checkout
-    cloneCredential: !DefaultCredential {}
+    cloneCredential: !SshCredential
+      keySecret: oneagent-key
     withLfs: false
     withSubmodules: true
     condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
@@ -40,7 +42,7 @@ jobs:
     runInContainer: false
     interpreter: !DefaultInterpreter
       commands:
-      - make deploy-fr
+      - make all
     useTTY: false
     condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
   triggers:
