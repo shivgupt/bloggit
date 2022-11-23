@@ -11,7 +11,7 @@ jobs:
       - echo "ls -a $(pwd):"
       - ls -a
       - git init
-      - git remote add origin ssh://onedev/bloggit .
+      - git remote add origin ssh://onedev/bloggit
       - git pull origin main
       - git submodule update --init --recursive modules/urbit
     useTTY: false
