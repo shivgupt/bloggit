@@ -51,6 +51,7 @@ jobs:
     interpreter: !DefaultInterpreter
       commands:
       - make all
+      - make deploy
     useTTY: false
     condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
   triggers:

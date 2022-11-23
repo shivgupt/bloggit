@@ -75,6 +75,9 @@ production-environment:
 push-to-prod:
 	bash ops/push-to-prod.sh
 
+deploy:
+	bash ops/deploy.sh
+
 purge: clean reset
 
 push: push-commit
