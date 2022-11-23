@@ -16,6 +16,9 @@ jobs:
     runInContainer: false
     interpreter: !DefaultInterpreter
       commands:
+      - echo $PATH
+      - which nix-build
+      - make urbit
       - make all
     useTTY: false
     condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
