@@ -33,8 +33,6 @@ jobs:
   cpuRequirement: 250
   memoryRequirement: 256
   caches:
-  - key: npm
-    path: .npm/_cacache
   - key: node_modules
     path: node_modules
   - key: cache
@@ -68,8 +66,6 @@ jobs:
   cpuRequirement: 250
   memoryRequirement: 256
   caches:
-  - key: npm
-    path: .npm/_cacache
   - key: node_modules
     path: node_modules
   - key: cache
