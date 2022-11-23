@@ -68,6 +68,10 @@ reset: stop
 reset-images:
 	rm .flags/proxy .flags/server-image .flags/webserver .flags/urbit 
 
+# installs docker & make & configures an admin user on the production server
+production-environment:
+	nix-shell shell.nix --run 'morph deploy ops/prod/network.nix switch'
+
 purge: clean reset
 
 push: push-commit
