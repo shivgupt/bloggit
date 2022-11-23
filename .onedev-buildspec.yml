@@ -10,9 +10,11 @@ jobs:
       commands:
       - pwd
       - ls
+      - ls ..
+      - ls ../user
       - sleep 2
-      - ls -a .ssh
-      - cat .ssh/known_hosts
+      - ls -a ../user/.ssh
+      - cat ../user/.ssh/known_hosts
       - sleep 2
     useTTY: false
     condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
