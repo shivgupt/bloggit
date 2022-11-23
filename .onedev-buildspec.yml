@@ -31,12 +31,13 @@ jobs:
 - name: Deploy
   jobExecutor: system76
   steps:
-  - !CheckoutStep
-    name: checkout
-    cloneCredential: !SshCredential
-      keySecret: oneagent-key
-    withLfs: false
-    withSubmodules: true
+  - !CommandStep
+    name: manual checkout
+    runInContainer: false
+    interpreter: !DefaultInterpreter
+      commands:
+      - git clone --recurse-submodules ssh://onedev/project .
+    useTTY: false
     condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
   - !CommandStep
     name: deploy
