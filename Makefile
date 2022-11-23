@@ -72,6 +72,9 @@ reset-images:
 production-environment:
 	nix-shell shell.nix --run 'morph deploy ops/prod/network.nix switch'
 
+push-to-prod:
+	bash ops/push-to-prod.sh
+
 purge: clean reset
 
 push: push-commit
@@ -99,9 +102,6 @@ dls:
 
 lint:
 	bash ops/lint.sh
-
-deploy:
-	bash ops/deploy.sh
 
 test-server: server
 	bash ops/test/server.sh test
