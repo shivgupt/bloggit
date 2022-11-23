@@ -10,9 +10,6 @@ jobs:
       commands:
       - echo "ls -al $(pwd):"
       - ls -al
-      - echo "realpath to .npm: $(realpath .npm)"
-      - echo "realpath to .node_modules: $(realpath .node_modules)"
-      - echo "realpath to .cache: $(realpath .cache)"
       - git init
       - git remote add origin ssh://onedev/bloggit
       - git pull origin main
