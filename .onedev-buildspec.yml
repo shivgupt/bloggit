@@ -16,6 +16,9 @@ jobs:
     runInContainer: false
     interpreter: !DefaultInterpreter
       commands:
+      - echo "I am $(whoami)"
+      - echo "home=$HOME"
+      - if ! which nix-build; then echo "nix is required but not installed" && exit 1; fi
       - echo $PATH
       - which nix-build
       - make urbit
