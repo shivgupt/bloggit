@@ -34,7 +34,7 @@ jobs:
   memoryRequirement: 256
   caches:
   - key: npm
-    path: .npm
+    path: .npm/_cacache
   - key: node_modules
     path: node_modules
   - key: cache
@@ -69,7 +69,7 @@ jobs:
   memoryRequirement: 256
   caches:
   - key: npm
-    path: .npm
+    path: .npm/_cacache
   - key: node_modules
     path: node_modules
   - key: cache
