@@ -27,6 +27,13 @@ jobs:
   retryDelay: 30
   cpuRequirement: 250
   memoryRequirement: 256
+  caches:
+  - key: npm
+    path: .npm
+  - key: node_modules
+    path: node_modules
+  - key: cache
+    path: .cache
   timeout: 3600
 - name: Deploy
   jobExecutor: system76
@@ -54,4 +61,11 @@ jobs:
   retryDelay: 30
   cpuRequirement: 250
   memoryRequirement: 256
+  caches:
+  - key: npm
+    path: .npm
+  - key: node_modules
+    path: node_modules
+  - key: cache
+    path: .cache
   timeout: 3600
