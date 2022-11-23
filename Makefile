@@ -40,6 +40,9 @@ prod: dev webserver server-image
 start: dev
 	bash ops/start.sh
 
+start-agent:
+	nix-shell --run 'cd agent && bash bin/agent.sh console'
+
 start-prod: dev
 	export BLOG_PROD=true; bash ops/start.sh
 
@@ -149,8 +152,8 @@ proxy: $(shell find modules/proxy $(find_options))
 
 urbit: $(shell find modules/urbit $(find_options))
 	$(log_start)
-	docker build --file modules/urbit/Dockerfile $(cache_from) --tag $(project)_urbit:latest modules/urbit
-	docker tag $(project)_urbit:latest $(project)_urbit:$(commit)
+	nix-build modules/urbit/src/default.nix -A docker-image
+	docker load < result
 	$(log_finish) && mv -f $(totalTime) .flags/$@
 
 webserver: client $(shell find modules/client/ops $(find_options))
