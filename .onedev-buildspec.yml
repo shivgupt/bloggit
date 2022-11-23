@@ -4,23 +4,12 @@ jobs:
   jobExecutor: system76
   steps:
   - !CommandStep
-    name: debug ssh
+    name: manual checkout
     runInContainer: false
     interpreter: !DefaultInterpreter
       commands:
-      - pwd
-      - ls
-      - ls ..
-      - ls -a ../user
-      - git clone ssh://onedev/urbit
+      - git clone --recurse-submodules ssh://onedev/bloggit
     useTTY: false
-    condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
-  - !CheckoutStep
-    name: checkout
-    cloneCredential: !SshCredential
-      keySecret: oneagent-key
-    withLfs: false
-    withSubmodules: true
     condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
   - !CommandStep
     name: make
