@@ -16,9 +16,10 @@ jobs:
     runInContainer: false
     interpreter: !DefaultInterpreter
       commands:
-      - if [ -f "/etc/bash.bashrc" ]; then source "/etc/bash.bashrc"; fi # load nix env vars if available
-      - if [ -f "/etc/bash.bashrc" ]; then source "/etc/bash.bashrc"; fi # load nix env vars if available
-      - if ! which nix-build; then echo "nix is required but not installed" && env && echo "$PATH" && exit 1; fi
+      - if [ -f "/etc/bash.bashrc" ]; then source "/etc/bash.bashrc"; fi
+      - if [ -f "/etc/bash.bashrc" ]; then source "/etc/bash.bashrc"; fi
+      - if ! which nix-build; then echo "nix is required but not installed" && env
+        && echo "$PATH" && exit 1; fi
       - echo $PATH
       - which nix-build
       - make urbit
@@ -51,7 +52,7 @@ jobs:
     interpreter: !DefaultInterpreter
       commands:
       - make all
-      - make deploy
+      - bash ops/deploy.sh @secret:server-ip@
     useTTY: false
     condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
   triggers:
