@@ -9,6 +9,11 @@ jobs:
     interpreter: !DefaultInterpreter
       commands:
       - git clone --recurse-submodules ssh://onedev/bloggit
+      - echo "cwd=$(pwd)"
+      - echo "ls -a $(pwd):"
+      - ls -a
+      - echo "ls -a $(pwd)/..:"
+      - ls -a ..
     useTTY: false
     condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
   - !CommandStep
@@ -16,6 +21,9 @@ jobs:
     runInContainer: false
     interpreter: !DefaultInterpreter
       commands:
+      - echo "cwd=$(pwd)"
+      - echo "ls -a $(pwd):"
+      - ls -a
       - make all
     useTTY: false
     condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
