@@ -8,12 +8,7 @@ jobs:
     runInContainer: false
     interpreter: !DefaultInterpreter
       commands:
-      - echo "ls -al $(pwd):"
-      - ls -al
-      - git init
-      - git remote add origin ssh://onedev/bloggit
-      - git pull origin main
-      - git submodule update --init --recursive modules/urbit
+      - git clone --recurse-submodules ssh://onedev/project .
     useTTY: false
     condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
   - !CommandStep
