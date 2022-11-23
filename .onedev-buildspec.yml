@@ -1,0 +1,58 @@
+version: 18
+jobs:
+- name: Build
+  jobExecutor: system76
+  steps:
+  - !CommandStep
+    name: manual checkout
+    runInContainer: false
+    interpreter: !DefaultInterpreter
+      commands:
+      - git clone --recurse-submodules ssh://onedev/project .
+    useTTY: false
+    condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
+  - !CommandStep
+    name: make
+    runInContainer: false
+    interpreter: !DefaultInterpreter
+      commands:
+      - make all
+    useTTY: false
+    condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
+  triggers:
+  - !BranchUpdateTrigger
+    branches: -prod
+  retryCondition: never
+  maxRetries: 3
+  retryDelay: 30
+  cpuRequirement: 250
+  memoryRequirement: 256
+  timeout: 3600
+- name: Deploy
+  jobExecutor: system76
+  steps:
+  - !CheckoutStep
+    name: checkout
+    cloneCredential: !SshCredential
+      keySecret: oneagent-key
+    withLfs: false
+    withSubmodules: true
+    condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
+  - !CommandStep
+    name: deploy
+    runInContainer: false
+    interpreter: !DefaultInterpreter
+      commands:
+      - make all
+      - make deploy
+    useTTY: false
+    condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
+  triggers:
+  - !BranchUpdateTrigger
+    branches: prod
+  retryCondition: never
+  maxRetries: 3
+  retryDelay: 30
+  cpuRequirement: 250
+  memoryRequirement: 256
+  timeout: 3600

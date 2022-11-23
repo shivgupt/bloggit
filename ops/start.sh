@@ -267,7 +267,7 @@ do
 done
 
 # Delete old images in prod to prevent the disk from filling up
-if [[ "$BLOG_PROD" == "true" ]]
+if [[ "$BLOG_SEMVER" == "true" ]]
 then
   docker container prune --force;
   mapfile -t imagesToRemove < <(docker image ls \

@@ -1,5 +1,6 @@
 # Specify make-specific variables (VPATH = prerequisite search path)
 VPATH=.flags
+SHELL=bash
 
 dir=$(shell cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )
 project=$(shell cat $(dir)/package.json | jq .name | tr -d '"')
@@ -40,6 +41,9 @@ prod: dev webserver server-image
 start: dev
 	bash ops/start.sh
 
+start-agent:
+	nix-shell --run 'cd agent && bash bin/agent.sh console'
+
 start-prod: dev
 	export BLOG_PROD=true; bash ops/start.sh
 
@@ -63,6 +67,16 @@ reset: stop
 
 reset-images:
 	rm .flags/proxy .flags/server-image .flags/webserver .flags/urbit 
+
+# installs docker & make & configures an admin user on the production server
+production-environment:
+	nix-shell shell.nix --run 'morph deploy ops/prod/network.nix switch'
+
+push-to-prod:
+	bash ops/push-to-prod.sh
+
+deploy:
+	bash ops/deploy.sh
 
 purge: clean reset
 
@@ -91,9 +105,6 @@ dls:
 
 lint:
 	bash ops/lint.sh
-
-deploy:
-	bash ops/deploy.sh
 
 test-server: server
 	bash ops/test/server.sh test
@@ -149,8 +160,9 @@ proxy: $(shell find modules/proxy $(find_options))
 
 urbit: $(shell find modules/urbit $(find_options))
 	$(log_start)
-	docker build --file modules/urbit/Dockerfile $(cache_from) --tag $(project)_urbit:latest modules/urbit
-	docker tag $(project)_urbit:latest $(project)_urbit:$(commit)
+	nix-build modules/urbit/default.nix -A docker-image
+	docker load --input result
+	docker tag urbit:v1.12 $(project)_urbit:$(commit)
 	$(log_finish) && mv -f $(totalTime) .flags/$@
 
 webserver: client $(shell find modules/client/ops $(find_options))
