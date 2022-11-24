@@ -157,9 +157,8 @@ proxy: $(shell find modules/proxy $(find_options))
 
 urbit: $(shell find modules/urbit $(find_options))
 	$(log_start)
-	nix-build modules/urbit/default.nix -A docker-image
-	docker load --input result
-	docker tag urbit:v1.12 $(project)_urbit:$(commit)
+	docker build --file modules/urbit/Dockerfile $(cache_from) --tag $(project)_urbit:latest modules/urbit
+	docker tag $(project)_urbit:latest $(project)_urbit:$(commit)
 	$(log_finish) && mv -f $(totalTime) .flags/$@
 
 webserver: client $(shell find modules/client/ops $(find_options))
