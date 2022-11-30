@@ -11,7 +11,7 @@
       { };
   };
 
-  bohendo-com = { modulesPath, lib, name, pkgs, ... }: {
+  shivhendo = { modulesPath, lib, name, pkgs, ... }: {
     imports = lib.optional (builtins.pathExists ./do-userdata.nix) ./do-userdata.nix ++ [
       (modulesPath + "/virtualisation/digital-ocean-config.nix")
     ];
@@ -19,7 +19,7 @@
     system.stateVersion = "22.05";
 
     deployment.targetUser = "root";
-    deployment.targetHost = "0.0.0.0"; # TODO: replace with real IPv4
+    deployment.targetHost = "138.197.165.22"; # TODO: replace with real IPv4
 
     networking.hostName = name;
     networking.firewall.allowedTCPPorts = [ 80 443 ];
@@ -31,7 +31,7 @@
       extraGroups = [ "wheel" "docker" ];
       packages = [ ];
       openssh.authorizedKeys.keys = [
-        ''${builtins.readFile ./bohendo.pub}''
+        ''${builtins.readFile ./shivani.pub}''
       ];
     };
 
@@ -43,7 +43,7 @@
     services.openssh = {
       enable = true;
       # require public key authentication for better security
-      passwordAuthentication = false;
+      passwordAuthentication = true;
       kbdInteractiveAuthentication = false;
     };
 
@@ -73,8 +73,8 @@
         init = {
           defaultBranch = "main";
         };
-        user = { email = "bohendo@pm.me"; };
-        user = { name = "bohendo"; };
+        user = { email = "shivhendo@proton.me"; };
+        user = { name = "shivhendo"; };
       };
     };
 

@@ -69,6 +69,9 @@ reset-images:
 	rm .flags/proxy .flags/server-image .flags/webserver .flags/urbit 
 
 # installs docker & make & configures an admin user on the production server
+production-image:
+	cd ops/prod && nix-build image.nix
+
 production-environment:
 	nix-shell shell.nix --run 'morph deploy ops/prod/network.nix switch'
 
