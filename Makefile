@@ -34,9 +34,10 @@ $(shell mkdir -p .flags)
 # Command & Control Shortcuts
 
 default: dev
-all: dev prod
 dev: server proxy urbit
 prod: dev webserver server-image
+all: dev prod
+	bash ops/tag-images.sh $(commit)
 
 start: dev
 	bash ops/start.sh

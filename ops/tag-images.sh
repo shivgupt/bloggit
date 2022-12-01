@@ -11,6 +11,14 @@ tag="${1:-$semver}"
 for name in builder proxy server webserver urbit
 do
   image=${project}_$name
-  echo "Tagging image $image:$commit as $image:$tag"
-  docker tag "$image:$commit" "$image:$tag" || true
+	if ! grep "$commit" <<<"$(docker image ls | grep "$image")" > /dev/null
+	then
+		echo "Tagging image $image:latest as $image:$commit"
+		docker tag "$image:latest" "$image:$commit" || true
+	fi
+	if [[ "$commit" != "$tag" ]]
+	then
+		echo "Tagging image $image:$commit as $image:$tag"
+		docker tag "$image:$commit" "$image:$tag" || true
+	fi
 done
