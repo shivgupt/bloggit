@@ -25,7 +25,10 @@ echo
 echo "Restarting bloggit"
 ssh $user@$ipAddress <<EOF
 cd bloggit
-git reset --hard $commit
+git branch tmp $commit
+git checkout $branch
+git merge tmp
+git branch -D tmp
 make all
 make restart
 EOF
