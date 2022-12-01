@@ -11,15 +11,29 @@
       { };
   };
 
-  bohendo-com = { modulesPath, lib, name, pkgs, ... }: {
+  shivhendo = { modulesPath, lib, name, pkgs, ... }: {
     imports = lib.optional (builtins.pathExists ./do-userdata.nix) ./do-userdata.nix ++ [
       (modulesPath + "/virtualisation/digital-ocean-config.nix")
     ];
 
+    systemd.services.bloggit = {
+      script = ''
+        if [ ! -d /home/admin/bloggit ]
+        then
+          ${pkgs.git}/bin/git init /home/admin/bloggit
+          chown -R admin /home/admin/bloggit
+        fi
+      '';
+      wantedBy = ["multi-user.target"];
+      serviceConfig = {
+        Type = "oneshot";
+      };
+    };
+
     system.stateVersion = "22.05";
 
     deployment.targetUser = "root";
-    deployment.targetHost = "0.0.0.0"; # TODO: replace with real IPv4
+    deployment.targetHost = (builtins.readFile ./PROD_SERVER_IP_ADDRESS); # TODO: replace with real IPv4
 
     networking.hostName = name;
     networking.firewall.allowedTCPPorts = [ 80 443 ];
@@ -31,6 +45,7 @@
       extraGroups = [ "wheel" "docker" ];
       packages = [ ];
       openssh.authorizedKeys.keys = [
+        ''${builtins.readFile ./shivani.pub}''
         ''${builtins.readFile ./bohendo.pub}''
       ];
     };
@@ -43,7 +58,7 @@
     services.openssh = {
       enable = true;
       # require public key authentication for better security
-      passwordAuthentication = false;
+      passwordAuthentication = true;
       kbdInteractiveAuthentication = false;
     };
 
@@ -70,11 +85,14 @@
     programs.git = {
       enable = true;
       config = {
+        receive = {
+          denyCurrentBranch = "ignore";
+        };
         init = {
           defaultBranch = "main";
         };
-        user = { email = "bohendo@pm.me"; };
-        user = { name = "bohendo"; };
+        user = { email = "shivhendo@proton.me"; };
+        user = { name = "shivhendo"; };
       };
     };
 
