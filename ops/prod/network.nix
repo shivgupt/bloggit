@@ -85,6 +85,9 @@
     programs.git = {
       enable = true;
       config = {
+        receive = {
+          denyCurrentBranch = "ignore";
+        };
         init = {
           defaultBranch = "main";
         };
