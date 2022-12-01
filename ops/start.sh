@@ -239,8 +239,6 @@ services:
       PORT: '$urbit_internal_port'
     volumes:
       - '$datadir_urbit:/root/urbit/data'
-    ports:
-      - '31337:80'
 
 EOF
 
