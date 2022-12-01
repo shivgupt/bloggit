@@ -11,7 +11,7 @@
       { };
   };
 
-  shivhendo = { modulesPath, lib, name, pkgs, ... }: {
+  bloggit = { modulesPath, lib, name, pkgs, ... }: {
     imports = lib.optional (builtins.pathExists ./do-userdata.nix) ./do-userdata.nix ++ [
       (modulesPath + "/virtualisation/digital-ocean-config.nix")
     ];
@@ -33,7 +33,7 @@
     system.stateVersion = "22.05";
 
     deployment.targetUser = "root";
-    deployment.targetHost = (builtins.readFile ./PROD_SERVER_IP_ADDRESS); # TODO: replace with real IPv4
+    deployment.targetHost = (builtins.readFile ./PROD_SERVER_IP_ADDRESS);
 
     networking.hostName = name;
     networking.firewall.allowedTCPPorts = [ 80 443 ];
@@ -45,8 +45,8 @@
       extraGroups = [ "wheel" "docker" ];
       packages = [ ];
       openssh.authorizedKeys.keys = [
-        ''${builtins.readFile ./shivani.pub}''
         ''${builtins.readFile ./bohendo.pub}''
+        ''${builtins.readFile ./shivani.pub}''
       ];
     };
 
@@ -91,8 +91,6 @@
         init = {
           defaultBranch = "main";
         };
-        user = { email = "shivhendo@proton.me"; };
-        user = { name = "shivhendo"; };
       };
     };
 

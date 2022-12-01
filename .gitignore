@@ -21,6 +21,7 @@ modules/*/package-lock.json
 blog-content.git
 data
 PROD_SERVER_IP_ADDRESS
+*_IP_ADDRESS
 ipfs
 
 # Compiled output
