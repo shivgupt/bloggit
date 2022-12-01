@@ -33,7 +33,7 @@
     system.stateVersion = "22.05";
 
     deployment.targetUser = "root";
-    deployment.targetHost = "138.197.165.22"; # TODO: replace with real IPv4
+    deployment.targetHost = (builtins.readFile ./PROD_SERVER_IP_ADDRESS); # TODO: replace with real IPv4
 
     networking.hostName = name;
     networking.firewall.allowedTCPPorts = [ 80 443 ];
