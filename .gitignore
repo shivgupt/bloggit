@@ -12,6 +12,7 @@ modules/*/package-lock.json
 
 # Local storage
 *.local
+*.pub
 .blog-content.git
 .env
 .ipfs
@@ -19,6 +20,7 @@ modules/*/package-lock.json
 .test-content.git
 blog-content.git
 data
+PROD_SERVER_IP_ADDRESS
 ipfs
 
 # Compiled output
