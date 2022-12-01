@@ -11,7 +11,7 @@ fi
 echo "Preparing to deploy prod branch at commit $(git rev-parse HEAD | head -c 8) to server at $server"
 sleep 2
 
-git push ssh://$user@$server/home/$user/bloggit prod
+git push ssh://$user@$server/home/$user/bloggit shivhendo.com
 
 ssh $user@$server <<EOF
 cd bloggit
