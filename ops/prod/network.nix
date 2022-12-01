@@ -16,6 +16,20 @@
       (modulesPath + "/virtualisation/digital-ocean-config.nix")
     ];
 
+    systemd.services.bloggit = {
+      script = ''
+        if [ ! -d /home/admin/bloggit ]
+        then
+          ${pkgs.git}/bin/git init /home/admin/bloggit
+          chown -R admin /home/admin/bloggit
+        fi
+      '';
+      wantedBy = ["multi-user.target"];
+      serviceConfig = {
+        Type = "oneshot";
+      };
+    };
+
     system.stateVersion = "22.05";
 
     deployment.targetUser = "root";
@@ -32,6 +46,7 @@
       packages = [ ];
       openssh.authorizedKeys.keys = [
         ''${builtins.readFile ./shivani.pub}''
+        ''${builtins.readFile ./bohendo.pub}''
       ];
     };
 
