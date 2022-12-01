@@ -8,7 +8,7 @@ semver=v$(grep -m 1 '"version":' package.json | cut -d '"' -f 4)
 
 tag="${1:-$semver}"
 
-for name in builder proxy server webserver
+for name in builder proxy server webserver urbit
 do
   image=${project}_$name
   echo "Tagging image $image:$commit as $image:$tag"
