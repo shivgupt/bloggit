@@ -233,6 +233,8 @@ services:
   urbit:
     image: '$urbit_image'
     $common
+    tty: true
+    stdin_open: true
     environment:
       DATADIR: '/root/urbit/data'
       URBIT_NAME: '$BLOG_URBIT_NAME'
