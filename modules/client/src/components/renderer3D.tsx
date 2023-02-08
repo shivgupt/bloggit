@@ -17,7 +17,6 @@ export const Renderer3D = (src: any) => {
         <Suspense fallback={null}>
           <primitive object={gltf.scene} scale={.3} />
           <OrbitControls />
-          <Environment preset="sunset" background />
         </Suspense>
       </Canvas>
     </div>

@@ -3,6 +3,35 @@ import axios from "axios";
 
 import { emptyIndex } from "./constants";
 
+export const fetchImg = async (url: string):Promise<Array<string>> => {
+  console.log(`Fetching image ${url}`);
+  const result = [] as Array<string>;
+  try {
+
+    const response = await axios(url);
+    if (response.status === 200) {
+      console.log(response.headers['content-type']);
+      if (response.headers['content-type'] === "model/gltf-binary") {
+         result.push("glb");
+         result.push(response.data);
+      }
+      else if (response.headers['content-type'].slice(0,5) === "video") {
+         result.push("video");
+         result.push(response.data);
+      }
+      else {
+         result.push("image");
+         result.push(response.data);
+      }
+    } else {
+      throw new Error(`Got bad data from ${url}`);
+    }
+  
+  } catch (e) { console.log(e) }
+  console.log(result);
+  return result;
+};
+
 export const fetchRef = async (): Promise<string> => {
   const configUrl = "/git/config";
   console.log(`Fetching latest ref from ${configUrl}`);
