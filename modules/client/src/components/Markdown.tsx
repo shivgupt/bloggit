@@ -14,6 +14,8 @@ import { getChildValue, replaceEmojiString, slugify } from "../utils";
 import { Renderer3D } from "./renderer3D";
 import { HashLink } from "./HashLink";
 
+import { fetchImg } from "../utils";
+
 const StyledReactMarkdown =styled(ReactMarkdown)(({ theme }) => ({
     padding: "20px",
     textAlign: "justify",
@@ -59,19 +61,17 @@ export const Markdown = ({
   }: {
     node?: any;
   }) => {
-    const src = node.properties.src;
-    return (!imgErrors[src]
-      ? <img
-        onError={() => {
-          if (!imgErrors[src]) {
-            setImgErrors(old => ({ ...old, [src]: true }));
-          }
-        }}
-        src={src}
-        alt={node.properties.alt}
-        style={{ display: "block", margin: "auto", maxWidth: "90%" }}
-      />
-      : !vidErrors[src] ? <video
+    let src;
+    let renderType;
+    (async () => {
+      const response = await fetchImg(node.properties.src);
+      renderType = response[0];
+      src = response[1];
+    })()
+    if (renderType === "glb") {
+      return <Renderer3D src={src} />
+    } else if (renderType === "video") {
+        return <video
           onError={() => {
             if (!vidErrors[src]) {
               setVidErrors(old => ({ ...old, [src]: true }));
@@ -81,8 +81,18 @@ export const Markdown = ({
           src={src}
           style={{ display: "block", margin: "auto", maxWidth: "90%" }}
         />
-        : <Renderer3D src={src} />
-    );
+    } else {
+      return <img
+        onError={() => {
+          if (!imgErrors[src]) {
+            setImgErrors(old => ({ ...old, [src]: true }));
+          }
+        }}
+        src={src}
+        alt={node.properties.alt}
+        style={{ display: "block", margin: "auto", maxWidth: "90%" }}
+      />
+    }
   };
 
   const AnimationRenderer = ({
