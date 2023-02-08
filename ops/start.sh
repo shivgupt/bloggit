@@ -92,7 +92,7 @@ bash "$root/ops/pull-images.sh" "$urbit_image"
 
 ipfs_internal_port=5001
 
-ipfs_image="ipfs/go-ipfs:v0.8.0"
+ipfs_image="ipfs/kubo:latest"
 bash "$root/ops/pull-images.sh" "$ipfs_image"
 
 ########################################
