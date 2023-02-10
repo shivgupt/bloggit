@@ -16,7 +16,7 @@ import { HashLink } from "./HashLink";
 
 import { fetchImg } from "../utils";
 
-const StyledReactMarkdown =styled(ReactMarkdown)(({ theme }) => ({
+const StyledReactMarkdown = styled(ReactMarkdown)(({ theme }) => ({
     padding: "20px",
     textAlign: "justify",
     fontVariant: "discretionary-ligatures",
@@ -61,13 +61,17 @@ export const Markdown = ({
   }: {
     node?: any;
   }) => {
-    let src;
-    let renderType;
-    (async () => {
-      const response = await fetchImg(node.properties.src);
-      renderType = response[0];
-      src = response[1];
-    })()
+    const [src, setSrc] = useState(node.properties.src);
+    const [renderType, setRenderType] = useState("");
+    useEffect(() => {
+      (async () => {
+        const response = await fetchImg(node.properties.src);
+        setRenderType(response[0]);
+        // renderType = response[0];
+        // src = response[1];
+      })()
+    }, []);
+
     if (renderType === "glb") {
       return <Renderer3D src={src} />
     } else if (renderType === "video") {
