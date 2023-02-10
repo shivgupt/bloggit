@@ -2,6 +2,8 @@ import IconButton from "@mui/material/IconButton";
 import Link from "@mui/material/Link";
 import { styled, useTheme } from "@mui/material/styles";
 import LinkIcon from "@mui/icons-material/Link";
+import { ArcRotateCamera, Scene, SceneLoader } from "@babylonjs/core";
+import { GLTFFileLoader } from "@babylonjs/loaders/glTF";
 import React, { useContext, useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
@@ -15,6 +17,8 @@ import { Renderer3D } from "./renderer3D";
 import { HashLink } from "./HashLink";
 
 import { fetchImg } from "../utils";
+
+SceneLoader.RegisterPlugin(new GLTFFileLoader());
 
 const StyledReactMarkdown = styled(ReactMarkdown)(({ theme }) => ({
     padding: "20px",
@@ -73,7 +77,26 @@ export const Markdown = ({
     }, []);
 
     if (renderType === "glb") {
-      return <Renderer3D src={src} />
+      const onSceneReady = (scene: Scene) => {
+        console.log("Will load glb soon");
+        (async (scene: Scene, url: string, filename = "") => {
+          if (!url || !scene) return;
+
+          try {
+
+            const container = await SceneLoader.LoadAssetContainerAsync(url, "", scene, null, ".glb");
+            if (container) {
+              let camera = scene.getCameraById("viewCamera") as ArcRotateCamera;
+              camera.setTarget(container.meshes[0], true, true, true);
+              container.addAllToScene();
+            }
+          } catch (e) {
+            console.log(`Cannot load glb got Error ${JSON.stringify(e, null, 2)}`, e)
+          }
+        })(scene, src);
+      }
+
+      return <Renderer3D src={src} onSceneReady={onSceneReady} />
     } else if (renderType === "video") {
         return <video
           onError={() => {
@@ -97,16 +120,6 @@ export const Markdown = ({
         style={{ display: "block", margin: "auto", maxWidth: "90%" }}
       />
     }
-  };
-
-  const AnimationRenderer = ({
-    node,
-  }: {
-    node?: any;
-  }) => {
-    const src = node.properties.src;
-    console.log(src)
-    return (<div id="VRBox"> <Renderer3D src={src} /> </div>)
   };
 
   const LinkRenderer = ({
@@ -199,7 +212,6 @@ export const Markdown = ({
         h5: HeadingRenderer,
         h6: HeadingRenderer,
         img: ImageRenderer,
-        animate: AnimationRenderer,
       }}
       remarkPlugins={[gfm]}
     >

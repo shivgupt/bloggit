@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@bloggit/types": "1.0.0",
+    "@babylonjs/core": "5.46.0",
+    "@babylonjs/loaders": "5.46.0",
     "@date-io/date-fns": "2.10.8",
     "@fontsource/monsieur-la-doulaise": "4.2.2",
     "@mui/material": "5.9.3",
@@ -19,9 +21,6 @@
     "@mui/icons-material": "5.8.4",
     "@mui/lab": "5.0.0-alpha.93",
     "@mui/x-date-pickers": "5.0.0-beta.4",
-    "@react-three/drei": "^9.17.3",
-    "@react-three/fiber": "^8.2.2",
-    "@react-three/xr": "^4.0.1",
     "axios": "0.21.4",
     "emoji-dictionary": "1.0.11",
     "react-copy-to-clipboard": "5.1.0",
@@ -37,7 +36,6 @@
     "react-syntax-highlighter": "15.4.3",
     "react-vis": "1.11.7",
     "remark-gfm": "1.0.0",
-    "three": "^0.142.0",
     "web-vitals": "^2.1.4"
   },
   "devDependencies": {
@@ -47,10 +45,8 @@
     "@types/jest": "^27.5.2",
     "@types/node": "^16.11.45",
     "@types/react": "^18.0.15",
-    "@types/react-dom": "18.0.6",
     "@types/react-copy-to-clipboard": "5.0.4",
     "@types/react-dom": "18.0.6",
-    "@types/three": "^0.142.0",
     "cypress": "7.2.0",
     "cypress-terminal-report": "3.1.0",
     "typescript": "4.3.5"
