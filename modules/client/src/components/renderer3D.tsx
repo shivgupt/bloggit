@@ -27,14 +27,14 @@ export const Renderer3D = (props: {
 
     if (!canvas) return;
 
-    const engine = new Engine(canvas, false, { adaptToDeviceRatio: true }, false)
+    const engine = new Engine(canvas, false, { adaptToDeviceRatio: false }, true)
     const scene = new Scene(engine, {});
 
     const camera = new ArcRotateCamera(
-      "viewCamera", 0, 0, 3, new Vector3(0, 0, 0), scene
+      "viewCamera", Math.PI, Math.PI/3, 20, new Vector3(0, 1, 0), scene
     );
-    camera.attachControl(true);
-    // camera.minZ = 0.1;
+    camera.attachControl(true, true);
+    camera.minZ = 0.1;
 
     const light = new HemisphericLight("ambientLight", new Vector3(0, 1, 0), scene);
     // light.intensity = 2;
@@ -62,30 +62,8 @@ export const Renderer3D = (props: {
 
     return () => {
       scene.getEngine().dispose();
-      if (window) {
-        window.removeEventListener("resize", resize);
-      }
     };
   }, [onSceneReady, onRender, src])
 
   return <canvas ref={reactCanvas} {...rest} />;
-  // let srcURL = `${window.location.origin}${src.src}`;
-
-  // const gltf = useLoader(GLTFLoader, srcURL);
-
-  // return (
-  //   <div style = {{height:"100vh", width:"100%"}}>
-  //     <Canvas>
-  //       <Suspense fallback={null}>
-  //         <primitive object={gltf.scene} scale={.3} />
-  //         <OrbitControls />
-  //         <Environment preset="sunset" background />
-  //       </Suspense>
-  //     </Canvas>
-  //   </div>
-  // );
 };
-
-/*
-  <Environment background files="DJI_0060.hdr" />
- */

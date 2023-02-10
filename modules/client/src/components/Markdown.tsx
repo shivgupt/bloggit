@@ -86,8 +86,6 @@ export const Markdown = ({
 
             const container = await SceneLoader.LoadAssetContainerAsync(url, "", scene, null, ".glb");
             if (container) {
-              let camera = scene.getCameraById("viewCamera") as ArcRotateCamera;
-              camera.setTarget(container.meshes[0], true, true, true);
               container.addAllToScene();
             }
           } catch (e) {
@@ -96,7 +94,7 @@ export const Markdown = ({
         })(scene, src);
       }
 
-      return <Renderer3D src={src} onSceneReady={onSceneReady} />
+      return <Renderer3D src={src} onSceneReady={onSceneReady} style={{ maxWidth: "90%" }} />
     } else if (renderType === "video") {
         return <video
           onError={() => {
