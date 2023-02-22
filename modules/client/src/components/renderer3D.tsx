@@ -12,8 +12,8 @@ import { Color3, CubeTexture, StandardMaterial, Texture } from "@babylonjs/core"
 
 export const Renderer3D = (props: {
   onRender?: (scene: Scene) => void,
-  onSceneReady: (scene: Scene) => void,
-  src: string,
+  onSceneReady: (scene: Scene, assetBlob: any) => void,
+  src: any,
 } & React.CanvasHTMLAttributes<HTMLCanvasElement>) => {
 
   const {
@@ -40,10 +40,10 @@ export const Renderer3D = (props: {
     // light.intensity = 2;
 
     if (scene.isReady()) {
-      onSceneReady(scene);
+      onSceneReady(scene, src);
     } else {
       scene.onReadyObservable.addOnce((scene: Scene) => {
-        onSceneReady(scene);
+        onSceneReady(scene, src);
       })
     }
     engine.runRenderLoop(() => {

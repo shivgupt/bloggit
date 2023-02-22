@@ -4,51 +4,32 @@ import { FilesInput } from "@babylonjs/core";
 
 import { emptyIndex } from "./constants";
 
-export const fetchMedia = async (url: string):Promise<{contentType: string, data: string}> => {
-  console.log(`Fetching image ${url}`);
+export const fetchMedia = async (url: string):Promise<{contentType: string, data: any}> => {
+  console.log(`Fetching media ${url}`);
   const result = {} as any;
   try {
-
     const response = await axios(url);
     if (response.status === 200) {
-      const blob = new Blob([response.data], {type: response.headers['content-type']});
+      const blob = new Blob([response.data] , {type: response.headers['content-type']} );
+      console.log(blob);
+      result.data = blob;
       result.contentType = response.headers['content-type'];
-      // result.data = "cachedFile";
-      // FilesInput.FilesToLoad[result.data] = blob as any;
-      
       const reader = new FileReader();
       reader.readAsDataURL(blob);
-      return await new Promise((resolve, reject) => {
-        reader.onload = async () => {
-          result.contentType = response.headers['content-type'];
-          // result.push(reader.result as string);
-          result.data = await (await fetch(reader.result as string)).arrayBuffer();
-          console.log(result.data.slice(0,10));
-          resolve(result);
+      result.data = await new Promise((resolve, reject) => {
+        reader.onload = () => {
+          resolve(reader.result);
         }
         reader.onerror = () => {
-          reject(reader.error);
+          throw new Error(`Got bad data from ${url}`);
         }
       });
-      // if (response.headers['content-type'] === "model/gltf-binary") {
-      //    result.push("glb");
-      //    result.push(response.data);
-      // }
-      // else if (response.headers['content-type'].slice(0,5) === "video") {
-      //    result.push("video");
-      //    result.push(response.data);
-      // }
-      // else {
-      //    result.push("image");
-      //    result.push(response.data);
-      // }
     } else {
       throw new Error(`Got bad data from ${url}`);
     }
   } catch (e) {
       throw new Error(`Got bad data from ${url}`);
   }
-  console.log(result);
   return result;
 };
 

@@ -76,46 +76,41 @@ export const Markdown = ({
     }, []);
 
     if (renderType === "model/gltf-binary") {
-      const onSceneReady = (scene: Scene) => {
-        (async (scene: Scene, url = "", file = "") => {
+      const onSceneReady = (scene: Scene, assetBlob: any) => {
+        (async () => {
           if (!scene) return;
-          console.log(file);
+          // console.log(assetBlob);
 
           try { 
 
-            SceneLoader.Append("", file, scene);
-            // SceneLoader.LoadAssetContainer("", file, scene, (container) => {
-            //   console.log("got container", Object.keys(container));
-            //   if (container) {
-            //     container.addAllToScene();
-            //   }
-            // });
+            SceneLoader.ImportMesh( "" , "", assetBlob, scene, undefined, undefined,
+              (scene) => { console.log("oops loader error")} , ".glb")
           } catch (e) {
-            console.log(`Cannot load glb got Error ${JSON.stringify(e, null, 2)}`, e)
+            console.log(`Cannot load glb got Error`, e)
           }
-        })(scene, "", src);
+        })();
       }
 
       return <Renderer3D src={src} onSceneReady={onSceneReady} style={{ maxWidth: "90%" }} />
     } else if (renderType.slice(0,5) === "video") {
         return <video
           onError={() => {
-            if (!vidErrors[src]) {
-              setVidErrors(old => ({ ...old, [src]: true }));
+            if (!vidErrors[node.properties.src]) {
+              setVidErrors(old => ({ ...old, [node.properties.src]: true }));
             }
           }}
           controls
-          src={src}
+          src={node.properties.src}
           style={{ display: "block", margin: "auto", maxWidth: "90%" }}
         />
     } else if(renderType.slice(0,5) === "image"){
       return <img
         onError={() => {
-          if (!imgErrors[src]) {
-            setImgErrors(old => ({ ...old, [src]: true }));
+          if (!imgErrors[node.properties.src]) {
+            setImgErrors(old => ({ ...old, [node.properties.src]: true }));
           }
         }}
-        src={src}
+        src={node.properties.src}
         alt={node.properties.alt}
         style={{ display: "block", margin: "auto", maxWidth: "90%" }}
       />
