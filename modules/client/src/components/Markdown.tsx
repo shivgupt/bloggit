@@ -16,7 +16,7 @@ import { getChildValue, replaceEmojiString, slugify } from "../utils";
 import { Renderer3D } from "./renderer3D";
 import { HashLink } from "./HashLink";
 
-import { fetchImg } from "../utils";
+import { fetchMedia } from "../utils";
 
 SceneLoader.RegisterPlugin(new GLTFFileLoader());
 
@@ -65,37 +65,39 @@ export const Markdown = ({
   }: {
     node?: any;
   }) => {
-    const [src, setSrc] = useState(node.properties.src);
+    const [src, setSrc] = useState("");
     const [renderType, setRenderType] = useState("");
     useEffect(() => {
       (async () => {
-        const response = await fetchImg(node.properties.src);
-        setRenderType(response[0]);
-        // renderType = response[0];
-        // src = response[1];
+        const response = await fetchMedia(node.properties.src);
+        setRenderType(response.contentType);
+        setSrc(response.data);
       })()
     }, []);
 
-    if (renderType === "glb") {
+    if (renderType === "model/gltf-binary") {
       const onSceneReady = (scene: Scene) => {
-        console.log("Will load glb soon");
-        (async (scene: Scene, url: string, filename = "") => {
-          if (!url || !scene) return;
+        (async (scene: Scene, url = "", file = "") => {
+          if (!scene) return;
+          console.log(file);
 
-          try {
+          try { 
 
-            const container = await SceneLoader.LoadAssetContainerAsync(url, "", scene, null, ".glb");
-            if (container) {
-              container.addAllToScene();
-            }
+            SceneLoader.Append("", file, scene);
+            // SceneLoader.LoadAssetContainer("", file, scene, (container) => {
+            //   console.log("got container", Object.keys(container));
+            //   if (container) {
+            //     container.addAllToScene();
+            //   }
+            // });
           } catch (e) {
             console.log(`Cannot load glb got Error ${JSON.stringify(e, null, 2)}`, e)
           }
-        })(scene, src);
+        })(scene, "", src);
       }
 
       return <Renderer3D src={src} onSceneReady={onSceneReady} style={{ maxWidth: "90%" }} />
-    } else if (renderType === "video") {
+    } else if (renderType.slice(0,5) === "video") {
         return <video
           onError={() => {
             if (!vidErrors[src]) {
@@ -106,7 +108,7 @@ export const Markdown = ({
           src={src}
           style={{ display: "block", margin: "auto", maxWidth: "90%" }}
         />
-    } else {
+    } else if(renderType.slice(0,5) === "image"){
       return <img
         onError={() => {
           if (!imgErrors[src]) {

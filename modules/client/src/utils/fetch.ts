@@ -1,33 +1,53 @@
 import { BlogIndex, HistoryResponse, PostData } from "@bloggit/types";
 import axios from "axios";
+import { FilesInput } from "@babylonjs/core";
 
 import { emptyIndex } from "./constants";
 
-export const fetchImg = async (url: string):Promise<Array<string>> => {
+export const fetchMedia = async (url: string):Promise<{contentType: string, data: string}> => {
   console.log(`Fetching image ${url}`);
-  const result = [] as Array<string>;
+  const result = {} as any;
   try {
 
     const response = await axios(url);
     if (response.status === 200) {
-      console.log(response.headers['content-type']);
-      if (response.headers['content-type'] === "model/gltf-binary") {
-         result.push("glb");
-         result.push(response.data);
-      }
-      else if (response.headers['content-type'].slice(0,5) === "video") {
-         result.push("video");
-         result.push(response.data);
-      }
-      else {
-         result.push("image");
-         result.push(response.data);
-      }
+      const blob = new Blob([response.data], {type: response.headers['content-type']});
+      result.contentType = response.headers['content-type'];
+      // result.data = "cachedFile";
+      // FilesInput.FilesToLoad[result.data] = blob as any;
+      
+      const reader = new FileReader();
+      reader.readAsDataURL(blob);
+      return await new Promise((resolve, reject) => {
+        reader.onload = async () => {
+          result.contentType = response.headers['content-type'];
+          // result.push(reader.result as string);
+          result.data = await (await fetch(reader.result as string)).arrayBuffer();
+          console.log(result.data.slice(0,10));
+          resolve(result);
+        }
+        reader.onerror = () => {
+          reject(reader.error);
+        }
+      });
+      // if (response.headers['content-type'] === "model/gltf-binary") {
+      //    result.push("glb");
+      //    result.push(response.data);
+      // }
+      // else if (response.headers['content-type'].slice(0,5) === "video") {
+      //    result.push("video");
+      //    result.push(response.data);
+      // }
+      // else {
+      //    result.push("image");
+      //    result.push(response.data);
+      // }
     } else {
       throw new Error(`Got bad data from ${url}`);
     }
-  
-  } catch (e) { console.log(e) }
+  } catch (e) {
+      throw new Error(`Got bad data from ${url}`);
+  }
   console.log(result);
   return result;
 };
