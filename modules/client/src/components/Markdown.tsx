@@ -76,22 +76,32 @@ export const Markdown = ({
     }, []);
 
     if (renderType === "model/gltf-binary") {
-      const onSceneReady = (scene: Scene, assetBlob: any) => {
+      const onSceneReady = (scene: Scene, src: any) => {
         (async () => {
           if (!scene) return;
           // console.log(assetBlob);
 
           try { 
 
-            SceneLoader.ImportMesh( "" , "", assetBlob, scene, undefined, undefined,
-              (scene) => { console.log("oops loader error")} , ".glb")
+            const container = await SceneLoader.LoadAssetContainerAsync(
+              src,
+              "",
+              scene,
+              undefined,
+              ".glb"
+            );
+            if (container) {
+              container.addAllToScene();
+            }
+            // SceneLoader.ImportMesh( "" , "", assetBlob, scene, undefined, undefined,
+            // (scene) => { console.log("oops loader error")} , ".glb")
           } catch (e) {
             console.log(`Cannot load glb got Error`, e)
           }
         })();
       }
 
-      return <Renderer3D src={src} onSceneReady={onSceneReady} style={{ maxWidth: "90%" }} />
+      return <Renderer3D src={node.properties.src} onSceneReady={onSceneReady} style={{ maxWidth: "90%" }} />
     } else if (renderType.slice(0,5) === "video") {
         return <video
           onError={() => {
