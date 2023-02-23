@@ -16,7 +16,7 @@ import { getChildValue, replaceEmojiString, slugify } from "../utils";
 import { Renderer3D } from "./renderer3D";
 import { HashLink } from "./HashLink";
 
-import { fetchMedia } from "../utils";
+import { fetchMediaType } from "../utils";
 
 SceneLoader.RegisterPlugin(new GLTFFileLoader());
 
@@ -65,13 +65,12 @@ export const Markdown = ({
   }: {
     node?: any;
   }) => {
-    const [src, setSrc] = useState("");
+    const [src, setSrc] = useState(node.properties.src);
     const [renderType, setRenderType] = useState("");
     useEffect(() => {
       (async () => {
-        const response = await fetchMedia(node.properties.src);
-        setRenderType(response.contentType);
-        setSrc(response.data);
+        const mediaType = await fetchMediaType(node.properties.src);
+        setRenderType(mediaType);
       })()
     }, []);
 
@@ -79,48 +78,39 @@ export const Markdown = ({
       const onSceneReady = (scene: Scene, src: any) => {
         (async () => {
           if (!scene) return;
-          // console.log(assetBlob);
 
           try { 
-
             const container = await SceneLoader.LoadAssetContainerAsync(
-              src,
-              "",
-              scene,
-              undefined,
-              ".glb"
+              src, "", scene, undefined, ".glb"
             );
             if (container) {
               container.addAllToScene();
             }
-            // SceneLoader.ImportMesh( "" , "", assetBlob, scene, undefined, undefined,
-            // (scene) => { console.log("oops loader error")} , ".glb")
           } catch (e) {
             console.log(`Cannot load glb got Error`, e)
           }
         })();
       }
-
       return <Renderer3D src={node.properties.src} onSceneReady={onSceneReady} style={{ maxWidth: "90%" }} />
     } else if (renderType.slice(0,5) === "video") {
         return <video
           onError={() => {
-            if (!vidErrors[node.properties.src]) {
-              setVidErrors(old => ({ ...old, [node.properties.src]: true }));
+            if (!vidErrors[src]) {
+              setVidErrors(old => ({ ...old, [src]: true }));
             }
           }}
           controls
-          src={node.properties.src}
+          src={src}
           style={{ display: "block", margin: "auto", maxWidth: "90%" }}
         />
     } else if(renderType.slice(0,5) === "image"){
       return <img
         onError={() => {
-          if (!imgErrors[node.properties.src]) {
-            setImgErrors(old => ({ ...old, [node.properties.src]: true }));
+          if (!imgErrors[src]) {
+            setImgErrors(old => ({ ...old, [src]: true }));
           }
         }}
-        src={node.properties.src}
+        src={src}
         alt={node.properties.alt}
         style={{ display: "block", margin: "auto", maxWidth: "90%" }}
       />

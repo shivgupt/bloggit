@@ -4,33 +4,18 @@ import { FilesInput } from "@babylonjs/core";
 
 import { emptyIndex } from "./constants";
 
-export const fetchMedia = async (url: string):Promise<{contentType: string, data: any}> => {
+export const fetchMediaType = async (url: string):Promise<string> => {
   console.log(`Fetching media ${url}`);
-  const result = {} as any;
   try {
     const response = await axios(url);
     if (response.status === 200) {
-      const blob = new Blob([response.data] , {type: response.headers['content-type']} );
-      console.log(blob);
-      result.data = blob;
-      result.contentType = response.headers['content-type'];
-      const reader = new FileReader();
-      reader.readAsDataURL(blob);
-      result.data = await new Promise((resolve, reject) => {
-        reader.onload = () => {
-          resolve(reader.result);
-        }
-        reader.onerror = () => {
-          throw new Error(`Got bad data from ${url}`);
-        }
-      });
+      return response.headers['content-type'];
     } else {
       throw new Error(`Got bad data from ${url}`);
     }
   } catch (e) {
       throw new Error(`Got bad data from ${url}`);
   }
-  return result;
 };
 
 export const fetchRef = async (): Promise<string> => {
@@ -63,7 +48,7 @@ export const fetchFile = async (path: string, _ref?: string): Promise<string> =>
         throw new Error(`Got bad data from ${url}: ${JSON.stringify(response.data)}`);
       }
     } catch (e) {
-      console.error(e.message);
+      console.error(e);
       fileCache[ref][path] = "Does Not Exist";
     }
   }
