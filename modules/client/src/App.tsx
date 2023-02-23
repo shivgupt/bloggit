@@ -1,7 +1,7 @@
 import Container from "@mui/material/Container";
 import CssBaseline from "@mui/material/CssBaseline";
 import Snackbar from "@mui/material/Snackbar";
-import { Theme, ThemeProvider } from "@mui/material/styles";
+import { ThemeProvider } from "@mui/material/styles";
 import Alert from "@mui/material/Alert";
 import { styled } from "@mui/material/styles";
 

@@ -48,24 +48,14 @@ export const Markdown = ({
 }: {
   content: string;
 }) => {
-  const [imgErrors, setImgErrors] = useState({});
-  const [vidErrors, setVidErrors] = useState({});
   const theme = useTheme();
-
-  useEffect(() => {
-    console.log(`Got image errors`, imgErrors);
-  }, [imgErrors]);
-
-  useEffect(() => {
-    console.log(`Got video errors`, vidErrors);
-  }, [vidErrors]);
 
   const ImageRenderer = ({
     node,
   }: {
     node?: any;
   }) => {
-    const [src, setSrc] = useState(node.properties.src);
+    const src = node.properties.src;
     const [renderType, setRenderType] = useState("");
     useEffect(() => {
       (async () => {
@@ -91,13 +81,12 @@ export const Markdown = ({
           }
         })();
       }
+      console.log("Calling renderer after reciving node: ", node);
       return <Renderer3D src={node.properties.src} onSceneReady={onSceneReady} style={{ maxWidth: "90%" }} />
     } else if (renderType.slice(0,5) === "video") {
         return <video
           onError={() => {
-            if (!vidErrors[src]) {
-              setVidErrors(old => ({ ...old, [src]: true }));
-            }
+            console.log("Got video errors")
           }}
           controls
           src={src}
@@ -106,9 +95,7 @@ export const Markdown = ({
     } else if(renderType.slice(0,5) === "image"){
       return <img
         onError={() => {
-          if (!imgErrors[src]) {
-            setImgErrors(old => ({ ...old, [src]: true }));
-          }
+          console.log("Got image errors")
         }}
         src={src}
         alt={node.properties.alt}
@@ -195,6 +182,7 @@ export const Markdown = ({
     </>);
   };
 
+  console.log("Rendering post")
   return (
     <StyledReactMarkdown
       components={{
